@@ -2,11 +2,11 @@ import { Footnote } from "@components/Text"
 import { IoniconName } from "@components/common/Icons"
 import { AppStyles } from "@lib/AppColorStyle"
 import { ColorString } from "TiFShared/domain-models/ColorString"
-import { StyleProp, ViewStyle, View, StyleSheet, Pressable } from "react-native"
-import { SettingsSwitchView } from "./Switch"
+import { Pressable, StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 import { SettingsCardView } from "./Card"
 import { SettingsNamedIconRowView } from "./NamedIconRow"
 import { useCurrentSettingsSection } from "./Section"
+import { SettingsSwitchView } from "./Switch"
 
 export type SettingsToggleCardProps = {
   isOn: boolean
@@ -57,7 +57,7 @@ export const SettingsToggleCardView = ({
             </View>
           </Pressable>
         </SettingsNamedIconRowView>
-        <Footnote style={styles.descriptionText}>{description}</Footnote>
+        <Footnote style={styles.bottomText}>{description}</Footnote>
       </View>
     </SettingsCardView>
   </View>
@@ -69,12 +69,12 @@ const styles = StyleSheet.create({
     borderRadius: 12
   },
   innerContainer: {
-    padding: 16,
     display: "flex",
-    flexDirection: "column",
-    rowGap: 8
+    flexDirection: "column"
   },
-  descriptionText: {
+  bottomText: {
+    paddingHorizontal: 16,
+    paddingBottom: 16,
     opacity: 0.5
   }
 })

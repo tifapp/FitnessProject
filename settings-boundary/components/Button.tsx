@@ -1,12 +1,12 @@
+import { AppStyles } from "@lib/AppColorStyle"
 import {
   StyleProp,
+  StyleSheet,
   TouchableHighlight,
-  ViewStyle,
   View,
-  StyleSheet
+  ViewStyle
 } from "react-native"
 import { useCurrentSettingsSection } from "./Section"
-import { AppStyles } from "@lib/AppColorStyle"
 
 export type SettingsButtonProps = {
   onTapped?: () => void
@@ -36,6 +36,6 @@ export const SettingsButton = ({
 
 const styles = StyleSheet.create({
   container: {
-    padding: 16
+    padding: 0
   }
 })

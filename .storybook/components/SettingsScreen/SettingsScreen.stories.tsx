@@ -1,14 +1,14 @@
 import { BASE_HEADER_SCREEN_OPTIONS } from "@components/Navigation"
 import { delayData, sleep } from "@lib/utils/DelayData"
+import { uuidString } from "@lib/utils/UUID"
 import { HapticsProvider } from "@modules/tif-haptics"
 import { NavigationContainer } from "@react-navigation/native"
 import { createStackNavigator } from "@react-navigation/stack"
 import { SettingsScreen } from "@screens/SettingsScreen/SettingsScreen"
 import {
-  AppearanceSettingsView,
-  BlockListSettingsView,
-  CalendarSettingsView,
-  useBlockListSettings
+  PrivacySettingsView,
+  useBlockListSettings,
+  usePrivacySettingsPermissions
 } from "@settings-boundary"
 import { SettingsProvider } from "@settings-storage/Hooks"
 import { SQLiteLocalSettingsStorage } from "@settings-storage/LocalSettings"
@@ -18,12 +18,10 @@ import { ComponentMeta, ComponentStory } from "@storybook/react-native"
 import { TestHaptics } from "@test-helpers/Haptics"
 import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
 import { testSQLite } from "@test-helpers/SQLite"
+import { UserHandle } from "TiFShared/domain-models/User"
+import { RootSiblingParent } from "react-native-root-siblings"
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context"
 import { mockBlockListPage } from "settings-boundary/MockData"
-import { RootSiblingParent } from "react-native-root-siblings"
-import { uuidString } from "@lib/utils/UUID"
-import { UserHandle } from "TiFShared/domain-models/User"
-import { UserSessionProvider } from "@user/Session"
 
 const SettingsMeta: ComponentMeta<typeof SettingsScreen> = {
   title: "Settings Screen",
@@ -96,7 +94,10 @@ const Test = () => {
         localSettingsStore={localStore}
         userSettingsStore={userStore}
       >
-        <CalendarSettingsView />
+        <PrivacySettingsView
+          permissions={usePrivacySettingsPermissions()}
+          onPrivacyPolicyTapped={function (): void {}}
+        />
       </SettingsProvider>
     </SafeAreaView>
   )

@@ -1,21 +1,35 @@
 import { Ionicon, IoniconName } from "@components/common/Icons"
 import { ColorString } from "TiFShared/domain-models/ColorString"
-import { StyleProp, ViewStyle, StyleSheet, View } from "react-native"
-import { SettingsNamedIconRowView } from "./NamedIconRow"
+import { ReactNode } from "react"
+import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 import { SettingsButton } from "./Button"
+import { SettingsNamedIconRowView } from "./NamedIconRow"
+import { SettingsRowItemView } from "./RowItem"
 
-export type SettingsNavigationLinkProps = {
+type BaseSettingsNavigationLinkProps = {
   title: string
-  iconName: IoniconName
-  iconBackgroundColor: ColorString
+  description?: string
   onTapped: () => void
   isDisabled?: boolean
   rightAccessory?: ReactNode
   style?: StyleProp<ViewStyle>
 }
 
+export type SettingsNavigationLinkProps = BaseSettingsNavigationLinkProps &
+  (
+    | {
+        iconName: IoniconName
+        iconBackgroundColor: ColorString
+      }
+    | {
+        iconName?: undefined
+        iconBackgroundColor?: undefined
+      }
+  )
+
 export const SettingsNavigationLinkView = ({
   title,
+  description,
   iconName,
   iconBackgroundColor,
   onTapped,
@@ -24,23 +38,29 @@ export const SettingsNavigationLinkView = ({
   style
 }: SettingsNavigationLinkProps) => (
   <SettingsButton onTapped={onTapped} isDisabled={isDisabled} style={style}>
-    <SettingsNamedIconRowView
-      iconName={iconName}
-      iconBackgroundColor={iconBackgroundColor}
-      name={title}
-    >
-      <View style={styles.accessoryRow}>
-        {rightAccessory}
-        <Ionicon name="chevron-forward" style={styles.chevron} />
-      </View>
-    </SettingsNamedIconRowView>
+    {iconName && iconBackgroundColor ? (
+      <SettingsNamedIconRowView
+        iconName={iconName}
+        iconBackgroundColor={iconBackgroundColor}
+        name={title}
+      >
+        <View style={styles.accessoryRow}>
+          {rightAccessory}
+          <Ionicon name="chevron-forward" style={styles.chevron} />
+        </View>
+      </SettingsNamedIconRowView>
+    ) : (
+      <SettingsRowItemView title={title} description={description}>
+        <View style={styles.accessoryRow}>
+          {rightAccessory}
+          <Ionicon name="chevron-forward" style={styles.chevron} />
+        </View>
+      </SettingsRowItemView>
+    )}
   </SettingsButton>
 )
 
 const styles = StyleSheet.create({
-  container: {
-    padding: 16
-  },
   titleText: {
     flex: 1
   },

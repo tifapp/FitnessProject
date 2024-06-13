@@ -1,6 +1,6 @@
-import { StyleProp, ViewStyle, StyleSheet, View } from "react-native"
+import { StyleProp, ViewStyle } from "react-native"
+import { SettingsRowItemView } from "./RowItem"
 import { SettingsSwitchView } from "./Switch"
-import { SettingsLabelView } from "./Label"
 
 export type SettingsNamedToggleProps = {
   name: string
@@ -17,27 +17,7 @@ export const SettingsNamedToggleView = ({
   onIsOnChange,
   style
 }: SettingsNamedToggleProps) => (
-  <View style={style}>
-    <View style={styles.container}>
-      <SettingsLabelView
-        title={name}
-        description={description}
-        style={styles.label}
-      />
-      <SettingsSwitchView isOn={isOn} onIsOnChange={onIsOnChange} />
-    </View>
-  </View>
+  <SettingsRowItemView title={name} description={description} style={style}>
+    <SettingsSwitchView isOn={isOn} onIsOnChange={onIsOnChange} />
+  </SettingsRowItemView>
 )
-
-const styles = StyleSheet.create({
-  container: {
-    display: "flex",
-    flexDirection: "row",
-    alignItems: "center",
-    columnGap: 8,
-    padding: 16
-  },
-  label: {
-    rowGap: 4
-  }
-})

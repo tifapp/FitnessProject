@@ -1,17 +1,21 @@
-import { BodyText } from "@components/Text"
+import { BodyText, Headline } from "@components/Text"
 import { AppStyles } from "@lib/AppColorStyle"
 import { useUserSettings } from "@settings-storage/Hooks"
 import { settingsSelector } from "@settings-storage/Settings"
 import { Placemark } from "TiFShared/domain-models/Placemark"
+import dayjs from "dayjs"
 import React from "react"
-import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
+import {
+  StyleProp,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+  ViewStyle
+} from "react-native"
 import { SettingsNamedToggleView } from "./components/NamedToggle"
 import { SettingsNavigationLinkView } from "./components/NavigationLink"
 import { SettingsScrollView } from "./components/ScrollView"
-import {
-  SettingsCardSectionView,
-  SettingsSectionView
-} from "./components/Section"
+import { SettingsCardSectionView } from "./components/Section"
 
 export type SettingDurationCardProps = {
   style?: StyleProp<ViewStyle>
@@ -19,37 +23,45 @@ export type SettingDurationCardProps = {
 }
 
 export const SettingsDurationCard = ({
+  style,
   durationInSeconds
 }: SettingDurationCardProps) => {
+  const duration = dayjs.duration(durationInSeconds, "s").format("H[h] m[m]")
   return (
-    <View style={styles.container}>
-      <View style={{ flexDirection: "column" }}>
-        <BodyText style={styles.cardDuration}>{durationInSeconds}</BodyText>
-      </View>
-    </View>
+    <TouchableOpacity style={styles.container}>
+      <BodyText>{duration}</BodyText>
+    </TouchableOpacity>
   )
 }
 
 export type DurationSectionViewProps = {
-  title: string
   currentPresets: number[]
 }
 
 export const DurationSectionView = ({
-  title,
   currentPresets
 }: DurationSectionViewProps) => {
   return (
-    <SettingsSectionView style={styles.settingsSection} title={title}>
-      {currentPresets.map((index) => {
-        return (
-          <SettingsDurationCard
-            key={index}
-            durationInSeconds={currentPresets[index]}
-          />
-        )
-      })}
-    </SettingsSectionView>
+    <>
+      <Headline style={{ padding: 16 }}>Duration Presets</Headline>
+      <View style={styles.settingsSection}>
+        {currentPresets
+          .sort((a, b) => {
+            return a - b
+          })
+          .map((item, index) => {
+            return (
+              <SettingsDurationCard
+                key={index}
+                durationInSeconds={currentPresets[index]}
+              />
+            )
+          })}
+        {currentPresets.length < 6 ? (
+          <SettingsDurationCard key={0} durationInSeconds={0} />
+        ) : undefined}
+      </View>
+    </>
   )
 }
 
@@ -99,25 +111,32 @@ const PresetSectionView = ({ onLocationPresetTapped }: PresetSectionProps) => {
       <SettingsNavigationLinkView
         title={"Location"}
         description={settings.eventPresetPlacemark?.name ?? "No Location"}
-        onTapped={() => onLocationPresetTapped(settings.eventPresetPlacemark)}
+        onTapped={() => onLocationPresetTapped(settings.eventPresetPlacemark!)}
       />
-      <DurationSectionView
-        title={"Duration Presets"}
-        currentPresets={[15, 30, 60, 120]}
-      />
+      <DurationSectionView currentPresets={[1800, 3600, 5400, 7200, 14400]} />
     </SettingsCardSectionView>
   )
 }
 
 const styles = StyleSheet.create({
   container: {
+    height: "50%",
+    width: "28%",
+    alignItems: "center",
     backgroundColor: "white",
-    borderColor: "black"
+    borderColor: "black",
+    marginHorizontal: 8,
+    marginBottom: 8,
+    paddingVertical: 16
   },
   cardDuration: {
     color: AppStyles.darkColor
   },
   settingsSection: {
-    flexWrap: "wrap"
+    alignContent: "space-between",
+    justifyContent: "flex-start",
+    flexDirection: "row",
+    flexWrap: "wrap",
+    padding: 16
   }
 })
