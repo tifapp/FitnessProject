@@ -78,7 +78,7 @@ describe("SQLite tests", () => {
       }
       throw new Error()
     })
-    const sqlite = new TiFSQLite("hello/world", open)
+    const sqlite = new TiFSQLite("hello/world", jest.fn(), open)
     const result = await sqlite.withTransaction(async (db) => {
       return await db.queryFirst<{ value: number }>`SELECT TRUE AS value`
     })

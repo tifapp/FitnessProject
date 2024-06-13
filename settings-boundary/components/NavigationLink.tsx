@@ -1,6 +1,6 @@
 import { Ionicon, IoniconName } from "@components/common/Icons"
 import { ColorString } from "TiFShared/domain-models/ColorString"
-import { StyleProp, ViewStyle, StyleSheet } from "react-native"
+import { StyleProp, ViewStyle, StyleSheet, View } from "react-native"
 import { SettingsNamedIconRowView } from "./NamedIconRow"
 import { SettingsButton } from "./Button"
 
@@ -10,6 +10,7 @@ export type SettingsNavigationLinkProps = {
   iconBackgroundColor: ColorString
   onTapped: () => void
   isDisabled?: boolean
+  rightAccessory?: ReactNode
   style?: StyleProp<ViewStyle>
 }
 
@@ -19,6 +20,7 @@ export const SettingsNavigationLinkView = ({
   iconBackgroundColor,
   onTapped,
   isDisabled,
+  rightAccessory,
   style
 }: SettingsNavigationLinkProps) => (
   <SettingsButton onTapped={onTapped} isDisabled={isDisabled} style={style}>
@@ -27,7 +29,10 @@ export const SettingsNavigationLinkView = ({
       iconBackgroundColor={iconBackgroundColor}
       name={title}
     >
-      <Ionicon name="chevron-forward" style={styles.chevron} />
+      <View style={styles.accessoryRow}>
+        {rightAccessory}
+        <Ionicon name="chevron-forward" style={styles.chevron} />
+      </View>
     </SettingsNamedIconRowView>
   </SettingsButton>
 )
@@ -41,5 +46,10 @@ const styles = StyleSheet.create({
   },
   chevron: {
     opacity: 0.15
+  },
+  accessoryRow: {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center"
   }
 })

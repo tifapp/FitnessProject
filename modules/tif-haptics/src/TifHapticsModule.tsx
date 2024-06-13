@@ -79,12 +79,14 @@ export const TiFHaptics = {
 } as Haptics
 
 export type HapticsContextValues = Haptics & {
-  isSupportedOnDevice: boolean
+  isFeedbackSupportedOnDevice: boolean
+  isAudioSupportedOnDevice: boolean
 }
 
 const HapticsContext = createContext<HapticsContextValues>({
   ...TiFHaptics,
-  isSupportedOnDevice: !!TiFNativeHaptics.IS_HAPTICS_SUPPORTED
+  isFeedbackSupportedOnDevice: !!TiFNativeHaptics.IS_HAPTICS_SUPPORTED,
+  isAudioSupportedOnDevice: true // TODO: - Native Code
 })
 
 /**
@@ -94,7 +96,8 @@ export const useHaptics = () => useContext(HapticsContext)
 
 export type HapticsProviderProps = {
   haptics: Haptics
-  isSupportedOnDevice: boolean
+  isFeedbackSupportedOnDevice: boolean
+  isAudioSupportedOnDevice: boolean
   children: ReactNode
 }
 
@@ -104,13 +107,15 @@ export type HapticsProviderProps = {
 export const HapticsProvider = ({
   children,
   haptics,
-  isSupportedOnDevice
+  isFeedbackSupportedOnDevice,
+  isAudioSupportedOnDevice
 }: HapticsProviderProps) => (
   <HapticsContext.Provider
     value={{
       play: (event) => haptics.play(event),
       apply: (settings) => haptics.apply(settings),
-      isSupportedOnDevice
+      isFeedbackSupportedOnDevice,
+      isAudioSupportedOnDevice
     }}
   >
     {children}
