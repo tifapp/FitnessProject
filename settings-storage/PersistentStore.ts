@@ -4,18 +4,24 @@ import { CallbackCollection } from "@lib/utils/CallbackCollection"
 import { logger } from "TiFShared/logging"
 
 /**
- * An interface for storing settings.
+ * An interface for loading settings.
  */
-export interface SettingsStorage<Settings extends AnySettings> {
-  /**
-   * A unique identifier of this storage instance used for logging.
-   */
-  get tag(): string
-
+export interface SettingsReader<Settings extends AnySettings> {
   /**
    * Loads the current settings from the storage.
    */
   load(): Promise<Settings>
+}
+
+/**
+ * An interface for storing settings.
+ */
+export interface SettingsStorage<Settings extends AnySettings>
+  extends SettingsReader<Settings> {
+  /**
+   * A unique identifier of this storage instance used for logging.
+   */
+  get tag(): string
 
   /**
    * Saves the new values of the settings in `partialSettings`.

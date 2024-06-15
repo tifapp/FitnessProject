@@ -3,6 +3,7 @@ import { ContentText } from "./ContentText"
 import { EventHandle } from "TiFShared/domain-models/Event"
 import { fireEvent, render, screen } from "@testing-library/react-native"
 import { ColorString } from "TiFShared/domain-models/ColorString"
+import { OpenWeblinkProvider } from "@modules/tif-weblinks"
 
 describe("ContentText tests", () => {
   beforeEach(() => jest.resetAllMocks())
@@ -99,12 +100,13 @@ describe("ContentText tests", () => {
 
   const renderLinkedText = (url: string) => {
     return render(
-      <ContentText
-        text={url}
-        onUserHandleTapped={userHandleTappedAction}
-        onEventHandleTapped={eventHandleTappedAction}
-        onURLTapped={urlTappedAction}
-      />
+      <OpenWeblinkProvider open={urlTappedAction}>
+        <ContentText
+          text={url}
+          onUserHandleTapped={userHandleTappedAction}
+          onEventHandleTapped={eventHandleTappedAction}
+        />
+      </OpenWeblinkProvider>
     )
   }
 })

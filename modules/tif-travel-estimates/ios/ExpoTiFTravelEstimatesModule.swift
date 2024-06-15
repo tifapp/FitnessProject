@@ -1,5 +1,5 @@
 import ExpoModulesCore
-import TiFTravelEstimates
+import TiFNative
 
 public class ExpoTiFTravelEstimatesModule: Module {
   public func definition() -> ModuleDefinition {

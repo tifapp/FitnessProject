@@ -6,7 +6,6 @@ import {
   Text,
   TextProps,
   TextStyle,
-  Pressable,
   Platform
 } from "react-native"
 import { SettingsScrollView } from "./components/ScrollView"
@@ -14,9 +13,11 @@ import { SettingsSectionView } from "./components/Section"
 import { SettingsCardView } from "./components/Card"
 import { useLocalSettings } from "@settings-storage/Hooks"
 import { settingsSelector } from "@settings-storage/Settings"
-import { BodyText, CaptionTitle } from "@components/Text"
+import { BodyText } from "@components/Text"
 import { AppStyles } from "@lib/AppColorStyle"
 import { FontScaleFactors, useFontScale } from "@lib/Fonts"
+import { useOpenWeblink } from "@modules/tif-weblinks"
+import { SettingsPreviewableOptionView } from "./components/PreviewableOption"
 
 export type AppearanceSettingsProps = {
   style?: StyleProp<ViewStyle>
@@ -37,7 +38,7 @@ const ThemeSectionView = () => {
     <SettingsSectionView title="Theme">
       <SettingsCardView>
         <View style={styles.previewOptionRow}>
-          <PreviewableOptionView
+          <SettingsPreviewableOptionView
             name="System"
             isSelected={settings.userInterfaceStyle === "system"}
             onSelected={() => update({ userInterfaceStyle: "system" })}
@@ -45,8 +46,8 @@ const ThemeSectionView = () => {
           >
             <View style={styles.systemUserInterfaceStylePreviewDark} />
             <View style={styles.systemUserInterfaceStylePreviewLight} />
-          </PreviewableOptionView>
-          <PreviewableOptionView
+          </SettingsPreviewableOptionView>
+          <SettingsPreviewableOptionView
             name="Dark"
             isSelected={settings.userInterfaceStyle === "dark"}
             onSelected={() => update({ userInterfaceStyle: "dark" })}
@@ -55,7 +56,7 @@ const ThemeSectionView = () => {
               styles.darkUserInterfaceStylePreview
             ]}
           />
-          <PreviewableOptionView
+          <SettingsPreviewableOptionView
             name="Light"
             isSelected={settings.userInterfaceStyle === "light"}
             onSelected={() => update({ userInterfaceStyle: "light" })}
@@ -77,6 +78,7 @@ const FontFamilySectionView = () => {
   const fontScale = useFontScale({
     maximumScaleFactor: FontScaleFactors.xxxLarge
   })
+  const openWeblink = useOpenWeblink()
   return (
     <SettingsSectionView
       title="Font"
@@ -89,6 +91,7 @@ const FontFamilySectionView = () => {
           <BodyText
             style={styles.learnMore}
             suppressHighlighting
+            onPress={() => openWeblink("https://opendyslexic.org/about")}
             // TODO: - Open web page.
           >
             Learn More...
@@ -98,7 +101,7 @@ const FontFamilySectionView = () => {
     >
       <SettingsCardView>
         <View style={styles.previewOptionRow}>
-          <PreviewableOptionView
+          <SettingsPreviewableOptionView
             name="Open Sans"
             NameComponent={(props: TextProps) => (
               <Text
@@ -111,8 +114,8 @@ const FontFamilySectionView = () => {
             previewStyle={styles.fontOptionPreviewContainer}
           >
             <FontOptionPreviewView textStyle={styles.openSansOptionPreview} />
-          </PreviewableOptionView>
-          <PreviewableOptionView
+          </SettingsPreviewableOptionView>
+          <SettingsPreviewableOptionView
             name="Open Dyslexic"
             NameComponent={(props: TextProps) => (
               <Text
@@ -131,7 +134,7 @@ const FontFamilySectionView = () => {
             <FontOptionPreviewView
               textStyle={styles.openDyslexicOptionPreview}
             />
-          </PreviewableOptionView>
+          </SettingsPreviewableOptionView>
         </View>
       </SettingsCardView>
     </SettingsSectionView>
@@ -150,69 +153,6 @@ const FontOptionPreviewView = ({ textStyle }: FontOptionPreviewProps) => (
   </View>
 )
 
-type PreviewableOptionProps = {
-  name: string
-  NameComponent?: (props: TextProps) => JSX.Element
-  previewStyle?: StyleProp<ViewStyle>
-  isSelected: boolean
-  onSelected: () => void
-  children?: JSX.Element | JSX.Element[]
-}
-
-const DefaultPreviewOptionName = (props: TextProps) => (
-  <CaptionTitle {...props} />
-)
-
-const PreviewableOptionView = ({
-  name,
-  NameComponent = DefaultPreviewOptionName,
-  previewStyle,
-  isSelected,
-  onSelected,
-  children
-}: PreviewableOptionProps) => (
-  <Pressable onPress={onSelected} style={styles.previewOptionContainer}>
-    <View
-      style={[
-        previewStyle,
-        {
-          borderRadius: 12,
-          overflow: "hidden",
-          borderWidth: isSelected ? 2 : 0
-        }
-      ]}
-    >
-      {children}
-    </View>
-    <View
-      style={{
-        height:
-          32 * useFontScale({ maximumScaleFactor: FontScaleFactors.xxxLarge })
-      }}
-    >
-      <View
-        style={{
-          borderRadius: 12,
-          overflow: "hidden",
-          backgroundColor: isSelected ? AppStyles.darkColor : undefined
-        }}
-      >
-        <NameComponent
-          maxFontSizeMultiplier={FontScaleFactors.xxxLarge}
-          style={[
-            {
-              padding: 8,
-              color: isSelected ? "white" : AppStyles.darkColor
-            }
-          ]}
-        >
-          {name}
-        </NameComponent>
-      </View>
-    </View>
-  </Pressable>
-)
-
 const styles = StyleSheet.create({
   fontSubtitleBase: {
     opacity: 0.5
@@ -222,13 +162,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-evenly",
     paddingVertical: 16
-  },
-  previewOptionContainer: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
-    rowGap: 8
   },
   previewOptionPreview: {
     width: 128,

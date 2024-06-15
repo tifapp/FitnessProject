@@ -11,7 +11,7 @@ import {
   BlockListUser,
   removeUsersFromBlockListPages
 } from "TiFShared/domain-models/BlockList"
-import { useMemo, useState } from "react"
+import { memo, useCallback, useMemo, useState } from "react"
 import {
   StyleProp,
   Pressable,
@@ -45,9 +45,24 @@ export type UseBlockListSettingsEnvironment = {
 export const BLOCK_LIST_SETTINGS_ALERTS = {
   unblockUserConfirmation: {
     title: (username: string) => `Unblock ${username}?`,
-    description: (user: Pick<BlockListUser, "username" | "handle">) => {
-      return `Do you really want to unblock ${user.username} (${user.handle}). You won't be able to block them for another 48 hours.`
-    }
+    description: (
+      user: Pick<BlockListUser, "username" | "handle">
+    ) => `Are you sure you want to unblock ${user.username} (${user.handle})? You will need to wait 48 hours to block them again.
+
+    They will be able to view your profile and see your activity, including the events you attend.
+
+    You can continue to report them for any inappropriate behavior.`,
+    buttons: (cancel: () => void, unblock: () => void) => [
+      {
+        text: "Cancel",
+        style: "cancel" as const,
+        onPress: cancel
+      },
+      {
+        text: "Confirm",
+        onPress: unblock
+      }
+    ]
   },
   unblockUserFailed: {
     title: "Uh Oh!",
@@ -113,7 +128,7 @@ const useBlocklistSettingsUnblocking = ({
   >()
   const [isShowingErrorAlert, setIsShowingErrorAlert] = useState(false)
   const queryClient = useQueryClient()
-  const unblockMutation = useMutation(
+  const { mutate: unblock } = useMutation(
     async (user: BlockListUser) => await unblockUser(user.id),
     {
       onSuccess: (_, user) => {
@@ -141,31 +156,27 @@ const useBlocklistSettingsUnblocking = ({
   return {
     activeUnblockingIds,
     mostRecentUnblockedUser,
-    userUnblocked: (user: BlockListUser) => {
-      setMostRecentUnblockedUser(undefined)
-      setActiveUnblockingIds((ids) => [...ids, user.id])
-      Alert.alert(
-        BLOCK_LIST_SETTINGS_ALERTS.unblockUserConfirmation.title(user.username),
-        BLOCK_LIST_SETTINGS_ALERTS.unblockUserConfirmation.description(user),
-        [
-          {
-            text: "Cancel",
-            style: "cancel",
-            onPress: () => {
+    userUnblocked: useCallback(
+      (user: BlockListUser) => {
+        setMostRecentUnblockedUser(undefined)
+        setActiveUnblockingIds((ids) => [...ids, user.id])
+        Alert.alert(
+          BLOCK_LIST_SETTINGS_ALERTS.unblockUserConfirmation.title(
+            user.username
+          ),
+          BLOCK_LIST_SETTINGS_ALERTS.unblockUserConfirmation.description(user),
+          BLOCK_LIST_SETTINGS_ALERTS.unblockUserConfirmation.buttons(
+            () => {
               setActiveUnblockingIds((ids) => {
                 return ids.filter((id) => id !== user.id)
               })
-            }
-          },
-          {
-            text: "Confirm",
-            onPress: () => {
-              unblockMutation.mutate(user)
-            }
-          }
-        ]
-      )
-    }
+            },
+            () => unblock(user)
+          )
+        )
+      },
+      [unblock]
+    )
   }
 }
 
@@ -190,6 +201,7 @@ export const BlockListSettingsView = ({
 }: BlockListSettingsProps) => (
   <>
     <FlatListView
+      removeClippedSubviews
       data={state.users}
       keyExtractor={blockListUserKeyExtractor}
       renderItem={({ item: user }: { item: BlockListUser }) => (
@@ -258,44 +270,50 @@ type BlockListUserProps = {
   onUnblockTapped: (user: BlockListUser) => void
 }
 
-const BlockListUserView = ({
+const BlockListUserView = memo(function BlockListUserView({
   user,
   isActivelyBeingBlocked,
   onUnblockTapped,
   onProfileTapped
-}: BlockListUserProps) => (
-  <Animated.View
-    entering={Platform.OS === "ios" ? FadeIn : undefined}
-    exiting={Platform.OS === "ios" ? FadeOut : undefined}
-    style={styles.container}
-  >
-    <SettingsCardView>
-      <View style={styles.userContainer}>
-        <View style={styles.profileAndName}>
-          <Pressable onPress={() => onProfileTapped(user.id)}>
-            <ProfileImageAndName
-              username={user.username}
-              handle={user.handle}
-              imageURL={user.profileImageURL}
-            />
-          </Pressable>
-        </View>
-        <TouchableOpacity
-          activeOpacity={0.5}
-          onPress={() => onUnblockTapped(user)}
-          disabled={isActivelyBeingBlocked}
-          hitSlop={{ top: 16, bottom: 16, left: 16, right: 16 }}
-          style={{ opacity: isActivelyBeingBlocked ? 0.5 : 1 }}
-        >
-          <View style={styles.unblockButton}>
-            <Ionicon name="trash" size={16} color={AppStyles.red.toString()} />
-            <BoldFootnote style={styles.unblockText}>Unblock</BoldFootnote>
+}: BlockListUserProps) {
+  return (
+    <Animated.View
+      entering={Platform.OS === "ios" ? FadeIn : undefined}
+      exiting={Platform.OS === "ios" ? FadeOut : undefined}
+      style={styles.container}
+    >
+      <SettingsCardView>
+        <View style={styles.userContainer}>
+          <View style={styles.profileAndName}>
+            <Pressable onPress={() => onProfileTapped(user.id)}>
+              <ProfileImageAndName
+                username={user.username}
+                handle={user.handle}
+                imageURL={user.profileImageURL}
+              />
+            </Pressable>
           </View>
-        </TouchableOpacity>
-      </View>
-    </SettingsCardView>
-  </Animated.View>
-)
+          <TouchableOpacity
+            activeOpacity={0.5}
+            onPress={() => onUnblockTapped(user)}
+            disabled={isActivelyBeingBlocked}
+            hitSlop={{ top: 16, bottom: 16, left: 16, right: 16 }}
+            style={{ opacity: isActivelyBeingBlocked ? 0.5 : 1 }}
+          >
+            <View style={styles.unblockButton}>
+              <Ionicon
+                name="trash"
+                size={16}
+                color={AppStyles.red.toString()}
+              />
+              <BoldFootnote style={styles.unblockText}>Unblock</BoldFootnote>
+            </View>
+          </TouchableOpacity>
+        </View>
+      </SettingsCardView>
+    </Animated.View>
+  )
+})
 
 const styles = StyleSheet.create({
   container: {

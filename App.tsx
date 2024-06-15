@@ -1,3 +1,5 @@
+import "@lib/TiFAPI"
+import "date-time/DateRangeFormatting"
 import { TiFMenuProvider } from "@components/TiFMenuProvider"
 import { useAppFonts } from "@lib/Fonts"
 import React from "react"
@@ -24,9 +26,6 @@ import { setupCognito } from "@auth-boundary"
 import { registerForPushNotifications } from "./notifications"
 import awsconfig from "./src/aws-exports"
 import { NetInfoInternetConnectionStatus } from "@lib/InternetConnection"
-import "TiFShared"
-import "@lib/TiFAPI"
-import "date-time/DateRangeFormatting"
 import { consoleLogHandler, logger, addLogHandler } from "TiFShared/logging"
 
 const log = logger("app.root")

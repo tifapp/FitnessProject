@@ -1,29 +1,25 @@
 import { BASE_HEADER_SCREEN_OPTIONS } from "@components/Navigation"
 import { NavigationContainer } from "@react-navigation/native"
 import { createStackNavigator } from "@react-navigation/stack"
-import { SettingsScreen } from "@screens/SettingsScreen/SettingsScreen"
 import { SettingsProvider } from "@settings-storage/Hooks"
 import { SQLiteLocalSettingsStorage } from "@settings-storage/LocalSettings"
 import { PersistentSettingsStores } from "@settings-storage/PersistentStores"
 import { SQLiteUserSettingsStorage } from "@settings-storage/UserSettings"
-import { ComponentMeta, ComponentStory } from "@storybook/react-native"
 import { testSQLite } from "@test-helpers/SQLite"
 import { RootSiblingParent } from "react-native-root-siblings"
 import { SafeAreaProvider } from "react-native-safe-area-context"
 import { HelpAndSupportView } from "settings-boundary/HelpAndSupport"
+import { StoryMeta } from "../../HelperTypes"
 
-const SettingsMeta: ComponentMeta<typeof SettingsScreen> = {
-  title: "Settings Screen",
-  component: SettingsScreen
+const SettingsMeta: StoryMeta = {
+  title: "Settings Screen"
 }
 
 export default SettingsMeta
 
-type SettingsStory = ComponentStory<typeof SettingsScreen>
-
 const Stack = createStackNavigator()
 
-export const Basic: SettingsStory = () => (
+export const Basic = () => (
   <RootSiblingParent>
     <SafeAreaProvider>
       <NavigationContainer>
