@@ -18,6 +18,7 @@ import { AppStyles } from "@lib/AppColorStyle"
 import { FontScaleFactors, useFontScale } from "@lib/Fonts"
 import { useOpenWeblink } from "@modules/tif-weblinks"
 import { SettingsPreviewableOptionView } from "./components/PreviewableOption"
+import { isOSMajorVersionAvailable } from "@lib/Platform"
 
 export type AppearanceSettingsProps = {
   style?: StyleProp<ViewStyle>
@@ -75,10 +76,12 @@ const FontFamilySectionView = () => {
   const { settings, update } = useLocalSettings(
     settingsSelector("preferredFontFamily")
   )
-  const fontScale = useFontScale({
-    maximumScaleFactor: FontScaleFactors.xxxLarge
-  })
   const openWeblink = useOpenWeblink()
+  const iOSOpenDyslexicTopMagin =
+    -4 *
+    useFontScale({
+      maximumScaleFactor: FontScaleFactors.xxxLarge
+    })
   return (
     <SettingsSectionView
       title="Font"
@@ -123,7 +126,10 @@ const FontFamilySectionView = () => {
                 style={[
                   props.style,
                   styles.openDyslexicOptionLabel,
-                  { marginTop: Platform.OS === "ios" ? -4 * fontScale : 0 }
+                  {
+                    marginTop:
+                      Platform.OS === "ios" ? iOSOpenDyslexicTopMagin : 0
+                  }
                 ]}
               />
             )}
@@ -132,7 +138,15 @@ const FontFamilySectionView = () => {
             previewStyle={styles.fontOptionPreviewContainer}
           >
             <FontOptionPreviewView
-              textStyle={styles.openDyslexicOptionPreview}
+              textStyle={[
+                styles.openDyslexicOptionPreview,
+                {
+                  marginTop:
+                    Platform.OS === "ios" && isOSMajorVersionAvailable(18)
+                      ? iOSOpenDyslexicTopMagin
+                      : 0
+                }
+              ]}
             />
           </SettingsPreviewableOptionView>
         </View>
