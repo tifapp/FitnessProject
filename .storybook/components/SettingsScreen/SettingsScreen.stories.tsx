@@ -5,10 +5,15 @@ import { SettingsProvider } from "@settings-storage/Hooks"
 import { SQLiteLocalSettingsStorage } from "@settings-storage/LocalSettings"
 import { PersistentSettingsStores } from "@settings-storage/PersistentStores"
 import { SQLiteUserSettingsStorage } from "@settings-storage/UserSettings"
+import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
 import { testSQLite } from "@test-helpers/SQLite"
+import { composeAsync, isAvailableAsync } from "expo-mail-composer"
 import { RootSiblingParent } from "react-native-root-siblings"
 import { SafeAreaProvider } from "react-native-safe-area-context"
-import { HelpAndSupportView } from "settings-boundary/HelpAndSupport"
+import {
+  HelpAndSupportView,
+  useHelpAndSupportSettings
+} from "settings-boundary/HelpAndSupport"
 import { StoryMeta } from "../../HelperTypes"
 
 const SettingsMeta: StoryMeta = {
@@ -22,11 +27,13 @@ const Stack = createStackNavigator()
 export const Basic = () => (
   <RootSiblingParent>
     <SafeAreaProvider>
-      <NavigationContainer>
-        <Stack.Navigator screenOptions={{ ...BASE_HEADER_SCREEN_OPTIONS }}>
-          <Stack.Screen name="Settings" component={Test} />
-        </Stack.Navigator>
-      </NavigationContainer>
+      <TestQueryClientProvider>
+        <NavigationContainer>
+          <Stack.Navigator screenOptions={{ ...BASE_HEADER_SCREEN_OPTIONS }}>
+            <Stack.Screen name="Settings" component={Test} />
+          </Stack.Navigator>
+        </NavigationContainer>
+      </TestQueryClientProvider>
     </SafeAreaProvider>
   </RootSiblingParent>
 )
@@ -40,17 +47,17 @@ const userStore = PersistentSettingsStores.user(
 )
 
 const Test = () => {
+  const state = useHelpAndSupportSettings({
+    isShowingContactSection: isAvailableAsync,
+    composeEmail: composeAsync,
+    compileLogs: () => console.log("")
+  })
   return (
     <SettingsProvider
       localSettingsStore={localStore}
       userSettingsStore={userStore}
     >
-      <HelpAndSupportView
-        style={{ flex: 1 }}
-        onViewHelpTapped={() => console.log("View Help")}
-        onReportBugTapped={() => console.log("Report Bug")}
-        onRequestFeatureTapped={() => console.log("Request Feature")}
-      />
+      <HelpAndSupportView style={{ flex: 1 }} state={state} />
     </SettingsProvider>
   )
 }

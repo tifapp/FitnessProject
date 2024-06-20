@@ -1,72 +1,203 @@
 import { AppStyles } from "@lib/AppColorStyle"
-import { StyleProp, ViewStyle } from "react-native"
+import { useOpenWeblink } from "@modules/tif-weblinks"
+import { useQuery } from "@tanstack/react-query"
+import {
+  MailComposerOptions,
+  MailComposerResult,
+  MailComposerStatus
+} from "expo-mail-composer"
+import React from "react"
+import { Alert, StyleProp, ViewStyle } from "react-native"
 import { SettingsNavigationLinkView } from "./components/NavigationLink"
 import { SettingsScrollView } from "./components/ScrollView"
-import { SettingsSectionView } from "./components/Section"
+import { SettingsCardSectionView } from "./components/Section"
+
+export const HELP_AND_SUPPORT_EMAILS = {
+  featureRequested: {
+    recipients: ["TIF@myspace.com"],
+    subject: "Request for Feature",
+    body: "I want to request a feature for the app!"
+  },
+  bugReported: {
+    recipients: ["TIF@myspace.com"],
+    subject: "Bug Report",
+    body: "There's a bug here in the app!"
+  }
+}
+
+export const HELP_AND_SUPPORT_ALERTS = {
+  reportBugTapped: {
+    title: "Attach Logs?",
+    description:
+      "Adding these logs will help make it easier for us to pinpoint the bug you're having.",
+    buttons: (
+      reportWithLogs: () => Promise<void>,
+      reportWithoutLogs: () => Promise<void>,
+      logQuestion: () => void
+    ) => [
+      {
+        text: "Yes",
+        onPress: reportWithLogs
+      },
+      {
+        text: "No",
+        onPress: reportWithoutLogs
+      },
+      {
+        text: "What is this?",
+        onPress: logQuestion
+      }
+    ]
+  },
+  reportBugSuccess: {
+    title: "Success!",
+    description: "We received your feedback! Thank you for supporting the app!"
+  },
+  reportBugError: {
+    title: "Error",
+    description: "We're sorry, we had an error receiving your request."
+  },
+  requestFeatureSuccess: {
+    title: "Success!",
+    description: "We received your request! Thank you for supporting the app!"
+  },
+  requestFeatureError: {
+    title: "Error",
+    description: "We're sorry, we had an error receiving your request."
+  }
+}
 
 export type EventSettingsProps = {
   style?: StyleProp<ViewStyle>
-  onViewHelpTapped: () => void
-  onReportBugTapped: () => void
-  onRequestFeatureTapped: () => void
+  state: ReturnType<typeof useHelpAndSupportSettings>
 }
 
-export const HelpAndSupportView = ({
-  style,
-  onViewHelpTapped,
-  onReportBugTapped,
-  onRequestFeatureTapped
-}: EventSettingsProps) => (
+export const HelpAndSupportView = ({ style, state }: EventSettingsProps) => (
   <SettingsScrollView style={style}>
-    <HelpSectionView
-      onViewHelpTapped={onViewHelpTapped}
-      onReportBugTapped={onReportBugTapped}
-      onRequestFeatureTapped={onRequestFeatureTapped}
-    />
+    <HelpSectionView state={state} />
   </SettingsScrollView>
 )
 
-type PresetSectionProps = {
-  onViewHelpTapped: () => void
-  onReportBugTapped: () => void
-  onRequestFeatureTapped: () => void
+export type UseHelpAndSupportSettingsEnvironment = {
+  isShowingContactSection: () => Promise<boolean>
+  compileLogs: () => void
+  composeEmail: (email: MailComposerOptions) => Promise<MailComposerResult>
 }
 
-export const HelpSectionView = ({
-  onViewHelpTapped,
-  onReportBugTapped,
-  onRequestFeatureTapped
-}: PresetSectionProps) => {
+export const useHelpAndSupportSettings = (
+  env: UseHelpAndSupportSettingsEnvironment
+) => {
+  const { data: isShowingContactSection } = useQuery(
+    ["isMailComposerAvailable"],
+    async () => await env.isShowingContactSection(),
+    { initialData: true }
+  )
+
+  return {
+    isShowingContactSection,
+    featureRequested: async () => {
+      try {
+        const { status } = await env.composeEmail(
+          HELP_AND_SUPPORT_EMAILS.featureRequested
+        )
+        if (status === MailComposerStatus.SENT) {
+          Alert.alert(
+            HELP_AND_SUPPORT_ALERTS.requestFeatureSuccess.title,
+            HELP_AND_SUPPORT_ALERTS.requestFeatureSuccess.description
+          )
+        }
+      } catch {
+        Alert.alert(
+          HELP_AND_SUPPORT_ALERTS.requestFeatureError.title,
+          HELP_AND_SUPPORT_ALERTS.requestFeatureError.description
+        )
+      }
+    },
+    bugReported: async () => {
+      Alert.alert(
+        HELP_AND_SUPPORT_ALERTS.reportBugTapped.title,
+        HELP_AND_SUPPORT_ALERTS.reportBugTapped.description,
+        HELP_AND_SUPPORT_ALERTS.reportBugTapped.buttons(
+          async () => {
+            try {
+              const { status } = await env.composeEmail(
+                HELP_AND_SUPPORT_EMAILS.bugReported
+              )
+              if (status === MailComposerStatus.SENT) {
+                Alert.alert(
+                  HELP_AND_SUPPORT_ALERTS.reportBugSuccess.title,
+                  HELP_AND_SUPPORT_ALERTS.reportBugSuccess.description
+                )
+              }
+            } catch {
+              Alert.alert(
+                HELP_AND_SUPPORT_ALERTS.reportBugError.title,
+                HELP_AND_SUPPORT_ALERTS.reportBugError.description
+              )
+            }
+          },
+          async () => {
+            try {
+              const { status } = await env.composeEmail(
+                HELP_AND_SUPPORT_EMAILS.bugReported
+              )
+              if (status === MailComposerStatus.SENT) {
+                Alert.alert(
+                  HELP_AND_SUPPORT_ALERTS.reportBugSuccess.title,
+                  HELP_AND_SUPPORT_ALERTS.reportBugSuccess.description
+                )
+              }
+            } catch {
+              Alert.alert(
+                HELP_AND_SUPPORT_ALERTS.reportBugError.title,
+                HELP_AND_SUPPORT_ALERTS.reportBugError.description
+              )
+            }
+          },
+          () => console.log("What are logs?")
+        )
+      )
+    }
+  }
+}
+type PresetSectionProps = {
+  state: ReturnType<typeof useHelpAndSupportSettings>
+}
+
+export const HelpSectionView = ({ state }: PresetSectionProps) => {
+  const open = useOpenWeblink()
   return (
-    <SettingsSectionView>
-      <SettingsSectionView
+    <>
+      <SettingsCardSectionView
         title="Help Center"
         subtitle="This is the hub for any help you may want, or reports or feedback you might have about the app."
       >
         <SettingsNavigationLinkView
           title={"View Help Center"}
-          onTapped={onViewHelpTapped}
-          iconName={"link"}
-          iconBackgroundColor={AppStyles.yellow}
+          onTapped={() => open("https://www.google.com")}
+          iconName={"help-circle"}
+          iconBackgroundColor={AppStyles.black}
         />
-      </SettingsSectionView>
-      <SettingsSectionView
-        title="Contact Us"
-        subtitle="Feel free to talk to us about anything you might be feeling about the app!"
-      >
-        <SettingsNavigationLinkView
-          title={"Report a Bug"}
-          onTapped={onReportBugTapped}
-          iconName={"link"}
-          iconBackgroundColor={AppStyles.yellow}
-        />
-        <SettingsNavigationLinkView
-          title={"Request a Feature"}
-          onTapped={onRequestFeatureTapped}
-          iconName={"link"}
-          iconBackgroundColor={AppStyles.yellow}
-        />
-      </SettingsSectionView>
-    </SettingsSectionView>
+      </SettingsCardSectionView>
+      {state.isShowingContactSection && (
+        <SettingsCardSectionView
+          title="Contact Us"
+          subtitle="Feel free to talk to us about anything you might be feeling about the app!"
+        >
+          <SettingsNavigationLinkView
+            title={"Report a Bug"}
+            onTapped={state.bugReported}
+            iconName={"bug"}
+            iconBackgroundColor={AppStyles.black}
+          />
+          <SettingsNavigationLinkView
+            title={"Request a Feature"}
+            onTapped={state.featureRequested}
+            iconName={"build"}
+            iconBackgroundColor={AppStyles.black}
+          />
+        </SettingsCardSectionView>
+      )}
+    </>
   )
 }
