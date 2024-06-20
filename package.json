@@ -134,7 +134,8 @@
     "type-detect": "4.0.8",
     "use-sync-external-store": "^1.2.2",
     "uuid": "^9.0.0",
-    "zod": "^3.20.6"
+    "zod": "^3.20.6",
+    "expo-mail-composer": "~12.7.1"
   },
   "devDependencies": {
     "@aws-amplify/cli": "^10.8.1",
