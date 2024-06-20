@@ -1,4 +1,5 @@
 import { BASE_HEADER_SCREEN_OPTIONS } from "@components/Navigation"
+import { presentEmailComposer } from "@lib/EmailComposition"
 import { NavigationContainer } from "@react-navigation/native"
 import { createStackNavigator } from "@react-navigation/stack"
 import { SettingsProvider } from "@settings-storage/Hooks"
@@ -7,7 +8,7 @@ import { PersistentSettingsStores } from "@settings-storage/PersistentStores"
 import { SQLiteUserSettingsStorage } from "@settings-storage/UserSettings"
 import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
 import { testSQLite } from "@test-helpers/SQLite"
-import { composeAsync, isAvailableAsync } from "expo-mail-composer"
+import { isAvailableAsync } from "expo-mail-composer"
 import { RootSiblingParent } from "react-native-root-siblings"
 import { SafeAreaProvider } from "react-native-safe-area-context"
 import {
@@ -49,7 +50,7 @@ const userStore = PersistentSettingsStores.user(
 const Test = () => {
   const state = useHelpAndSupportSettings({
     isShowingContactSection: isAvailableAsync,
-    composeEmail: composeAsync,
+    composeEmail: presentEmailComposer,
     compileLogs: async () => "Test"
   })
   return (

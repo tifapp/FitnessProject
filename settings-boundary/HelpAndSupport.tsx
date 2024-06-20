@@ -1,16 +1,14 @@
 import { AppStyles } from "@lib/AppColorStyle"
+import { EmailCompositionResult, EmailTemplate } from "@lib/EmailComposition"
 import { useOpenWeblink } from "@modules/tif-weblinks"
 import { useQuery } from "@tanstack/react-query"
-import {
-  MailComposerOptions,
-  MailComposerResult,
-  MailComposerStatus
-} from "expo-mail-composer"
 import React from "react"
 import { Alert, StyleProp, ViewStyle } from "react-native"
 import { SettingsNavigationLinkView } from "./components/NavigationLink"
 import { SettingsScrollView } from "./components/ScrollView"
 import { SettingsCardSectionView } from "./components/Section"
+
+export const COMPILING_LOGS_INFO_URL = "https://logs.com"
 
 export const HELP_AND_SUPPORT_EMAILS = {
   featureRequested: {
@@ -59,6 +57,17 @@ export const HELP_AND_SUPPORT_ALERTS = {
     title: "Error",
     description: "We're sorry, we had an error receiving your request."
   },
+  compileLogError: {
+    title: "Error",
+    description:
+      "We're sorry, we had an error compiling logs. Sending bug report without logs.",
+    buttons: (confirmLogsCompileError: () => void) => [
+      {
+        text: "OK",
+        onPress: confirmLogsCompileError
+      }
+    ]
+  },
   requestFeatureSuccess: {
     title: "Success!",
     description: "We received your request! Thank you for supporting the app!"
@@ -83,7 +92,7 @@ export const HelpAndSupportView = ({ style, state }: EventSettingsProps) => (
 export type UseHelpAndSupportSettingsEnvironment = {
   isShowingContactSection: () => Promise<boolean>
   compileLogs: () => Promise<string>
-  composeEmail: (email: MailComposerOptions) => Promise<MailComposerResult>
+  composeEmail: (email: EmailTemplate) => Promise<EmailCompositionResult>
 }
 
 export const useHelpAndSupportSettings = (
@@ -100,10 +109,10 @@ export const useHelpAndSupportSettings = (
     isShowingContactSection,
     featureRequested: async () => {
       try {
-        const { status } = await env.composeEmail(
+        const status = await env.composeEmail(
           HELP_AND_SUPPORT_EMAILS.featureRequested
         )
-        if (status === MailComposerStatus.SENT) {
+        if (status === "success") {
           Alert.alert(
             HELP_AND_SUPPORT_ALERTS.requestFeatureSuccess.title,
             HELP_AND_SUPPORT_ALERTS.requestFeatureSuccess.description
@@ -124,10 +133,10 @@ export const useHelpAndSupportSettings = (
           async () => {
             try {
               const zipFileURI = await env.compileLogs()
-              const { status } = await env.composeEmail(
+              const status = await env.composeEmail(
                 HELP_AND_SUPPORT_EMAILS.bugReported(zipFileURI)
               )
-              if (status === MailComposerStatus.SENT) {
+              if (status === "success") {
                 Alert.alert(
                   HELP_AND_SUPPORT_ALERTS.reportBugSuccess.title,
                   HELP_AND_SUPPORT_ALERTS.reportBugSuccess.description
@@ -142,10 +151,10 @@ export const useHelpAndSupportSettings = (
           },
           async () => {
             try {
-              const { status } = await env.composeEmail(
+              const status = await env.composeEmail(
                 HELP_AND_SUPPORT_EMAILS.bugReported(undefined)
               )
-              if (status === MailComposerStatus.SENT) {
+              if (status === "success") {
                 Alert.alert(
                   HELP_AND_SUPPORT_ALERTS.reportBugSuccess.title,
                   HELP_AND_SUPPORT_ALERTS.reportBugSuccess.description
@@ -158,7 +167,7 @@ export const useHelpAndSupportSettings = (
               )
             }
           },
-          () => open("https://www.google.com")
+          () => open(COMPILING_LOGS_INFO_URL)
         )
       )
     }

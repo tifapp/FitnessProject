@@ -1,7 +1,6 @@
 import { captureAlerts } from "@test-helpers/Alerts"
 import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
 import { act, renderHook, waitFor } from "@testing-library/react-native"
-import { MailComposerStatus } from "expo-mail-composer"
 import {
   HELP_AND_SUPPORT_ALERTS,
   HELP_AND_SUPPORT_EMAILS,
@@ -27,7 +26,7 @@ describe("HelpAndSupportSettings tests", () => {
       )
     })
     test("Successful request feature flow", async () => {
-      composeEmail.mockResolvedValue({ status: MailComposerStatus.SENT })
+      composeEmail.mockResolvedValue("success")
       const { result } = renderUseHelpAndSupportSettings()
       await waitFor(() =>
         expect(result.current.isShowingContactSection).toEqual(true)
@@ -55,7 +54,7 @@ describe("HelpAndSupportSettings tests", () => {
       )
     })
     test("Successful report bug flow: no logs selected", async () => {
-      composeEmail.mockResolvedValueOnce({ status: MailComposerStatus.SENT })
+      composeEmail.mockResolvedValueOnce("success")
       compileLogs.mockRejectedValueOnce(new Error("Logs not compiled"))
       const { result } = renderUseHelpAndSupportSettings()
       await waitFor(() =>
@@ -72,7 +71,7 @@ describe("HelpAndSupportSettings tests", () => {
       )
     })
     test("Successful report bug flow: logs selected", async () => {
-      composeEmail.mockResolvedValueOnce({ status: MailComposerStatus.SENT })
+      composeEmail.mockResolvedValueOnce("success")
       compileLogs.mockResolvedValueOnce(TEST_COMPILE_LOGS_URI)
       const { result } = renderUseHelpAndSupportSettings()
       await waitFor(() =>
