@@ -18,11 +18,12 @@ export const HELP_AND_SUPPORT_EMAILS = {
     subject: "Request for Feature",
     body: "I want to request a feature for the app!"
   },
-  bugReported: {
+  bugReported: (compileLogsURI?: string) => ({
     recipients: ["TIF@myspace.com"],
     subject: "Bug Report",
-    body: "There's a bug here in the app!"
-  }
+    body: "There's a bug here in the app!",
+    attachments: compileLogsURI ? [compileLogsURI] : undefined
+  })
 }
 
 export const HELP_AND_SUPPORT_ALERTS = {
@@ -41,6 +42,7 @@ export const HELP_AND_SUPPORT_ALERTS = {
       },
       {
         text: "No",
+        style: "cancel" as const,
         onPress: reportWithoutLogs
       },
       {
@@ -80,7 +82,7 @@ export const HelpAndSupportView = ({ style, state }: EventSettingsProps) => (
 
 export type UseHelpAndSupportSettingsEnvironment = {
   isShowingContactSection: () => Promise<boolean>
-  compileLogs: () => void
+  compileLogs: () => Promise<string>
   composeEmail: (email: MailComposerOptions) => Promise<MailComposerResult>
 }
 
@@ -92,6 +94,7 @@ export const useHelpAndSupportSettings = (
     async () => await env.isShowingContactSection(),
     { initialData: true }
   )
+  const open = useOpenWeblink()
 
   return {
     isShowingContactSection,
@@ -120,8 +123,9 @@ export const useHelpAndSupportSettings = (
         HELP_AND_SUPPORT_ALERTS.reportBugTapped.buttons(
           async () => {
             try {
+              const zipFileURI = await env.compileLogs()
               const { status } = await env.composeEmail(
-                HELP_AND_SUPPORT_EMAILS.bugReported
+                HELP_AND_SUPPORT_EMAILS.bugReported(zipFileURI)
               )
               if (status === MailComposerStatus.SENT) {
                 Alert.alert(
@@ -139,7 +143,7 @@ export const useHelpAndSupportSettings = (
           async () => {
             try {
               const { status } = await env.composeEmail(
-                HELP_AND_SUPPORT_EMAILS.bugReported
+                HELP_AND_SUPPORT_EMAILS.bugReported(undefined)
               )
               if (status === MailComposerStatus.SENT) {
                 Alert.alert(
@@ -154,7 +158,7 @@ export const useHelpAndSupportSettings = (
               )
             }
           },
-          () => console.log("What are logs?")
+          () => open("https://www.google.com")
         )
       )
     }

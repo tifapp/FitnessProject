@@ -10,6 +10,7 @@ import {
 
 describe("HelpAndSupportSettings tests", () => {
   describe("UseHelpAndSupportSettings tests", () => {
+    const TEST_COMPILE_LOGS_URI = "test/logs.zip"
     const { alertPresentationSpy, tapAlertButton } = captureAlerts()
     const isShowingContactSection = jest.fn()
     const compileLogs = jest.fn()
@@ -54,7 +55,8 @@ describe("HelpAndSupportSettings tests", () => {
       )
     })
     test("Successful report bug flow: no logs selected", async () => {
-      composeEmail.mockResolvedValue({ status: MailComposerStatus.SENT })
+      composeEmail.mockResolvedValueOnce({ status: MailComposerStatus.SENT })
+      compileLogs.mockRejectedValueOnce(new Error("Logs not compiled"))
       const { result } = renderUseHelpAndSupportSettings()
       await waitFor(() =>
         expect(result.current.isShowingContactSection).toEqual(true)
@@ -66,11 +68,12 @@ describe("HelpAndSupportSettings tests", () => {
         HELP_AND_SUPPORT_ALERTS.reportBugSuccess.description
       )
       expect(composeEmail).toHaveBeenCalledWith(
-        HELP_AND_SUPPORT_EMAILS.bugReported
+        HELP_AND_SUPPORT_EMAILS.bugReported(undefined)
       )
     })
     test("Successful report bug flow: logs selected", async () => {
-      composeEmail.mockResolvedValue({ status: MailComposerStatus.SENT })
+      composeEmail.mockResolvedValueOnce({ status: MailComposerStatus.SENT })
+      compileLogs.mockResolvedValueOnce(TEST_COMPILE_LOGS_URI)
       const { result } = renderUseHelpAndSupportSettings()
       await waitFor(() =>
         expect(result.current.isShowingContactSection).toEqual(true)
@@ -82,7 +85,7 @@ describe("HelpAndSupportSettings tests", () => {
         HELP_AND_SUPPORT_ALERTS.reportBugSuccess.description
       )
       expect(composeEmail).toHaveBeenCalledWith(
-        HELP_AND_SUPPORT_EMAILS.bugReported
+        HELP_AND_SUPPORT_EMAILS.bugReported(TEST_COMPILE_LOGS_URI)
       )
     })
     const renderUseHelpAndSupportSettings = () => {

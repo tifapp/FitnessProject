@@ -50,7 +50,7 @@ const Test = () => {
   const state = useHelpAndSupportSettings({
     isShowingContactSection: isAvailableAsync,
     composeEmail: composeAsync,
-    compileLogs: () => console.log("")
+    compileLogs: async () => "Test"
   })
   return (
     <SettingsProvider
