@@ -87,6 +87,29 @@ describe("HelpAndSupportSettings tests", () => {
         HELP_AND_SUPPORT_EMAILS.bugReported(TEST_COMPILE_LOGS_URI)
       )
     })
+    test("Unsuccessful report bug flow: logs failure, switch to no logs", async () => {
+      compileLogs.mockRejectedValueOnce(new Error("Something went wrong"))
+      const { result } = renderUseHelpAndSupportSettings()
+      await waitFor(() =>
+        expect(result.current.isShowingContactSection).toEqual(true)
+      )
+      await act(async () => await result.current.bugReported())
+      await reportWithLogs()
+      expect(alertPresentationSpy).toHaveBeenCalledWith(
+        HELP_AND_SUPPORT_ALERTS.compileLogError.title,
+        HELP_AND_SUPPORT_ALERTS.compileLogError.description,
+        expect.any(Array)
+      )
+      composeEmail.mockResolvedValueOnce("success")
+      await reportWithoutLogsAfterFailure()
+      expect(alertPresentationSpy).toHaveBeenCalledWith(
+        HELP_AND_SUPPORT_ALERTS.reportBugSuccess.title,
+        HELP_AND_SUPPORT_ALERTS.reportBugSuccess.description
+      )
+      expect(composeEmail).toHaveBeenCalledWith(
+        HELP_AND_SUPPORT_EMAILS.bugReported(undefined)
+      )
+    })
     const renderUseHelpAndSupportSettings = () => {
       return renderHook(
         () =>
@@ -105,6 +128,10 @@ describe("HelpAndSupportSettings tests", () => {
 
     const reportWithoutLogs = async () => {
       await tapAlertButton("No")
+    }
+
+    const reportWithoutLogsAfterFailure = async () => {
+      await tapAlertButton("OK")
     }
 
     const reportWithLogs = async () => {

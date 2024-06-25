@@ -131,41 +131,38 @@ export const useHelpAndSupportSettings = (
         HELP_AND_SUPPORT_ALERTS.reportBugTapped.description,
         HELP_AND_SUPPORT_ALERTS.reportBugTapped.buttons(
           async () => {
-            try {
-              const zipFileURI = await env.compileLogs()
-              const status = await env.composeEmail(
-                HELP_AND_SUPPORT_EMAILS.bugReported(zipFileURI)
-              )
-              if (status === "success") {
+            await env
+              .compileLogs()
+              .then(async (URI) => {
+                try {
+                  const status = await env.composeEmail(
+                    HELP_AND_SUPPORT_EMAILS.bugReported(URI)
+                  )
+                  if (status === "success") {
+                    Alert.alert(
+                      HELP_AND_SUPPORT_ALERTS.reportBugSuccess.title,
+                      HELP_AND_SUPPORT_ALERTS.reportBugSuccess.description
+                    )
+                  }
+                } catch {
+                  Alert.alert(
+                    HELP_AND_SUPPORT_ALERTS.reportBugError.title,
+                    HELP_AND_SUPPORT_ALERTS.reportBugError.description
+                  )
+                }
+              })
+              .catch(() =>
                 Alert.alert(
-                  HELP_AND_SUPPORT_ALERTS.reportBugSuccess.title,
-                  HELP_AND_SUPPORT_ALERTS.reportBugSuccess.description
+                  HELP_AND_SUPPORT_ALERTS.compileLogError.title,
+                  HELP_AND_SUPPORT_ALERTS.compileLogError.description,
+                  HELP_AND_SUPPORT_ALERTS.compileLogError.buttons(async () =>
+                    noLogsBugReport(env.composeEmail)
+                  )
                 )
-              }
-            } catch {
-              Alert.alert(
-                HELP_AND_SUPPORT_ALERTS.reportBugError.title,
-                HELP_AND_SUPPORT_ALERTS.reportBugError.description
               )
-            }
           },
           async () => {
-            try {
-              const status = await env.composeEmail(
-                HELP_AND_SUPPORT_EMAILS.bugReported(undefined)
-              )
-              if (status === "success") {
-                Alert.alert(
-                  HELP_AND_SUPPORT_ALERTS.reportBugSuccess.title,
-                  HELP_AND_SUPPORT_ALERTS.reportBugSuccess.description
-                )
-              }
-            } catch {
-              Alert.alert(
-                HELP_AND_SUPPORT_ALERTS.reportBugError.title,
-                HELP_AND_SUPPORT_ALERTS.reportBugError.description
-              )
-            }
+            noLogsBugReport(env.composeEmail)
           },
           () => open(COMPILING_LOGS_INFO_URL)
         )
@@ -173,6 +170,28 @@ export const useHelpAndSupportSettings = (
     }
   }
 }
+
+const noLogsBugReport = async (
+  composeEmail: (email: EmailTemplate) => Promise<EmailCompositionResult>
+) => {
+  try {
+    const status = await composeEmail(
+      HELP_AND_SUPPORT_EMAILS.bugReported(undefined)
+    )
+    if (status === "success") {
+      Alert.alert(
+        HELP_AND_SUPPORT_ALERTS.reportBugSuccess.title,
+        HELP_AND_SUPPORT_ALERTS.reportBugSuccess.description
+      )
+    }
+  } catch {
+    Alert.alert(
+      HELP_AND_SUPPORT_ALERTS.reportBugError.title,
+      HELP_AND_SUPPORT_ALERTS.reportBugError.description
+    )
+  }
+}
+
 type PresetSectionProps = {
   state: ReturnType<typeof useHelpAndSupportSettings>
 }
