@@ -17,6 +17,7 @@ describe("HelpAndSupportSettings tests", () => {
     beforeEach(() => {
       jest.resetAllMocks()
     })
+
     test("Detect if signed in to email", async () => {
       isShowingContactSection.mockResolvedValue(false)
       const { result } = renderUseHelpAndSupportSettings()
@@ -25,41 +26,32 @@ describe("HelpAndSupportSettings tests", () => {
         expect(result.current.isShowingContactSection).toEqual(false)
       )
     })
-    test("Successful request feature flow", async () => {
-      composeEmail.mockResolvedValue("success")
-      const { result } = renderUseHelpAndSupportSettings()
-      await waitFor(() =>
-        expect(result.current.isShowingContactSection).toEqual(true)
-      )
-      await act(async () => await result.current.featureRequested())
+
+    test("Successful submit feedback flow", async () => {
+      const result = await setupSuccessfulFlow()
+      await act(async () => await result.current.feedbackSubmitted())
       expect(alertPresentationSpy).toHaveBeenCalledWith(
-        HELP_AND_SUPPORT_ALERTS.requestFeatureSuccess.title,
-        HELP_AND_SUPPORT_ALERTS.requestFeatureSuccess.description
+        HELP_AND_SUPPORT_ALERTS.submitFeedbackSuccess.title,
+        HELP_AND_SUPPORT_ALERTS.submitFeedbackSuccess.description
       )
 
       expect(composeEmail).toHaveBeenCalledWith(
-        HELP_AND_SUPPORT_EMAILS.featureRequested
+        HELP_AND_SUPPORT_EMAILS.feedbackSubmitted
       )
     })
-    test("Unsuccessful request feature flow", async () => {
-      composeEmail.mockRejectedValue(new Error("Bad error"))
-      const { result } = renderUseHelpAndSupportSettings()
-      await waitFor(() =>
-        expect(result.current.isShowingContactSection).toEqual(true)
-      )
-      await act(async () => await result.current.featureRequested())
+
+    test("Unsuccessful submit feedback flow", async () => {
+      const result = await setupUnsuccessfulFlow()
+      await act(async () => await result.current.feedbackSubmitted())
       expect(alertPresentationSpy).toHaveBeenCalledWith(
-        HELP_AND_SUPPORT_ALERTS.requestFeatureError.title,
-        HELP_AND_SUPPORT_ALERTS.requestFeatureError.description
+        HELP_AND_SUPPORT_ALERTS.submitFeedbackError.title,
+        HELP_AND_SUPPORT_ALERTS.submitFeedbackError.description
       )
     })
+
     test("Successful report bug flow: no logs selected", async () => {
-      composeEmail.mockResolvedValueOnce("success")
       compileLogs.mockRejectedValueOnce(new Error("Logs not compiled"))
-      const { result } = renderUseHelpAndSupportSettings()
-      await waitFor(() =>
-        expect(result.current.isShowingContactSection).toEqual(true)
-      )
+      const result = await setupSuccessfulFlow()
       await act(async () => await result.current.bugReported())
       await reportWithoutLogs()
       expect(alertPresentationSpy).toHaveBeenCalledWith(
@@ -70,13 +62,10 @@ describe("HelpAndSupportSettings tests", () => {
         HELP_AND_SUPPORT_EMAILS.bugReported(undefined)
       )
     })
-    test("Successful report bug flow: logs selected", async () => {
-      composeEmail.mockResolvedValueOnce("success")
+
+    test("Successful report bug flow: logs success", async () => {
       compileLogs.mockResolvedValueOnce(TEST_COMPILE_LOGS_URI)
-      const { result } = renderUseHelpAndSupportSettings()
-      await waitFor(() =>
-        expect(result.current.isShowingContactSection).toEqual(true)
-      )
+      const result = await setupSuccessfulFlow()
       await act(async () => await result.current.bugReported())
       await reportWithLogs()
       expect(alertPresentationSpy).toHaveBeenCalledWith(
@@ -87,12 +76,10 @@ describe("HelpAndSupportSettings tests", () => {
         HELP_AND_SUPPORT_EMAILS.bugReported(TEST_COMPILE_LOGS_URI)
       )
     })
-    test("Unsuccessful report bug flow: logs failure, switch to no logs", async () => {
+
+    test("Successful report bug flow: logs failure, switch to no logs", async () => {
       compileLogs.mockRejectedValueOnce(new Error("Something went wrong"))
-      const { result } = renderUseHelpAndSupportSettings()
-      await waitFor(() =>
-        expect(result.current.isShowingContactSection).toEqual(true)
-      )
+      const result = await setupSuccessfulFlow()
       await act(async () => await result.current.bugReported())
       await reportWithLogs()
       expect(alertPresentationSpy).toHaveBeenCalledWith(
@@ -100,7 +87,6 @@ describe("HelpAndSupportSettings tests", () => {
         HELP_AND_SUPPORT_ALERTS.compileLogError.description,
         expect.any(Array)
       )
-      composeEmail.mockResolvedValueOnce("success")
       await reportWithoutLogsAfterFailure()
       expect(alertPresentationSpy).toHaveBeenCalledWith(
         HELP_AND_SUPPORT_ALERTS.reportBugSuccess.title,
@@ -110,6 +96,51 @@ describe("HelpAndSupportSettings tests", () => {
         HELP_AND_SUPPORT_EMAILS.bugReported(undefined)
       )
     })
+
+    test("Successful submit question flow", async () => {
+      const result = await setupSuccessfulFlow()
+      await act(async () => await result.current.questionSubmitted())
+      expect(alertPresentationSpy).toHaveBeenCalledWith(
+        HELP_AND_SUPPORT_ALERTS.submitQuestionSuccess.title,
+        HELP_AND_SUPPORT_ALERTS.submitQuestionSuccess.description
+      )
+
+      expect(composeEmail).toHaveBeenCalledWith(
+        HELP_AND_SUPPORT_EMAILS.questionSubmitted
+      )
+    })
+
+    test("Unsuccessful submit question flow", async () => {
+      composeEmail.mockRejectedValue(new Error("Bad error"))
+      const { result } = renderUseHelpAndSupportSettings()
+      await waitFor(() =>
+        expect(result.current.isShowingContactSection).toEqual(true)
+      )
+      await act(async () => await result.current.questionSubmitted())
+      expect(alertPresentationSpy).toHaveBeenCalledWith(
+        HELP_AND_SUPPORT_ALERTS.submitQuestionError.title,
+        HELP_AND_SUPPORT_ALERTS.submitQuestionError.description
+      )
+    })
+
+    const setupSuccessfulFlow = async () => {
+      composeEmail.mockResolvedValue("success")
+      const { result } = renderUseHelpAndSupportSettings()
+      await waitFor(() =>
+        expect(result.current.isShowingContactSection).toEqual(true)
+      )
+      return result
+    }
+
+    const setupUnsuccessfulFlow = async () => {
+      composeEmail.mockRejectedValue(new Error("Bad error"))
+      const { result } = renderUseHelpAndSupportSettings()
+      await waitFor(() =>
+        expect(result.current.isShowingContactSection).toEqual(true)
+      )
+      return result
+    }
+
     const renderUseHelpAndSupportSettings = () => {
       return renderHook(
         () =>
@@ -136,10 +167,6 @@ describe("HelpAndSupportSettings tests", () => {
 
     const reportWithLogs = async () => {
       await tapAlertButton("Yes")
-    }
-
-    const logsQuestion = async () => {
-      await tapAlertButton("What is this?")
     }
   })
 })

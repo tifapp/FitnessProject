@@ -11,20 +11,35 @@ import { SettingsCardSectionView } from "./components/Section"
 export const COMPILING_LOGS_INFO_URL = "https://logs.com"
 
 export const HELP_AND_SUPPORT_EMAILS = {
-  featureRequested: {
+  feedbackSubmitted: {
     recipients: ["TIF@myspace.com"],
-    subject: "Request for Feature",
-    body: "I want to request a feature for the app!"
+    subject: "App Feedback",
+    body: "Please provide detailed feedback on the app below, including suggestions for app improvements or any other feedback you have."
   },
   bugReported: (compileLogsURI?: string) => ({
     recipients: ["TIF@myspace.com"],
-    subject: "Bug Report",
-    body: "There's a bug here in the app!",
+    subject: "App Bug Report",
+    body: "Please provide a detailed explanation of the bug below, including all relevant information pertaining to it",
     attachments: compileLogsURI ? [compileLogsURI] : undefined
-  })
+  }),
+  questionSubmitted: {
+    recipients: ["TIF@myspace.com"],
+    subject: "App Question",
+    body: "Please list your question below and include all necessary details so that we can respond effectively."
+  }
 }
 
 export const HELP_AND_SUPPORT_ALERTS = {
+  submitFeedbackSuccess: {
+    title: "Received!",
+    description:
+      "Thank you for submitting your feedback and helping us improve the app. We appreciate your input."
+  },
+  submitFeedbackError: {
+    title: "Oops!",
+    description:
+      "Something went wrong while submitting your feedback. Please try again."
+  },
   reportBugTapped: {
     title: "Attach Logs?",
     description:
@@ -50,15 +65,17 @@ export const HELP_AND_SUPPORT_ALERTS = {
     ]
   },
   reportBugSuccess: {
-    title: "Success!",
-    description: "We received your feedback! Thank you for supporting the app!"
+    title: "Received!",
+    description:
+      "Thank you for reporting this bug and helping us improve the app. We appreciate your input."
   },
   reportBugError: {
-    title: "Error",
-    description: "We're sorry, we had an error receiving your request."
+    title: "Oops!",
+    description:
+      "Something went wrong while reporting this bug. Please try again."
   },
   compileLogError: {
-    title: "Error",
+    title: "Oops!",
     description:
       "We're sorry, we had an error compiling logs. Sending bug report without logs.",
     buttons: (confirmLogsCompileError: () => void) => [
@@ -68,13 +85,15 @@ export const HELP_AND_SUPPORT_ALERTS = {
       }
     ]
   },
-  requestFeatureSuccess: {
-    title: "Success!",
-    description: "We received your request! Thank you for supporting the app!"
+  submitQuestionSuccess: {
+    title: "Received!",
+    description:
+      "Thank you for submitting your question. We’ll get back to you shortly. In the meantime, please visit our Help Center for FAQ’s and additional resources."
   },
-  requestFeatureError: {
-    title: "Error",
-    description: "We're sorry, we had an error receiving your request."
+  submitQuestionError: {
+    title: "Oops!",
+    description:
+      "Something went wrong while submitting your question. Please try again."
   }
 }
 
@@ -107,21 +126,21 @@ export const useHelpAndSupportSettings = (
 
   return {
     isShowingContactSection,
-    featureRequested: async () => {
+    feedbackSubmitted: async () => {
       try {
         const status = await env.composeEmail(
-          HELP_AND_SUPPORT_EMAILS.featureRequested
+          HELP_AND_SUPPORT_EMAILS.feedbackSubmitted
         )
         if (status === "success") {
           Alert.alert(
-            HELP_AND_SUPPORT_ALERTS.requestFeatureSuccess.title,
-            HELP_AND_SUPPORT_ALERTS.requestFeatureSuccess.description
+            HELP_AND_SUPPORT_ALERTS.submitFeedbackSuccess.title,
+            HELP_AND_SUPPORT_ALERTS.submitFeedbackSuccess.description
           )
         }
       } catch {
         Alert.alert(
-          HELP_AND_SUPPORT_ALERTS.requestFeatureError.title,
-          HELP_AND_SUPPORT_ALERTS.requestFeatureError.description
+          HELP_AND_SUPPORT_ALERTS.submitFeedbackError.title,
+          HELP_AND_SUPPORT_ALERTS.submitFeedbackError.description
         )
       }
     },
@@ -167,6 +186,24 @@ export const useHelpAndSupportSettings = (
           () => open(COMPILING_LOGS_INFO_URL)
         )
       )
+    },
+    questionSubmitted: async () => {
+      try {
+        const status = await env.composeEmail(
+          HELP_AND_SUPPORT_EMAILS.questionSubmitted
+        )
+        if (status === "success") {
+          Alert.alert(
+            HELP_AND_SUPPORT_ALERTS.submitQuestionSuccess.title,
+            HELP_AND_SUPPORT_ALERTS.submitQuestionSuccess.description
+          )
+        }
+      } catch {
+        Alert.alert(
+          HELP_AND_SUPPORT_ALERTS.submitQuestionError.title,
+          HELP_AND_SUPPORT_ALERTS.submitQuestionError.description
+        )
+      }
     }
   }
 }
@@ -202,7 +239,7 @@ export const HelpSectionView = ({ state }: PresetSectionProps) => {
     <>
       <SettingsCardSectionView
         title="Help Center"
-        subtitle="This is the hub for any help you may want, or reports or feedback you might have about the app."
+        subtitle="You can find additional resources and answers to your questions by visiting the Help Center."
       >
         <SettingsNavigationLinkView
           title={"View Help Center"}
@@ -214,7 +251,7 @@ export const HelpSectionView = ({ state }: PresetSectionProps) => {
       {state.isShowingContactSection && (
         <SettingsCardSectionView
           title="Contact Us"
-          subtitle="Feel free to talk to us about anything you might be feeling about the app!"
+          subtitle="Submit your requests below."
         >
           <SettingsNavigationLinkView
             title={"Report a Bug"}
@@ -223,9 +260,15 @@ export const HelpSectionView = ({ state }: PresetSectionProps) => {
             iconBackgroundColor={AppStyles.black}
           />
           <SettingsNavigationLinkView
-            title={"Request a Feature"}
-            onTapped={state.featureRequested}
+            title={"Submit Feedback"}
+            onTapped={state.feedbackSubmitted}
             iconName={"build"}
+            iconBackgroundColor={AppStyles.black}
+          />
+          <SettingsNavigationLinkView
+            title={"Submit Feedback"}
+            onTapped={state.questionSubmitted}
+            iconName={"help-circle"}
             iconBackgroundColor={AppStyles.black}
           />
         </SettingsCardSectionView>
