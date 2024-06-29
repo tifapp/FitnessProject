@@ -4,6 +4,8 @@ import { act, renderHook, waitFor } from "@testing-library/react-native"
 import {
   HELP_AND_SUPPORT_ALERTS,
   HELP_AND_SUPPORT_EMAILS,
+  HELP_AND_SUPPORT_EMAIL_ERROR_ALERTS,
+  HELP_AND_SUPPORT_EMAIL_SUCCESS_ALERTS,
   useHelpAndSupportSettings
 } from "./HelpAndSupport"
 
@@ -31,8 +33,8 @@ describe("HelpAndSupportSettings tests", () => {
       const result = await setupSuccessfulFlow()
       await act(async () => await result.current.feedbackSubmitted())
       expect(alertPresentationSpy).toHaveBeenCalledWith(
-        HELP_AND_SUPPORT_ALERTS.submitFeedbackSuccess.title,
-        HELP_AND_SUPPORT_ALERTS.submitFeedbackSuccess.description
+        HELP_AND_SUPPORT_EMAIL_SUCCESS_ALERTS.submitFeedbackSuccess.title,
+        HELP_AND_SUPPORT_EMAIL_SUCCESS_ALERTS.submitFeedbackSuccess.description
       )
 
       expect(composeEmail).toHaveBeenCalledWith(
@@ -44,8 +46,8 @@ describe("HelpAndSupportSettings tests", () => {
       const result = await setupUnsuccessfulFlow()
       await act(async () => await result.current.feedbackSubmitted())
       expect(alertPresentationSpy).toHaveBeenCalledWith(
-        HELP_AND_SUPPORT_ALERTS.submitFeedbackError.title,
-        HELP_AND_SUPPORT_ALERTS.submitFeedbackError.description
+        HELP_AND_SUPPORT_EMAIL_ERROR_ALERTS.submitFeedbackError.title,
+        HELP_AND_SUPPORT_EMAIL_ERROR_ALERTS.submitFeedbackError.description
       )
     })
 
@@ -55,8 +57,8 @@ describe("HelpAndSupportSettings tests", () => {
       await act(async () => await result.current.bugReported())
       await reportWithoutLogs()
       expect(alertPresentationSpy).toHaveBeenCalledWith(
-        HELP_AND_SUPPORT_ALERTS.reportBugSuccess.title,
-        HELP_AND_SUPPORT_ALERTS.reportBugSuccess.description
+        HELP_AND_SUPPORT_EMAIL_SUCCESS_ALERTS.reportBugSuccess.title,
+        HELP_AND_SUPPORT_EMAIL_SUCCESS_ALERTS.reportBugSuccess.description
       )
       expect(composeEmail).toHaveBeenCalledWith(
         HELP_AND_SUPPORT_EMAILS.bugReported(undefined)
@@ -69,8 +71,8 @@ describe("HelpAndSupportSettings tests", () => {
       await act(async () => await result.current.bugReported())
       await reportWithLogs()
       expect(alertPresentationSpy).toHaveBeenCalledWith(
-        HELP_AND_SUPPORT_ALERTS.reportBugSuccess.title,
-        HELP_AND_SUPPORT_ALERTS.reportBugSuccess.description
+        HELP_AND_SUPPORT_EMAIL_SUCCESS_ALERTS.reportBugSuccess.title,
+        HELP_AND_SUPPORT_EMAIL_SUCCESS_ALERTS.reportBugSuccess.description
       )
       expect(composeEmail).toHaveBeenCalledWith(
         HELP_AND_SUPPORT_EMAILS.bugReported(TEST_COMPILE_LOGS_URI)
@@ -89,8 +91,8 @@ describe("HelpAndSupportSettings tests", () => {
       )
       await reportWithoutLogsAfterFailure()
       expect(alertPresentationSpy).toHaveBeenCalledWith(
-        HELP_AND_SUPPORT_ALERTS.reportBugSuccess.title,
-        HELP_AND_SUPPORT_ALERTS.reportBugSuccess.description
+        HELP_AND_SUPPORT_EMAIL_SUCCESS_ALERTS.reportBugSuccess.title,
+        HELP_AND_SUPPORT_EMAIL_SUCCESS_ALERTS.reportBugSuccess.description
       )
       expect(composeEmail).toHaveBeenCalledWith(
         HELP_AND_SUPPORT_EMAILS.bugReported(undefined)
@@ -101,8 +103,8 @@ describe("HelpAndSupportSettings tests", () => {
       const result = await setupSuccessfulFlow()
       await act(async () => await result.current.questionSubmitted())
       expect(alertPresentationSpy).toHaveBeenCalledWith(
-        HELP_AND_SUPPORT_ALERTS.submitQuestionSuccess.title,
-        HELP_AND_SUPPORT_ALERTS.submitQuestionSuccess.description
+        HELP_AND_SUPPORT_EMAIL_SUCCESS_ALERTS.submitQuestionSuccess.title,
+        HELP_AND_SUPPORT_EMAIL_SUCCESS_ALERTS.submitQuestionSuccess.description
       )
 
       expect(composeEmail).toHaveBeenCalledWith(
@@ -118,8 +120,8 @@ describe("HelpAndSupportSettings tests", () => {
       )
       await act(async () => await result.current.questionSubmitted())
       expect(alertPresentationSpy).toHaveBeenCalledWith(
-        HELP_AND_SUPPORT_ALERTS.submitQuestionError.title,
-        HELP_AND_SUPPORT_ALERTS.submitQuestionError.description
+        HELP_AND_SUPPORT_EMAIL_ERROR_ALERTS.submitQuestionError.title,
+        HELP_AND_SUPPORT_EMAIL_ERROR_ALERTS.submitQuestionError.description
       )
     })
 

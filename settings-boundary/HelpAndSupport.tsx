@@ -64,16 +64,6 @@ export const HELP_AND_SUPPORT_ALERTS = {
       }
     ]
   },
-  reportBugSuccess: {
-    title: "Received!",
-    description:
-      "Thank you for reporting this bug and helping us improve the app. We appreciate your input."
-  },
-  reportBugError: {
-    title: "Oops!",
-    description:
-      "Something went wrong while reporting this bug. Please try again."
-  },
   compileLogError: {
     title: "Oops!",
     description:
@@ -84,11 +74,37 @@ export const HELP_AND_SUPPORT_ALERTS = {
         onPress: confirmLogsCompileError
       }
     ]
+  }
+}
+
+export const HELP_AND_SUPPORT_EMAIL_SUCCESS_ALERTS = {
+  submitFeedbackSuccess: {
+    title: "Received!",
+    description:
+      "Thank you for submitting your feedback and helping us improve the app. We appreciate your input."
+  },
+  reportBugSuccess: {
+    title: "Received!",
+    description:
+      "Thank you for reporting this bug and helping us improve the app. We appreciate your input."
   },
   submitQuestionSuccess: {
     title: "Received!",
     description:
       "Thank you for submitting your question. We’ll get back to you shortly. In the meantime, please visit our Help Center for FAQ’s and additional resources."
+  }
+}
+
+export const HELP_AND_SUPPORT_EMAIL_ERROR_ALERTS = {
+  submitFeedbackError: {
+    title: "Oops!",
+    description:
+      "Something went wrong while submitting your feedback. Please try again."
+  },
+  reportBugError: {
+    title: "Oops!",
+    description:
+      "Something went wrong while reporting this bug. Please try again."
   },
   submitQuestionError: {
     title: "Oops!",
@@ -127,22 +143,12 @@ export const useHelpAndSupportSettings = (
   return {
     isShowingContactSection,
     feedbackSubmitted: async () => {
-      try {
-        const status = await env.composeEmail(
-          HELP_AND_SUPPORT_EMAILS.feedbackSubmitted
-        )
-        if (status === "success") {
-          Alert.alert(
-            HELP_AND_SUPPORT_ALERTS.submitFeedbackSuccess.title,
-            HELP_AND_SUPPORT_ALERTS.submitFeedbackSuccess.description
-          )
-        }
-      } catch {
-        Alert.alert(
-          HELP_AND_SUPPORT_ALERTS.submitFeedbackError.title,
-          HELP_AND_SUPPORT_ALERTS.submitFeedbackError.description
-        )
-      }
+      createEmail(
+        env.composeEmail,
+        HELP_AND_SUPPORT_EMAILS.feedbackSubmitted,
+        "submitFeedbackSuccess",
+        "submitFeedbackError"
+      )
     },
     bugReported: async () => {
       Alert.alert(
@@ -150,81 +156,72 @@ export const useHelpAndSupportSettings = (
         HELP_AND_SUPPORT_ALERTS.reportBugTapped.description,
         HELP_AND_SUPPORT_ALERTS.reportBugTapped.buttons(
           async () => {
-            await env
-              .compileLogs()
-              .then(async (URI) => {
-                try {
-                  const status = await env.composeEmail(
-                    HELP_AND_SUPPORT_EMAILS.bugReported(URI)
-                  )
-                  if (status === "success") {
-                    Alert.alert(
-                      HELP_AND_SUPPORT_ALERTS.reportBugSuccess.title,
-                      HELP_AND_SUPPORT_ALERTS.reportBugSuccess.description
-                    )
-                  }
-                } catch {
-                  Alert.alert(
-                    HELP_AND_SUPPORT_ALERTS.reportBugError.title,
-                    HELP_AND_SUPPORT_ALERTS.reportBugError.description
-                  )
-                }
-              })
-              .catch(() =>
-                Alert.alert(
-                  HELP_AND_SUPPORT_ALERTS.compileLogError.title,
-                  HELP_AND_SUPPORT_ALERTS.compileLogError.description,
-                  HELP_AND_SUPPORT_ALERTS.compileLogError.buttons(async () =>
-                    noLogsBugReport(env.composeEmail)
+            try {
+              const URI = await env.compileLogs()
+              if (URI) {
+                createEmail(
+                  env.composeEmail,
+                  HELP_AND_SUPPORT_EMAILS.bugReported(URI),
+                  "reportBugSuccess",
+                  "reportBugError"
+                )
+              }
+            } catch {
+              Alert.alert(
+                HELP_AND_SUPPORT_ALERTS.compileLogError.title,
+                HELP_AND_SUPPORT_ALERTS.compileLogError.description,
+                HELP_AND_SUPPORT_ALERTS.compileLogError.buttons(async () =>
+                  createEmail(
+                    env.composeEmail,
+                    HELP_AND_SUPPORT_EMAILS.bugReported(undefined),
+                    "reportBugSuccess",
+                    "reportBugError"
                   )
                 )
               )
+            }
           },
           async () => {
-            noLogsBugReport(env.composeEmail)
+            createEmail(
+              env.composeEmail,
+              HELP_AND_SUPPORT_EMAILS.bugReported(undefined),
+              "reportBugSuccess",
+              "reportBugError"
+            )
           },
           () => open(COMPILING_LOGS_INFO_URL)
         )
       )
     },
     questionSubmitted: async () => {
-      try {
-        const status = await env.composeEmail(
-          HELP_AND_SUPPORT_EMAILS.questionSubmitted
-        )
-        if (status === "success") {
-          Alert.alert(
-            HELP_AND_SUPPORT_ALERTS.submitQuestionSuccess.title,
-            HELP_AND_SUPPORT_ALERTS.submitQuestionSuccess.description
-          )
-        }
-      } catch {
-        Alert.alert(
-          HELP_AND_SUPPORT_ALERTS.submitQuestionError.title,
-          HELP_AND_SUPPORT_ALERTS.submitQuestionError.description
-        )
-      }
+      createEmail(
+        env.composeEmail,
+        HELP_AND_SUPPORT_EMAILS.questionSubmitted,
+        "submitQuestionSuccess",
+        "submitQuestionError"
+      )
     }
   }
 }
 
-const noLogsBugReport = async (
-  composeEmail: (email: EmailTemplate) => Promise<EmailCompositionResult>
+export const createEmail = async (
+  composeEmail: (email: EmailTemplate) => Promise<EmailCompositionResult>,
+  emailTemplate: EmailTemplate,
+  successAlerts: keyof typeof HELP_AND_SUPPORT_EMAIL_SUCCESS_ALERTS,
+  failureAlerts: keyof typeof HELP_AND_SUPPORT_EMAIL_ERROR_ALERTS
 ) => {
   try {
-    const status = await composeEmail(
-      HELP_AND_SUPPORT_EMAILS.bugReported(undefined)
-    )
+    const status = await composeEmail(emailTemplate)
     if (status === "success") {
       Alert.alert(
-        HELP_AND_SUPPORT_ALERTS.reportBugSuccess.title,
-        HELP_AND_SUPPORT_ALERTS.reportBugSuccess.description
+        HELP_AND_SUPPORT_EMAIL_SUCCESS_ALERTS[successAlerts].title,
+        HELP_AND_SUPPORT_EMAIL_SUCCESS_ALERTS[successAlerts].description
       )
     }
   } catch {
     Alert.alert(
-      HELP_AND_SUPPORT_ALERTS.reportBugError.title,
-      HELP_AND_SUPPORT_ALERTS.reportBugError.description
+      HELP_AND_SUPPORT_EMAIL_ERROR_ALERTS[failureAlerts].title,
+      HELP_AND_SUPPORT_EMAIL_ERROR_ALERTS[failureAlerts].description
     )
   }
 }
@@ -244,7 +241,7 @@ export const HelpSectionView = ({ state }: PresetSectionProps) => {
         <SettingsNavigationLinkView
           title={"View Help Center"}
           onTapped={() => open("https://www.google.com")}
-          iconName={"help-circle"}
+          iconName={"information-circle"}
           iconBackgroundColor={AppStyles.black}
         />
       </SettingsCardSectionView>
