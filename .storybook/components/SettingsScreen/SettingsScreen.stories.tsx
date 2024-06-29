@@ -2,39 +2,39 @@ import { BASE_HEADER_SCREEN_OPTIONS } from "@components/Navigation"
 import { delayData, sleep } from "@lib/utils/DelayData"
 import { uuidString } from "@lib/utils/UUID"
 import { HapticsProvider } from "@modules/tif-haptics"
+import { OpenWeblinkProvider, openWeblink } from "@modules/tif-weblinks"
 import { NavigationContainer } from "@react-navigation/native"
 import { createStackNavigator } from "@react-navigation/stack"
-import { SettingsScreen } from "@screens/SettingsScreen/SettingsScreen"
 import {
-  PrivacySettingsView,
-  useBlockListSettings,
-  usePrivacySettingsPermissions
+  AppearanceSettingsView,
+  useBlockListSettings
 } from "@settings-boundary"
 import { SettingsProvider } from "@settings-storage/Hooks"
-import { SQLiteLocalSettingsStorage } from "@settings-storage/LocalSettings"
+import {
+  LocalSettings,
+  SQLiteLocalSettingsStorage
+} from "@settings-storage/LocalSettings"
 import { PersistentSettingsStores } from "@settings-storage/PersistentStores"
 import { SQLiteUserSettingsStorage } from "@settings-storage/UserSettings"
-import { ComponentMeta, ComponentStory } from "@storybook/react-native"
 import { TestHaptics } from "@test-helpers/Haptics"
 import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
 import { testSQLite } from "@test-helpers/SQLite"
+import { UserSessionProvider } from "@user/Session"
 import { UserHandle } from "TiFShared/domain-models/User"
 import { RootSiblingParent } from "react-native-root-siblings"
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context"
 import { mockBlockListPage } from "settings-boundary/MockData"
+import { StoryMeta } from "../../HelperTypes"
 
-const SettingsMeta: ComponentMeta<typeof SettingsScreen> = {
-  title: "Settings Screen",
-  component: SettingsScreen
+const SettingsMeta: StoryMeta = {
+  title: "Settings Screen"
 }
 
 export default SettingsMeta
 
-type SettingsStory = ComponentStory<typeof SettingsScreen>
-
 const Stack = createStackNavigator()
 
-export const Basic: SettingsStory = () => (
+export const Basic = () => (
   <RootSiblingParent>
     <SafeAreaProvider>
       <HapticsProvider
@@ -43,11 +43,32 @@ export const Basic: SettingsStory = () => (
         isFeedbackSupportedOnDevice
       >
         <TestQueryClientProvider>
-          <NavigationContainer>
-            <Stack.Navigator screenOptions={{ ...BASE_HEADER_SCREEN_OPTIONS }}>
-              <Stack.Screen name="Calendar" component={Test} />
-            </Stack.Navigator>
-          </NavigationContainer>
+          <OpenWeblinkProvider
+            open={async (url) =>
+              openWeblink(url, {
+                load: async () => {
+                  return {
+                    isUsingSafariReaderMode: true,
+                    preferredBrowserName: "in-app"
+                  } as LocalSettings
+                }
+              })
+            }
+          >
+            <UserSessionProvider
+              userSession={async () => {
+                throw new Error()
+              }}
+            >
+              <NavigationContainer>
+                <Stack.Navigator
+                  screenOptions={{ ...BASE_HEADER_SCREEN_OPTIONS }}
+                >
+                  <Stack.Screen name="Settings" component={Test} />
+                </Stack.Navigator>
+              </NavigationContainer>
+            </UserSessionProvider>
+          </OpenWeblinkProvider>
         </TestQueryClientProvider>
       </HapticsProvider>
     </SafeAreaProvider>
@@ -94,10 +115,7 @@ const Test = () => {
         localSettingsStore={localStore}
         userSettingsStore={userStore}
       >
-        <PrivacySettingsView
-          permissions={usePrivacySettingsPermissions()}
-          onPrivacyPolicyTapped={function (): void {}}
-        />
+        <AppearanceSettingsView />
       </SettingsProvider>
     </SafeAreaView>
   )

@@ -1,16 +1,16 @@
 import { Footnote, Headline } from "@components/Text"
-import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
+import { StyleProp, ViewStyle, StyleSheet, View } from "react-native"
 
 export type SettingsLabelProps = {
-  style?: StyleProp<ViewStyle>
   title: string
   description?: string
+  style?: StyleProp<ViewStyle>
 }
 
 export const SettingsLabelView = ({
-  style,
   title,
-  description
+  description,
+  style
 }: SettingsLabelProps) => (
   <View style={style}>
     <View style={styles.label}>

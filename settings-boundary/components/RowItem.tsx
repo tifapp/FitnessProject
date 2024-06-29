@@ -1,5 +1,5 @@
 import { ReactNode } from "react"
-import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
+import { StyleProp, ViewStyle, View, StyleSheet } from "react-native"
 import { SettingsLabelView } from "./Label"
 
 export type SettingsRowItemProps = {
@@ -31,10 +31,9 @@ const styles = StyleSheet.create({
   row: {
     display: "flex",
     flexDirection: "row",
-    columnGap: 8,
     alignItems: "center",
-    padding: 16,
-    flex: 1
+    flex: 1,
+    padding: 16
   },
   label: {
     flex: 1

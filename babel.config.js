@@ -9,7 +9,6 @@ const modulePath = (dir) => {
 }
 
 const MODULES = [
-  "screens",
   "components",
   "assets",
   "lib",

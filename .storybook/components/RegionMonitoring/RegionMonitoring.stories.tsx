@@ -1,4 +1,3 @@
-import { SettingsScreen } from "@screens/SettingsScreen/SettingsScreen"
 import { ComponentMeta, ComponentStory } from "@storybook/react-native"
 import React, { useMemo, useState } from "react"
 import { SafeAreaProvider } from "react-native-safe-area-context"
@@ -22,8 +21,9 @@ import Slider from "@react-native-community/slider"
 import MapView from "react-native-maps"
 import { EventRegion } from "@event/ClientSideEvent"
 import { EventArrivalBannerView } from "@event-details-boundary/ArrivalBanner"
+import { StoryMeta } from ".storybook/HelperTypes"
 
-const RegionMonitoringMeta: ComponentMeta<typeof SettingsScreen> = {
+const RegionMonitoringMeta: StoryMeta = {
   title: "Region Monitoring"
 }
 

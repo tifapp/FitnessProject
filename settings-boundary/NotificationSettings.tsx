@@ -50,8 +50,8 @@ const PermissionsDisabledSectionView = ({
           <View style={styles.permissionsDisabledTextColumn}>
             <Headline>Notifications are off!</Headline>
             <BodyText>
-              Turn on notifications to stay up to date on the latest and
-              greatest developments in your fitness journey!
+              Enable app notifications to receive important event updates, event
+              arrivals notifications, and profile notifications.
             </BodyText>
           </View>
         </View>
@@ -79,23 +79,23 @@ const EventChangesSectionView = ({ isEnabled }: EditableSectionBaseProps) => (
   >
     <SettingsCardView>
       <NamedTriggerIdToggleView
-        name="When the Start Time or Duration Changes"
+        name="Event Start Time or Duration Changes"
         id="event-time-changed"
       />
       <NamedTriggerIdToggleView
-        name="When the Location Changes"
+        name="Event Location Changes"
         id="event-location-changed"
       />
       <NamedTriggerIdToggleView
-        name="When the Name Changes"
+        name="Event Name Changes"
         id="event-name-changed"
       />
       <NamedTriggerIdToggleView
-        name="When the Description Changes"
+        name="Event Description Changes"
         id="event-description-changed"
       />
       <NamedTriggerIdToggleView
-        name="When the Event is Cancelled"
+        name="Event Cancellation"
         id="event-cancelled"
       />
     </SettingsCardView>
@@ -109,14 +109,14 @@ const EventTimingSectionView = ({ isEnabled }: EditableSectionBaseProps) => (
   >
     <SettingsCardView>
       <NamedTriggerIdToggleView
-        name="Prior to the Event Starting"
+        name="Prior to an Event Starting"
         id="event-starting-soon"
       />
       <NamedTriggerIdToggleView
-        name="When the Event Starts"
+        name="When an Event Starts"
         id="event-started"
       />
-      <NamedTriggerIdToggleView name="When the Event Ends" id="event-ended" />
+      <NamedTriggerIdToggleView name="When an Event Ends" id="event-ended" />
     </SettingsCardView>
   </SettingsSectionView>
 )
@@ -128,17 +128,18 @@ const EventArrivalsSectionView = ({ isEnabled }: EditableSectionBaseProps) => (
   >
     <SettingsCardView>
       <NamedTriggerIdToggleView
-        name="When I Arrive at the Event"
+        name="When You Arrive at an Event"
+        description="Notification is sent when you’ve arrived at an event."
         id="user-entered-region"
       />
       <NamedTriggerIdToggleView
-        name="When Others Arrive at the Event"
-        description="This notification is sent periodically throughout the duration of the event, not on every arrival."
+        name="When Others Arrive at an Event"
+        description="Notification is sent periodically on others arrival at an event."
         id="event-periodic-arrivals"
       />
       <NamedTriggerIdToggleView
         name="Attendance Headcount"
-        description="This notification is sent at the start of the event."
+        description="Notification is sent when an event starts."
         id="event-attendance-headcount"
       />
     </SettingsCardView>
@@ -149,11 +150,11 @@ const ProfileSectionView = ({ isEnabled }: EditableSectionBaseProps) => (
   <SettingsSectionView isDisabled={!isEnabled} title="Profile Notifications">
     <SettingsCardView>
       <NamedTriggerIdToggleView
-        name="When I Receive a Friend Request"
+        name="When You Receive a Friend Request"
         id="friend-request-received"
       />
       <NamedTriggerIdToggleView
-        name="When Someone Accepts my Friend Request"
+        name="When Someone Accepts Your Friend Request"
         id="friend-request-accepted"
       />
     </SettingsCardView>

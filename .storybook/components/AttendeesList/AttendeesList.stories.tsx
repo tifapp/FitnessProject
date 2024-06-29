@@ -4,13 +4,13 @@ import { EventAttendeeMocks } from "@event-details-boundary/MockData"
 import { AttendeesListView } from "@event-details-boundary/attendees-list/AttendeesList"
 import { NavigationContainer } from "@react-navigation/native"
 import { createStackNavigator } from "@react-navigation/stack"
-import { SettingsScreen } from "@screens/SettingsScreen/SettingsScreen"
 import { EventAttendee } from "@event/ClientSideEvent"
 import { ComponentMeta, ComponentStory } from "@storybook/react-native"
 import React from "react"
 import { View } from "react-native"
+import { StoryMeta } from ".storybook/HelperTypes"
 
-const AttendeesListMeta: ComponentMeta<typeof SettingsScreen> = {
+const AttendeesListMeta: StoryMeta = {
   title: "Attendees List Screen"
 }
 export default AttendeesListMeta
