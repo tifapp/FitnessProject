@@ -30,35 +30,41 @@ describe("HelpAndSupportSettings tests", () => {
     })
 
     test("Successful submit feedback flow", async () => {
-      const result = await setupSuccessfulFlow()
+      const result = await renderSuccessfulEmailCompositionFlow()
       act(() => result.current.feedbackSubmitted())
-      expect(alertPresentationSpy).toHaveBeenCalledWith(
-        HELP_AND_SUPPORT_EMAIL_SUCCESS_ALERTS.submitFeedbackSuccess.title,
-        HELP_AND_SUPPORT_EMAIL_SUCCESS_ALERTS.submitFeedbackSuccess.description
+      await waitFor(async () =>
+        expect(alertPresentationSpy).toHaveBeenCalledWith(
+          HELP_AND_SUPPORT_EMAIL_SUCCESS_ALERTS.submitFeedbackSuccess.title,
+          HELP_AND_SUPPORT_EMAIL_SUCCESS_ALERTS.submitFeedbackSuccess
+            .description
+        )
       )
-
       expect(composeEmail).toHaveBeenCalledWith(
         HELP_AND_SUPPORT_EMAILS.feedbackSubmitted
       )
     })
 
     test("Unsuccessful submit feedback flow", async () => {
-      const result = await setupUnsuccessfulFlow()
+      const result = await renderUnsuccessfulEmailCompositionFlow()
       act(() => result.current.feedbackSubmitted())
-      expect(alertPresentationSpy).toHaveBeenCalledWith(
-        HELP_AND_SUPPORT_EMAIL_ERROR_ALERTS.submitFeedbackError.title,
-        HELP_AND_SUPPORT_EMAIL_ERROR_ALERTS.submitFeedbackError.description
+      await waitFor(async () =>
+        expect(alertPresentationSpy).toHaveBeenCalledWith(
+          HELP_AND_SUPPORT_EMAIL_ERROR_ALERTS.submitFeedbackError.title,
+          HELP_AND_SUPPORT_EMAIL_ERROR_ALERTS.submitFeedbackError.description
+        )
       )
     })
 
     test("Successful report bug flow: no logs selected", async () => {
       compileLogs.mockRejectedValueOnce(new Error("Logs not compiled"))
-      const result = await setupSuccessfulFlow()
+      const result = await renderSuccessfulEmailCompositionFlow()
       act(() => result.current.bugReported())
       await reportWithoutLogs()
-      expect(alertPresentationSpy).toHaveBeenCalledWith(
-        HELP_AND_SUPPORT_EMAIL_SUCCESS_ALERTS.reportBugSuccess.title,
-        HELP_AND_SUPPORT_EMAIL_SUCCESS_ALERTS.reportBugSuccess.description
+      await waitFor(async () =>
+        expect(alertPresentationSpy).toHaveBeenCalledWith(
+          HELP_AND_SUPPORT_EMAIL_SUCCESS_ALERTS.reportBugSuccess.title,
+          HELP_AND_SUPPORT_EMAIL_SUCCESS_ALERTS.reportBugSuccess.description
+        )
       )
       expect(composeEmail).toHaveBeenCalledWith(
         HELP_AND_SUPPORT_EMAILS.bugReported(undefined)
@@ -67,12 +73,14 @@ describe("HelpAndSupportSettings tests", () => {
 
     test("Successful report bug flow: logs success", async () => {
       compileLogs.mockResolvedValueOnce(TEST_COMPILE_LOGS_URI)
-      const result = await setupSuccessfulFlow()
+      const result = await renderSuccessfulEmailCompositionFlow()
       act(() => result.current.bugReported())
       await reportWithLogs()
-      expect(alertPresentationSpy).toHaveBeenCalledWith(
-        HELP_AND_SUPPORT_EMAIL_SUCCESS_ALERTS.reportBugSuccess.title,
-        HELP_AND_SUPPORT_EMAIL_SUCCESS_ALERTS.reportBugSuccess.description
+      await waitFor(async () =>
+        expect(alertPresentationSpy).toHaveBeenCalledWith(
+          HELP_AND_SUPPORT_EMAIL_SUCCESS_ALERTS.reportBugSuccess.title,
+          HELP_AND_SUPPORT_EMAIL_SUCCESS_ALERTS.reportBugSuccess.description
+        )
       )
       expect(composeEmail).toHaveBeenCalledWith(
         HELP_AND_SUPPORT_EMAILS.bugReported(TEST_COMPILE_LOGS_URI)
@@ -81,18 +89,22 @@ describe("HelpAndSupportSettings tests", () => {
 
     test("Successful report bug flow: logs failure, switch to no logs", async () => {
       compileLogs.mockRejectedValueOnce(new Error("Something went wrong"))
-      const result = await setupSuccessfulFlow()
+      const result = await renderSuccessfulEmailCompositionFlow()
       act(() => result.current.bugReported())
       await reportWithLogs()
-      expect(alertPresentationSpy).toHaveBeenCalledWith(
-        HELP_AND_SUPPORT_ALERTS.compileLogError.title,
-        HELP_AND_SUPPORT_ALERTS.compileLogError.description,
-        expect.any(Array)
+      await waitFor(async () =>
+        expect(alertPresentationSpy).toHaveBeenCalledWith(
+          HELP_AND_SUPPORT_ALERTS.compileLogError.title,
+          HELP_AND_SUPPORT_ALERTS.compileLogError.description,
+          expect.any(Array)
+        )
       )
       await reportWithoutLogsAfterFailure()
-      expect(alertPresentationSpy).toHaveBeenCalledWith(
-        HELP_AND_SUPPORT_EMAIL_SUCCESS_ALERTS.reportBugSuccess.title,
-        HELP_AND_SUPPORT_EMAIL_SUCCESS_ALERTS.reportBugSuccess.description
+      await waitFor(async () =>
+        expect(alertPresentationSpy).toHaveBeenCalledWith(
+          HELP_AND_SUPPORT_EMAIL_SUCCESS_ALERTS.reportBugSuccess.title,
+          HELP_AND_SUPPORT_EMAIL_SUCCESS_ALERTS.reportBugSuccess.description
+        )
       )
       expect(composeEmail).toHaveBeenCalledWith(
         HELP_AND_SUPPORT_EMAILS.bugReported(undefined)
@@ -100,11 +112,14 @@ describe("HelpAndSupportSettings tests", () => {
     })
 
     test("Successful submit question flow", async () => {
-      const result = await setupSuccessfulFlow()
+      const result = await renderSuccessfulEmailCompositionFlow()
       act(() => result.current.questionSubmitted())
-      expect(alertPresentationSpy).toHaveBeenCalledWith(
-        HELP_AND_SUPPORT_EMAIL_SUCCESS_ALERTS.submitQuestionSuccess.title,
-        HELP_AND_SUPPORT_EMAIL_SUCCESS_ALERTS.submitQuestionSuccess.description
+      await waitFor(async () =>
+        expect(alertPresentationSpy).toHaveBeenCalledWith(
+          HELP_AND_SUPPORT_EMAIL_SUCCESS_ALERTS.submitQuestionSuccess.title,
+          HELP_AND_SUPPORT_EMAIL_SUCCESS_ALERTS.submitQuestionSuccess
+            .description
+        )
       )
 
       expect(composeEmail).toHaveBeenCalledWith(
@@ -119,9 +134,11 @@ describe("HelpAndSupportSettings tests", () => {
         expect(result.current.isShowingContactSection).toEqual(true)
       )
       act(() => result.current.questionSubmitted())
-      expect(alertPresentationSpy).toHaveBeenCalledWith(
-        HELP_AND_SUPPORT_EMAIL_ERROR_ALERTS.submitQuestionError.title,
-        HELP_AND_SUPPORT_EMAIL_ERROR_ALERTS.submitQuestionError.description
+      await waitFor(async () =>
+        expect(alertPresentationSpy).toHaveBeenCalledWith(
+          HELP_AND_SUPPORT_EMAIL_ERROR_ALERTS.submitQuestionError.title,
+          HELP_AND_SUPPORT_EMAIL_ERROR_ALERTS.submitQuestionError.description
+        )
       )
     })
 

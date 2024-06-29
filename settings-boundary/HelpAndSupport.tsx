@@ -47,7 +47,7 @@ export const HELP_AND_SUPPORT_ALERTS = {
     buttons: (
       reportWithLogs: () => Promise<void>,
       reportWithoutLogs: () => Promise<void>,
-     openLogsHelpCenter: () => void
+      openLogsHelpCenter: () => void
     ) => [
       {
         text: "Yes",
@@ -179,8 +179,8 @@ export const useHelpAndSupportSettings = (
               )
             }
           },
-          () => {
-            createEmail(
+          async () => {
+            await createEmail(
               env.composeEmail,
               HELP_AND_SUPPORT_EMAILS.bugReported(undefined),
               "reportBugSuccess",
