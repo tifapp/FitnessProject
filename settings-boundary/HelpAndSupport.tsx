@@ -47,7 +47,7 @@ export const HELP_AND_SUPPORT_ALERTS = {
     buttons: (
       reportWithLogs: () => Promise<void>,
       reportWithoutLogs: () => Promise<void>,
-      logQuestion: () => void
+     openLogsHelpCenter: () => void
     ) => [
       {
         text: "Yes",
@@ -60,7 +60,7 @@ export const HELP_AND_SUPPORT_ALERTS = {
       },
       {
         text: "What is this?",
-        onPress: logQuestion
+        onPress: openLogsHelpCenter
       }
     ]
   },
@@ -142,7 +142,7 @@ export const useHelpAndSupportSettings = (
 
   return {
     isShowingContactSection,
-    feedbackSubmitted: async () => {
+    feedbackSubmitted: () => {
       createEmail(
         env.composeEmail,
         HELP_AND_SUPPORT_EMAILS.feedbackSubmitted,
@@ -150,7 +150,7 @@ export const useHelpAndSupportSettings = (
         "submitFeedbackError"
       )
     },
-    bugReported: async () => {
+    bugReported: () => {
       Alert.alert(
         HELP_AND_SUPPORT_ALERTS.reportBugTapped.title,
         HELP_AND_SUPPORT_ALERTS.reportBugTapped.description,
@@ -158,19 +158,17 @@ export const useHelpAndSupportSettings = (
           async () => {
             try {
               const URI = await env.compileLogs()
-              if (URI) {
-                createEmail(
-                  env.composeEmail,
-                  HELP_AND_SUPPORT_EMAILS.bugReported(URI),
-                  "reportBugSuccess",
-                  "reportBugError"
-                )
-              }
+              createEmail(
+                env.composeEmail,
+                HELP_AND_SUPPORT_EMAILS.bugReported(URI),
+                "reportBugSuccess",
+                "reportBugError"
+              )
             } catch {
               Alert.alert(
                 HELP_AND_SUPPORT_ALERTS.compileLogError.title,
                 HELP_AND_SUPPORT_ALERTS.compileLogError.description,
-                HELP_AND_SUPPORT_ALERTS.compileLogError.buttons(async () =>
+                HELP_AND_SUPPORT_ALERTS.compileLogError.buttons(() =>
                   createEmail(
                     env.composeEmail,
                     HELP_AND_SUPPORT_EMAILS.bugReported(undefined),
@@ -181,7 +179,7 @@ export const useHelpAndSupportSettings = (
               )
             }
           },
-          async () => {
+          () => {
             createEmail(
               env.composeEmail,
               HELP_AND_SUPPORT_EMAILS.bugReported(undefined),
@@ -193,7 +191,7 @@ export const useHelpAndSupportSettings = (
         )
       )
     },
-    questionSubmitted: async () => {
+    questionSubmitted: () => {
       createEmail(
         env.composeEmail,
         HELP_AND_SUPPORT_EMAILS.questionSubmitted,

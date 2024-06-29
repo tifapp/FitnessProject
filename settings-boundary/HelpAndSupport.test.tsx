@@ -31,7 +31,7 @@ describe("HelpAndSupportSettings tests", () => {
 
     test("Successful submit feedback flow", async () => {
       const result = await setupSuccessfulFlow()
-      await act(async () => await result.current.feedbackSubmitted())
+      act(() => result.current.feedbackSubmitted())
       expect(alertPresentationSpy).toHaveBeenCalledWith(
         HELP_AND_SUPPORT_EMAIL_SUCCESS_ALERTS.submitFeedbackSuccess.title,
         HELP_AND_SUPPORT_EMAIL_SUCCESS_ALERTS.submitFeedbackSuccess.description
@@ -44,7 +44,7 @@ describe("HelpAndSupportSettings tests", () => {
 
     test("Unsuccessful submit feedback flow", async () => {
       const result = await setupUnsuccessfulFlow()
-      await act(async () => await result.current.feedbackSubmitted())
+      act(() => result.current.feedbackSubmitted())
       expect(alertPresentationSpy).toHaveBeenCalledWith(
         HELP_AND_SUPPORT_EMAIL_ERROR_ALERTS.submitFeedbackError.title,
         HELP_AND_SUPPORT_EMAIL_ERROR_ALERTS.submitFeedbackError.description
@@ -54,7 +54,7 @@ describe("HelpAndSupportSettings tests", () => {
     test("Successful report bug flow: no logs selected", async () => {
       compileLogs.mockRejectedValueOnce(new Error("Logs not compiled"))
       const result = await setupSuccessfulFlow()
-      await act(async () => await result.current.bugReported())
+      act(() => result.current.bugReported())
       await reportWithoutLogs()
       expect(alertPresentationSpy).toHaveBeenCalledWith(
         HELP_AND_SUPPORT_EMAIL_SUCCESS_ALERTS.reportBugSuccess.title,
@@ -68,7 +68,7 @@ describe("HelpAndSupportSettings tests", () => {
     test("Successful report bug flow: logs success", async () => {
       compileLogs.mockResolvedValueOnce(TEST_COMPILE_LOGS_URI)
       const result = await setupSuccessfulFlow()
-      await act(async () => await result.current.bugReported())
+      act(() => result.current.bugReported())
       await reportWithLogs()
       expect(alertPresentationSpy).toHaveBeenCalledWith(
         HELP_AND_SUPPORT_EMAIL_SUCCESS_ALERTS.reportBugSuccess.title,
@@ -82,7 +82,7 @@ describe("HelpAndSupportSettings tests", () => {
     test("Successful report bug flow: logs failure, switch to no logs", async () => {
       compileLogs.mockRejectedValueOnce(new Error("Something went wrong"))
       const result = await setupSuccessfulFlow()
-      await act(async () => await result.current.bugReported())
+      act(() => result.current.bugReported())
       await reportWithLogs()
       expect(alertPresentationSpy).toHaveBeenCalledWith(
         HELP_AND_SUPPORT_ALERTS.compileLogError.title,
@@ -101,7 +101,7 @@ describe("HelpAndSupportSettings tests", () => {
 
     test("Successful submit question flow", async () => {
       const result = await setupSuccessfulFlow()
-      await act(async () => await result.current.questionSubmitted())
+      act(() => result.current.questionSubmitted())
       expect(alertPresentationSpy).toHaveBeenCalledWith(
         HELP_AND_SUPPORT_EMAIL_SUCCESS_ALERTS.submitQuestionSuccess.title,
         HELP_AND_SUPPORT_EMAIL_SUCCESS_ALERTS.submitQuestionSuccess.description
@@ -118,14 +118,14 @@ describe("HelpAndSupportSettings tests", () => {
       await waitFor(() =>
         expect(result.current.isShowingContactSection).toEqual(true)
       )
-      await act(async () => await result.current.questionSubmitted())
+      act(() => result.current.questionSubmitted())
       expect(alertPresentationSpy).toHaveBeenCalledWith(
         HELP_AND_SUPPORT_EMAIL_ERROR_ALERTS.submitQuestionError.title,
         HELP_AND_SUPPORT_EMAIL_ERROR_ALERTS.submitQuestionError.description
       )
     })
 
-    const setupSuccessfulFlow = async () => {
+    const renderSuccessfulEmailCompositionFlow = async () => {
       composeEmail.mockResolvedValue("success")
       const { result } = renderUseHelpAndSupportSettings()
       await waitFor(() =>
@@ -134,7 +134,7 @@ describe("HelpAndSupportSettings tests", () => {
       return result
     }
 
-    const setupUnsuccessfulFlow = async () => {
+    const renderUnsuccessfulEmailCompositionFlow = async () => {
       composeEmail.mockRejectedValue(new Error("Bad error"))
       const { result } = renderUseHelpAndSupportSettings()
       await waitFor(() =>
