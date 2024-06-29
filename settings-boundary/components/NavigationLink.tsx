@@ -1,8 +1,9 @@
 import { Ionicon, IoniconName } from "@components/common/Icons"
 import { ColorString } from "TiFShared/domain-models/ColorString"
-import { StyleProp, ViewStyle, StyleSheet, View } from "react-native"
-import { SettingsNamedIconRowView } from "./NamedIconRow"
+import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 import { SettingsButton } from "./Button"
+import { SettingsNamedIconRowView } from "./NamedIconRow"
+import { ReactNode } from "react"
 
 export type SettingsNavigationLinkProps = {
   title: string

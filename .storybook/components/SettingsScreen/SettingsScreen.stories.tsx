@@ -1,32 +1,20 @@
 import { BASE_HEADER_SCREEN_OPTIONS } from "@components/Navigation"
-import { delayData, sleep } from "@lib/utils/DelayData"
-import { HapticsProvider } from "@modules/tif-haptics"
+import { presentEmailComposer } from "@lib/EmailComposition"
 import { NavigationContainer } from "@react-navigation/native"
 import { createStackNavigator } from "@react-navigation/stack"
-import { SettingsScreen } from "@screens/SettingsScreen/SettingsScreen"
-import {
-  AppearanceSettingsView,
-  BlockListSettingsView,
-  RootSettingsView,
-  useBlockListSettings
-} from "@settings-boundary"
 import { SettingsProvider } from "@settings-storage/Hooks"
-import {
-  LocalSettings,
-  SQLiteLocalSettingsStorage
-} from "@settings-storage/LocalSettings"
+import { SQLiteLocalSettingsStorage } from "@settings-storage/LocalSettings"
 import { PersistentSettingsStores } from "@settings-storage/PersistentStores"
 import { SQLiteUserSettingsStorage } from "@settings-storage/UserSettings"
-import { TestHaptics } from "@test-helpers/Haptics"
 import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
 import { testSQLite } from "@test-helpers/SQLite"
-import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context"
-import { mockBlockListPage } from "settings-boundary/MockData"
+import { isAvailableAsync } from "expo-mail-composer"
 import { RootSiblingParent } from "react-native-root-siblings"
-import { uuidString } from "@lib/utils/UUID"
-import { UserHandle } from "TiFShared/domain-models/User"
-import { UserSessionProvider } from "@user/Session"
-import { OpenWeblinkProvider, openWeblink } from "@modules/tif-weblinks"
+import { SafeAreaProvider } from "react-native-safe-area-context"
+import {
+  HelpAndSupportView,
+  useHelpAndSupportSettings
+} from "settings-boundary/HelpAndSupport"
 import { StoryMeta } from "../../HelperTypes"
 
 const SettingsMeta: StoryMeta = {
@@ -40,40 +28,13 @@ const Stack = createStackNavigator()
 export const Basic = () => (
   <RootSiblingParent>
     <SafeAreaProvider>
-      <HapticsProvider
-        haptics={new TestHaptics()}
-        isAudioSupportedOnDevice
-        isFeedbackSupportedOnDevice
-      >
-        <TestQueryClientProvider>
-          <OpenWeblinkProvider
-            open={async (url) =>
-              openWeblink(url, {
-                load: async () => {
-                  return {
-                    isUsingSafariReaderMode: true,
-                    preferredBrowserName: "in-app"
-                  } as LocalSettings
-                }
-              })
-            }
-          >
-            <UserSessionProvider
-              userSession={async () => {
-                throw new Error()
-              }}
-            >
-              <NavigationContainer>
-                <Stack.Navigator
-                  screenOptions={{ ...BASE_HEADER_SCREEN_OPTIONS }}
-                >
-                  <Stack.Screen name="Settings" component={Test} />
-                </Stack.Navigator>
-              </NavigationContainer>
-            </UserSessionProvider>
-          </OpenWeblinkProvider>
-        </TestQueryClientProvider>
-      </HapticsProvider>
+      <TestQueryClientProvider>
+        <NavigationContainer>
+          <Stack.Navigator screenOptions={{ ...BASE_HEADER_SCREEN_OPTIONS }}>
+            <Stack.Screen name="Settings" component={Test} />
+          </Stack.Navigator>
+        </NavigationContainer>
+      </TestQueryClientProvider>
     </SafeAreaProvider>
   </RootSiblingParent>
 )
@@ -87,39 +48,17 @@ const userStore = PersistentSettingsStores.user(
 )
 
 const Test = () => {
-  const state = useBlockListSettings({
-    nextPage: async () => {
-      const page = mockBlockListPage(100, uuidString())
-      return await delayData(
-        {
-          ...page,
-          users: [
-            ...page.users,
-            {
-              id: uuidString(),
-              username: "Catherine O'Kon IV",
-              handle: UserHandle.sillyBitchell,
-              profileImageURL: null
-            }
-          ]
-        },
-        3000
-      )
-    },
-    unblockUser: async (ids) => {
-      console.log("Unblocking", ids)
-      await sleep(1000)
-      // throw new Error()
-    }
+  const state = useHelpAndSupportSettings({
+    isShowingContactSection: isAvailableAsync,
+    composeEmail: presentEmailComposer,
+    compileLogs: async () => "Test"
   })
   return (
-    <SafeAreaView edges={["bottom"]}>
-      <SettingsProvider
-        localSettingsStore={localStore}
-        userSettingsStore={userStore}
-      >
-        <AppearanceSettingsView />
-      </SettingsProvider>
-    </SafeAreaView>
+    <SettingsProvider
+      localSettingsStore={localStore}
+      userSettingsStore={userStore}
+    >
+      <HelpAndSupportView style={{ flex: 1 }} state={state} />
+    </SettingsProvider>
   )
 }

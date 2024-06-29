@@ -1,3 +1,15 @@
+import { useEffectEvent } from "@lib/utils/UseEffectEvent"
+import { useOpenWeblink } from "@modules/tif-weblinks"
+import {
+  EventHandle,
+  EventHandleLinkifyMatch
+} from "TiFShared/domain-models/Event"
+import {
+  UserHandle,
+  UserHandleLinkifyMatch
+} from "TiFShared/domain-models/User"
+import { linkify } from "TiFShared/lib/LinkifyIt"
+import { Match } from "linkify-it"
 import React, { useEffect, useMemo, useState } from "react"
 import {
   StyleProp,
@@ -8,25 +20,12 @@ import {
   View,
   ViewStyle
 } from "react-native"
-import { openURL } from "expo-linking"
-import { BodyText, Headline } from "../components/Text"
-import { Match } from "linkify-it"
-import {
-  UserHandle,
-  UserHandleLinkifyMatch
-} from "TiFShared/domain-models/User"
-import {
-  EventHandle,
-  EventHandleLinkifyMatch
-} from "TiFShared/domain-models/Event"
-import { linkify } from "TiFShared/lib/LinkifyIt"
-import { useEffectEvent } from "@lib/utils/UseEffectEvent"
 import Animated, {
-  FadeOut,
   FadeIn,
+  FadeOut,
   LinearTransition
 } from "react-native-reanimated"
-import { useOpenWeblink } from "@modules/tif-weblinks"
+import { BodyText, Headline } from "../components/Text"
 
 export type ContentTextCallbacks = {
   onUserHandleTapped: (handle: UserHandle) => void
