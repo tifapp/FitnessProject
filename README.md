@@ -1,163 +1,65 @@
 # FitnessProject
 
-## tiF Mobile App: Health and Fitness
+React Native Frontend Repo for tiF.
 
-- Our new mobile app is an application designed to make socializing be much more accessible for individuals just getting into fitness, or to give a simplistic, but reliable way to schedule events for themselves and groups. We plan on having the app be available as a tool used to build communities and strengthen bonds with others in the pursuit of getting healthier, in order to take advantage of the rising digital age, instead of ignoring it.
+## Getting Started
 
-- We hope to expand into further prospects as we develop our application, and begin turning fitness around!
+### Xcode and Android Studio
 
-## Installation
+We use expo's bare workflow to manage our app. This means that we have full control over the native Xcode and Android Studio projects, but we use EAS build and the expo-cli to aid us in development.
 
-In order to install the project, you must first:
+First, ensure that you have either a recent version of Xcode or Android Studio installed. You will need either one of these tools to compile the iOS and Android apps respectively. Xcode is only available on macOS, so you will need a mac to compile the iOS app.
 
-1. Create an email account and a [GitHub](https://github.com/signup) account to access the repo:
+You can find latest releases of Xcode [here](https://xcodereleases.com/) (Do not install it through the mac app store).
 
-2. Clone the remote repository to your local machine using a git client or through the command line.
+You can find latest releases of Android Studio [here](https://developer.android.com/studio/releases).
 
-   #### Git Client
+Everytime new native code is added, either through native code we write, or from another library, you will need to rebuild the app in both tools.
 
-   After installing, click the “clone from URL” button and add the repo’s git: <https://github.com/tifapp/FitnessProject.git>
+### `.env` Files
 
-   #### Command Line
+We have 2 `.env` files that we use in this repo, `.env` and `.env.infra`. The first contains a few public API keys (such as the Sentry DSN and Mixpanel Token) and base URLs for APIs we use in production. The second file contains secrets needed by infrastructure related tooling, such as EAS post-install scripts, and are not bundled in the production app.
 
-   If you are instead using the command line, install git and then run this command:
+### Setup + Running
 
-   `git clone https://github.com/tifapp/FitnessProject.git`
+After cloning the repo, make sure to run the typical `npm install`. Then afterwards, there are various scripts you can run for development. Here are the main ones you'll need to know about in order of relevance:
+1. `npm run start` to start the dev server (you will need to compile the app with Android Studio or Xcode before running this).
+2. `npm run sb_start` to start the dev server for runing the storybook version of the app (you will need to compile the app with Android Studio or Xcode before running this).
+3. `npm run test` to run the unit tests.
+4. `npm run test-acceptance` to run the acceptance (or e2e) tests.
+5. `npm run eas_dev_build` to create an EAS dev build on expo's servers.
+6. `npm run eas_dev_build_local` to create a local EAS dev build (you must have Xcode or Android Studio installed for this to work).
 
-3. Install [Node.js](https://nodejs.org/download/release/v16.13.1/) version 16.13.1:
+### Contributing
 
-   #### Windows
+For now we have a typical checkout branch, make changes, open PR flow. However, we'll often review PRs during our regular meetings.
 
-   Look for the package labeled "node-v16.13.1-win…", and download.
+When opening a PR, try to explain the changes you've made and **why** you're making them. PR descriptions serve as a crucial reference point of documentation, so don't skimp on this part.
 
-   #### Mac
+Each PR will also need to have one or more trello tickets linked to it. You can link a ticket by putting the URL to the ticket at the bottom of the PR. If your PR does not cover an explicit ticket (eg. in the moment fix, or the ticket hasn't been created for some reason), you can put `TASK_UNTRACKED` at the bottom of the PR. However, only do this sparingly.
 
-   Look for the package labeled "node-v16.13.1-pkg", and download.
+## Development Guidelines
 
-4. Install the Expo CLI in the command line, using this command: `npm install expo-cli --global`
+Since this is a react application, you'll want to get familiar with our conventions of using react since it is unopinionated. Luckily, the general architecture is documented [here](https://github.com/tifapp/TiFShared/wiki/Frontend-Architecture).
 
-5. Go to the FitnessProject folder (`cd FitnessProject`), then install all dependencies through the command line (`npm install`).
+Try not to install too many libraries/dependencies if you can get away with it. If it doesn't take to long to write the code for a particular task yourself, then avoid using a library. When looking for a library, always check to make sure that expo has an appropriate package for the task at hand.
 
-## Usage
+Do not be afraid of writing native code if needed, especially if there are no well maintained packages for the task at hand. At the very least, you should learn to understand basic Objective C, Swift, Kotlin, and Java as react native is built on top of all 4 languages.
 
-Using the app is fairly simple:
+## TiFShared
 
-### Running the Server
+If you're working on code that can be shared between the frontend and backend codebases, then submit it to our [shared](https://github.com/tifapp/TiFShared) repo. We use `TiFShared` as a dependency of this project, and it contains crucial model types and utility functions in our codebase.
 
-To use the app, you must first run the metro server on your machine through the command line:
+## Troubleshooting
 
-#### Local Process
+If you're having issues, please reach out on slack. If you're dealing with a configuration issue of some kind, please edit [this](https://github.com/tifapp/TiFShared/wiki/Configuration-Issues) document with details on the issue, and add every step you took to solve the issue to that document. Keeping a past record of issues is important for preventing issues in the future.
 
-1.  `expo start`
+## Appendix
 
-    - Note: You must be on the same wifi network, in order to make proper usage of the server.
-
-#### Publicly Accessible Proces
-
-2. `expo start –tunnel`
-
-   - Note: This opens a tunnel link that is accessible to anyone from the internet.
-
-Second, download the Expo Go App on the Play Store/App Store, to test the application locally.
-
-1.  To use the app, you must scan the given QR code or link from the terminal using the Expo Go app.
-
-## Manually Testing the App
-
-- Use “`expo start`”/“`expo start --tunnel`”
-
-- Scan the QR code on your testing device or open the tunnel URL by clicking on the link
-
-- Create a new user, or use the test account to enter sandbox mode
-
-  - [cse115bdevelopers@gmail.com](mailto:cse115bdevelopers@gmail.com)
-  - cse115bdeveloper
-
-## Running Automated Testing
-
-We utilize automated testing in a good portion of our work. In order to run tests that have been created, you must:
-
-## Convention
-
-The standards that we have for our code are located on our [style guide](STYLEGUIDE.md).
-
-## Development process
-
-To develop for the app, you must utilize a code editor of your own choosing. Recommendations are given below, for the usage of [Visual Studio Code](https://visualstudio.microsoft.com/downloads/).
-
-### Recommended Settings for VSCode
-
-Settings here are to be added onto your workspace's settings.json.
-
-      {
-      	"diffEditor.renderSideBySide":false,
-      	"\[javascript]":
-      	{
-      		"editor.defaultFormatter":"esbenp.prettier-vscode",
-      		"editor.formatOnSave":true,
-      		"editor.formatOnPaste":true,
-      		"editor.autoIndent":"full",
-      	},
-      	"editor.codeActionsOnSave":
-      	{
-      		"source.fixAll":true,
-      		"source.fixAll.eslint":true,
-      		"source.organizeImports":true,
-      		"source.addMissingImports":true,
-      	},
-      	"javascript.updateImportsOnFileMove.enabled":"always",
-      	"\[json]":
-      	{
-      		"editor.defaultFormatter":"esbenp.prettier-vscode"
-      	}
-      }
-
-If you are a developer for the app, please keep track of tasks on our Trello: [Fitness Project (fitnessproject19) | Trello](https://trello.com/w/fitnessproject19)
-
-### Recommended Extensions for VSCode
-
-- Prettier ESLint
-- Code spell checker
-- GraphQL: Inline Operation Execution
-- GraphQL: Language Feature Support
-- GraphQL: Syntax Highlighting
-
-## Branch Management / Pull Request Policy
-
-- Branch off the development branch for each task you are performing.
-
-- When you are ready to merge your feature branch to the sprint branch, create a pull request and have it reviewed by one other team member.
-
-  - Recommended to checkout the branch and test the changes locally before approval
-
-- Before the pull request, do a git rebase squash.
-
-- Once merged, delete the branch afterward.
-
-### React Native
-
-- Documentation: <https://reactnative.dev/>
-
-- Tutorial: <https://reactnative.dev/docs/getting-started>
-
-### Appendix
-
-<https://www.linode.com/docs/guides/install-and-use-npm-on-linux/>
-
-<https://docs.expo.dev/workflow/expo-cli/>
-
-[Setting up the development environment · React Native](https://reactnative.dev/docs/environment-setup)
-
-<https://reactnative.dev/docs/getting-started>
-
-### Storybook
-
-1. `cd .storybook`
-
-2. `npm install`
-
-3. `expo start`
-
-4. When adding new stories, run "`npm run update-stories`" so they appear in the app
-
-See examples in .storybook/components
+- React Native Docs: <https://reactnative.dev/>
+- Expo Github Repo: <https://github.com/expo/expo>
+- Expo Docs: <https://docs.expo.dev/>
+- Xcode Releases: <https://xcodereleases.com/>
+- Android Studio Releases: <https://developer.android.com/studio/releases>
+- TiFShared: <https://github.com/tifapp/TiFShared>
+- Architecture: <https://github.com/tifapp/TiFShared/wiki/Configuration-Issues>
