@@ -52,7 +52,7 @@ If you're working on code that can be shared between the frontend and backend co
 
 ## Troubleshooting
 
-If you're having issues, please reach out on slack. If you're dealing with a configuration issue of some kind, please edit [this](https://github.com/tifapp/TiFShared/wiki/Configuration-Issues) document with details on the issue, and add every step you took to solve the issue to that document. Keeping a past record of issues is important for preventing issues in the future.
+If you're having issues, please reach out on slack. If you're dealing with a configuration issue of some kind, please edit [this "what the fuck" document](https://github.com/tifapp/TiFShared/wiki/WTF-Issues) with details on the issue, and add every step you took to solve the issue to that document. Keeping a past record of issues is important for preventing issues in the future.
 
 ## Appendix
 
