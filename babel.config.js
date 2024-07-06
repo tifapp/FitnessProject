@@ -27,7 +27,8 @@ const MODULES = [
   "event",
   "user",
   "settings-storage",
-  "settings-boundary"
+  "settings-boundary",
+  "edit-event"
 ]
 
 module.exports = function (api) {
