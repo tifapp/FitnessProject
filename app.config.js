@@ -8,24 +8,24 @@ const { MAPS_API_KEY, EXPO_PROJECT_ID, EXPO_PROJECT_OWNER, EAS_BUILD_TYPE } =
 const { bundleIdentifier, icon, splash, name } =
   EAS_BUILD_TYPE === "development"
     ? {
-      bundleIdentifier: "com.tifapp.FitnessAppDevelopment",
-      icon: ".storybook/assets/icon.png",
-      splash: ".storybook/assets/splash.png",
-      name: "FitnessAppDevelopment"
-    }
+        bundleIdentifier: "com.tifapp.FitnessAppDevelopment",
+        icon: ".storybook/assets/icon.png",
+        splash: ".storybook/assets/splash.png",
+        name: "FitnessAppDevelopment"
+      }
     : EAS_BUILD_TYPE === "preview"
       ? {
-        bundleIdentifier: "com.tifapp.FitnessAppPreview",
-        icon: "./assets/icon.png",
-        splash: "./assets/splash.png",
-        name: "FitnessAppPreview"
-      }
+          bundleIdentifier: "com.tifapp.FitnessAppPreview",
+          icon: "./assets/icon.png",
+          splash: "./assets/splash.png",
+          name: "FitnessAppPreview"
+        }
       : {
-        bundleIdentifier: "com.tifapp.FitnessApp",
-        icon: "./assets/icon.png",
-        splash: "./assets/splash.png",
-        name: "FitnessApp"
-      }
+          bundleIdentifier: "com.tifapp.FitnessApp",
+          icon: "./assets/icon.png",
+          splash: "./assets/splash.png",
+          name: "FitnessApp"
+        }
 
 const config = {
   name,
@@ -58,16 +58,17 @@ const config = {
       }
     ],
     "expo-font",
-    "expo-secure-store"
+    "expo-secure-store",
+    "expo-asset"
   ],
   assetBundlePatterns: ["**/*"],
   ios: {
     bundleIdentifier,
     infoPlist: {
       NSLocationAlwaysAndWhenInUseUsageDescription:
-        "To inform others of your arrival, tap \"Change to Always Allow.\"",
+        'To inform others of your arrival, tap "Change to Always Allow."',
       NSLocationWhenInUseUsageDescription:
-        "Discover events and receive travel estimates for events by tapping \"Allow Once\" or \"Allow While Using App.\"",
+        'Discover events and receive travel estimates for events by tapping "Allow Once" or "Allow While Using App."',
       UIBackgroundModes: ["location", "fetch"],
       LSApplicationQueriesSchemes: [
         "comgooglemaps",

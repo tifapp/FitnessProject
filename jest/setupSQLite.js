@@ -1,7 +1,7 @@
 // @ts-nocheck
 // Copied from: https://github.com/expo/expo/blob/main/packages/expo-sqlite/src/next/__mocks__/ExpoSQLiteNext.ts
 
-jest.mock("../node_modules/expo-sqlite/build/next/ExpoSQLiteNext", () => {
+jest.mock("../node_modules/expo-sqlite/build/ExpoSQLiteNext", () => {
   const assert = require("assert")
   const sqlite3 = require("better-sqlite3")
 
