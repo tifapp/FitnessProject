@@ -57,7 +57,18 @@ const config = {
         project: "react-native"
       }
     ],
-    "expo-font",
+    [
+      "expo-font",
+      {
+        fonts: [
+          "./assets/fonts/OpenSans-Bold.ttf",
+          "./assets/fonts/OpenSans-Regular.ttf",
+          "./assets/fonts/OpenSans-SemiBold.ttf",
+          "./assets/fonts/OpenDyslexic3-Bold.ttf",
+          "./assets/fonts/OpenDyslexic3-Regular.ttf"
+        ]
+      }
+    ],
     "expo-secure-store",
     "expo-asset"
   ],
