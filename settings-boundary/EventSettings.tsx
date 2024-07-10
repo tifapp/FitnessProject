@@ -1,9 +1,10 @@
-import { BodyText, Headline } from "@components/Text"
+import { Headline } from "@components/Text"
+import { Ionicon } from "@components/common/Icons"
 import { AppStyles } from "@lib/AppColorStyle"
 import { useUserSettings } from "@settings-storage/Hooks"
 import { settingsSelector } from "@settings-storage/Settings"
 import { Placemark } from "TiFShared/domain-models/Placemark"
-import dayjs from "dayjs"
+import { formatEventDurationPreset } from "TiFShared/domain-models/Settings"
 import React from "react"
 import {
   StyleProp,
@@ -15,7 +16,10 @@ import {
 import { SettingsNamedToggleView } from "./components/NamedToggle"
 import { SettingsNavigationLinkView } from "./components/NavigationLink"
 import { SettingsScrollView } from "./components/ScrollView"
-import { SettingsCardSectionView } from "./components/Section"
+import {
+  SettingsCardSectionView,
+  SettingsSectionView
+} from "./components/Section"
 
 export type SettingDurationCardProps = {
   style?: StyleProp<ViewStyle>
@@ -26,43 +30,83 @@ export const SettingsDurationCard = ({
   style,
   durationInSeconds
 }: SettingDurationCardProps) => {
-  const duration = dayjs.duration(durationInSeconds, "s").format("H[h] m[m]")
   return (
     <TouchableOpacity style={styles.container}>
-      <BodyText>{duration}</BodyText>
+      <Headline>{formatEventDurationPreset(durationInSeconds)}</Headline>
+      <TouchableOpacity style={styles.closeButton}>
+        <Ionicon size={16} color={"white"} name={"close"} />
+      </TouchableOpacity>
     </TouchableOpacity>
   )
 }
 
-export type DurationSectionViewProps = {
-  currentPresets: number[]
+export const AddDurationCard = () => {
+  return (
+    <TouchableOpacity style={styles.addButtonContainer}>
+      <Ionicon size={36} color={AppStyles.colorOpacity35} name={"add"} />
+    </TouchableOpacity>
+  )
 }
 
-export const DurationSectionView = ({
-  currentPresets
-}: DurationSectionViewProps) => {
+export const DurationSectionView = () => {
+  const { settings } = useUserSettings(settingsSelector("eventPresetDurations"))
+  console.log(settings)
+  const sortedDurations = settings.eventPresetDurations.sort((a, b) => a - b)
   return (
-    <>
-      <Headline style={{ padding: 16 }}>Duration Presets</Headline>
-      <View style={styles.settingsSection}>
-        {currentPresets
-          .sort((a, b) => {
-            return a - b
-          })
-          .map((item, index) => {
-            return (
-              <SettingsDurationCard
-                key={index}
-                durationInSeconds={currentPresets[index]}
-              />
-            )
-          })}
-        {currentPresets.length < 6 ? (
-          <SettingsDurationCard key={0} durationInSeconds={0} />
-        ) : undefined}
-      </View>
-    </>
+    <SettingsSectionView title="Duration Presets">
+      {sortedDurations.length < 3 ? (
+        <View style={styles.presetRowsGridContainer}>
+          <View style={styles.durationPresetRow}>
+            {createDurationCards(0, sortedDurations, 3)}
+            {settings.eventPresetDurations.length < 3 ? (
+              <AddDurationCard />
+            ) : undefined}
+            {settings.eventPresetDurations.length < 2 ? (
+              <View style={[styles.container, { opacity: 0 }]} />
+            ) : undefined}
+            {settings.eventPresetDurations.length < 1 ? (
+              <View style={[styles.container, { opacity: 0 }]} />
+            ) : undefined}
+          </View>
+        </View>
+      ) : (
+        <View style={styles.presetRowsGridContainer}>
+          <View style={styles.durationPresetRow}>
+            {createDurationCards(0, sortedDurations, 3)}
+          </View>
+          <View style={styles.durationPresetRow}>
+            {createDurationCards(3, sortedDurations)}
+            {settings.eventPresetDurations.length < 6 ? (
+              <AddDurationCard />
+            ) : undefined}
+            {settings.eventPresetDurations.length < 5 ? (
+              <View style={[styles.container, { opacity: 0 }]} />
+            ) : undefined}
+            {settings.eventPresetDurations.length < 4 ? (
+              <View style={[styles.container, { opacity: 0 }]} />
+            ) : undefined}
+          </View>
+        </View>
+      )}
+    </SettingsSectionView>
   )
+}
+
+export const createDurationCards = (
+  start: number,
+  durations: number[],
+  end?: number
+) => {
+  return durations.slice(start, end).map((item) => {
+    return (
+      <>
+        <SettingsDurationCard
+          key={`duration-preset-key-${item}`}
+          durationInSeconds={item}
+        />
+      </>
+    )
+  })
 }
 
 export type EventSettingsProps = {
@@ -77,6 +121,7 @@ export const EventSettingsView = ({
   return (
     <SettingsScrollView style={style}>
       <PresetSectionView onLocationPresetTapped={onLocationPresetTapped} />
+      <DurationSectionView />
     </SettingsScrollView>
   )
 }
@@ -88,7 +133,6 @@ type PresetSectionProps = {
 const PresetSectionView = ({ onLocationPresetTapped }: PresetSectionProps) => {
   const { settings, update } = useUserSettings(
     settingsSelector(
-      "eventPresetDurations",
       "eventPresetPlacemark",
       "eventPresetShouldHideAfterStartDate"
     )
@@ -113,30 +157,57 @@ const PresetSectionView = ({ onLocationPresetTapped }: PresetSectionProps) => {
         description={settings.eventPresetPlacemark?.name ?? "No Location"}
         onTapped={() => onLocationPresetTapped(settings.eventPresetPlacemark!)}
       />
-      <DurationSectionView currentPresets={[1800, 3600, 5400, 7200, 14400]} />
     </SettingsCardSectionView>
   )
 }
 
 const styles = StyleSheet.create({
   container: {
-    height: "50%",
-    width: "28%",
+    flex: 1,
+    height: 64,
+    borderRadius: 12,
+    position: "relative",
+    justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "white",
-    borderColor: "black",
-    marginHorizontal: 8,
-    marginBottom: 8,
-    paddingVertical: 16
+    backgroundColor: AppStyles.eventCardColor,
+    borderColor: "black"
+  },
+  addButtonContainer: {
+    flex: 1,
+    height: 64,
+    borderRadius: 12,
+    position: "relative",
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: AppStyles.eventCardColor,
+    borderStyle: "dashed",
+    opacity: 0.5,
+    borderColor: AppStyles.colorOpacity50,
+    borderWidth: 2
+  },
+  presetRowsGridContainer: {
+    rowGap: 8
   },
   cardDuration: {
     color: AppStyles.darkColor
   },
-  settingsSection: {
+  durationPresetRow: {
     alignContent: "space-between",
     justifyContent: "flex-start",
     flexDirection: "row",
-    flexWrap: "wrap",
-    padding: 16
+    columnGap: 8,
+    flexWrap: "wrap"
+  },
+  closeButton: {
+    justifyContent: "center",
+    alignItems: "center",
+    height: 24,
+    width: 24,
+    borderRadius: 64,
+    right: "-5%",
+    top: "-10%",
+    position: "absolute",
+    backgroundColor: AppStyles.black.toString(),
+    borderColor: "black"
   }
 })

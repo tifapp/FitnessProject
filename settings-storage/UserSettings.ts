@@ -1,19 +1,19 @@
+import { SQLExecutable, TiFSQLite } from "@lib/SQLite"
+import { MutationObserver, QueryClient } from "@tanstack/react-query"
+import { TiFAPI } from "TiFShared/api"
+import { UpdateUserSettingsRequest } from "TiFShared/api/models/User"
 import {
   DEFAULT_USER_SETTINGS,
   PushNotificationTriggerID,
   PushNotificationTriggerIDSchema,
   UserSettings
 } from "TiFShared/domain-models/Settings"
-import { PersistentSettingsStore, SettingsStorage } from "./PersistentStore"
-import { SQLExecutable, TiFSQLite } from "@lib/SQLite"
 import { mergeWithPartial } from "TiFShared/lib/Object"
-import { SettingsStore } from "./Settings"
-import { TiFAPI } from "TiFShared/api"
-import { UpdateUserSettingsRequest } from "TiFShared/api/models/User"
 import { logger } from "TiFShared/logging"
-import { QueryClient, MutationObserver } from "@tanstack/react-query"
 import { z } from "zod"
+import { PersistentSettingsStore, SettingsStorage } from "./PersistentStore"
 import { PersistentSettingsStores } from "./PersistentStores"
+import { SettingsStore } from "./Settings"
 
 const STORAGE_TAG = "sqlite.user.settings"
 
@@ -25,6 +25,7 @@ type SQLiteUserSettings = {
   pushNotificationTriggerIds: string
   eventCalendarStartOfWeekDay: string
   eventCalendarDefaultLayout: string
+  eventPresetDurations: string
   version: number
 }
 
@@ -56,6 +57,7 @@ export class SQLiteUserSettingsStorage
         pushNotificationTriggerIds,
         eventCalendarStartOfWeekDay,
         eventCalendarDefaultLayout,
+        eventPresetDurations,
         version
       ) VALUES (
         ${newSettings.isAnalyticsEnabled},
@@ -64,6 +66,7 @@ export class SQLiteUserSettingsStorage
         ${serializeTriggerIds(newSettings.pushNotificationTriggerIds)},
         ${newSettings.eventCalendarStartOfWeekDay},
         ${newSettings.eventCalendarDefaultLayout},
+        ${serializeDurations(newSettings.eventPresetDurations)},
         ${newSettings.version}
       )
       `
@@ -83,6 +86,9 @@ export class SQLiteUserSettingsStorage
       canShareArrivalStatus: sqliteSettings.canShareArrivalStatus === 1,
       pushNotificationTriggerIds: deserializeTriggerIds(
         sqliteSettings.pushNotificationTriggerIds
+      ),
+      eventPresetDurations: deserializeDurations(
+        sqliteSettings.eventPresetDurations
       )
     }
   }
@@ -96,6 +102,14 @@ const deserializeTriggerIds = (serializedIds: string) => {
   return z
     .array(PushNotificationTriggerIDSchema)
     .parse(serializedIds.split(","))
+}
+
+const serializeDurations = (durations: number[]) => {
+  return durations.join(",")
+}
+
+const deserializeDurations = (serializedDurations: string) => {
+  return serializedDurations.split(",").map((x) => +x)
 }
 
 const log = logger("user.settings.synchronizing.store")

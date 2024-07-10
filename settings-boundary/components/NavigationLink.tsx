@@ -4,6 +4,7 @@ import { ReactNode } from "react"
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 import { SettingsButton } from "./Button"
 import { SettingsNamedIconRowView } from "./NamedIconRow"
+import { SettingsRowItemView } from "./RowItem"
 
 type BaseSettingsNavigationLinkProps = {
   title: string
@@ -37,16 +38,25 @@ export const SettingsNavigationLinkView = ({
   style
 }: SettingsNavigationLinkProps) => (
   <SettingsButton onTapped={onTapped} isDisabled={isDisabled} style={style}>
-    <SettingsNamedIconRowView
-      iconName={iconName}
-      iconBackgroundColor={iconBackgroundColor}
-      name={title}
-    >
-      <View style={styles.accessoryRow}>
-        {rightAccessory}
-        <Ionicon name="chevron-forward" style={styles.chevron} />
-      </View>
-    </SettingsNamedIconRowView>
+    {iconName ? (
+      <SettingsNamedIconRowView
+        iconName={iconName}
+        iconBackgroundColor={iconBackgroundColor}
+        name={title}
+      >
+        <View style={styles.accessoryRow}>
+          {rightAccessory}
+          <Ionicon name="chevron-forward" style={styles.chevron} />
+        </View>
+      </SettingsNamedIconRowView>
+    ) : (
+      <SettingsRowItemView title={title} description={description}>
+        <View style={styles.accessoryRow}>
+          {rightAccessory}
+          <Ionicon name="chevron-forward" style={styles.chevron} />
+        </View>
+      </SettingsRowItemView>
+    )}
   </SettingsButton>
 )
 

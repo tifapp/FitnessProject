@@ -1,7 +1,7 @@
-import { mergeWithPartial } from "TiFShared/lib/Object"
-import { AnySettings, SettingsStore, areSettingsEqual } from "./Settings"
 import { CallbackCollection } from "@lib/utils/CallbackCollection"
+import { mergeWithPartial } from "TiFShared/lib/Object"
 import { logger } from "TiFShared/logging"
+import { AnySettings, SettingsStore, areSettingsEqual } from "./Settings"
 
 /**
  * An interface for loading settings.
@@ -86,6 +86,7 @@ export class PersistentSettingsStore<Settings extends AnySettings>
     if (this.initialLoadPromise) return
     this.initialLoadPromise = this.persistedSettings()
       .then((settings) => {
+        console.log(settings)
         this.currentSettings = settings
         this.subscribers.send(settings)
       })
