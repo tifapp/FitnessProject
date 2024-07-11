@@ -38,6 +38,9 @@ import RegionMonitoringMeta, {
 import SearchBarMeta, {
   Default as SearchBarBasic
 } from "../components/SearchBar/SearchBar.stories"
+import EventSettingsDurationMeta, {
+  Basic as EventSettingsDurationBasic
+} from "../components/SettingsScreen/EventSettingsDurations.stories"
 import EventSettingsMeta, {
   Basic as EventSettingsBasic
 } from "../components/SettingsScreen/EventSettingsScreen.stories"
@@ -85,6 +88,11 @@ const stories = [
     name: EventSettingsMeta.title,
     component: EventSettingsBasic,
     args: EventSettingsMeta.args
+  },
+  {
+    name: EventSettingsDurationMeta.title,
+    component: EventSettingsDurationBasic,
+    args: EventSettingsDurationMeta.args
   },
   {
     name: TextFieldMeta.title,

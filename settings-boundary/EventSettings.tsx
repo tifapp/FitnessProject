@@ -50,7 +50,6 @@ export const AddDurationCard = () => {
 
 export const DurationSectionView = () => {
   const { settings } = useUserSettings(settingsSelector("eventPresetDurations"))
-  console.log(settings)
   const sortedDurations = settings.eventPresetDurations.sort((a, b) => a - b)
   return (
     <SettingsSectionView title="Duration Presets">
@@ -112,15 +111,31 @@ export const createDurationCards = (
 export type EventSettingsProps = {
   style?: StyleProp<ViewStyle>
   onLocationPresetTapped: (locationPreset: Placemark) => void
+  onDurationTapped: () => void
 }
 
 export const EventSettingsView = ({
   style,
-  onLocationPresetTapped
+  onLocationPresetTapped,
+  onDurationTapped
 }: EventSettingsProps) => {
   return (
     <SettingsScrollView style={style}>
-      <PresetSectionView onLocationPresetTapped={onLocationPresetTapped} />
+      <PresetSectionView
+        onLocationPresetTapped={onLocationPresetTapped}
+        onDurationTapped={onDurationTapped}
+      />
+    </SettingsScrollView>
+  )
+}
+
+export type EventDurationsProps = {
+  style?: StyleProp<ViewStyle>
+}
+
+export const EventDurationView = ({ style }: EventDurationsProps) => {
+  return (
+    <SettingsScrollView style={style}>
       <DurationSectionView />
     </SettingsScrollView>
   )
@@ -128,9 +143,13 @@ export const EventSettingsView = ({
 
 type PresetSectionProps = {
   onLocationPresetTapped: (locationPreset: Placemark) => void
+  onDurationTapped: () => void
 }
 
-const PresetSectionView = ({ onLocationPresetTapped }: PresetSectionProps) => {
+const PresetSectionView = ({
+  onLocationPresetTapped,
+  onDurationTapped
+}: PresetSectionProps) => {
   const { settings, update } = useUserSettings(
     settingsSelector(
       "eventPresetPlacemark",
@@ -140,12 +159,12 @@ const PresetSectionView = ({ onLocationPresetTapped }: PresetSectionProps) => {
   return (
     <SettingsCardSectionView
       title="Presets"
-      subtitle="These presets will be filled in when you create a new event."
+      subtitle="These presets will populate when you create a new event."
     >
       <SettingsNamedToggleView
         name={"Hide After Start Date"}
         description={
-          "The event will not be shown publicly to other users after it starts."
+          "The event will no longer be publicly visible to other users after it starts."
         }
         isOn={settings.eventPresetShouldHideAfterStartDate}
         onIsOnChange={(eventPresetShouldHideAfterStartDate) =>
@@ -156,6 +175,11 @@ const PresetSectionView = ({ onLocationPresetTapped }: PresetSectionProps) => {
         title={"Location"}
         description={settings.eventPresetPlacemark?.name ?? "No Location"}
         onTapped={() => onLocationPresetTapped(settings.eventPresetPlacemark!)}
+      />
+      <SettingsNavigationLinkView
+        title={"Durations"}
+        description={"Set Durations"}
+        onTapped={() => onDurationTapped()}
       />
     </SettingsCardSectionView>
   )

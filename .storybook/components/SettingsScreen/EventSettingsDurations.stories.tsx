@@ -1,16 +1,15 @@
 import { StoryMeta } from ".storybook/HelperTypes"
 import { NavigationContainer } from "@react-navigation/native"
 import { createStackNavigator } from "@react-navigation/stack"
-import { EventSettingsView } from "@settings-boundary/EventSettings"
 import { SQLiteLocalSettingsStorage } from "@settings-storage/LocalSettings"
 import { PersistentSettingsStores } from "@settings-storage/PersistentStores"
 import { settingsSelector } from "@settings-storage/Settings"
 import { SQLiteUserSettingsStorage } from "@settings-storage/UserSettings"
 import { ComponentStory } from "@storybook/react-native"
 import React from "react"
-import { Button, View } from "react-native"
+import { View } from "react-native"
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context"
-import { DurationSectionView } from "settings-boundary/EventSettings"
+import { EventDurationView } from "settings-boundary/EventSettings"
 import { BASE_HEADER_SCREEN_OPTIONS } from "../../../components/Navigation"
 import {
   SettingsProvider,
@@ -18,12 +17,12 @@ import {
 } from "../../../settings-storage/Hooks"
 import { testSQLite } from "../../../test-helpers/SQLite"
 
-const EventSettingsMeta: StoryMeta = {
-  title: "Event Settings Screen",
+const EventSettingsDurationMeta: StoryMeta = {
+  title: "Durations Screen",
   component: View
 }
 
-export default EventSettingsMeta
+export default EventSettingsDurationMeta
 
 type SettingsStory = ComponentStory<typeof View>
 
@@ -37,10 +36,7 @@ export const Basic: SettingsStory = () => (
     >
       <NavigationContainer>
         <Stack.Navigator screenOptions={{ ...BASE_HEADER_SCREEN_OPTIONS }}>
-          <Stack.Screen
-            name="Event Settings"
-            component={EventSettingsScreenTest}
-          />
+          <Stack.Screen name="Durations" component={DurationScreenTest} />
         </Stack.Navigator>
       </NavigationContainer>
     </SettingsProvider>
@@ -55,13 +51,13 @@ const userStore = PersistentSettingsStores.user(
   new SQLiteUserSettingsStorage(testSQLite)
 )
 
-const EventSettingsScreenTest = () => {
+const DurationScreenTest = () => {
+  const { settings, update } = useUserSettings(
+    settingsSelector("eventPresetDurations")
+  )
   return (
     <SafeAreaView edges={["bottom"]}>
-      <EventSettingsView
-        onLocationPresetTapped={() => console.log("Location")}
-        onDurationTapped={() => console.log("Durations")}
-      />
+      <EventDurationView />
     </SafeAreaView>
   )
 }
