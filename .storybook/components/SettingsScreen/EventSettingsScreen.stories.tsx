@@ -5,7 +5,7 @@ import { EventSettingsView } from "@settings-boundary/EventSettings"
 import { SQLiteLocalSettingsStorage } from "@settings-storage/LocalSettings"
 import { PersistentSettingsStores } from "@settings-storage/PersistentStores"
 import { SQLiteUserSettingsStorage } from "@settings-storage/UserSettings"
-import { ComponentStory } from "@storybook/react-native"
+
 import React from "react"
 import { View } from "react-native"
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context"
@@ -19,8 +19,6 @@ const EventSettingsMeta: StoryMeta = {
 }
 
 export default EventSettingsMeta
-
-type SettingsStory = ComponentStory<typeof View>
 
 const Stack = createStackNavigator()
 
