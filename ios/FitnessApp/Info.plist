@@ -95,6 +95,14 @@
     <string>Allow $(PRODUCT_NAME) to access your reminders</string>
     <key>NSRemindersUsageDescription</key>
     <string>Allow $(PRODUCT_NAME) to access your reminders</string>
+    <key>UIAppFonts</key>
+    <array>
+      <string>OpenSans-Bold.ttf</string>
+      <string>OpenSans-Regular.ttf</string>
+      <string>OpenSans-SemiBold.ttf</string>
+      <string>OpenDyslexic3-Bold.ttf</string>
+      <string>OpenDyslexic3-Regular.ttf</string>
+    </array>
     <key>UIBackgroundModes</key>
     <array>
       <string>location</string>
@@ -104,7 +112,7 @@
     <string>SplashScreen</string>
     <key>UIRequiredDeviceCapabilities</key>
     <array>
-      <string>armv7</string>
+      <string>arm64</string>
     </array>
     <key>UIRequiresFullScreen</key>
     <false/>

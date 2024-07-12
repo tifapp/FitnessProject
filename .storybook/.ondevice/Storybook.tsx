@@ -142,10 +142,17 @@ const stories = [
 ]
 
 const CustomStorybookUI = () => {
-  const [isFontsLoaded] = useAppFonts()
+  const [isFontsLoaded, error] = useAppFonts()
   const [selectedStory, setSelectedStory] = useState(-1)
 
-  if (!isFontsLoaded) return null
+  console.log(error)
+  if (!isFontsLoaded)
+    return (
+      <Text style={{ marginTop: 128 }}>
+        The fonts did not load. You are trapped here forever!
+        {JSON.stringify(error)}
+      </Text>
+    )
 
   // Render the selected story
   if (selectedStory !== -1) {
