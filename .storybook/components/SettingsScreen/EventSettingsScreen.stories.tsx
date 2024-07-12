@@ -4,18 +4,13 @@ import { createStackNavigator } from "@react-navigation/stack"
 import { EventSettingsView } from "@settings-boundary/EventSettings"
 import { SQLiteLocalSettingsStorage } from "@settings-storage/LocalSettings"
 import { PersistentSettingsStores } from "@settings-storage/PersistentStores"
-import { settingsSelector } from "@settings-storage/Settings"
 import { SQLiteUserSettingsStorage } from "@settings-storage/UserSettings"
 import { ComponentStory } from "@storybook/react-native"
 import React from "react"
-import { Button, View } from "react-native"
+import { View } from "react-native"
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context"
-import { DurationSectionView } from "settings-boundary/EventSettings"
 import { BASE_HEADER_SCREEN_OPTIONS } from "../../../components/Navigation"
-import {
-  SettingsProvider,
-  useUserSettings
-} from "../../../settings-storage/Hooks"
+import { SettingsProvider } from "../../../settings-storage/Hooks"
 import { testSQLite } from "../../../test-helpers/SQLite"
 
 const EventSettingsMeta: StoryMeta = {
@@ -29,7 +24,7 @@ type SettingsStory = ComponentStory<typeof View>
 
 const Stack = createStackNavigator()
 
-export const Basic: SettingsStory = () => (
+export const Basic = () => (
   <SafeAreaProvider>
     <SettingsProvider
       localSettingsStore={{} as any}
