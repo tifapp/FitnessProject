@@ -37,13 +37,13 @@ describe("RoswaalClient tests", () => {
     await client.uploadTestResultsIfAble()
     expect(uploadedResults).toEqual([
       {
-        name: "Hello",
-        actionResults: [{ didPass: true }, { didPass: true }],
+        testName: "Hello",
+        commandFailureOrdinal: null,
         error: null
       },
       {
-        name: "World",
-        actionResults: [{ didPass: true }, { didPass: true }],
+        testName: "World",
+        commandFailureOrdinal: null,
         error: null
       }
     ])
@@ -63,8 +63,8 @@ describe("RoswaalClient tests", () => {
     expect(uploadedResults).toEqual(
       expect.arrayContaining([
         {
-          name: "Hello",
-          actionResults: [{ didPass: true }, { didPass: false }],
+          testName: "Hello",
+          commandFailureOrdinal: 1,
           error: {
             message: "I died",
             stackTrace: expect.any(String)

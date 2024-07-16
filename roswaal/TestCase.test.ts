@@ -10,8 +10,8 @@ describe("RoswaalTestCases tests", () => {
     testCase.appendAction(jest.fn())
     const result = await testCase.run(jest.fn())
     expect(result).toEqual({
-      name: "Test",
-      actionResults: [{ didPass: true }, { didPass: true }, { didPass: true }],
+      testName: "Test",
+      commandFailureOrdinal: null,
       error: null
     })
   })
@@ -26,13 +26,8 @@ describe("RoswaalTestCases tests", () => {
     testCase.appendAction(jest.fn())
     const result = await testCase.run(jest.fn())
     expect(result).toEqual({
-      name: "Test",
-      actionResults: [
-        { didPass: true },
-        { didPass: true },
-        { didPass: false },
-        { didPass: false }
-      ],
+      testName: "Test",
+      commandFailureOrdinal: 2,
       error: new Error("I died")
     })
   })
@@ -46,12 +41,8 @@ describe("RoswaalTestCases tests", () => {
     testCase.appendAction(jest.fn())
     const result = await testCase.run(jest.fn())
     expect(result).toEqual({
-      name: "Test",
-      actionResults: [
-        { didPass: false },
-        { didPass: false },
-        { didPass: false }
-      ],
+      testName: "Test",
+      commandFailureOrdinal: 0,
       error: new Error("I died")
     })
   })
