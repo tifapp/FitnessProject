@@ -34,9 +34,8 @@ describe("HelpAndSupportSettings tests", () => {
       act(() => result.current.feedbackSubmitted())
       await waitFor(async () =>
         expect(alertPresentationSpy).toHaveBeenCalledWith(
-          HELP_AND_SUPPORT_EMAIL_SUCCESS_ALERTS.submitFeedbackSuccess.title,
-          HELP_AND_SUPPORT_EMAIL_SUCCESS_ALERTS.submitFeedbackSuccess
-            .description
+          HELP_AND_SUPPORT_EMAIL_SUCCESS_ALERTS.submitFeedback.title,
+          HELP_AND_SUPPORT_EMAIL_SUCCESS_ALERTS.submitFeedback.description
         )
       )
       expect(composeEmail).toHaveBeenCalledWith(
@@ -49,8 +48,8 @@ describe("HelpAndSupportSettings tests", () => {
       act(() => result.current.feedbackSubmitted())
       await waitFor(async () =>
         expect(alertPresentationSpy).toHaveBeenCalledWith(
-          HELP_AND_SUPPORT_EMAIL_ERROR_ALERTS.submitFeedbackError.title,
-          HELP_AND_SUPPORT_EMAIL_ERROR_ALERTS.submitFeedbackError.description
+          HELP_AND_SUPPORT_EMAIL_ERROR_ALERTS.submitFeedback.title,
+          HELP_AND_SUPPORT_EMAIL_ERROR_ALERTS.submitFeedback.description
         )
       )
     })
@@ -62,8 +61,8 @@ describe("HelpAndSupportSettings tests", () => {
       await reportWithoutLogs()
       await waitFor(async () =>
         expect(alertPresentationSpy).toHaveBeenCalledWith(
-          HELP_AND_SUPPORT_EMAIL_SUCCESS_ALERTS.reportBugSuccess.title,
-          HELP_AND_SUPPORT_EMAIL_SUCCESS_ALERTS.reportBugSuccess.description
+          HELP_AND_SUPPORT_EMAIL_SUCCESS_ALERTS.reportBug.title,
+          HELP_AND_SUPPORT_EMAIL_SUCCESS_ALERTS.reportBug.description
         )
       )
       expect(composeEmail).toHaveBeenCalledWith(
@@ -78,8 +77,8 @@ describe("HelpAndSupportSettings tests", () => {
       await reportWithLogs()
       await waitFor(async () =>
         expect(alertPresentationSpy).toHaveBeenCalledWith(
-          HELP_AND_SUPPORT_EMAIL_SUCCESS_ALERTS.reportBugSuccess.title,
-          HELP_AND_SUPPORT_EMAIL_SUCCESS_ALERTS.reportBugSuccess.description
+          HELP_AND_SUPPORT_EMAIL_SUCCESS_ALERTS.reportBug.title,
+          HELP_AND_SUPPORT_EMAIL_SUCCESS_ALERTS.reportBug.description
         )
       )
       expect(composeEmail).toHaveBeenCalledWith(
@@ -102,8 +101,8 @@ describe("HelpAndSupportSettings tests", () => {
       await reportWithoutLogsAfterFailure()
       await waitFor(async () =>
         expect(alertPresentationSpy).toHaveBeenCalledWith(
-          HELP_AND_SUPPORT_EMAIL_SUCCESS_ALERTS.reportBugSuccess.title,
-          HELP_AND_SUPPORT_EMAIL_SUCCESS_ALERTS.reportBugSuccess.description
+          HELP_AND_SUPPORT_EMAIL_SUCCESS_ALERTS.reportBug.title,
+          HELP_AND_SUPPORT_EMAIL_SUCCESS_ALERTS.reportBug.description
         )
       )
       expect(composeEmail).toHaveBeenCalledWith(
@@ -116,9 +115,8 @@ describe("HelpAndSupportSettings tests", () => {
       act(() => result.current.questionSubmitted())
       await waitFor(async () =>
         expect(alertPresentationSpy).toHaveBeenCalledWith(
-          HELP_AND_SUPPORT_EMAIL_SUCCESS_ALERTS.submitQuestionSuccess.title,
-          HELP_AND_SUPPORT_EMAIL_SUCCESS_ALERTS.submitQuestionSuccess
-            .description
+          HELP_AND_SUPPORT_EMAIL_SUCCESS_ALERTS.submitQuestion.title,
+          HELP_AND_SUPPORT_EMAIL_SUCCESS_ALERTS.submitQuestion.description
         )
       )
 
@@ -136,8 +134,8 @@ describe("HelpAndSupportSettings tests", () => {
       act(() => result.current.questionSubmitted())
       await waitFor(async () =>
         expect(alertPresentationSpy).toHaveBeenCalledWith(
-          HELP_AND_SUPPORT_EMAIL_ERROR_ALERTS.submitQuestionError.title,
-          HELP_AND_SUPPORT_EMAIL_ERROR_ALERTS.submitQuestionError.description
+          HELP_AND_SUPPORT_EMAIL_ERROR_ALERTS.submitQuestion.title,
+          HELP_AND_SUPPORT_EMAIL_ERROR_ALERTS.submitQuestion.description
         )
       )
     })
@@ -164,7 +162,7 @@ describe("HelpAndSupportSettings tests", () => {
       return renderHook(
         () =>
           useHelpAndSupportSettings({
-            isShowingContactSection,
+            isMailComposerAvailable: isShowingContactSection,
             compileLogs,
             composeEmail
           }),

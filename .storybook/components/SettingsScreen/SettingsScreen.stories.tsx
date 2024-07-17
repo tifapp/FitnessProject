@@ -49,7 +49,7 @@ const userStore = PersistentSettingsStores.user(
 
 const Test = () => {
   const state = useHelpAndSupportSettings({
-    isShowingContactSection: isAvailableAsync,
+    isMailComposerAvailable: isAvailableAsync,
     composeEmail: presentEmailComposer,
     compileLogs: async () => "Test"
   })
