@@ -2,6 +2,7 @@ import { SQLExecutable, TiFSQLite } from "@lib/SQLite"
 import { MutationObserver, QueryClient } from "@tanstack/react-query"
 import { TiFAPI } from "TiFShared/api"
 import { UpdateUserSettingsRequest } from "TiFShared/api/models/User"
+import { Placemark } from "TiFShared/domain-models/Placemark"
 import {
   DEFAULT_USER_SETTINGS,
   PushNotificationTriggerID,
@@ -26,6 +27,8 @@ type SQLiteUserSettings = {
   eventCalendarStartOfWeekDay: string
   eventCalendarDefaultLayout: string
   eventPresetDurations: string
+  eventPresetPlacemark: string
+  eventPresetShouldHideAfterStartDate: number
   version: number
 }
 
@@ -58,6 +61,8 @@ export class SQLiteUserSettingsStorage
         eventCalendarStartOfWeekDay,
         eventCalendarDefaultLayout,
         eventPresetDurations,
+        eventPresetPlacemark,
+        eventPresetShouldHideAfterStartDate,
         version
       ) VALUES (
         ${newSettings.isAnalyticsEnabled},
@@ -67,6 +72,8 @@ export class SQLiteUserSettingsStorage
         ${newSettings.eventCalendarStartOfWeekDay},
         ${newSettings.eventCalendarDefaultLayout},
         ${serializeDurations(newSettings.eventPresetDurations)},
+        ${serializePlacemark(newSettings.eventPresetPlacemark)},
+        ${newSettings.eventPresetShouldHideAfterStartDate},
         ${newSettings.version}
       )
       `
@@ -84,11 +91,16 @@ export class SQLiteUserSettingsStorage
       isAnalyticsEnabled: sqliteSettings.isAnalyticsEnabled === 1,
       isCrashReportingEnabled: sqliteSettings.isCrashReportingEnabled === 1,
       canShareArrivalStatus: sqliteSettings.canShareArrivalStatus === 1,
+      eventPresetShouldHideAfterStartDate:
+        sqliteSettings.eventPresetShouldHideAfterStartDate === 1,
       pushNotificationTriggerIds: deserializeTriggerIds(
         sqliteSettings.pushNotificationTriggerIds
       ),
       eventPresetDurations: deserializeDurations(
         sqliteSettings.eventPresetDurations
+      ),
+      eventPresetPlacemark: deserializePlacemark(
+        sqliteSettings.eventPresetPlacemark
       )
     }
   }
@@ -110,6 +122,14 @@ const serializeDurations = (durations: number[]) => {
 
 const deserializeDurations = (serializedDurations: string) => {
   return serializedDurations.split(",").map((x) => +x)
+}
+
+const serializePlacemark = (placemark: Placemark) => {
+  return JSON.stringify(placemark)
+}
+
+const deserializePlacemark = (serializedPlacemark: string): Placemark => {
+  return JSON.parse(serializedPlacemark)
 }
 
 const log = logger("user.settings.synchronizing.store")

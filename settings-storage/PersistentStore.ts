@@ -86,7 +86,6 @@ export class PersistentSettingsStore<Settings extends AnySettings>
     if (this.initialLoadPromise) return
     this.initialLoadPromise = this.persistedSettings()
       .then((settings) => {
-        console.log(settings)
         this.currentSettings = settings
         this.subscribers.send(settings)
       })

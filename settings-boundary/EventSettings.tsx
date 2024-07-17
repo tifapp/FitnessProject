@@ -160,12 +160,12 @@ const PresetSectionView = ({
   return (
     <SettingsCardSectionView
       title="Presets"
-      subtitle="These presets will populate when you create a new event."
+      subtitle="These presets will be populated when you create an event."
     >
       <SettingsNamedToggleView
         name={"Hide After Start Date"}
         description={
-          "The event will no longer be publicly visible to other users after it starts."
+          "The event will no longer be publicly visible to other users once it starts."
         }
         isOn={settings.eventPresetShouldHideAfterStartDate}
         onIsOnChange={(eventPresetShouldHideAfterStartDate) =>
