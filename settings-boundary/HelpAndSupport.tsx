@@ -14,18 +14,68 @@ export const HELP_AND_SUPPORT_EMAILS = {
   feedbackSubmitted: {
     recipients: ["TIF@myspace.com"],
     subject: "App Feedback",
-    body: "Please provide detailed feedback on the app below, including suggestions for app improvements or any other feedback you have."
+    body: `\
+<strong>📝 1. Select one or more feedback topics below and provide the necessary details. (Required)</strong>
+<br>
+<br>
+<br>
+<strong>a. App functionality (How can the app help you?)</strong>
+<br>
+<br>
+<br>
+<strong>b. Creative synergy (Are the features of the app helping you progress?)</strong>
+<br>
+<br>
+<br>
+<strong>c. Other feedback (Any other general feedback you have)</strong>
+<br>
+<br>
+<br>
+<strong>📸 2. Provide any supplementary information or files related to the feedback above. (Optional)</strong>
+<br>
+<br>
+<br>
+    `,
+    isHtml: true
   },
   bugReported: (compileLogsURI?: string) => ({
     recipients: ["TIF@myspace.com"],
     subject: "App Bug Report",
-    body: "Please provide a detailed explanation of the bug below, including all relevant information pertaining to it",
-    attachments: compileLogsURI ? [compileLogsURI] : undefined
+    body: `\
+<strong>🐞 1. Briefly describe the bug and the issues it is causing in the app. (Required)</strong>
+<br>
+<br>
+<br>
+<strong>a. Specify the steps that it took for you to get to the bug. (Required)</strong>
+<br>
+<br>
+<br>
+<strong>b. What was the expected result supposed to be? (Required)</strong>
+<br>
+<br>
+<br>
+<strong>📸 2. Provide any supplementary information or files related to this bug (Optional).</strong>
+<br>
+<br>
+<br>
+    `,
+    attachments: compileLogsURI ? [compileLogsURI] : undefined,
+    isHtml: true
   }),
   questionSubmitted: {
     recipients: ["TIF@myspace.com"],
     subject: "App Question",
-    body: "Please list your question below and include all necessary details so that we can respond effectively."
+    body: `\
+<strong>❓ 1. List your question(s) and provide all relevant details. (Required)</strong>
+<br>
+<br>
+<br>
+<strong>📸 2. Provide any supplementary information or files related to this question. (Optional)</strong>
+<br>
+<br>
+<br>
+    `,
+    isHtml: true
   }
 }
 
@@ -239,7 +289,7 @@ export const HelpSectionView = ({ state }: PresetSectionProps) => {
         <SettingsNavigationLinkView
           title={"View Help Center"}
           onTapped={() => open("https://www.google.com")}
-          iconName={"information-circle"}
+          iconName="information-circle"
           iconBackgroundColor={AppStyles.black}
         />
       </SettingsCardSectionView>
@@ -249,21 +299,21 @@ export const HelpSectionView = ({ state }: PresetSectionProps) => {
           subtitle="Submit your requests below."
         >
           <SettingsNavigationLinkView
-            title={"Report a Bug"}
+            title="Report a Bug"
             onTapped={state.bugReported}
-            iconName={"bug"}
+            iconName="bug"
             iconBackgroundColor={AppStyles.black}
           />
           <SettingsNavigationLinkView
-            title={"Submit Feedback"}
+            title="Submit Feedback"
             onTapped={state.feedbackSubmitted}
-            iconName={"build"}
+            iconName="build"
             iconBackgroundColor={AppStyles.black}
           />
           <SettingsNavigationLinkView
-            title={"Submit Feedback"}
+            title="Ask Question"
             onTapped={state.questionSubmitted}
-            iconName={"help-circle"}
+            iconName="help-circle"
             iconBackgroundColor={AppStyles.black}
           />
         </SettingsCardSectionView>
