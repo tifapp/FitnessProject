@@ -9,6 +9,7 @@ import React from "react"
 import {
   StyleProp,
   StyleSheet,
+  TouchableHighlight,
   TouchableOpacity,
   View,
   ViewStyle
@@ -31,20 +32,20 @@ export const SettingsDurationCard = ({
   durationInSeconds
 }: SettingDurationCardProps) => {
   return (
-    <TouchableOpacity style={styles.container}>
+    <View style={styles.container}>
       <Headline>{formatEventDurationPreset(durationInSeconds)}</Headline>
       <TouchableOpacity style={styles.closeButton}>
         <Ionicon size={16} color={"white"} name={"close"} />
       </TouchableOpacity>
-    </TouchableOpacity>
+    </View>
   )
 }
 
 export const AddDurationCard = () => {
   return (
-    <TouchableOpacity style={styles.addButtonContainer}>
+    <TouchableHighlight style={styles.addButtonContainer}>
       <Ionicon size={36} color={AppStyles.colorOpacity35} name={"add"} />
-    </TouchableOpacity>
+    </TouchableHighlight>
   )
 }
 
