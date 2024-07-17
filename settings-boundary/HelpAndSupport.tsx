@@ -1,5 +1,9 @@
 import { AppStyles } from "@lib/AppColorStyle"
-import { EmailCompositionResult, EmailTemplate } from "@lib/EmailComposition"
+import {
+  EmailCompositionResult,
+  EmailTemplate,
+  TIF_SUPPORT_EMAIL
+} from "@lib/EmailComposition"
 import { useOpenWeblink } from "@modules/tif-weblinks"
 import { useQuery } from "@tanstack/react-query"
 import React from "react"
@@ -10,73 +14,68 @@ import { SettingsCardSectionView } from "./components/Section"
 
 export const COMPILING_LOGS_INFO_URL = "https://logs.com"
 
+type EmailSection = string & { _tag: "help-and-support-email-section" }
+
+const email = (
+  subject: string,
+  attachments: string[],
+  ...sections: EmailSection[]
+) => ({
+  recipients: [TIF_SUPPORT_EMAIL],
+  subject,
+  body: sections.join("\n"),
+  attachments,
+  isHtml: true
+})
+
+const emailSection = (name: string) => {
+  return `<strong>${name}</strong><br><br><br>` as EmailSection
+}
+
 export const HELP_AND_SUPPORT_EMAILS = {
-  feedbackSubmitted: {
-    recipients: ["TIF@myspace.com"],
-    subject: "App Feedback",
-    body: `\
-<strong>📝 1. Select one or more feedback topics below and provide the necessary details. (Required)</strong>
-<br>
-<br>
-<br>
-<strong>a. App functionality (How can the app help you?)</strong>
-<br>
-<br>
-<br>
-<strong>b. Creative synergy (Are the features of the app helping you progress?)</strong>
-<br>
-<br>
-<br>
-<strong>c. Other feedback (Any other general feedback you have)</strong>
-<br>
-<br>
-<br>
-<strong>📸 2. Provide any supplementary information or files related to the feedback above. (Optional)</strong>
-<br>
-<br>
-<br>
-    `,
-    isHtml: true
+  feedbackSubmitted: email(
+    "App Feedback",
+    [],
+    emailSection(
+      "📝 1. Select one or more feedback topics below and provide the necessary details. (Required)"
+    ),
+    emailSection("a. App functionality (How can the app help you?)"),
+    emailSection(
+      "b. Creative synergy (Are the features of the app helping you progress?)"
+    ),
+    emailSection("c. Other feedback (Any other general feedback you have)"),
+    emailSection(
+      "📸 2. Provide any supplementary information or files related to the feedback above. (Optional)"
+    )
+  ),
+  bugReported: (compileLogsURI?: string) => {
+    return email(
+      "App Bug Report",
+      compileLogsURI ? [compileLogsURI] : [],
+      emailSection(
+        "🐞 1. Briefly describe the bug and the issues it is causing in the app. (Required)"
+      ),
+      emailSection(
+        "a. Specify the steps that it took for you to get to the bug. (Required)"
+      ),
+      emailSection(
+        "b. What was the expected result supposed to be? (Required)"
+      ),
+      emailSection(
+        "📸 2. Provide any supplementary information or files related to this bug (Optional)."
+      )
+    )
   },
-  bugReported: (compileLogsURI?: string) => ({
-    recipients: ["TIF@myspace.com"],
-    subject: "App Bug Report",
-    body: `\
-<strong>🐞 1. Briefly describe the bug and the issues it is causing in the app. (Required)</strong>
-<br>
-<br>
-<br>
-<strong>a. Specify the steps that it took for you to get to the bug. (Required)</strong>
-<br>
-<br>
-<br>
-<strong>b. What was the expected result supposed to be? (Required)</strong>
-<br>
-<br>
-<br>
-<strong>📸 2. Provide any supplementary information or files related to this bug (Optional).</strong>
-<br>
-<br>
-<br>
-    `,
-    attachments: compileLogsURI ? [compileLogsURI] : undefined,
-    isHtml: true
-  }),
-  questionSubmitted: {
-    recipients: ["TIF@myspace.com"],
-    subject: "App Question",
-    body: `\
-<strong>❓ 1. List your question(s) and provide all relevant details. (Required)</strong>
-<br>
-<br>
-<br>
-<strong>📸 2. Provide any supplementary information or files related to this question. (Optional)</strong>
-<br>
-<br>
-<br>
-    `,
-    isHtml: true
-  }
+  questionSubmitted: email(
+    "App Question",
+    [],
+    emailSection(
+      "❓ 1. List your question(s) and provide all relevant details. (Required)"
+    ),
+    emailSection(
+      "📸 2. Provide any supplementary information or files related to this question. (Optional)"
+    )
+  )
 }
 
 export const HELP_AND_SUPPORT_ALERTS = {
