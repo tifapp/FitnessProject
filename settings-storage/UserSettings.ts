@@ -124,7 +124,7 @@ const deserializeDurations = (serializedDurations: string) => {
   return serializedDurations.split(",").map((x) => +x)
 }
 
-const serializePlacemark = (placemark: Placemark) => {
+const serializePlacemark = (placemark: Placemark | null) => {
   return JSON.stringify(placemark)
 }
 
