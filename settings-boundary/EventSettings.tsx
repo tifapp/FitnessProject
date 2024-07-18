@@ -5,6 +5,7 @@ import { useUserSettings } from "@settings-storage/Hooks"
 import { settingsSelector } from "@settings-storage/Settings"
 import { Placemark } from "TiFShared/domain-models/Placemark"
 import { formatEventDurationPreset } from "TiFShared/domain-models/Settings"
+import { repeatElements } from "TiFShared/lib/Array"
 import React from "react"
 import {
   StyleProp,
@@ -49,64 +50,62 @@ export const AddDurationCard = () => {
   )
 }
 
+type DurationCardRowViewProps = {
+  sortedDurations: number[]
+  start: number
+  end: number
+}
+
+const DurationCardRowView = ({
+  sortedDurations,
+  start,
+  end
+}: DurationCardRowViewProps) => {
+  const rowArray = repeatElements(end - start, (index) => index + start)
+  return (
+    <View style={styles.durationPresetRow}>
+      {rowArray.map((index) => {
+        if (index < sortedDurations.length) {
+          return (
+            <SettingsDurationCard
+              key={`duration-preset-key-${sortedDurations[index]}`}
+              durationInSeconds={sortedDurations[index]}
+            />
+          )
+        } else if (index === sortedDurations.length) {
+          return <AddDurationCard key={"add-duration"} />
+        } else {
+          return (
+            <View
+              key={`blank-card-${index}`}
+              style={[styles.container, { opacity: 0 }]}
+            />
+          )
+        }
+      })}
+    </View>
+  )
+}
+
 export const DurationSectionView = () => {
   const { settings } = useUserSettings(settingsSelector("eventPresetDurations"))
   const sortedDurations = settings.eventPresetDurations.sort((a, b) => a - b)
   return (
     <SettingsSectionView title="Duration Presets">
-      {sortedDurations.length < 3 ? (
-        <View style={styles.presetRowsGridContainer}>
-          <View style={styles.durationPresetRow}>
-            {createDurationCards(0, sortedDurations, 3)}
-            {settings.eventPresetDurations.length < 3 ? (
-              <AddDurationCard />
-            ) : undefined}
-            {settings.eventPresetDurations.length < 2 ? (
-              <View style={[styles.container, { opacity: 0 }]} />
-            ) : undefined}
-            {settings.eventPresetDurations.length < 1 ? (
-              <View style={[styles.container, { opacity: 0 }]} />
-            ) : undefined}
-          </View>
-        </View>
-      ) : (
-        <View style={styles.presetRowsGridContainer}>
-          <View style={styles.durationPresetRow}>
-            {createDurationCards(0, sortedDurations, 3)}
-          </View>
-          <View style={styles.durationPresetRow}>
-            {createDurationCards(3, sortedDurations)}
-            {settings.eventPresetDurations.length < 6 ? (
-              <AddDurationCard />
-            ) : undefined}
-            {settings.eventPresetDurations.length < 5 ? (
-              <View style={[styles.container, { opacity: 0 }]} />
-            ) : undefined}
-            {settings.eventPresetDurations.length < 4 ? (
-              <View style={[styles.container, { opacity: 0 }]} />
-            ) : undefined}
-          </View>
-        </View>
-      )}
+      <View style={styles.presetRowsGridContainer}>
+        <DurationCardRowView
+          sortedDurations={sortedDurations}
+          start={0}
+          end={3}
+        />
+        <DurationCardRowView
+          sortedDurations={sortedDurations}
+          start={3}
+          end={6}
+        />
+      </View>
     </SettingsSectionView>
   )
-}
-
-export const createDurationCards = (
-  start: number,
-  durations: number[],
-  end?: number
-) => {
-  return durations.slice(start, end).map((item) => {
-    return (
-      <>
-        <SettingsDurationCard
-          key={`duration-preset-key-${item}`}
-          durationInSeconds={item}
-        />
-      </>
-    )
-  })
 }
 
 export type EventSettingsProps = {
