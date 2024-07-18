@@ -1,5 +1,5 @@
-import { useWindowDimensions } from "react-native"
 import { useFonts } from "expo-font"
+import { useWindowDimensions } from "react-native"
 
 /**
  * Loads all fonts for the app. (Currently just open sans variants).
@@ -24,6 +24,7 @@ export const useAppFonts = () => {
  */
 export namespace FontScaleFactors {
   export const xxxLarge = 1.5
+  export const accessibility1 = 1.75
   export const accessibility2 = 2.2
 }
 

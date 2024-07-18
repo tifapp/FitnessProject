@@ -1,6 +1,7 @@
 import { Headline } from "@components/Text"
 import { Ionicon } from "@components/common/Icons"
 import { AppStyles } from "@lib/AppColorStyle"
+import { FontScaleFactors, useFontScale } from "@lib/Fonts"
 import { useUserSettings } from "@settings-storage/Hooks"
 import { settingsSelector } from "@settings-storage/Settings"
 import { Placemark } from "TiFShared/domain-models/Placemark"
@@ -89,20 +90,43 @@ const DurationCardRowView = ({
 
 export const DurationSectionView = () => {
   const { settings } = useUserSettings(settingsSelector("eventPresetDurations"))
+  const fontScale = useFontScale()
   const sortedDurations = settings.eventPresetDurations.sort((a, b) => a - b)
   return (
     <SettingsSectionView title="Duration Presets">
       <View style={styles.presetRowsGridContainer}>
-        <DurationCardRowView
-          sortedDurations={sortedDurations}
-          start={0}
-          end={3}
-        />
-        <DurationCardRowView
-          sortedDurations={sortedDurations}
-          start={3}
-          end={6}
-        />
+        {fontScale >= FontScaleFactors.accessibility1 ? (
+          <>
+            <DurationCardRowView
+              sortedDurations={sortedDurations}
+              start={0}
+              end={3}
+            />
+            <DurationCardRowView
+              sortedDurations={sortedDurations}
+              start={3}
+              end={6}
+            />
+          </>
+        ) : (
+          <>
+            <DurationCardRowView
+              sortedDurations={sortedDurations}
+              start={0}
+              end={2}
+            />
+            <DurationCardRowView
+              sortedDurations={sortedDurations}
+              start={2}
+              end={4}
+            />
+            <DurationCardRowView
+              sortedDurations={sortedDurations}
+              start={4}
+              end={6}
+            />
+          </>
+        )}
       </View>
     </SettingsSectionView>
   )
