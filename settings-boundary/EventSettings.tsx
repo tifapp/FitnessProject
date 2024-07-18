@@ -95,7 +95,7 @@ export const DurationSectionView = () => {
   return (
     <SettingsSectionView title="Duration Presets">
       <View style={styles.presetRowsGridContainer}>
-        {fontScale >= FontScaleFactors.accessibility1 ? (
+        {fontScale < FontScaleFactors.accessibility1 ? (
           <>
             <DurationCardRowView
               sortedDurations={sortedDurations}
