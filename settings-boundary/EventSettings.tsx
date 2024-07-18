@@ -33,8 +33,9 @@ export const SettingsDurationCard = ({
   style,
   durationInSeconds
 }: SettingDurationCardProps) => {
+  const fontScale = useFontScale()
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { height: 64 * fontScale }]}>
       <Headline>{formatEventDurationPreset(durationInSeconds)}</Headline>
       <TouchableOpacity style={styles.closeButton}>
         <Ionicon size={16} color={"white"} name={"close"} />
@@ -44,8 +45,11 @@ export const SettingsDurationCard = ({
 }
 
 export const AddDurationCard = () => {
+  const fontScale = useFontScale()
   return (
-    <TouchableHighlight style={styles.addButtonContainer}>
+    <TouchableHighlight
+      style={[styles.addButtonContainer, { height: 64 * fontScale }]}
+    >
       <Ionicon size={36} color={AppStyles.colorOpacity35} name={"add"} />
     </TouchableHighlight>
   )
