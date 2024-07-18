@@ -39,7 +39,7 @@ export const HELP_AND_SUPPORT_EMAILS = {
     emailSection(
       "📝 1. Select one or more feedback topics below and provide the necessary details. (Required)"
     ),
-    emailSection("a. App functionality (How can the app help you?)"),
+    emailSection("a. App functionality (How could the app help you?)"),
     emailSection(
       "b. Creative synergy (Are the features of the app helping you progress?)"
     ),
@@ -58,11 +58,9 @@ export const HELP_AND_SUPPORT_EMAILS = {
       emailSection(
         "a. Specify the steps that it took for you to get to the bug. (Required)"
       ),
+      emailSection("b. What did you expect to happen? (Required)"),
       emailSection(
-        "b. What was the expected result supposed to be? (Required)"
-      ),
-      emailSection(
-        "📸 2. Provide any supplementary information or files related to this bug (Optional)."
+        "📸 2. Provide any supplementary information or screenshots related to the feedback above. (Optional)"
       )
     )
   },
@@ -73,7 +71,7 @@ export const HELP_AND_SUPPORT_EMAILS = {
       "❓ 1. List your question(s) and provide all relevant details. (Required)"
     ),
     emailSection(
-      "📸 2. Provide any supplementary information or files related to this question. (Optional)"
+      "📸 2. Provide any supplementary information or screenshots related to these question(s). (Optional)"
     )
   )
 }
