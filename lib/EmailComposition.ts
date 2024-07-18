@@ -12,6 +12,8 @@ export type EmailCompositionResult =
 
 export type EmailTemplate = MailComposerOptions
 
+export const TIF_SUPPORT_EMAIL = "tifapp@doesnotexistyet.com"
+
 /**
  * Presents the device's email composer with the specified {@link EmailTemplate}, and returns
  * whether or not the user sent an email through the composer's UI.
