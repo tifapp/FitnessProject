@@ -2,7 +2,7 @@ import { Headline } from "@components/Text"
 import { Ionicon } from "@components/common/Icons"
 import { AppStyles } from "@lib/AppColorStyle"
 import { FontScaleFactors, useFontScale } from "@lib/Fonts"
-import { useUserSettings } from "@settings-storage/Hooks"
+import { useUpdateUserSettings, useUserSettings } from "@settings-storage/Hooks"
 import { settingsSelector } from "@settings-storage/Settings"
 import { Placemark } from "TiFShared/domain-models/Placemark"
 import { formatEventDurationPreset } from "TiFShared/domain-models/Settings"
@@ -68,7 +68,7 @@ const DurationCardRowView = ({
   start,
   end
 }: DurationCardRowViewProps) => {
-  const { update } = useUserSettings(settingsSelector("eventPresetDurations"))
+  const update = useUpdateUserSettings()
   const rowArray = repeatElements(end - start, (index) => index + start)
   return (
     <View style={styles.durationPresetRow}>

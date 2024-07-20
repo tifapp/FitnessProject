@@ -44,6 +44,23 @@ export const useUserSettings = <ScopedSettings extends AnySettings>(
   selector: (userSettings: UserSettings) => ScopedSettings
 ) => useSettingsStore(useSettings().userSettingsStore, selector)
 
+/**
+ * Returns a function to update the current local settings.
+ */
+export const useUpdateLocalSettings = () => {
+  const localStore = useSettings().localSettingsStore
+  return (localSettings: Partial<LocalSettings>) =>
+    localStore.update(localSettings)
+}
+
+/**
+ * Returns a function to update the current user settings.
+ */
+export const useUpdateUserSettings = () => {
+  const userStore = useSettings().userSettingsStore
+  return (userSettings: Partial<UserSettings>) => userStore.update(userSettings)
+}
+
 const useSettings = () => {
   const context = useContext(SettingsContext)
   if (!context) throw new Error("No SettingsProvider provided.")
