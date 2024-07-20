@@ -27,17 +27,19 @@ import {
 export type SettingDurationCardProps = {
   style?: StyleProp<ViewStyle>
   durationInSeconds: number
+  onClosePress: () => void
 }
 
 export const SettingsDurationCard = ({
   style,
-  durationInSeconds
+  durationInSeconds,
+  onClosePress
 }: SettingDurationCardProps) => {
   const fontScale = useFontScale()
   return (
     <View style={[styles.container, { height: 64 * fontScale }]}>
       <Headline>{formatEventDurationPreset(durationInSeconds)}</Headline>
-      <TouchableOpacity style={styles.closeButton}>
+      <TouchableOpacity style={styles.closeButton} onPress={onClosePress}>
         <Ionicon size={16} color={"white"} name={"close"} />
       </TouchableOpacity>
     </View>
@@ -66,6 +68,7 @@ const DurationCardRowView = ({
   start,
   end
 }: DurationCardRowViewProps) => {
+  const { update } = useUserSettings(settingsSelector("eventPresetDurations"))
   const rowArray = repeatElements(end - start, (index) => index + start)
   return (
     <View style={styles.durationPresetRow}>
@@ -75,6 +78,13 @@ const DurationCardRowView = ({
             <SettingsDurationCard
               key={`duration-preset-key-${sortedDurations[index]}`}
               durationInSeconds={sortedDurations[index]}
+              onClosePress={() =>
+                update({
+                  eventPresetDurations: sortedDurations.filter(
+                    (item) => item !== sortedDurations[index]
+                  )
+                })
+              }
             />
           )
         } else if (index === sortedDurations.length) {
