@@ -61,12 +61,19 @@ export const SettingsDurationCard = ({
 export const AddDurationCard = () => {
   const fontScale = useFontScale()
   return (
-    <TouchableHighlight
-      style={[styles.addButtonContainer, { height: 64 * fontScale }]}
-      underlayColor={AppStyles.colorOpacity35}
+    <Animated.View
+      style={{ flex: 1 }}
+      entering={FadeInLeft}
+      exiting={FadeOutLeft}
+      layout={TiFDefaultLayoutTransition}
     >
-      <Ionicon size={36} color={AppStyles.colorOpacity35} name={"add"} />
-    </TouchableHighlight>
+      <TouchableHighlight
+        style={[styles.addButtonContainer, { height: 64 * fontScale }]}
+        underlayColor={AppStyles.colorOpacity35}
+      >
+        <Ionicon size={36} color={AppStyles.darkColor} name={"add"} />
+      </TouchableHighlight>
+    </Animated.View>
   )
 }
 
@@ -255,8 +262,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     borderStyle: "dashed",
-    opacity: 0.5,
-    borderColor: AppStyles.colorOpacity50,
+
+    borderColor: AppStyles.darkColor,
     borderWidth: 2
   },
   presetRowsGridContainer: {
