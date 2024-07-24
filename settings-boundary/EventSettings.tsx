@@ -1,7 +1,8 @@
 import { Headline } from "@components/Text"
-import { Ionicon } from "@components/common/Icons"
+import { CircularIonicon, Ionicon } from "@components/common/Icons"
 import { AppStyles } from "@lib/AppColorStyle"
 import { FontScaleFactors, useFontScale } from "@lib/Fonts"
+import { TiFDefaultLayoutTransition } from "@lib/Reanimated"
 import { useUpdateUserSettings, useUserSettings } from "@settings-storage/Hooks"
 import { settingsSelector } from "@settings-storage/Settings"
 import { Placemark } from "TiFShared/domain-models/Placemark"
@@ -16,6 +17,7 @@ import {
   View,
   ViewStyle
 } from "react-native"
+import Animated, { FadeInLeft, FadeOutLeft } from "react-native-reanimated"
 import { SettingsNamedToggleView } from "./components/NamedToggle"
 import { SettingsNavigationLinkView } from "./components/NavigationLink"
 import { SettingsScrollView } from "./components/ScrollView"
@@ -37,12 +39,22 @@ export const SettingsDurationCard = ({
 }: SettingDurationCardProps) => {
   const fontScale = useFontScale()
   return (
-    <View style={[styles.container, { height: 64 * fontScale }]}>
+    <Animated.View
+      style={[styles.container, { height: 64 * fontScale }]}
+      entering={FadeInLeft}
+      exiting={FadeOutLeft}
+      layout={TiFDefaultLayoutTransition}
+    >
       <Headline>{formatEventDurationPreset(durationInSeconds)}</Headline>
-      <TouchableOpacity style={styles.closeButton} onPress={onClosePress}>
-        <Ionicon size={16} color={"white"} name={"close"} />
+      <TouchableOpacity
+        hitSlop={{ left: 16, right: 16, top: 16, bottom: 16 }}
+        style={styles.closeButton}
+        activeOpacity={0.8}
+        onPress={onClosePress}
+      >
+        <CircularIonicon backgroundColor={AppStyles.darkColor} name={"close"} />
       </TouchableOpacity>
-    </View>
+    </Animated.View>
   )
 }
 
@@ -51,6 +63,7 @@ export const AddDurationCard = () => {
   return (
     <TouchableHighlight
       style={[styles.addButtonContainer, { height: 64 * fontScale }]}
+      underlayColor={AppStyles.colorOpacity35}
     >
       <Ionicon size={36} color={AppStyles.colorOpacity35} name={"add"} />
     </TouchableHighlight>
@@ -241,7 +254,6 @@ const styles = StyleSheet.create({
     position: "relative",
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: AppStyles.eventCardColor,
     borderStyle: "dashed",
     opacity: 0.5,
     borderColor: AppStyles.colorOpacity50,
@@ -265,11 +277,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     height: 24,
     width: 24,
-    borderRadius: 64,
     right: "-5%",
     top: "-10%",
     position: "absolute",
-    backgroundColor: AppStyles.black.toString(),
     borderColor: "black"
   }
 })
