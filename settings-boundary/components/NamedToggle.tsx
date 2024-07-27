@@ -1,6 +1,6 @@
-import { StyleProp, ViewStyle, StyleSheet, View } from "react-native"
-import { SettingsSwitchView } from "./Switch"
+import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 import { SettingsLabelView } from "./Label"
+import { SettingsSwitchView } from "./Switch"
 
 export type SettingsNamedToggleProps = {
   name: string
@@ -38,6 +38,7 @@ const styles = StyleSheet.create({
     padding: 16
   },
   label: {
+    flex: 1,
     rowGap: 4
   }
 })
