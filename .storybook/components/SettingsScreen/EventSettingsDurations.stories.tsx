@@ -1,4 +1,5 @@
 import { StoryMeta } from ".storybook/HelperTypes"
+import { PrimaryButton } from "@components/Buttons"
 import { NavigationContainer } from "@react-navigation/native"
 import { createStackNavigator } from "@react-navigation/stack"
 import { SQLiteLocalSettingsStorage } from "@settings-storage/LocalSettings"
@@ -7,7 +8,7 @@ import { settingsSelector } from "@settings-storage/Settings"
 import { SQLiteUserSettingsStorage } from "@settings-storage/UserSettings"
 import { ComponentStory } from "@storybook/react-native"
 import React from "react"
-import { Button, View } from "react-native"
+import { View } from "react-native"
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context"
 import { EventDurationView } from "settings-boundary/EventSettings"
 import { BASE_HEADER_SCREEN_OPTIONS } from "../../../components/Navigation"
@@ -57,7 +58,7 @@ const DurationScreenTest = () => {
   )
   return (
     <SafeAreaView edges={["bottom"]}>
-      <Button
+      <PrimaryButton
         title="Add Test Buttons"
         onPress={() =>
           update({ eventPresetDurations: [600, 1200, 1800, 2400, 4800, 7200] })

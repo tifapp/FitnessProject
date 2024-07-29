@@ -1,3 +1,4 @@
+import { PrimaryButton } from "@components/Buttons"
 import { Headline } from "@components/Text"
 import { CircularIonicon, Ionicon } from "@components/common/Icons"
 import { AppStyles } from "@lib/AppColorStyle"
@@ -8,6 +9,8 @@ import { settingsSelector } from "@settings-storage/Settings"
 import { Placemark } from "TiFShared/domain-models/Placemark"
 import { formatEventDurationPreset } from "TiFShared/domain-models/Settings"
 import { repeatElements } from "TiFShared/lib/Array"
+import { useAtom } from "jotai"
+import { atomWithStorage } from "jotai/utils"
 import React from "react"
 import {
   StyleProp,
@@ -17,7 +20,12 @@ import {
   View,
   ViewStyle
 } from "react-native"
-import Animated, { FadeInLeft, FadeOutLeft } from "react-native-reanimated"
+import Animated, {
+  FadeInLeft,
+  FadeOutLeft,
+  ZoomIn,
+  ZoomOut
+} from "react-native-reanimated"
 import { SettingsNamedToggleView } from "./components/NamedToggle"
 import { SettingsNavigationLinkView } from "./components/NavigationLink"
 import { SettingsScrollView } from "./components/ScrollView"
@@ -25,6 +33,8 @@ import {
   SettingsCardSectionView,
   SettingsSectionView
 } from "./components/Section"
+
+export const eventSettingsEditMode = atomWithStorage("OFF", false)
 
 export type SettingDurationCardProps = {
   style?: StyleProp<ViewStyle>
@@ -38,6 +48,7 @@ export const SettingsDurationCard = ({
   onClosePress
 }: SettingDurationCardProps) => {
   const fontScale = useFontScale()
+  const [editMode] = useAtom(eventSettingsEditMode)
   return (
     <Animated.View
       style={[styles.container, { height: 64 * fontScale }]}
@@ -46,20 +57,29 @@ export const SettingsDurationCard = ({
       layout={TiFDefaultLayoutTransition}
     >
       <Headline>{formatEventDurationPreset(durationInSeconds)}</Headline>
-      <TouchableOpacity
-        hitSlop={{ left: 16, right: 16, top: 16, bottom: 16 }}
-        style={styles.closeButton}
-        activeOpacity={0.8}
-        onPress={onClosePress}
-      >
-        <CircularIonicon backgroundColor={AppStyles.darkColor} name={"close"} />
-      </TouchableOpacity>
+      {editMode ? (
+        <Animated.View
+          hitSlop={{ left: 16, right: 16, top: 16, bottom: 16 }}
+          style={styles.closeButton}
+          entering={ZoomIn}
+          exiting={ZoomOut}
+          layout={TiFDefaultLayoutTransition}
+        >
+          <TouchableOpacity activeOpacity={0.8} onPress={onClosePress}>
+            <CircularIonicon
+              backgroundColor={AppStyles.darkColor}
+              name={"close"}
+            />
+          </TouchableOpacity>
+        </Animated.View>
+      ) : undefined}
     </Animated.View>
   )
 }
 
 export const AddDurationCard = () => {
   const fontScale = useFontScale()
+
   return (
     <Animated.View
       style={{ flex: 1 }}
@@ -125,6 +145,7 @@ const DurationCardRowView = ({
 export const DurationSectionView = () => {
   const { settings } = useUserSettings(settingsSelector("eventPresetDurations"))
   const fontScale = useFontScale()
+  const [editModeOn, setEditModeOn] = useAtom(eventSettingsEditMode)
   const sortedDurations = settings.eventPresetDurations.sort((a, b) => a - b)
   return (
     <SettingsSectionView title="Duration Presets">
@@ -160,6 +181,17 @@ export const DurationSectionView = () => {
               end={6}
             />
           </>
+        )}
+      </View>
+      <View>
+        {editModeOn ? (
+          <PrimaryButton onPress={() => setEditModeOn(false)}>
+            Edit Mode On
+          </PrimaryButton>
+        ) : (
+          <PrimaryButton onPress={() => setEditModeOn(true)}>
+            Edit Mode Off
+          </PrimaryButton>
         )}
       </View>
     </SettingsSectionView>
