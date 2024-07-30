@@ -1,4 +1,3 @@
-import { PrimaryButton } from "@components/Buttons"
 import { Headline } from "@components/Text"
 import { CircularIonicon, Ionicon } from "@components/common/Icons"
 import { AppStyles } from "@lib/AppColorStyle"
@@ -145,10 +144,9 @@ const DurationCardRowView = ({
 export const DurationSectionView = () => {
   const { settings } = useUserSettings(settingsSelector("eventPresetDurations"))
   const fontScale = useFontScale()
-  const [editModeOn, setEditModeOn] = useAtom(eventSettingsEditMode)
   const sortedDurations = settings.eventPresetDurations.sort((a, b) => a - b)
   return (
-    <SettingsSectionView title="Duration Presets">
+    <SettingsSectionView>
       <View style={styles.presetRowsGridContainer}>
         {fontScale < FontScaleFactors.accessibility1 ? (
           <>
@@ -181,17 +179,6 @@ export const DurationSectionView = () => {
               end={6}
             />
           </>
-        )}
-      </View>
-      <View>
-        {editModeOn ? (
-          <PrimaryButton onPress={() => setEditModeOn(false)}>
-            Edit Mode On
-          </PrimaryButton>
-        ) : (
-          <PrimaryButton onPress={() => setEditModeOn(true)}>
-            Edit Mode Off
-          </PrimaryButton>
         )}
       </View>
     </SettingsSectionView>

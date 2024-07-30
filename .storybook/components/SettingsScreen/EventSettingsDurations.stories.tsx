@@ -7,10 +7,14 @@ import { PersistentSettingsStores } from "@settings-storage/PersistentStores"
 import { settingsSelector } from "@settings-storage/Settings"
 import { SQLiteUserSettingsStorage } from "@settings-storage/UserSettings"
 import { ComponentStory } from "@storybook/react-native"
+import { useAtom } from "jotai"
 import React from "react"
-import { View } from "react-native"
+import { StyleSheet, View } from "react-native"
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context"
-import { EventDurationView } from "settings-boundary/EventSettings"
+import {
+  EventDurationView,
+  eventSettingsEditMode
+} from "settings-boundary/EventSettings"
 import { BASE_HEADER_SCREEN_OPTIONS } from "../../../components/Navigation"
 import {
   SettingsProvider,
@@ -29,20 +33,47 @@ type SettingsStory = ComponentStory<typeof View>
 
 const Stack = createStackNavigator()
 
-export const Basic: SettingsStory = () => (
-  <SafeAreaProvider>
-    <SettingsProvider
-      localSettingsStore={{} as any}
-      userSettingsStore={userStore}
-    >
-      <NavigationContainer>
-        <Stack.Navigator screenOptions={{ ...BASE_HEADER_SCREEN_OPTIONS }}>
-          <Stack.Screen name="Durations" component={DurationScreenTest} />
-        </Stack.Navigator>
-      </NavigationContainer>
-    </SettingsProvider>
-  </SafeAreaProvider>
-)
+export const Basic: SettingsStory = () => {
+  const [editModeOn, setEditModeOn] = useAtom(eventSettingsEditMode)
+  return (
+    <SafeAreaProvider>
+      <SettingsProvider
+        localSettingsStore={{} as any}
+        userSettingsStore={userStore}
+      >
+        <NavigationContainer>
+          <Stack.Navigator
+            screenOptions={{
+              ...BASE_HEADER_SCREEN_OPTIONS,
+              headerRight: () => {
+                return editModeOn ? (
+                  <PrimaryButton
+                    style={{ left: 16 }}
+                    onPress={() => setEditModeOn(false)}
+                  >
+                    Edit Mode On
+                  </PrimaryButton>
+                ) : (
+                  <PrimaryButton
+                    style={{ left: 16 }}
+                    onPress={() => setEditModeOn(true)}
+                  >
+                    Edit Mode Off
+                  </PrimaryButton>
+                )
+              }
+            }}
+          >
+            <Stack.Screen
+              name="Duration Presets"
+              component={DurationScreenTest}
+            />
+          </Stack.Navigator>
+        </NavigationContainer>
+      </SettingsProvider>
+    </SafeAreaProvider>
+  )
+}
 
 const localStore = PersistentSettingsStores.local(
   new SQLiteLocalSettingsStorage(testSQLite)
@@ -68,3 +99,7 @@ const DurationScreenTest = () => {
     </SafeAreaView>
   )
 }
+
+const styles = StyleSheet.create({
+  editModePadding: { left: 16 }
+})
