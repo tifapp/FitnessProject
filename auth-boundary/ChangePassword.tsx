@@ -1,14 +1,14 @@
 import { Headline } from "@components/Text"
+import { TextFieldRefValue } from "@components/TextFields"
 import { AppStyles } from "@lib/AppColorStyle"
+import { TiFDefaultLayoutTransition } from "@lib/Reanimated"
+import { useFormSubmission } from "@lib/utils/Form"
 import React, { useRef, useState } from "react"
 import { Alert, Platform, StyleProp, StyleSheet, ViewStyle } from "react-native"
 import { TouchableOpacity } from "react-native-gesture-handler"
+import Animated from "react-native-reanimated"
 import { AuthFormView } from "./AuthLayout"
 import { AuthShadedPasswordTextField } from "./AuthTextFields"
-import { TextFieldRefValue } from "@components/TextFields"
-import Animated from "react-native-reanimated"
-import { useFormSubmission } from "@lib/utils/Form"
-import { TiFDefaultLayoutTransition } from "@lib/Reanimated"
 import { Password } from "./Password"
 
 export type ChangePasswordResult = "valid" | "incorrect-password"
@@ -184,7 +184,7 @@ export const ChangePasswordFormView = ({
 
       <Animated.View layout={TiFDefaultLayoutTransition}>
         <AuthShadedPasswordTextField
-          iconName="md-key"
+          iconName="key"
           iconBackgroundColor="#14B329"
           value={fields.newPassword}
           placeholder="New Password"
