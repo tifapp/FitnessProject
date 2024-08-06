@@ -51,6 +51,9 @@ import TextFieldMeta, {
 import VerifcationCodeMeta, {
   Basic as VerifcationCodeBasic
 } from "../components/VerificationCode/VerifyCode.stories"
+import EditEventDurationsMeta, {
+  Basic as EditEventDurationsBasic
+} from "../components/EditEvent/DurationPicker.stories"
 import { setupCognito } from "@auth-boundary/CognitoHelpers"
 import { InMemorySecureStore } from "@auth-boundary/CognitoSecureStorage"
 
@@ -137,6 +140,11 @@ const stories = [
     name: AttendeesListMeta.title,
     component: AttendeesListBasic,
     args: AttendeesListMeta.args
+  },
+  {
+    name: EditEventDurationsMeta.title,
+    component: EditEventDurationsBasic,
+    args: EditEventDurationsMeta.args
   }
   // Add more stories here...
 ]
