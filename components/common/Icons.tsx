@@ -143,9 +143,10 @@ export type CircularIoniconProps = {
  */
 export const CircularIonicon = ({
   backgroundColor,
+  maximumFontScaleFactor,
   name,
   style,
-  size,
+  size = DEFAULT_ICON_SIZE,
   ...props
 }: CircularIoniconProps) => (
   <View style={style}>
@@ -155,8 +156,18 @@ export const CircularIonicon = ({
           circularStyles.iconBackground,
           {
             backgroundColor,
-            width: size * 1.5,
-            height: size * 1.5
+            width:
+              size *
+              useFontScale({
+                maximumScaleFactor: maximumFontScaleFactor
+              }) *
+              1.5,
+            height:
+              size *
+              useFontScale({
+                maximumScaleFactor: maximumFontScaleFactor
+              }) *
+              1.5
           }
         ]}
       />
