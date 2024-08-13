@@ -9,11 +9,11 @@ import React, { ComponentProps } from "react"
 import {
   StyleProp,
   StyleSheet,
-  TouchableOpacityProps,
   TouchableOpacity,
+  TouchableOpacityProps,
+  View,
   ViewProps,
-  ViewStyle,
-  View
+  ViewStyle
 } from "react-native"
 
 /**
@@ -135,6 +135,7 @@ export type CircularIoniconProps = {
   backgroundColor: string
   name: IoniconName
   style?: StyleProp<ViewStyle>
+  size: number
 } & Omit<IconProps<IoniconName>, "size">
 
 /**
@@ -142,8 +143,10 @@ export type CircularIoniconProps = {
  */
 export const CircularIonicon = ({
   backgroundColor,
+  maximumFontScaleFactor,
   name,
   style,
+  size = DEFAULT_ICON_SIZE,
   ...props
 }: CircularIoniconProps) => (
   <View style={style}>
@@ -153,23 +156,27 @@ export const CircularIonicon = ({
           circularStyles.iconBackground,
           {
             backgroundColor,
-            width: DEFAULT_ICON_SIZE * 1.5,
-            height: DEFAULT_ICON_SIZE * 1.5
+            width:
+              size *
+              useFontScale({
+                maximumScaleFactor: maximumFontScaleFactor
+              }) *
+              1.5,
+            height:
+              size *
+              useFontScale({
+                maximumScaleFactor: maximumFontScaleFactor
+              }) *
+              1.5
           }
         ]}
       />
       <Ionicon
         {...props}
         name={name}
-        size={DEFAULT_ICON_SIZE * (2 / 3)}
+        size={(size * 1.5) / 2}
         color="white"
-        style={[
-          circularStyles.icon,
-          {
-            bottom: DEFAULT_ICON_SIZE / 2 - 1,
-            right: DEFAULT_ICON_SIZE / 2 - 2
-          }
-        ]}
+        style={circularStyles.icon}
       />
     </View>
   </View>
@@ -177,17 +184,20 @@ export const CircularIonicon = ({
 
 const circularStyles = StyleSheet.create({
   iconContainer: {
-    position: "relative"
+    position: "relative",
+    justifyContent: "center",
+    alignItems: "center"
   },
   icon: {
-    position: "absolute"
+    position: "absolute",
+    alignSelf: "center"
   },
   iconBackground: {
-    borderRadius: 32
+    borderRadius: 128
   }
 })
 
-export type RoundedIoniconProps = CircularIoniconProps & {
+export type RoundedIoniconProps = Omit<CircularIoniconProps, "size"> & {
   borderRadius: number
   size?: number
 }

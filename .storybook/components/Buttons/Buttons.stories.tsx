@@ -1,10 +1,10 @@
-import { SecondaryOutlinedButton, PrimaryButton } from "@components/Buttons"
+import { AuthBannerButton } from "@components/AuthBanner"
+import { PrimaryButton, SecondaryOutlinedButton } from "@components/Buttons"
 import { CircularIonicon } from "@components/common/Icons"
+import { BottomSheetModalProvider } from "@gorhom/bottom-sheet"
 import { EventColors } from "@lib/events"
 import { ComponentMeta, ComponentStory } from "@storybook/react-native"
 import { ScrollView, View } from "react-native"
-import { AuthBannerButton } from "@components/AuthBanner"
-import { BottomSheetModalProvider } from "@gorhom/bottom-sheet"
 import { GestureHandlerRootView } from "react-native-gesture-handler"
 import { SafeAreaProvider } from "react-native-safe-area-context"
 
@@ -23,6 +23,7 @@ export const Basic: ButtonsStory = () => (
         <ScrollView style={{ height: "100%" }}>
           <PrimaryButton>
             <CircularIonicon
+              size={24}
               name="airplane"
               backgroundColor={EventColors.Orange}
             />

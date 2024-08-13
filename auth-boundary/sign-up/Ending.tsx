@@ -57,6 +57,7 @@ const FeatureLabel = ({
 }: FeatureLabelProps) => (
   <View style={[styles.featureLabelContainer, style]}>
     <CircularIonicon
+      size={24}
       backgroundColor={iconColor}
       name={iconName}
       style={styles.featureLabelIcon}
