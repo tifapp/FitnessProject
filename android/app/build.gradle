@@ -170,7 +170,14 @@ android {
 
 dependencies {
     // The version of react-native is set by the React Native Gradle Plugin
+    ext {
+        compose_ui_version = '1.6.8'
+        compose_compiler_version = '1.5.15'
+    }
     implementation("com.facebook.react:react-android")
+    implementation 'com.github.commandiron:WheelPickerCompose:1.1.11'
+    implementation "androidx.compose.ui:ui:$compose_ui_version"
+    implementation "androidx.compose.material3:material3:1.2.1"
 
     def isGifEnabled = (findProperty('expo.gif.enabled') ?: "") == "true";
     def isWebpEnabled = (findProperty('expo.webp.enabled') ?: "") == "true";
