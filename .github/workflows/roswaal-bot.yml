@@ -14,12 +14,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Make a request if merged
+      - name: Make a roswaal request if merged
         if: github.event.pull_request.merged == true
         run: |
-          curl -I -X POST "https://roswaal.onetask.day/merge?password=${{ secrets.ROSWAAL_PASSWORD }}&branch=${{ github.head_ref }}"
+          curl -I -X POST "https://roswaal.onetask.day/merge?password=$7^P$8&branch=${{ github.head_ref }}"
 
-      - name: Make a request if closed without merging
+      - name: Make a roswaal request if closed without merging
         if: github.event.pull_request.merged == false
         run: |
-          curl -I -X POST "https://roswaal.onetask.day/close?password=${{ secrets.ROSWAAL_PASSWORD }}&branch=${{ github.head_ref }}"
+          curl -I -X POST "https://roswaal.onetask.day/close?password=$7^P$8&branch=${{ github.head_ref }}"
