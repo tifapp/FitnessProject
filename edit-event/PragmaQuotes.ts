@@ -1,0 +1,226 @@
+import { dayjs } from "TiFShared/lib/Dayjs"
+
+/**
+ * Returns Pragma's Quote when the user is editing an existing event through the edit form.
+ */
+export const editEventQuote = () => EDIT_EVENT_QUOTES.ext.randomElement()
+
+const EDIT_EVENT_QUOTES = [
+  "What would you like to change?",
+  "What will you change this time?",
+  "How will you change this event?"
+]
+
+/**
+ * Returns Pragma's Quote when the user is creating a new event through the edit form.
+ *
+ * @param date The current date.
+ */
+export const createEventQuote = (date: Date = new Date()) => {
+  const type = createEventQuoteType(date)
+  if (type.key === "upcomingHoliday") {
+    return CREATE_EVENT_QUOTES[type.key].ext.randomElement()(type.name)
+  } else if (type.key === "holiday") {
+    return CREATE_EVENT_QUOTES[type.key].ext.randomElement()(type.greeting)
+  }
+  return CREATE_EVENT_QUOTES[type.key].ext.randomElement()
+}
+
+const CREATE_EVENT_QUOTES = {
+  weekday: [
+    "What event is on you mind this week?",
+    "What event will you create this week?",
+    "How will you progress with this new event?"
+  ],
+  weekend: [
+    "What event is on you mind this weekend?",
+    "What event will you create this weekend?",
+    "Ready to gear up for this weekend's event?"
+  ],
+  upcomingHoliday: [
+    (name: string) => `Planning an event for ${name}?`,
+    (name: string) => `Will you make an event for ${name}?`,
+    (name: string) => `Want to make an event for ${name}?`
+  ],
+  holiday: [
+    (greeting: string) => `${greeting} Ready to make an event?`,
+    (greeting: string) => `${greeting} Want to celebrate with an event?`,
+    (greeting: string) => `${greeting} What event do you have in mind?`
+  ]
+}
+
+export type CreateEventQuoteType =
+  | { key: "weekday" | "weekend" }
+  | { key: "upcomingHoliday"; name: string }
+  | { key: "holiday"; greeting: string }
+
+/**
+ * Returns the type of Pragma's Quote when the user is creating a new event through the edit form.
+ *
+ * @param date The current date.
+ */
+export const createEventQuoteType = (
+  currentDate: Date
+): CreateEventQuoteType => {
+  const date = dayjs(currentDate)
+  const holidays = datedHolidays(date.year())
+  const upcomingHoliday = holidays.find((holiday) => {
+    const days = holiday.date.diff(date, "days")
+    return days >= 0 && days < 3
+  })
+  const todaysHoliday = holidays.find((holiday) => {
+    return holiday.date.isSame(date, "day")
+  })
+  if (todaysHoliday) {
+    return { key: "holiday", greeting: todaysHoliday.greeting }
+  }
+  if (upcomingHoliday) {
+    return { key: "upcomingHoliday", name: upcomingHoliday.name }
+  }
+  return { key: date.day() < 4 ? "weekday" : "weekend" }
+}
+
+enum WeekDayIndex {
+  Sunday = 0,
+  Monday = 1,
+  Tuesday = 2,
+  Wednesday = 3,
+  Thursday = 4,
+  Friday = 5,
+  Saturday = 6
+}
+
+type USHoliday = {
+  dayOfYear:
+    | { month: number; dayOfMonth: number }
+    | { month: number; weekdayIndex: WeekDayIndex; weekdayOccurence: number }
+  name: string
+  greeting: string
+}
+
+const datedHolidays = (year: number) => {
+  const upcomingNewYearsDay = {
+    date: dayjs(`${year + 1}-01-01`),
+    name: "New Year's Day",
+    dayOfYear: { month: 1, dayOfMonth: 1 },
+    greeting: "Happy New Year!"
+  }
+  return US_HOLIDAYS.map((holiday) => {
+    if ("weekdayIndex" in holiday.dayOfYear) {
+      return {
+        date: relativeHolidayDate(year, holiday.dayOfYear),
+        ...holiday
+      }
+    } else {
+      return {
+        date: dayjs(
+          `${year}-${holiday.dayOfYear.month}-${holiday.dayOfYear.dayOfMonth}`
+        ),
+        ...holiday
+      }
+    }
+  }).concat(upcomingNewYearsDay)
+}
+
+const relativeHolidayDate = (
+  year: number,
+  dayOfYear: {
+    month: number
+    weekdayIndex: WeekDayIndex
+    weekdayOccurence: number
+  }
+) => {
+  let date = dayjs(`${year}-${dayOfYear.month}-01`)
+  if (dayOfYear.weekdayOccurence < 0) {
+    date = date.endOf("month")
+  }
+  while (date.day() !== dayOfYear.weekdayIndex) {
+    date = date.add(dayOfYear.weekdayOccurence < 0 ? -1 : 1, "day")
+  }
+  const zeroIndexedOccurence =
+    dayOfYear.weekdayOccurence +
+    -dayOfYear.weekdayOccurence / Math.abs(dayOfYear.weekdayOccurence)
+  return date.add(zeroIndexedOccurence, "week")
+}
+
+const US_HOLIDAYS = [
+  {
+    dayOfYear: { month: 1, dayOfMonth: 1 },
+    name: "New Year's Day",
+    greeting: "Happy New Year!"
+  },
+  {
+    dayOfYear: {
+      month: 1,
+      weekdayIndex: WeekDayIndex.Monday,
+      weekdayOccurence: 3
+    },
+    name: "Martin Luther King, Jr. Day",
+    greeting: "Happy MLK Jr. Day!"
+  },
+  {
+    dayOfYear: {
+      month: 2,
+      weekdayIndex: WeekDayIndex.Monday,
+      weekdayOccurence: 3
+    },
+    name: "Presidents Day",
+    greeting: "Happy Presidents Day!"
+  },
+  {
+    dayOfYear: {
+      month: 5,
+      weekdayIndex: WeekDayIndex.Monday,
+      weekdayOccurence: -1
+    },
+    name: "Memorial Day",
+    greeting: "Happy Memorial Day!"
+  },
+  {
+    dayOfYear: { month: 6, dayOfMonth: 19 },
+    name: "Juneteenth",
+    greeting: "Happy Juneteenth!"
+  },
+  {
+    dayOfYear: { month: 7, dayOfMonth: 4 },
+    name: "Independence Day",
+    greeting: "Happy Independence Day!"
+  },
+  {
+    dayOfYear: {
+      month: 9,
+      weekdayIndex: WeekDayIndex.Monday,
+      weekdayOccurence: 1
+    },
+    name: "Labor Day",
+    greeting: "Happy Labor Day!"
+  },
+  {
+    dayOfYear: {
+      month: 10,
+      weekdayIndex: WeekDayIndex.Monday,
+      weekdayOccurence: 2
+    },
+    name: "Indigenous Peoples' Day",
+    reeting: "Happy Indigenous Peoples' Day!"
+  },
+  {
+    dayOfYear: { month: 11, dayOfMonth: 11 },
+    name: "Veterans Day",
+    greeting: "Veterans Day!"
+  },
+  {
+    dayOfYear: {
+      month: 11,
+      weekdayIndex: WeekDayIndex.Thursday,
+      weekdayOccurence: 4
+    },
+    name: "Thanksgiving",
+    greeting: "Happy Thanksgiving!"
+  },
+  {
+    dayOfYear: { month: 12, dayOfMonth: 25 },
+    name: "Christmas",
+    greeting: "Merry Christmas!"
+  }
+] as USHoliday[]
