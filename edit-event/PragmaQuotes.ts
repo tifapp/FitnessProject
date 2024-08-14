@@ -77,7 +77,7 @@ export const createEventQuoteType = (
   if (upcomingHoliday) {
     return { key: "upcomingHoliday", name: upcomingHoliday.name }
   }
-  return { key: date.day() < 4 ? "weekday" : "weekend" }
+  return { key: date.day() < WeekDayIndex.Thursday ? "weekday" : "weekend" }
 }
 
 enum WeekDayIndex {
@@ -137,10 +137,10 @@ const relativeHolidayDate = (
   while (date.day() !== dayOfYear.weekdayIndex) {
     date = date.add(dayOfYear.weekdayOccurence < 0 ? -1 : 1, "day")
   }
-  const zeroIndexedOccurence =
+  const weeksToAdd =
     dayOfYear.weekdayOccurence +
     -dayOfYear.weekdayOccurence / Math.abs(dayOfYear.weekdayOccurence)
-  return date.add(zeroIndexedOccurence, "week")
+  return date.add(weeksToAdd, "week")
 }
 
 const US_HOLIDAYS = [
