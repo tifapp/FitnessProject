@@ -1,0 +1,17 @@
+name: Auto Pass
+run-name: Auto Pass Setup
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+    branches:
+      - master
+      - development
+
+jobs:
+  build:
+    if: github.actor == 'roswaaltifbot' || startsWith(github.event.pull_request.title, 'IGNORE_BUILD')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install Dependencies
+        run: echo "Skipping build action for ${{ github.actor }} or PR title starting with IGNORE_BUILD"
