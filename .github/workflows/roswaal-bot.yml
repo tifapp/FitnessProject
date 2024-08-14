@@ -17,9 +17,9 @@ jobs:
       - name: Make a roswaal request if merged
         if: github.event.pull_request.merged == true
         run: |
-          curl -I -X POST "https://roswaal.onetask.day/merge?branch=${{ github.head_ref }}"
+          curl -I -X POST 'https://roswaal.onetask.day/merge?branch=${{ github.head_ref }}&password=${{ secrets.ROSWAAL_PASSWORD }}'
 
       - name: Make a roswaal request if closed without merging
         if: github.event.pull_request.merged == false
         run: |
-          curl -I -X POST "https://roswaal.onetask.day/close?branch=${{ github.head_ref }}"
+          curl -I -X POST 'https://roswaal.onetask.day/close?branch=${{ github.head_ref }}&password=${{ secrets.ROSWAAL_PASSWORD }}'
