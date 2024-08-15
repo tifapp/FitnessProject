@@ -1,4 +1,5 @@
 import { dayjs } from "TiFShared/lib/Dayjs"
+import { Dayjs } from "dayjs"
 
 /**
  * Returns Pragma's Quote when the user is editing an existing event through the edit form.
@@ -106,7 +107,7 @@ const datedHolidays = (year: number) => {
   return US_HOLIDAYS.map((holiday) => {
     if ("weekdayIndex" in holiday.dayOfYear) {
       return {
-        date: relativeHolidayDate(year, holiday.dayOfYear),
+        date: recurrencePatternDate(year, holiday.dayOfYear),
         ...holiday
       }
     } else {
@@ -120,7 +121,7 @@ const datedHolidays = (year: number) => {
   }).concat(upcomingNewYearsDay)
 }
 
-const relativeHolidayDate = (
+const recurrencePatternDate = (
   year: number,
   dayOfYear: {
     month: number
@@ -128,17 +129,16 @@ const relativeHolidayDate = (
     weekdayOccurence: number
   }
 ) => {
+  const isFindingNthLastOccurence = dayOfYear.weekdayOccurence < 0
   let date = dayjs(`${year}-${dayOfYear.month}-01`)
-  if (dayOfYear.weekdayOccurence < 0) {
+  if (isFindingNthLastOccurence) {
     date = date.endOf("month")
   }
+  const dateMovementOffset = isFindingNthLastOccurence ? -1 : 1
   while (date.day() !== dayOfYear.weekdayIndex) {
-    date = date.add(dayOfYear.weekdayOccurence < 0 ? -1 : 1, "day")
+    date = date.add(dateMovementOffset, "day")
   }
-  const weeksToAdd =
-    dayOfYear.weekdayOccurence +
-    -dayOfYear.weekdayOccurence / Math.abs(dayOfYear.weekdayOccurence)
-  return date.add(weeksToAdd, "week")
+  return date.add(dayOfYear.weekdayOccurence - dateMovementOffset, "week")
 }
 
 const NEW_YEARS_DAY_HOLIDAY = {
@@ -202,12 +202,17 @@ const US_HOLIDAYS = [
       weekdayOccurence: 2
     },
     name: "Indigenous Peoples' Day",
-    reeting: "Happy Indigenous Peoples' Day!"
+    greeting: "Happy Indigenous Peoples' Day!"
+  },
+  {
+    dayOfYear: { month: 10, dayOfMonth: 31 },
+    name: "Halloween",
+    greeting: "Happy Halloween!"
   },
   {
     dayOfYear: { month: 11, dayOfMonth: 11 },
     name: "Veterans Day",
-    greeting: "Veterans Day!"
+    greeting: "Happy Veterans Day!"
   },
   {
     dayOfYear: {
