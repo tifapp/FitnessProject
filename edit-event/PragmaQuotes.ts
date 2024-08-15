@@ -101,9 +101,7 @@ type USHoliday = {
 const datedHolidays = (year: number) => {
   const upcomingNewYearsDay = {
     date: dayjs(`${year + 1}-01-01`),
-    name: "New Year's Day",
-    dayOfYear: { month: 1, dayOfMonth: 1 },
-    greeting: "Happy New Year!"
+    ...NEW_YEARS_DAY_HOLIDAY
   }
   return US_HOLIDAYS.map((holiday) => {
     if ("weekdayIndex" in holiday.dayOfYear) {
@@ -143,12 +141,14 @@ const relativeHolidayDate = (
   return date.add(weeksToAdd, "week")
 }
 
+const NEW_YEARS_DAY_HOLIDAY = {
+  dayOfYear: { month: 1, dayOfMonth: 1 },
+  name: "New Year's Day",
+  greeting: "Happy New Year!"
+}
+
 const US_HOLIDAYS = [
-  {
-    dayOfYear: { month: 1, dayOfMonth: 1 },
-    name: "New Year's Day",
-    greeting: "Happy New Year!"
-  },
+  NEW_YEARS_DAY_HOLIDAY,
   {
     dayOfYear: {
       month: 1,
