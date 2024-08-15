@@ -156,7 +156,7 @@ const US_HOLIDAYS = [
       weekdayOccurence: 3
     },
     name: "Martin Luther King, Jr. Day",
-    greeting: "Happy MLK Jr. Day!"
+    greeting: "Happy Martin Luther King, Jr Day!"
   },
   {
     dayOfYear: {
@@ -166,6 +166,21 @@ const US_HOLIDAYS = [
     },
     name: "Presidents Day",
     greeting: "Happy Presidents Day!"
+  },
+  {
+    dayOfYear: { month: 2, dayOfMonth: 14 },
+    name: "Valentine's Day",
+    greeting: "Happy Valentine's Day!"
+  },
+  {
+    dayOfYear: { month: 3, dayOfMonth: 17 },
+    name: "St. Patrick's Day",
+    greeting: "Happy St. Patrick's Day!"
+  },
+  {
+    dayOfYear: { month: 5, dayOfMonth: 5 },
+    name: "Cinco de Mayo",
+    greeting: "Happy Cinco de Mayo!"
   },
   {
     dayOfYear: {
