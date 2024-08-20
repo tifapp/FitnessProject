@@ -299,6 +299,9 @@ PODS:
     - "sqlite3/bytecodevtab (~> 3.45.3+1)"
     - "sqlite3/fts (~> 3.45.3+1)"
     - "sqlite3/fts5 (~> 3.45.3+1)"
+  - ExpoTiFFileSystem (1.0.0):
+    - ExpoModulesCore
+    - Zip (~> 2.1)
   - ExpoTiFTravelEstimates (1.0.0):
     - ExpoModulesCore
     - TiFNative (~> 1.0.0)
@@ -1696,6 +1699,7 @@ PODS:
   - TiFNative (1.0.0)
   - UMAppLoader (4.6.0)
   - Yoga (0.0.0)
+  - Zip (2.1.2)
 
 DEPENDENCIES:
   - boost (from `../node_modules/react-native/third-party-podspecs/boost.podspec`)
@@ -1732,6 +1736,7 @@ DEPENDENCIES:
   - ExpoModulesCore (from `../node_modules/expo-modules-core`)
   - ExpoSecureStore (from `../node_modules/expo-secure-store/ios`)
   - ExpoSQLite (from `../node_modules/expo-sqlite/ios`)
+  - ExpoTiFFileSystem (from `../modules/tif-fs/ios`)
   - ExpoTiFTravelEstimates (from `../modules/tif-travel-estimates/ios`)
   - ExpoTiFWeblinks (from `../modules/tif-weblinks/ios`)
   - EXSplashScreen (from `../node_modules/expo-splash-screen/ios`)
@@ -1832,6 +1837,7 @@ SPEC REPOS:
     - Sentry
     - SocketRocket
     - sqlite3
+    - Zip
 
 EXTERNAL SOURCES:
   boost:
@@ -1902,6 +1908,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/expo-secure-store/ios"
   ExpoSQLite:
     :path: "../node_modules/expo-sqlite/ios"
+  ExpoTiFFileSystem:
+    :path: "../modules/tif-fs/ios"
   ExpoTiFTravelEstimates:
     :path: "../modules/tif-travel-estimates/ios"
   ExpoTiFWeblinks:
@@ -2104,6 +2112,7 @@ SPEC CHECKSUMS:
   ExpoModulesCore: 30e1ed4659356cb9a84e0e5ddf1d090d735973c1
   ExpoSecureStore: 060cebcb956b80ddae09821610ac1aa9e1ac74cd
   ExpoSQLite: ef3beaedbf5ea4573892f0099ef5514796db6066
+  ExpoTiFFileSystem: 7495dbac4d00dc98cde8a1aacc42ec202440a35e
   ExpoTiFTravelEstimates: 85978616eb4a4f60dd44f4ec2e84b4abd00986db
   ExpoTiFWeblinks: 9e7629e890c5e29040f44e11ccffc170b019bba4
   EXSplashScreen: fbf0ec78e9cee911df188bf17b4fe51d15a84b87
@@ -2198,6 +2207,7 @@ SPEC CHECKSUMS:
   TiFNative: 6131f406e028e8ba7a9a77749836857e6142b59f
   UMAppLoader: f17a5ee8e85b536ace0fc254b447a37ed198d57e
   Yoga: 04f1db30bb810187397fa4c37dd1868a27af229c
+  Zip: b3fef584b147b6e582b2256a9815c897d60ddc67
 
 PODFILE CHECKSUM: c927c5e1f20e62770e8a513fbd00f619a8d1163c
 
