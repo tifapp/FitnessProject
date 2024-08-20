@@ -40,6 +40,7 @@ public class ExpoTiFFileSystemModule: Module {
 extension URL {
   func zipContents(to destination: URL) async throws {
     try await withUnsafeThrowingContinuation { continuation in
+      // NB: Use a queue to avoid starving the cooperative thread-pool.
       DispatchQueue.logsZipArchiveQueue.async {
         do {
           try Zip.zipFiles(
