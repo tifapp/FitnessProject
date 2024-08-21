@@ -1,7 +1,7 @@
-import { mergeWithPartial } from "TiFShared/lib/Object"
-import { AnySettings, SettingsStore, areSettingsEqual } from "./Settings"
 import { CallbackCollection } from "@lib/utils/CallbackCollection"
+import { mergeWithPartial } from "TiFShared/lib/Object"
 import { logger } from "TiFShared/logging"
+import { AnySettings, SettingsStore, areSettingsEqual } from "./Settings"
 
 /**
  * An interface for loading settings.

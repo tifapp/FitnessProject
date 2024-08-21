@@ -1,8 +1,8 @@
+import { UserSettings } from "TiFShared/domain-models/Settings"
 import { createContext, useCallback, useContext } from "react"
+import { useSyncExternalStoreWithSelector } from "use-sync-external-store/with-selector"
 import { LocalSettings } from "./LocalSettings"
 import { AnySettings, SettingsStore, areSettingsEqual } from "./Settings"
-import { UserSettings } from "TiFShared/domain-models/Settings"
-import { useSyncExternalStoreWithSelector } from "use-sync-external-store/with-selector"
 
 const SettingsContext = createContext<
   | {
@@ -43,6 +43,23 @@ export const useLocalSettings = <ScopedSettings extends AnySettings>(
 export const useUserSettings = <ScopedSettings extends AnySettings>(
   selector: (userSettings: UserSettings) => ScopedSettings
 ) => useSettingsStore(useSettings().userSettingsStore, selector)
+
+/**
+ * Returns a function to update the current local settings.
+ */
+export const useUpdateLocalSettings = () => {
+  const localStore = useSettings().localSettingsStore
+  return (localSettings: Partial<LocalSettings>) =>
+    localStore.update(localSettings)
+}
+
+/**
+ * Returns a function to update the current user settings.
+ */
+export const useUpdateUserSettings = () => {
+  const userStore = useSettings().userSettingsStore
+  return (userSettings: Partial<UserSettings>) => userStore.update(userSettings)
+}
 
 const useSettings = () => {
   const context = useContext(SettingsContext)

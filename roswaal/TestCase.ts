@@ -2,8 +2,8 @@ import { repeatElements } from "TiFShared/lib/Array"
 import { TestAppLaunchConfig, launchApp } from "./Launch"
 
 export type RoswaalTestCaseResult = {
-  name: string
-  actionResults: RoswaalTestCaseActionResult[]
+  testName: string
+  commandFailureOrdinal: number | null
   error: Error | null
 }
 
@@ -58,33 +58,27 @@ export class RoswaalTestCase {
     const beforeLaunchResult = await this.runBeforeLaunch()
     if (beforeLaunchResult instanceof Error || beforeLaunchResult === null) {
       return {
-        name: this.name,
-        actionResults: repeatElements(this.actions.length + 1, {
-          didPass: false
-        }),
+        testName: this.name,
+        commandFailureOrdinal: 0,
         error: beforeLaunchResult
       }
     }
     await launch(beforeLaunchResult)
-    const actionResults = [{ didPass: true }]
     for (const [index, action] of this.actions.entries()) {
       try {
         await action()
-        actionResults.push({ didPass: true })
       } catch (e) {
         const error = e instanceof Error ? e : null
         return {
-          name: this.name,
-          actionResults: actionResults.concat(
-            repeatElements(this.actions.length - index, { didPass: false })
-          ),
+          testName: this.name,
+          commandFailureOrdinal: index + 1,
           error
         }
       }
     }
     return {
-      name: this.name,
-      actionResults,
+      testName: this.name,
+      commandFailureOrdinal: null,
       error: null
     }
   }

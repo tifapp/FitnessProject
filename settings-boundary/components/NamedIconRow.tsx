@@ -1,7 +1,7 @@
 import { Headline } from "@components/Text"
 import { CircularIonicon, IoniconName } from "@components/common/Icons"
 import { ColorString } from "TiFShared/domain-models/ColorString"
-import { StyleProp, ViewStyle, StyleSheet, View } from "react-native"
+import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 
 export type SettingsNamedIconRowProps = {
   iconName: IoniconName
@@ -21,6 +21,7 @@ export const SettingsNamedIconRowView = ({
   <View style={style}>
     <View style={styles.container}>
       <CircularIonicon
+        size={24}
         name={iconName}
         backgroundColor={iconBackgroundColor.toString()}
       />
@@ -38,6 +39,7 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "row",
     alignItems: "center",
-    columnGap: 8
+    columnGap: 8,
+    padding: 16
   }
 })

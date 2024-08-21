@@ -3,7 +3,10 @@ import { presentEmailComposer } from "@lib/EmailComposition"
 import { NavigationContainer } from "@react-navigation/native"
 import { createStackNavigator } from "@react-navigation/stack"
 import { SettingsProvider } from "@settings-storage/Hooks"
-import { SQLiteLocalSettingsStorage } from "@settings-storage/LocalSettings"
+import {
+  LocalSettings,
+  SQLiteLocalSettingsStorage
+} from "@settings-storage/LocalSettings"
 import { PersistentSettingsStores } from "@settings-storage/PersistentStores"
 import { SQLiteUserSettingsStorage } from "@settings-storage/UserSettings"
 import { TestQueryClientProvider } from "@test-helpers/ReactQuery"

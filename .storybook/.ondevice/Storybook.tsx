@@ -3,6 +3,8 @@ import { FlatList, Text, TouchableOpacity, View } from "react-native"
 import { useAppFonts } from "../../lib/Fonts"
 
 // Import your stories
+import { setupCognito } from "@auth-boundary/CognitoHelpers"
+import { InMemorySecureStore } from "@auth-boundary/CognitoSecureStorage"
 import AttendeesListMeta, {
   Basic as AttendeesListBasic
 } from "../components/AttendeesList/AttendeesList.stories"
@@ -36,6 +38,12 @@ import RegionMonitoringMeta, {
 import SearchBarMeta, {
   Default as SearchBarBasic
 } from "../components/SearchBar/SearchBar.stories"
+import EventSettingsDurationMeta, {
+  Basic as EventSettingsDurationBasic
+} from "../components/SettingsScreen/EventSettingsDurations.stories"
+import EventSettingsMeta, {
+  Basic as EventSettingsBasic
+} from "../components/SettingsScreen/EventSettingsScreen.stories"
 import SettingsMeta, {
   Basic as SettingsScreenBasic
 } from "../components/SettingsScreen/SettingsScreen.stories"
@@ -80,6 +88,16 @@ const stories = [
     name: ExploreEventsMeta.title,
     component: ExploreEventsBasic,
     args: ExploreEventsMeta.args
+  },
+  {
+    name: EventSettingsMeta.title,
+    component: EventSettingsBasic,
+    args: EventSettingsMeta.args
+  },
+  {
+    name: EventSettingsDurationMeta.title,
+    component: EventSettingsDurationBasic,
+    args: EventSettingsDurationMeta.args
   },
   {
     name: TextFieldMeta.title,

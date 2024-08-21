@@ -1,17 +1,20 @@
-import { StyleProp, ViewStyle, StyleSheet, View } from "react-native"
+import { PrimaryButton } from "@components/Buttons"
+import { BodyText, Headline } from "@components/Text"
+import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
+import { SettingsCardView } from "./components/Card"
 import { SettingsScrollView } from "./components/ScrollView"
 import { SettingsSectionView } from "./components/Section"
-import { SettingsCardView } from "./components/Card"
-import { BodyText, Headline, Subtitle } from "@components/Text"
-import { PrimaryButton } from "@components/Buttons"
-import { SettingsPermission } from "./Permissions"
-import { SettingsNamedToggleView } from "./components/NamedToggle"
+
+import { useUserSettings } from "@settings-storage/Hooks"
+import { settingsSelector } from "@settings-storage/Settings"
 import {
   PushNotificationTriggerID,
   toggleSettingsTriggerId
 } from "TiFShared/domain-models/Settings"
-import { useUserSettings } from "@settings-storage/Hooks"
-import { settingsSelector } from "@settings-storage/Settings"
+
+import { SettingsPermission } from "./Permissions"
+
+import { SettingsNamedToggleView } from "./components/NamedToggle"
 
 export type NotificationSettingsProps = {
   notificationPermission: SettingsPermission
