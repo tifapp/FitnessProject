@@ -62,8 +62,6 @@ import VerifcationCodeMeta, {
 import EditEventDurationsMeta, {
   Basic as EditEventDurationsBasic
 } from "../components/EditEvent/DurationPicker.stories"
-import { setupCognito } from "@auth-boundary/CognitoHelpers"
-import { InMemorySecureStore } from "@auth-boundary/CognitoSecureStorage"
 
 setupCognito(new InMemorySecureStore())
 

@@ -1,7 +1,8 @@
-import { BodyText } from "@components/Text"
+import { BodyText, Headline } from "@components/Text"
 import { AppStyles } from "@lib/AppColorStyle"
 import { FontScaleFactors, useFontScale } from "@lib/Fonts"
 import { useEffect, useState } from "react"
+import { Pressable } from "react-native"
 import {
   StyleProp,
   StyleSheet,
@@ -9,6 +10,16 @@ import {
   View,
   LayoutRectangle
 } from "react-native"
+import {
+  Gesture,
+  GestureDetector,
+  TapGestureHandler
+} from "react-native-gesture-handler"
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring
+} from "react-native-reanimated"
 import { formatEventDurationPreset } from "TiFShared/domain-models/Settings"
 
 export type EditEventDurationPickerProps = {
@@ -32,6 +43,7 @@ export const EditEventDurationPickerView = ({
   const [presetsState, setPresetsState] = useState(
     initialPresetsState(presetOptions)
   )
+  const isSliding = useSharedValue(false)
   const height =
     80 * useFontScale({ maximumScaleFactor: FontScaleFactors.xxxLarge })
   useEffect(
@@ -40,7 +52,13 @@ export const EditEventDurationPickerView = ({
   )
   const durations = presetOptions.sort((a, b) => a - b)
   const selectedIndex = presetOptions.findIndex((o) => value === o)
-  const backgroundTrailWith = presetsState.offsets[selectedIndex]?.x ?? 0
+  const selectedDimensions = presetsState.offsets[selectedIndex]
+  // const pickerOffset = useSharedValue(sele)
+  const tapGesture = Gesture.Tap()
+    .onTouchesDown(() => (isSliding.value = true))
+    .onTouchesCancelled(() => (isSliding.value = false))
+    .onTouchesUp(() => (isSliding.value = false))
+    .maxDuration(999999999999)
   return (
     <View style={style}>
       <View style={styles.container}>
@@ -49,7 +67,7 @@ export const EditEventDurationPickerView = ({
           style={[
             styles.backgroundTrail,
             {
-              width: backgroundTrailWith - 12,
+              width: (selectedDimensions?.x ?? 0) + 8,
               height: height - 12,
               marginTop: 6,
               marginLeft: 6
@@ -78,6 +96,37 @@ export const EditEventDurationPickerView = ({
             </View>
           ))}
         </View>
+        <GestureDetector gesture={tapGesture}>
+          <Animated.View
+            style={[
+              styles.selectedCard,
+              useAnimatedStyle(() => ({
+                height: withSpring(height - (isSliding.value ? 0 : 12)),
+                width: (selectedDimensions
+                  ? withSpring(
+                      isSliding.value
+                        ? selectedDimensions.width + 12
+                        : selectedDimensions.width
+                    )
+                  : undefined) as number | undefined,
+                marginTop: withSpring(isSliding.value ? 0 : 6),
+                marginLeft: 6,
+                left: selectedDimensions?.x ?? 0
+              }))
+            ]}
+          >
+            <View style={[styles.selectedContainer]}>
+              <Headline
+                style={[
+                  styles.selectedText,
+                  { width: selectedDimensions?.width }
+                ]}
+              >
+                {formatEventDurationPreset(value)}
+              </Headline>
+            </View>
+          </Animated.View>
+        </GestureDetector>
       </View>
     </View>
   )
@@ -92,6 +141,20 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 8,
     borderTopLeftRadius: 8,
     backgroundColor: AppStyles.black.withOpacity(0.15).toString()
+  },
+  selectedCard: {
+    position: "absolute",
+    borderRadius: 8,
+    backgroundColor: AppStyles.black.toString()
+  },
+  selectedContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center"
+  },
+  selectedText: {
+    color: "white",
+    textAlign: "center"
   },
   backgroundCard: {
     position: "absolute",
