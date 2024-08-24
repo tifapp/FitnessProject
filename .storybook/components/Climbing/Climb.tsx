@@ -59,9 +59,18 @@ function useMeter() {
   return { meter, startMeter, stopMeter }
 }
 
+const DistanceText = ({ distance }: { distance: number }) => {
+  return (
+    <Text style={styles.distanceCounter}>
+      Distance: {distance.toFixed(2)} feet
+    </Text>
+  )
+}
+
 export function SimpleJumpGame() {
   const [distance, setDistance] = useState(0)
   const boxPosition = useSharedValue(0)
+  const boxScale = useSharedValue(1)
   const cameraPosition = useSharedValue(0)
 
   const { meter, startMeter, stopMeter } = useMeter()
@@ -72,9 +81,15 @@ export function SimpleJumpGame() {
     stopMeter()
     const jumpDistance = meter.value * 2
     const targetPosition = boxPosition.value - jumpDistance
+    const targetScale = 0.8 // Target scale after the jump (adjust as needed)
 
-    // Animate the box moving forward
+    // Animate the box moving forward and shrinking
     boxPosition.value = withTiming(targetPosition, {
+      duration: 500,
+      easing: Easing.out(Easing.cubic)
+    })
+
+    boxScale.value = withTiming(targetScale, {
       duration: 500,
       easing: Easing.out(Easing.cubic)
     })
@@ -100,7 +115,10 @@ export function SimpleJumpGame() {
 
   const boxStyle = useAnimatedStyle(() => {
     return {
-      transform: [{ translateY: boxPosition.value }]
+      transform: [
+        { translateY: boxPosition.value },
+        { scale: boxScale.value } // Apply the scale transformation
+      ]
     }
   })
 
@@ -113,9 +131,7 @@ export function SimpleJumpGame() {
   return (
     <View style={styles.container}>
       <View style={styles.hudContainer}>
-        <Text style={styles.distanceCounter}>
-          Distance: {Math.floor(distance)} units
-        </Text>
+        <DistanceText distance={distance} />
         <View style={styles.meterContainer}>
           <Animated.View style={[styles.meter, meterStyle]} />
         </View>
@@ -172,7 +188,8 @@ const styles = StyleSheet.create({
   },
   meterContainer: {
     position: "absolute",
-    bottom: 100,
+    bottom: 30, // Position the meter above the bottom of the screen
+    left: "10%", // Center the meter horizontally
     width: "80%",
     height: 20,
     backgroundColor: "#ddd",
