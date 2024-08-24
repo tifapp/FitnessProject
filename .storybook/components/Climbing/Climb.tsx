@@ -58,6 +58,7 @@ function useMeter() {
 
   return { meter, startMeter, stopMeter }
 }
+
 export function SimpleJumpGame() {
   const [distance, setDistance] = useState(0)
   const boxPosition = useSharedValue(0)
@@ -110,36 +111,46 @@ export function SimpleJumpGame() {
   })
 
   return (
-    <Animated.View style={[styles.scene, cameraStyle]}>
-      <View style={styles.container}>
+    <View style={styles.container}>
+      <View style={styles.hudContainer}>
+        <Text style={styles.distanceCounter}>
+          Distance: {Math.floor(distance)} units
+        </Text>
+        <View style={styles.meterContainer}>
+          <Animated.View style={[styles.meter, meterStyle]} />
+        </View>
+      </View>
+      <Animated.View style={[styles.scene, cameraStyle]}>
         <View style={styles.rowsContainer}>
           <View style={styles.rowOfBoxes} />
           <View style={styles.rowOfBoxes} />
           <View style={styles.rowOfBoxes} />
         </View>
         <Animated.View style={[styles.character, boxStyle]} />
-        <View style={styles.meterContainer}>
-          <Animated.View style={[styles.meter, meterStyle]} />
-        </View>
-        <Pressable
-          style={styles.pressArea}
-          onPressIn={handlePressIn}
-          onPressOut={handlePressOut}
-        />
-        <Text style={styles.distanceCounter}>
-          Distance: {Math.floor(distance)} units
-        </Text>
-      </View>
-    </Animated.View>
+      </Animated.View>
+      <Pressable
+        style={styles.pressArea}
+        onPressIn={handlePressIn}
+        onPressOut={handlePressOut}
+      />
+    </View>
   )
 }
 
 const styles = StyleSheet.create({
-  scene: {
+  container: {
     flex: 1,
     backgroundColor: "#f0f0f0"
   },
-  container: {
+  hudContainer: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    alignItems: "center",
+    padding: 10
+  },
+  scene: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center"
@@ -178,9 +189,6 @@ const styles = StyleSheet.create({
     height: "100%"
   },
   distanceCounter: {
-    position: "absolute",
-    top: 50,
-    left: 20,
     fontSize: 24,
     fontWeight: "bold"
   }
