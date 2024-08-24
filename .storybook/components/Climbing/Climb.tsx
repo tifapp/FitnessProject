@@ -58,12 +58,10 @@ function useMeter() {
 
   return { meter, startMeter, stopMeter }
 }
-
 export function SimpleJumpGame() {
   const [distance, setDistance] = useState(0)
   const boxPosition = useSharedValue(0)
   const cameraPosition = useSharedValue(0)
-  const cameraScale = useSharedValue(1)
 
   const { meter, startMeter, stopMeter } = useMeter()
 
@@ -72,17 +70,20 @@ export function SimpleJumpGame() {
   const handlePressOut = () => {
     stopMeter()
     const jumpDistance = meter.value * 2
+    const targetPosition = boxPosition.value - jumpDistance
 
-    boxPosition.value = withTiming(boxPosition.value - jumpDistance, {
+    // Animate the box moving forward
+    boxPosition.value = withTiming(targetPosition, {
       duration: 500,
       easing: Easing.out(Easing.cubic)
     })
 
     setDistance((prev) => prev + jumpDistance)
 
+    // Ensure the camera catches up to the box position
     cameraPosition.value = withDelay(
-      500,
-      withTiming(boxPosition.value, {
+      500, // Delay before the camera starts moving
+      withTiming(targetPosition, {
         duration: 500,
         easing: Easing.out(Easing.cubic)
       })
@@ -97,57 +98,49 @@ export function SimpleJumpGame() {
   })
 
   const boxStyle = useAnimatedStyle(() => {
-    const derivedScale = 1 - Math.abs(boxPosition.value) / 1000
     return {
-      transform: [{ translateY: boxPosition.value }, { scale: derivedScale }]
+      transform: [{ translateY: boxPosition.value }]
     }
   })
 
   const cameraStyle = useAnimatedStyle(() => {
     return {
-      transform: [
-        { translateY: cameraPosition.value },
-        { scale: cameraScale.value }
-      ]
+      transform: [{ translateY: -cameraPosition.value }]
     }
   })
 
   return (
-    <View style={styles.container}>
-      <Animated.View style={[styles.background, cameraStyle]}>
+    <Animated.View style={[styles.scene, cameraStyle]}>
+      <View style={styles.container}>
         <View style={styles.rowsContainer}>
           <View style={styles.rowOfBoxes} />
           <View style={styles.rowOfBoxes} />
           <View style={styles.rowOfBoxes} />
         </View>
-      </Animated.View>
-      <Animated.View style={[styles.character, boxStyle]} />
-      <View style={styles.meterContainer}>
-        <Animated.View style={[styles.meter, meterStyle]} />
+        <Animated.View style={[styles.character, boxStyle]} />
+        <View style={styles.meterContainer}>
+          <Animated.View style={[styles.meter, meterStyle]} />
+        </View>
+        <Pressable
+          style={styles.pressArea}
+          onPressIn={handlePressIn}
+          onPressOut={handlePressOut}
+        />
+        <Text style={styles.distanceCounter}>
+          Distance: {Math.floor(distance)} units
+        </Text>
       </View>
-      <Pressable
-        style={styles.pressArea}
-        onPressIn={handlePressIn}
-        onPressOut={handlePressOut}
-      />
-      <Text style={styles.distanceCounter}>
-        Distance: {Math.floor(distance)} units
-      </Text>
-    </View>
+    </Animated.View>
   )
 }
 
 const styles = StyleSheet.create({
+  scene: {
+    flex: 1,
+    backgroundColor: "#f0f0f0"
+  },
   container: {
     flex: 1,
-    backgroundColor: "#f0f0f0",
-    justifyContent: "center",
-    alignItems: "center"
-  },
-  background: {
-    position: "absolute",
-    width: SCREEN_WIDTH,
-    height: SCREEN_HEIGHT,
     justifyContent: "center",
     alignItems: "center"
   },
@@ -159,13 +152,12 @@ const styles = StyleSheet.create({
   rowOfBoxes: {
     flexDirection: "row",
     justifyContent: "space-around",
-    width: SCREEN_WIDTH
+    width: "100%"
   },
   character: {
     width: 50,
     height: 50,
-    backgroundColor: "blue",
-    position: "absolute"
+    backgroundColor: "blue"
   },
   meterContainer: {
     position: "absolute",
