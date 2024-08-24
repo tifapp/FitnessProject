@@ -66,7 +66,6 @@ export class EventArrivalsTracker {
         this.geofencer.replaceGeofencedRegions(arrivals.regions),
         this.storage.replace(arrivals)
       ])
-      // this.updateGeofencingSubscription(arrivals)
       this.callbacks.send(arrivals)
     } catch (e) {
       log.error("Failed to replace regions", { message: e.message })
