@@ -128,7 +128,7 @@
     "react-native-select-dropdown": "^3.2.1",
     "react-native-svg": "15.2.0",
     "regenerator-runtime": "^0.13.11",
-    "TiFShared": "github:tifapp/TiFShared#main",
+    "TiFShared": "github:tifapp/TiFShared#combined2",
     "type-detect": "4.0.8",
     "use-sync-external-store": "^1.2.2",
     "uuid": "^9.0.0",
@@ -197,7 +197,7 @@
     "qrcode": "^1.5.3",
     "react-native-web": "~0.19.6",
     "react-test-renderer": "18.2",
-    "typescript": "~5.3.3"
+    "typescript": "~5.4.2"
   },
   "private": true,
   "version": "1.0.0"

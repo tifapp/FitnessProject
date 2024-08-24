@@ -1,12 +1,12 @@
-import { TiFAPI } from "TiFShared/api"
 import { randomFloatInRange } from "@lib/utils/Random"
 import { mockLocationCoordinate2D } from "@location/MockData"
 import { mswServer } from "@test-helpers/msw"
 import { DefaultBodyType, HttpResponse, StrictRequest, http } from "msw"
-import { performEventArrivalsOperation } from "./ArrivalsOperation"
-import { mockEventArrivalRegion } from "./MockData"
+import { TiFAPI } from "TiFShared/api"
 import { repeatElements } from "TiFShared/lib/Array"
 import { EventArrivals } from "./Arrivals"
+import { performEventArrivalsOperation } from "./ArrivalsOperation"
+import { mockEventArrivalRegion } from "./MockData"
 
 describe("ArrivalsOperation tests", () => {
   describe("PerformEventArrivalsOperation tests", () => {
