@@ -5,6 +5,9 @@ import { useAppFonts } from "../../lib/Fonts"
 // Import your stories
 import { setupCognito } from "@auth-boundary/CognitoHelpers"
 import { InMemorySecureStore } from "@auth-boundary/CognitoSecureStorage"
+import { sqliteLogHandler, sqliteLogs } from "@lib/Logging"
+import { dayjs } from "TiFShared/lib/Dayjs"
+import { addLogHandler, consoleLogHandler } from "TiFShared/logging"
 import AttendeesListMeta, {
   Basic as AttendeesListBasic
 } from "../components/AttendeesList/AttendeesList.stories"
@@ -14,6 +17,9 @@ import ButtonsMeta, {
 import ChangePasswordMeta, {
   Basic as ChangePasswordBasic
 } from "../components/ChangePassword/ChangePassword.stories"
+import ClimbingMeta, {
+  Basic as ClimbingBasic
+} from "../components/Climbing/Climbing.stories"
 import ContentReportingMeta, {
   Default as DefaultReportingFlow
 } from "../components/ContentReporting/ContentReporting.stories"
@@ -59,9 +65,6 @@ import TextFieldMeta, {
 import VerifcationCodeMeta, {
   Basic as VerifcationCodeBasic
 } from "../components/VerificationCode/VerifyCode.stories"
-import { addLogHandler, consoleLogHandler } from "TiFShared/logging"
-import { sqliteLogHandler, sqliteLogs } from "@lib/Logging"
-import { dayjs } from "TiFShared/lib/Dayjs"
 
 setupCognito(new InMemorySecureStore())
 addLogHandler(consoleLogHandler())
@@ -155,6 +158,11 @@ const stories = [
     name: RegionMonitoringMeta.title,
     component: RegionMonitoringBasic,
     args: RegionMonitoringMeta.args
+  },
+  {
+    name: ClimbingMeta.title,
+    component: ClimbingBasic,
+    args: ClimbingMeta.args
   },
   {
     name: AttendeesListMeta.title,
