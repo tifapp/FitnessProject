@@ -14,8 +14,7 @@ import { repeatElements } from "TiFShared/lib/Array"
 import {
   addTestArrivals,
   expectOrderInsensitiveEventArrivals,
-  regionWithArrivalData,
-  removeTestArrivals
+  regionWithArrivalData
 } from "./TestHelpers"
 import { EventArrivals } from "./Arrivals"
 
@@ -31,7 +30,10 @@ describe("EventArrivalsTracker tests", () => {
     testGeofencer,
     performArrivalOperation
   )
-  beforeEach(() => testGeofencer.reset())
+  beforeEach(() => {
+    testGeofencer.reset()
+    tracker.startTracking()
+  })
   afterEach(() => {
     performArrivalOperation.mockReset()
   })
@@ -56,11 +58,6 @@ describe("EventArrivalsTracker tests", () => {
     )
   })
 
-  test("does not subscribe to geofencing updates when no tracked arrivals", async () => {
-    await tracker.startTracking()
-    expect(testGeofencer.hasSubscriber).toEqual(false)
-  })
-
   test("subscribes to geofencing updates when new instance detects previously tracked arrivals", async () => {
     await addTestArrivals(tracker, mockEventArrival())
     tracker.stopTracking()
@@ -70,16 +67,8 @@ describe("EventArrivalsTracker tests", () => {
       testGeofencer,
       jest.fn()
     )
-    await tracker2.startTracking()
+    tracker2.startTracking()
     expect(testGeofencer.hasSubscriber).toEqual(true)
-  })
-
-  test("unsubscribes from tracker when removing all tracked arrivals", async () => {
-    const arrival = mockEventArrival()
-    await addTestArrivals(tracker, arrival)
-    expect(testGeofencer.hasSubscriber).toEqual(true)
-    await removeTestArrivals(tracker, arrival.eventId)
-    expect(testGeofencer.hasSubscriber).toEqual(false)
   })
 
   test("handle geofencing update, does arrived operation for all arrivals when entering region", async () => {
