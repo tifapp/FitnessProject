@@ -66,7 +66,7 @@ export class EventArrivalsTracker {
         this.geofencer.replaceGeofencedRegions(arrivals.regions),
         this.storage.replace(arrivals)
       ])
-      this.updateGeofencingSubscription(arrivals)
+      // this.updateGeofencingSubscription(arrivals)
       this.callbacks.send(arrivals)
     } catch (e) {
       log.error("Failed to replace regions", { message: e.message })
@@ -84,10 +84,13 @@ export class EventArrivalsTracker {
   }
 
   /**
-   * Starts tracking if there is at least 1 upcoming event arrival.
+   * Starts tracking arrivals by subscribing to the underlying geofencer.
    */
-  async startTracking() {
-    this.updateGeofencingSubscription(await this.storage.current())
+  startTracking() {
+    this.stopTracking()
+    this.unsubscribeFromGeofencing = this.geofencer.onUpdate((update) => {
+      this.handleGeofencingUpdate(update)
+    })
   }
 
   /**
@@ -123,14 +126,12 @@ export class EventArrivalsTracker {
     await this.replaceArrivals(await work(await this.storage.current()))
   }
 
-  private updateGeofencingSubscription(arrivals: EventArrivals) {
-    this.stopTracking()
-    if (arrivals.regions.length > 0) {
-      this.unsubscribeFromGeofencing = this.geofencer.onUpdate((update) => {
-        this.handleGeofencingUpdate(update)
-      })
-    }
-  }
+  // private updateGeofencingSubscription(arrivals: EventArrivals) {
+  //   this.stopTracking()
+  //   this.unsubscribeFromGeofencing = this.geofencer.onUpdate((update) => {
+  //     this.handleGeofencingUpdate(update)
+  //   })
+  // }
 
   private async handleGeofencingUpdate(update: EventArrivalGeofencedRegion) {
     const upcomingArrivals = await this.performArrivalsOperation(

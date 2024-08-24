@@ -41,6 +41,7 @@ describe("EventArrivalsTrackerRegionMonitor tests", () => {
   beforeEach(() => {
     performArrivalsOperation.mockReset()
     geofencer.reset()
+    tracker.startTracking()
     monitor = new EventArrivalsTrackerRegionMonitor(
       tracker,
       createForegroundMonitor()
