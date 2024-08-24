@@ -126,13 +126,6 @@ export class EventArrivalsTracker {
     await this.replaceArrivals(await work(await this.storage.current()))
   }
 
-  // private updateGeofencingSubscription(arrivals: EventArrivals) {
-  //   this.stopTracking()
-  //   this.unsubscribeFromGeofencing = this.geofencer.onUpdate((update) => {
-  //     this.handleGeofencingUpdate(update)
-  //   })
-  // }
-
   private async handleGeofencingUpdate(update: EventArrivalGeofencedRegion) {
     const upcomingArrivals = await this.performArrivalsOperation(
       update,
