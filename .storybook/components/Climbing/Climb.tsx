@@ -73,17 +73,14 @@ export function SimpleJumpGame() {
   const boxScale = useSharedValue(1)
   const cameraPosition = useSharedValue(0)
 
-  const { meter, startMeter, stopMeter } = useMeter()
-
-  const handlePressIn = startMeter
+  const { meter, startMeter: handlePressIn, stopMeter } = useMeter()
 
   const handlePressOut = () => {
     stopMeter()
     const jumpDistance = meter.value * 2
     const targetPosition = boxPosition.value - jumpDistance
-    const targetScale = 0.8 // Target scale after the jump (adjust as needed)
+    const targetScale = 0.8
 
-    // Animate the box moving forward and shrinking
     boxPosition.value = withTiming(targetPosition, {
       duration: 500,
       easing: Easing.out(Easing.cubic)
@@ -96,9 +93,8 @@ export function SimpleJumpGame() {
 
     setDistance((prev) => prev + jumpDistance)
 
-    // Ensure the camera catches up to the box position
     cameraPosition.value = withDelay(
-      500, // Delay before the camera starts moving
+      500,
       withTiming(targetPosition, {
         duration: 500,
         easing: Easing.out(Easing.cubic)
@@ -106,43 +102,52 @@ export function SimpleJumpGame() {
     )
   }
 
-  const meterStyle = useAnimatedStyle(() => {
-    return {
-      width: `${meter.value}%`,
-      backgroundColor: meter.value >= maxMeter ? "red" : "green"
-    }
-  })
-
-  const boxStyle = useAnimatedStyle(() => {
-    return {
-      transform: [
-        { translateY: boxPosition.value },
-        { scale: boxScale.value } // Apply the scale transformation
-      ]
-    }
-  })
-
-  const cameraStyle = useAnimatedStyle(() => {
-    return {
-      transform: [{ translateY: -cameraPosition.value }]
-    }
-  })
-
   return (
     <View style={styles.container}>
       <View style={styles.hudContainer}>
         <DistanceText distance={distance} />
         <View style={styles.meterContainer}>
-          <Animated.View style={[styles.meter, meterStyle]} />
+          <Animated.View
+            style={[
+              styles.meter,
+              useAnimatedStyle(() => {
+                return {
+                  width: `${meter.value}%`,
+                  backgroundColor: meter.value >= maxMeter ? "red" : "green"
+                }
+              })
+            ]}
+          />
         </View>
       </View>
-      <Animated.View style={[styles.scene, cameraStyle]}>
+      <Animated.View
+        style={[
+          styles.scene,
+          useAnimatedStyle(() => {
+            return {
+              transform: [{ translateY: -cameraPosition.value }]
+            }
+          })
+        ]}
+      >
         <View style={styles.rowsContainer}>
           <View style={styles.rowOfBoxes} />
           <View style={styles.rowOfBoxes} />
           <View style={styles.rowOfBoxes} />
         </View>
-        <Animated.View style={[styles.character, boxStyle]} />
+        <Animated.View
+          style={[
+            styles.character,
+            useAnimatedStyle(() => {
+              return {
+                transform: [
+                  { translateY: boxPosition.value },
+                  { scale: boxScale.value }
+                ]
+              }
+            })
+          ]}
+        />
       </Animated.View>
       <Pressable
         style={styles.pressArea}
