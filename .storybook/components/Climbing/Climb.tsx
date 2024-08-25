@@ -72,6 +72,7 @@ export function SimpleJumpGame() {
   const boxPosition = useSharedValue(0)
   const boxScale = useSharedValue(1)
   const cameraPosition = useSharedValue(0)
+  const backgroundBoxScale = useSharedValue(1)
 
   const { meter, startMeter: handlePressIn, stopMeter } = useMeter()
 
@@ -96,6 +97,14 @@ export function SimpleJumpGame() {
     cameraPosition.value = withDelay(
       500,
       withTiming(targetPosition, {
+        duration: 500,
+        easing: Easing.out(Easing.cubic)
+      })
+    )
+
+    backgroundBoxScale.value = withDelay(
+      500,
+      withTiming(1.5, {
         duration: 500,
         easing: Easing.out(Easing.cubic)
       })
@@ -130,11 +139,16 @@ export function SimpleJumpGame() {
           })
         ]}
       >
-        <View style={styles.rowsContainer}>
-          <View style={styles.rowOfBoxes} />
-          <View style={styles.rowOfBoxes} />
-          <View style={styles.rowOfBoxes} />
-        </View>
+        <Animated.View
+          style={[
+            styles.backgroundBox,
+            useAnimatedStyle(() => {
+              return {
+                transform: [{ scale: backgroundBoxScale.value }]
+              }
+            })
+          ]}
+        />
         <Animated.View
           style={[
             styles.character,
@@ -186,6 +200,14 @@ const styles = StyleSheet.create({
     justifyContent: "space-around",
     width: "100%"
   },
+  backgroundBox: {
+    width: 100,
+    height: 100,
+    borderWidth: 4,
+    borderColor: "black",
+    backgroundColor: "transparent",
+    zIndex: -1
+  },
   character: {
     width: 50,
     height: 50,
@@ -193,8 +215,8 @@ const styles = StyleSheet.create({
   },
   meterContainer: {
     position: "absolute",
-    bottom: 30, // Position the meter above the bottom of the screen
-    left: "10%", // Center the meter horizontally
+    bottom: 30,
+    left: "10%",
     width: "80%",
     height: 20,
     backgroundColor: "#ddd",
