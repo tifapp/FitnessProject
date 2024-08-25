@@ -6,6 +6,7 @@ import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withDelay,
+  withSequence,
   withTiming
 } from "react-native-reanimated"
 
@@ -80,17 +81,23 @@ export function SimpleJumpGame() {
     stopMeter()
     const jumpDistance = meter.value * 2
     const targetPosition = boxPosition.value - jumpDistance
-    const targetScale = 0.8
 
     boxPosition.value = withTiming(targetPosition, {
       duration: 500,
       easing: Easing.out(Easing.cubic)
     })
 
-    boxScale.value = withTiming(targetScale, {
-      duration: 500,
-      easing: Easing.out(Easing.cubic)
-    })
+    boxScale.value = withSequence(
+      withTiming(0.4, {
+        //should depend on distance from camera (current distance - new distance)
+        duration: 500,
+        easing: Easing.out(Easing.cubic)
+      }),
+      withTiming(1, {
+        duration: 500,
+        easing: Easing.out(Easing.cubic)
+      })
+    )
 
     setDistance((prev) => prev + jumpDistance)
 
@@ -104,7 +111,8 @@ export function SimpleJumpGame() {
 
     backgroundBoxScale.value = withDelay(
       500,
-      withTiming(1.5, {
+      withTiming(1.5 + distance / 100, {
+        //should also depend on distance from camera
         duration: 500,
         easing: Easing.out(Easing.cubic)
       })
