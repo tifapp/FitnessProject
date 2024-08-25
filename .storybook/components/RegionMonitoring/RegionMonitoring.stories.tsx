@@ -1,27 +1,68 @@
-import { ComponentMeta, ComponentStory } from "@storybook/react-native"
 import React, { useMemo, useState } from "react"
 import { SafeAreaProvider } from "react-native-safe-area-context"
 import {
+  EventArrivals,
+  EventArrivalsTracker,
+  EventArrivalsTrackerRegionMonitor,
+  EventRegionMonitor,
+  ExpoEventArrivalsGeofencer,
   ForegroundEventRegionMonitor,
+  SQLiteEventArrivalsStorage,
   useHasArrivedAtRegion
 } from "@arrival-tracking"
 import { Button, Modal, View } from "react-native"
 import {
   LocationAccuracy,
-  getCurrentPositionAsync,
   requestBackgroundPermissionsAsync,
   requestForegroundPermissionsAsync,
   watchPositionAsync
 } from "expo-location"
-import { useRequestForegroundLocationPermissions } from "@location/UserLocation"
 import { BodyText, Headline, Title } from "@components/Text"
 import { TiFQueryClientProvider } from "@lib/ReactQuery"
-import { LocationCoordinate2D } from "@shared-models/Location"
 import Slider from "@react-native-community/slider"
 import MapView from "react-native-maps"
-import { EventRegion } from "@event/ClientSideEvent"
 import { EventArrivalBannerView } from "@event-details-boundary/ArrivalBanner"
 import { StoryMeta } from ".storybook/HelperTypes"
+import { LocationCoordinate2D } from "TiFShared/domain-models/LocationCoordinate2D"
+import { EventRegion } from "TiFShared/domain-models/Event"
+import { Migrations, TiFSQLite } from "@lib/SQLite"
+import { useQuery } from "@tanstack/react-query"
+import {
+  requestPermissionsAsync as requestNotificationPermissionsAsync,
+  scheduleNotificationAsync,
+  setNotificationHandler
+} from "expo-notifications"
+
+setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: false
+  })
+})
+
+const storage = new SQLiteEventArrivalsStorage(
+  new TiFSQLite("region-monitoring", Migrations.main)
+)
+const tracker = new EventArrivalsTracker(
+  storage,
+  ExpoEventArrivalsGeofencer.shared,
+  async (_, kind) => {
+    await scheduleNotificationAsync({
+      content: {
+        title: kind === "arrived" ? "Arrived!" : "Departed!",
+        body:
+          kind === "arrived"
+            ? "You have entered the monitored region!"
+            : "You have left the monitored region!"
+      },
+      trigger: null
+    })
+    return await storage.current()
+  }
+)
+tracker.startTracking()
+ExpoEventArrivalsGeofencer.shared.defineTask()
 
 const RegionMonitoringMeta: StoryMeta = {
   title: "Region Monitoring"
@@ -29,9 +70,7 @@ const RegionMonitoringMeta: StoryMeta = {
 
 export default RegionMonitoringMeta
 
-type RegionMonitoringStory = ComponentStory<typeof SettingsScreen>
-
-export const Basic: RegionMonitoringStory = () => (
+export const Basic = () => (
   <SafeAreaProvider>
     <View
       style={{
@@ -49,12 +88,19 @@ export const Basic: RegionMonitoringStory = () => (
 )
 
 const StoryView = () => {
-  const { data, status } = useRequestForegroundLocationPermissions()
-  if (status === "success" && !data.granted) {
+  const { data: arePermissionsGranted, status } = useQuery(
+    ["region-monitoring-permissions"],
+    async () => {
+      await requestNotificationPermissionsAsync()
+      await requestForegroundPermissionsAsync()
+      return (await requestBackgroundPermissionsAsync()).granted
+    },
+    { initialData: false }
+  )
+  if (status === "success" && !arePermissionsGranted) {
     return (
       <BodyText>
-        You need to enable foreground location permissions to use this test
-        harness.
+        You need to enable all the permissions to use this test harness.
       </BodyText>
     )
   } else if (status !== "success") {
@@ -75,6 +121,23 @@ const MainView = () => {
   }, [arrivalRadiusMeters, coordinate])
   const [isShowingCoordinatePicker, setIsShowingCoordinatePicker] =
     useState(false)
+  const [lastKnownCoordinate, setLastKnownCoordinate] = useState<
+    LocationCoordinate2D | undefined
+  >()
+  const monitor = useMemo(() => {
+    const foregroundMonitor = new ForegroundEventRegionMonitor(
+      async (callback) => {
+        return await watchPositionAsync(
+          { accuracy: LocationAccuracy.Highest },
+          (location) => {
+            callback(location.coords)
+            setLastKnownCoordinate(location.coords)
+          }
+        )
+      }
+    )
+    return new EventArrivalsTrackerRegionMonitor(tracker, foregroundMonitor)
+  }, [])
   return (
     <View
       style={{
@@ -93,7 +156,21 @@ const MainView = () => {
       <Slider
         maximumValue={1000}
         minimumValue={5}
-        onValueChange={setArrivalRadiusMeters}
+        onValueChange={(arrivalRadiusMeters) => {
+          if (coordinate) {
+            tracker.replaceArrivals(
+              EventArrivals.fromRegions([
+                {
+                  coordinate,
+                  arrivalRadiusMeters,
+                  eventIds: [0],
+                  hasArrived: false
+                }
+              ])
+            )
+          }
+          setArrivalRadiusMeters(arrivalRadiusMeters)
+        }}
         step={1}
         value={Math.ceil(arrivalRadiusMeters)}
       />
@@ -106,12 +183,26 @@ const MainView = () => {
       {region && (
         <>
           <Spacer />
-          <RegionMonitoringView region={region} />
+          <RegionMonitoringView
+            monitor={monitor}
+            lastKnownCoordinate={lastKnownCoordinate}
+            region={region}
+          />
         </>
       )}
       <Modal visible={isShowingCoordinatePicker}>
         <CoordinatePickerView
           onSelected={(coordinate) => {
+            tracker.replaceArrivals(
+              EventArrivals.fromRegions([
+                {
+                  coordinate,
+                  arrivalRadiusMeters,
+                  eventIds: [0],
+                  hasArrived: false
+                }
+              ])
+            )
             setCoordinate(coordinate)
             setIsShowingCoordinatePicker(false)
           }}
@@ -161,24 +252,16 @@ const CoordinatePickerView = ({ onSelected }: CoordinatePickerProps) => (
 )
 
 type RegionMonitoringProps = {
+  monitor: EventRegionMonitor
+  lastKnownCoordinate?: LocationCoordinate2D
   region: EventRegion
 }
 
-const RegionMonitoringView = ({ region }: RegionMonitoringProps) => {
-  const [lastKnownCoordinate, setLastKnownCoordinate] = useState<
-    LocationCoordinate2D | undefined
-  >()
-  const monitor = useMemo(() => {
-    return new ForegroundEventRegionMonitor(async (callback) => {
-      return await watchPositionAsync(
-        { accuracy: LocationAccuracy.Highest },
-        (location) => {
-          callback(location.coords)
-          setLastKnownCoordinate(location.coords)
-        }
-      )
-    })
-  }, [])
+const RegionMonitoringView = ({
+  monitor,
+  lastKnownCoordinate,
+  region
+}: RegionMonitoringProps) => {
   const hasArrived = useHasArrivedAtRegion(region, monitor)
   return (
     <View>
