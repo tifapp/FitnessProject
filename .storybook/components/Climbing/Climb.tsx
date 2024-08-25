@@ -1,12 +1,18 @@
 import React, { useCallback, useRef, useState } from "react"
-import { Dimensions, Pressable, StyleSheet, Text, View } from "react-native"
+import {
+  Dimensions,
+  ImageBackground,
+  Pressable,
+  StyleSheet,
+  Text,
+  View
+} from "react-native"
 import Animated, {
   cancelAnimation,
   Easing,
   useAnimatedStyle,
   useSharedValue,
   withDelay,
-  withSequence,
   withTiming
 } from "react-native-reanimated"
 
@@ -14,6 +20,8 @@ const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window")
 
 const speed = 0.0004
 const maxMeter = 100
+const FOV = 1
+const cameraOffset = -275
 
 function calculateMeter(startTime: number): number {
   const elapsedTime = Date.now() - startTime
@@ -68,12 +76,22 @@ const DistanceText = ({ distance }: { distance: number }) => {
   )
 }
 
+const calculateScale = (distanceFromCamera: number) => {
+  "worklet"
+
+  if (distanceFromCamera >= cameraOffset) {
+    return FOV
+  }
+
+  const normalizedDistance =
+    Math.abs(distanceFromCamera + cameraOffset) / SCREEN_HEIGHT
+  return Math.max((1 - normalizedDistance) * FOV, 0)
+}
+
 export function SimpleJumpGame() {
   const [distance, setDistance] = useState(0)
   const boxPosition = useSharedValue(0)
-  const boxScale = useSharedValue(1)
-  const cameraPosition = useSharedValue(0)
-  const backgroundBoxScale = useSharedValue(1)
+  const cameraPosition = useSharedValue(cameraOffset)
 
   const { meter, startMeter: handlePressIn, stopMeter } = useMeter()
 
@@ -82,37 +100,18 @@ export function SimpleJumpGame() {
     const jumpDistance = meter.value * 2
     const targetPosition = boxPosition.value - jumpDistance
 
+    // Animate the box moving forward
     boxPosition.value = withTiming(targetPosition, {
       duration: 500,
       easing: Easing.out(Easing.cubic)
     })
 
-    boxScale.value = withSequence(
-      withTiming(0.4, {
-        //should depend on distance from camera (current distance - new distance)
-        duration: 500,
-        easing: Easing.out(Easing.cubic)
-      }),
-      withTiming(1, {
-        duration: 500,
-        easing: Easing.out(Easing.cubic)
-      })
-    )
-
     setDistance((prev) => prev + jumpDistance)
 
+    // Animate the camera catching up
     cameraPosition.value = withDelay(
       500,
-      withTiming(targetPosition, {
-        duration: 500,
-        easing: Easing.out(Easing.cubic)
-      })
-    )
-
-    backgroundBoxScale.value = withDelay(
-      500,
-      withTiming(1.5 + distance / 100, {
-        //should also depend on distance from camera
+      withTiming(targetPosition + cameraOffset, {
         duration: 500,
         easing: Easing.out(Easing.cubic)
       })
@@ -152,7 +151,11 @@ export function SimpleJumpGame() {
             styles.backgroundBox,
             useAnimatedStyle(() => {
               return {
-                transform: [{ scale: backgroundBoxScale.value }]
+                transform: [
+                  {
+                    scale: calculateScale(500 - cameraPosition.value)
+                  }
+                ]
               }
             })
           ]}
@@ -164,13 +167,22 @@ export function SimpleJumpGame() {
               return {
                 transform: [
                   { translateY: boxPosition.value },
-                  { scale: boxScale.value }
+                  {
+                    scale: calculateScale(
+                      boxPosition.value - cameraPosition.value
+                    )
+                  }
                 ]
               }
             })
           ]}
         />
       </Animated.View>
+      <ImageBackground
+        source={require("../../../assets/distancegradient.png")}
+        style={styles.gradient}
+        resizeMode="stretch"
+      />
       <Pressable
         style={styles.pressArea}
         onPressIn={handlePressIn}
@@ -198,6 +210,9 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center"
   },
+  gradient: {
+    ...StyleSheet.absoluteFillObject
+  },
   rowsContainer: {
     flexDirection: "column",
     justifyContent: "space-around",
@@ -219,7 +234,7 @@ const styles = StyleSheet.create({
   character: {
     width: 50,
     height: 50,
-    backgroundColor: "blue"
+    backgroundColor: "red"
   },
   meterContainer: {
     position: "absolute",
