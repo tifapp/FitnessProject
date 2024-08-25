@@ -76,7 +76,16 @@ const MainView = () => {
   const [isShowingCoordinatePicker, setIsShowingCoordinatePicker] =
     useState(false)
   return (
-    <View style={{ width: "100%", paddingHorizontal: 24 }}>
+    <View
+      style={{
+        width: "100%",
+        height: "100%",
+        paddingVertical: 24,
+        paddingHorizontal: 24
+      }}
+    >
+      <Title>Region Monitoring Demo</Title>
+      <Spacer />
       <Headline>
         Radius: <BodyText>{arrivalRadiusMeters} meters</BodyText>
       </Headline>
