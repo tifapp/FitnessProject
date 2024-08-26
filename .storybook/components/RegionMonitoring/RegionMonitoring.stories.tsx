@@ -27,8 +27,8 @@ import {
   scheduleNotificationAsync,
   setNotificationHandler
 } from "expo-notifications"
-import React, { useMemo, useState } from "react"
-import { Button, Modal, View } from "react-native"
+import { default as React, useEffect, useMemo, useState } from "react"
+import { Button, Modal, ScrollView, Switch, View } from "react-native"
 import MapView, { Marker } from "react-native-maps"
 import { SafeAreaProvider } from "react-native-safe-area-context"
 import { EventRegion } from "TiFShared/domain-models/Event"
@@ -51,7 +51,7 @@ const storage = new SQLiteEventArrivalsStorage(
 const tracker = new EventArrivalsTracker(
   storage,
   ExpoEventArrivalsGeofencer.shared,
-  async (_, kind) => {
+  async (region, kind) => {
     await scheduleNotificationAsync({
       content: {
         title: kind === "arrived" ? "Arrived!" : "Departed!",
@@ -62,7 +62,9 @@ const tracker = new EventArrivalsTracker(
       },
       trigger: null
     })
-    return await storage.current()
+    return EventArrivals.fromRegions([
+      { ...region, hasArrived: kind === "arrived", eventIds: [0] }
+    ])
   }
 )
 tracker.startTracking()
@@ -85,7 +87,12 @@ export const Basic = () => (
       }}
     >
       <TiFQueryClientProvider>
-        <StoryView />
+        <ScrollView
+          style={{ width: "100%" }}
+          contentContainerStyle={{ marginTop: 128 }}
+        >
+          <StoryView />
+        </ScrollView>
       </TiFQueryClientProvider>
     </View>
   </SafeAreaProvider>
@@ -126,11 +133,26 @@ const StoryView = () => {
   } else if (status !== "success") {
     return <BodyText>Requesting Location Permissions...</BodyText>
   } else {
-    return <MainView coords={currentCoords ?? DEFAULT_LOCATION} />
+    return <MainView />
   }
 }
 
-const MainView = ({ coords }: { coords: LocationCoordinate2D }) => {
+const watchLocation = async (
+  callback: (coordinate: LocationCoordinate2D) => void
+) => {
+  return await watchPositionAsync(
+    { accuracy: LocationAccuracy.Highest },
+    (location) => callback(location.coords)
+  )
+}
+
+const foregroundMonitor = new ForegroundEventRegionMonitor(watchLocation)
+const backgroundMonitor = new EventArrivalsTrackerRegionMonitor(
+  tracker,
+  foregroundMonitor
+)
+
+const MainView = () => {
   const [arrivalRadiusMeters, setArrivalRadiusMeters] = useState(100)
   const [coordinate, setCoordinate] = useState<
     LocationCoordinate2D | undefined
@@ -141,22 +163,28 @@ const MainView = ({ coords }: { coords: LocationCoordinate2D }) => {
   }, [arrivalRadiusMeters, coordinate])
   const [isShowingCoordinatePicker, setIsShowingCoordinatePicker] =
     useState(false)
-  const [lastKnownCoordinate, setLastKnownCoordinate] =
-    useState<LocationCoordinate2D>(coords)
-  const monitor = useMemo(() => {
-    const foregroundMonitor = new ForegroundEventRegionMonitor(
-      async (callback) => {
-        return await watchPositionAsync(
-          { accuracy: LocationAccuracy.Highest },
-          (location) => {
-            callback(location.coords)
-            setLastKnownCoordinate(location.coords)
-          }
-        )
-      }
-    )
-    return new EventArrivalsTrackerRegionMonitor(tracker, foregroundMonitor)
+  const [lastKnownCoordinate, setLastKnownCoordinate] = useState<
+    LocationCoordinate2D | undefined
+  >()
+  const [monitor, setMonitor] = useState<EventRegionMonitor>(backgroundMonitor)
+  useEffect(() => {
+    const sub = watchLocation(setLastKnownCoordinate)
+    return () => {
+      sub.then((s) => s.remove())
+    }
   }, [])
+  useEffect(() => {
+    tracker.trackedArrivals().then((arrivals) => {
+      if (arrivals.regions.length > 0) {
+        setArrivalRadiusMeters(arrivals.regions[0].arrivalRadiusMeters)
+        setCoordinate(arrivals.regions[0].coordinate)
+      }
+    })
+  }, [])
+  const estimatedDistance =
+    lastKnownCoordinate &&
+    coordinate &&
+    coordinateDistance(lastKnownCoordinate, coordinate, "meters")
   return (
     <View
       style={{
@@ -198,20 +226,42 @@ const MainView = ({ coords }: { coords: LocationCoordinate2D }) => {
         title="Change Event Location"
         onPress={() => setIsShowingCoordinatePicker(true)}
       />
+      {estimatedDistance && (
+        <BodyText>
+          <Headline>Estimated Distance:</Headline>{" "}
+          {Math.trunc(estimatedDistance)} meters
+        </BodyText>
+      )}
 
       {region && (
         <>
           <Spacer />
           <RegionMonitoringView
             monitor={monitor}
-            lastKnownCoordinate={lastKnownCoordinate}
+            lastKnownCoordinate={lastKnownCoordinate ?? DEFAULT_LOCATION}
             region={region}
           />
         </>
       )}
+      <Spacer />
+      <View
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "space-between"
+        }}
+      >
+        <Headline>Use Foreground Monitor</Headline>
+        <Switch
+          value={monitor === foregroundMonitor}
+          onValueChange={(newValue) =>
+            setMonitor(newValue ? foregroundMonitor : backgroundMonitor)
+          }
+        />
+      </View>
       <Modal visible={isShowingCoordinatePicker}>
         <CoordinatePickerView
-          lastKnownCoordinate={lastKnownCoordinate}
+          lastKnownCoordinate={lastKnownCoordinate ?? DEFAULT_LOCATION}
           onSelected={(coordinate) => {
             tracker.replaceArrivals(
               EventArrivals.fromRegions([
@@ -289,7 +339,7 @@ type RegionMonitoringProps = {
 
 const RegionMonitoringView = ({
   monitor,
-  lastKnownCoordinate,
+  lastKnownCoordinate = DEFAULT_LOCATION,
   region
 }: RegionMonitoringProps) => {
   const hasArrived = useHasArrivedAtRegion(region, monitor)
@@ -355,8 +405,8 @@ const RegionMonitoringView = ({
         />
       ) : (
         <BodyText>
-          The arrival Banner will appear here when the foreground monitor
-          detects that you've arrived at the region.
+          The arrival Banner will appear here when the app detects that you have
+          arrived at the region, and have stayed there for at least 20 seconds.
         </BodyText>
       )}
     </View>

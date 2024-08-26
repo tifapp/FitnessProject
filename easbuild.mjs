@@ -230,45 +230,45 @@ const manageCheckRun = async (/** @type {string} */ action) => {
   const buildLink = `https://expo.dev/accounts/tifapp/projects/FitnessApp/builds/${process.env.EAS_BUILD_ID}`
 
   switch (action) {
-  case "success":
-    checkRunData = {
-      ...checkRunParams,
-      output: {
-        title: `${checkRunName} Completed`,
-        summary: buildLink
+    case "success":
+      checkRunData = {
+        ...checkRunParams,
+        output: {
+          title: `${checkRunName} Completed`,
+          summary: buildLink
+        }
       }
-    }
-    break
-  case "failure":
-    checkRunData = {
-      ...checkRunParams,
-      output: {
-        title: `${checkRunName} Failed`,
-        summary: "Build failed with an error.",
-        text: buildLink
+      break
+    case "failure":
+      checkRunData = {
+        ...checkRunParams,
+        output: {
+          title: `${checkRunName} Failed`,
+          summary: "Build failed with an error.",
+          text: buildLink
+        }
       }
-    }
-    break
-  case "cancelled":
-    checkRunData = {
-      ...checkRunParams,
-      output: {
-        title: `${checkRunName} Cancelled`,
-        summary: "Build was cancelled."
+      break
+    case "cancelled":
+      checkRunData = {
+        ...checkRunParams,
+        output: {
+          title: `${checkRunName} Cancelled`,
+          summary: "Build was cancelled."
+        }
       }
-    }
-    break
-  default:
-    checkRunData = {
-      name: checkRunName,
-      status: "in_progress",
-      started_at: new Date().toISOString(),
-      head_sha: process.env.GITHUB_SHA,
-      output: {
-        title: `${checkRunName} Started`,
-        summary: `Build will be finished at approximately ${getPredictedBuildTime()}`
+      break
+    default:
+      checkRunData = {
+        name: checkRunName,
+        status: "in_progress",
+        started_at: new Date().toISOString(),
+        head_sha: process.env.GITHUB_SHA,
+        output: {
+          title: `${checkRunName} Started`,
+          summary: `Build will be finished at approximately ${getPredictedBuildTime()}`
+        }
       }
-    }
   }
 
   await checkGithubActionRuns(checkRunData, checkRunIdPath)

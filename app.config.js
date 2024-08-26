@@ -1,4 +1,5 @@
 import dotenv from "dotenv"
+import withTiFNativePod from "./injectTiFNativePod.js"
 
 dotenv.config({ path: ".env.infra" })
 
@@ -8,17 +9,17 @@ const { MAPS_API_KEY, EXPO_PROJECT_ID, EXPO_PROJECT_OWNER, EAS_BUILD_TYPE } =
 const { bundleIdentifier, icon, splash, name } =
   EAS_BUILD_TYPE === "development"
     ? {
-        bundleIdentifier: "com.tif.FitnessAppDevelopment",
+        bundleIdentifier: "com.tif.FitnessApp",
         icon: ".storybook/assets/icon.png",
         splash: ".storybook/assets/splash.png",
-        name: "FitnessAppDevelopment"
+        name: "FitnessApp"
       }
     : EAS_BUILD_TYPE === "preview"
       ? {
-          bundleIdentifier: "com.tif.FitnessAppPreview",
+          bundleIdentifier: "com.tif.FitnessApp",
           icon: "./assets/icon.png",
           splash: "./assets/splash.png",
-          name: "FitnessAppPreview"
+          name: "FitnessApp"
         }
       : {
           bundleIdentifier: "com.tif.FitnessApp",
@@ -67,6 +68,17 @@ const config = {
           "./assets/fonts/OpenDyslexic3-Bold.ttf",
           "./assets/fonts/OpenDyslexic3-Regular.ttf"
         ]
+      }
+    ],
+    [
+      "expo-build-properties",
+      {
+        ios: {
+          newArchEnabled: true
+        },
+        android: {
+          newArchEnabled: true
+        }
       }
     ],
     "expo-secure-store",
@@ -119,4 +131,4 @@ const config = {
   }
 }
 
-export default config
+export default withTiFNativePod(config)
