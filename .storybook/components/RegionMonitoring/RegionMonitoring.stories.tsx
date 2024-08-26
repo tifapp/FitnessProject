@@ -20,7 +20,7 @@ import {
 import { BodyText, Headline, Title } from "@components/Text"
 import { TiFQueryClientProvider } from "@lib/ReactQuery"
 import Slider from "@react-native-community/slider"
-import MapView from "react-native-maps"
+import MapView, { MapMarker } from "react-native-maps"
 import { EventArrivalBannerView } from "@event-details-boundary/ArrivalBanner"
 import { StoryMeta } from ".storybook/HelperTypes"
 import {
@@ -37,6 +37,16 @@ import {
 } from "expo-notifications"
 import { Switch } from "react-native"
 
+const MT_FUJI_REGION = {
+  coordinate: {
+    latitude: 35.362888,
+    longitude: 138.730981
+  },
+  arrivalRadiusMeters: 1000,
+  hasArrived: false,
+  eventIds: [1]
+}
+
 setNotificationHandler({
   handleNotification: async () => ({
     shouldShowAlert: true,
@@ -52,16 +62,33 @@ const tracker = new EventArrivalsTracker(
   storage,
   ExpoEventArrivalsGeofencer.shared,
   async (region, kind) => {
-    await scheduleNotificationAsync({
-      content: {
-        title: kind === "arrived" ? "Arrived!" : "Departed!",
-        body:
-          kind === "arrived"
-            ? "You have entered the monitored region!"
-            : "You have left the monitored region!"
-      },
-      trigger: null
-    })
+    if (
+      kind === "arrived" &&
+      coordinateDistance(
+        region.coordinate,
+        MT_FUJI_REGION.coordinate,
+        "meters"
+      ) < 1000
+    ) {
+      await scheduleNotificationAsync({
+        content: {
+          title: "You've Reached the Top of Mt. Fuji!",
+          body: "Hi Chetan! You have 30 seconds to reach the bottom, or else an avalanche will kill you! Time is ticking!!!"
+        },
+        trigger: null
+      })
+    } else {
+      await scheduleNotificationAsync({
+        content: {
+          title: kind === "arrived" ? "Arrived!" : "Departed!",
+          body:
+            kind === "arrived"
+              ? "You have entered the monitored region!"
+              : "You have left the monitored region!"
+        },
+        trigger: null
+      })
+    }
     return EventArrivals.fromRegions([
       { ...region, hasArrived: kind === "arrived", eventIds: [0] }
     ])
@@ -99,23 +126,25 @@ export const Basic = () => (
 )
 
 const StoryView = () => {
-  const { data: arePermissionsGranted, status } = useQuery(
+  const { data: arePermissionsGranted } = useQuery(
     ["region-monitoring-permissions"],
     async () => {
-      await requestNotificationPermissionsAsync()
+      const notificationsGranted = (await requestNotificationPermissionsAsync())
+        .granted
       await requestForegroundPermissionsAsync()
-      return (await requestBackgroundPermissionsAsync()).granted
+      return (
+        (await requestBackgroundPermissionsAsync()).granted &&
+        notificationsGranted
+      )
     },
     { initialData: false }
   )
-  if (status === "success" && !arePermissionsGranted) {
+  if (!arePermissionsGranted) {
     return (
       <BodyText>
         You need to enable all the permissions to use this test harness.
       </BodyText>
     )
-  } else if (status !== "success") {
-    return <BodyText>Requesting Location Permissions...</BodyText>
   } else {
     return <MainView />
   }
@@ -207,17 +236,6 @@ const MainView = () => {
           {Math.trunc(estimatedDistance)} meters
         </BodyText>
       )}
-
-      {region && (
-        <>
-          <Spacer />
-          <RegionMonitoringView
-            monitor={monitor}
-            lastKnownCoordinate={lastKnownCoordinate}
-            region={region}
-          />
-        </>
-      )}
       <Spacer />
       <View
         style={{
@@ -234,6 +252,18 @@ const MainView = () => {
           }
         />
       </View>
+      {region && (
+        <>
+          <Spacer />
+          <RegionMonitoringView
+            monitor={monitor}
+            lastKnownCoordinate={lastKnownCoordinate}
+            region={region}
+          />
+        </>
+      )}
+      <Spacer />
+      <View style={{ marginBottom: 150 }} />
       <Modal visible={isShowingCoordinatePicker}>
         <CoordinatePickerView
           onSelected={(coordinate) => {
@@ -278,6 +308,7 @@ const CoordinatePickerView = ({ onSelected }: CoordinatePickerProps) => (
           stylers: [{ visibility: "off" }]
         }
       ]}
+      followsUserLocation
       style={{ width: "100%", height: "100%" }}
     />
     <View
@@ -331,6 +362,23 @@ const RegionMonitoringView = ({
           arrived at the region, and have stayed there for at least 20 seconds.
         </BodyText>
       )}
+      <Spacer />
+      <MapView
+        customMapStyle={[
+          {
+            featureType: "poi",
+            stylers: [{ visibility: "off" }]
+          },
+          {
+            featureType: "transit",
+            stylers: [{ visibility: "off" }]
+          }
+        ]}
+        showsUserLocation
+        style={{ width: "100%", height: 350, borderRadius: 12 }}
+      >
+        <MapMarker coordinate={region.coordinate} />
+      </MapView>
     </View>
   )
 }
