@@ -175,6 +175,15 @@ describe("EventArrivalsTracker tests", () => {
     expect(callback).toHaveBeenCalledTimes(1)
   })
 
+  it("should only perform the arrivals operatio when arrival status changes for region", async () => {
+    const arrival = { ...mockEventArrival(), hasArrived: true }
+    await addTestArrivals(tracker, arrival)
+    testGeofencer.sendUpdate(arrival)
+    await verifyNeverOccurs(() => {
+      expect(performArrivalOperation).toHaveBeenCalled()
+    })
+  })
+
   const expectTrackedArrivals = async (arrivals: EventArrivals) => {
     await waitFor(async () => {
       const trackedArrivals = await tracker.trackedArrivals()

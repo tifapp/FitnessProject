@@ -126,6 +126,8 @@ export class EventArrivalsTracker {
   }
 
   private async handleGeofencingUpdate(update: EventArrivalGeofencedRegion) {
+    const hasArrived = await this.storage.hasArrivedAt(update)
+    if (hasArrived === update.hasArrived) return
     const upcomingArrivals = await this.performArrivalsOperation(
       update,
       update.hasArrived ? "arrived" : "departed"
