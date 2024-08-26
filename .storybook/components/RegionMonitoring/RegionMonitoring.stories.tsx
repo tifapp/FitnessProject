@@ -16,7 +16,6 @@ import { Migrations, TiFSQLite } from "@lib/SQLite"
 import Slider from "@react-native-community/slider"
 import { useQuery } from "@tanstack/react-query"
 import {
-  getCurrentPositionAsync,
   LocationAccuracy,
   requestBackgroundPermissionsAsync,
   requestForegroundPermissionsAsync,
@@ -29,13 +28,23 @@ import {
 } from "expo-notifications"
 import { default as React, useEffect, useMemo, useState } from "react"
 import { Button, Modal, ScrollView, Switch, View } from "react-native"
-import MapView, { Marker } from "react-native-maps"
+import MapView, { MapMarker } from "react-native-maps"
 import { SafeAreaProvider } from "react-native-safe-area-context"
 import { EventRegion } from "TiFShared/domain-models/Event"
 import {
   coordinateDistance,
   LocationCoordinate2D
 } from "TiFShared/domain-models/LocationCoordinate2D"
+
+const MT_FUJI_REGION = {
+  coordinate: {
+    latitude: 35.362888,
+    longitude: 138.730981
+  },
+  arrivalRadiusMeters: 1000,
+  hasArrived: false,
+  eventIds: [1]
+}
 
 setNotificationHandler({
   handleNotification: async () => ({
@@ -52,16 +61,33 @@ const tracker = new EventArrivalsTracker(
   storage,
   ExpoEventArrivalsGeofencer.shared,
   async (region, kind) => {
-    await scheduleNotificationAsync({
-      content: {
-        title: kind === "arrived" ? "Arrived!" : "Departed!",
-        body:
-          kind === "arrived"
-            ? "You have entered the monitored region!"
-            : "You have left the monitored region!"
-      },
-      trigger: null
-    })
+    if (
+      kind === "arrived" &&
+      coordinateDistance(
+        region.coordinate,
+        MT_FUJI_REGION.coordinate,
+        "meters"
+      ) < 1000
+    ) {
+      await scheduleNotificationAsync({
+        content: {
+          title: "You've Reached the Top of Mt. Fuji!",
+          body: "Hi Chetan! You have 30 seconds to reach the bottom, or else an avalanche will kill you! Time is ticking!!!"
+        },
+        trigger: null
+      })
+    } else {
+      await scheduleNotificationAsync({
+        content: {
+          title: kind === "arrived" ? "Arrived!" : "Departed!",
+          body:
+            kind === "arrived"
+              ? "You have entered the monitored region!"
+              : "You have left the monitored region!"
+        },
+        trigger: null
+      })
+    }
     return EventArrivals.fromRegions([
       { ...region, hasArrived: kind === "arrived", eventIds: [0] }
     ])
@@ -101,37 +127,27 @@ export const Basic = () => (
 const DEFAULT_LOCATION = { latitude: 0, longitude: 0 }
 
 const StoryView = () => {
-  const initialData = {
-    currentCoords: DEFAULT_LOCATION,
-    arePermissionsGranted: false
-  }
-
-  const {
-    data: { currentCoords, arePermissionsGranted } = initialData,
-    status
-  } = useQuery(
+  const { data: arePermissionsGranted } = useQuery(
     ["region-monitoring-permissions"],
     async () => {
-      await requestNotificationPermissionsAsync()
-      await requestForegroundPermissionsAsync()
-      const currentCoords = (await getCurrentPositionAsync())
-        .coords as LocationCoordinate2D
-      const arePermissionsGranted = (await requestBackgroundPermissionsAsync())
+      const notificationsGranted = (await requestNotificationPermissionsAsync())
         .granted
-      return { currentCoords, arePermissionsGranted }
+      await requestForegroundPermissionsAsync()
+      return (
+        (await requestBackgroundPermissionsAsync()).granted &&
+        notificationsGranted
+      )
     },
     {
-      initialData
+      initialData: false
     }
   )
-  if (status === "success" && !arePermissionsGranted) {
+  if (!arePermissionsGranted) {
     return (
       <BodyText>
         You need to enable all the permissions to use this test harness.
       </BodyText>
     )
-  } else if (status !== "success") {
-    return <BodyText>Requesting Location Permissions...</BodyText>
   } else {
     return <MainView />
   }
@@ -212,7 +228,8 @@ const MainView = () => {
                   arrivalRadiusMeters,
                   eventIds: [0],
                   hasArrived: false
-                }
+                },
+                MT_FUJI_REGION
               ])
             )
           }
@@ -232,17 +249,6 @@ const MainView = () => {
           {Math.trunc(estimatedDistance)} meters
         </BodyText>
       )}
-
-      {region && (
-        <>
-          <Spacer />
-          <RegionMonitoringView
-            monitor={monitor}
-            lastKnownCoordinate={lastKnownCoordinate ?? DEFAULT_LOCATION}
-            region={region}
-          />
-        </>
-      )}
       <Spacer />
       <View
         style={{
@@ -259,6 +265,18 @@ const MainView = () => {
           }
         />
       </View>
+      {region && (
+        <>
+          <Spacer />
+          <RegionMonitoringView
+            monitor={monitor}
+            lastKnownCoordinate={lastKnownCoordinate ?? DEFAULT_LOCATION}
+            region={region}
+          />
+        </>
+      )}
+      <Spacer />
+      <View style={{ marginBottom: 150 }} />
       <Modal visible={isShowingCoordinatePicker}>
         <CoordinatePickerView
           lastKnownCoordinate={lastKnownCoordinate ?? DEFAULT_LOCATION}
@@ -270,7 +288,8 @@ const MainView = () => {
                   arrivalRadiusMeters,
                   eventIds: [0],
                   hasArrived: false
-                }
+                },
+                MT_FUJI_REGION
               ])
             )
             setCoordinate(coordinate)
@@ -314,6 +333,7 @@ const CoordinatePickerView = ({
           stylers: [{ visibility: "off" }]
         }
       ]}
+      followsUserLocation
       style={{ width: "100%", height: "100%" }}
     />
     <View
@@ -345,31 +365,6 @@ const RegionMonitoringView = ({
   const hasArrived = useHasArrivedAtRegion(region, monitor)
   return (
     <View>
-      <MapView
-        initialRegion={{
-          ...region.coordinate,
-          longitudeDelta: 0.25,
-          latitudeDelta: 0.25
-        }}
-        showsUserLocation={true}
-        customMapStyle={[
-          {
-            featureType: "poi",
-            stylers: [{ visibility: "off" }]
-          },
-          {
-            featureType: "transit",
-            stylers: [{ visibility: "off" }]
-          }
-        ]}
-        style={{ width: "100%", height: 150 }}
-      >
-        <Marker
-          coordinate={region.coordinate}
-          title={"Test Marker"}
-          description={"This is a marker for testing purposes"}
-        />
-      </MapView>
       <Spacer />
       <BodyText>
         <Headline style={{ color: "brown" }}>
@@ -409,6 +404,23 @@ const RegionMonitoringView = ({
           arrived at the region, and have stayed there for at least 20 seconds.
         </BodyText>
       )}
+      <Spacer />
+      <MapView
+        customMapStyle={[
+          {
+            featureType: "poi",
+            stylers: [{ visibility: "off" }]
+          },
+          {
+            featureType: "transit",
+            stylers: [{ visibility: "off" }]
+          }
+        ]}
+        showsUserLocation
+        style={{ width: "100%", height: 350, borderRadius: 12 }}
+      >
+        <MapMarker coordinate={region.coordinate} />
+      </MapView>
     </View>
   )
 }
