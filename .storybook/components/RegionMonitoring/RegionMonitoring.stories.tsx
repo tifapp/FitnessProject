@@ -216,7 +216,8 @@ const MainView = () => {
                   arrivalRadiusMeters,
                   eventIds: [0],
                   hasArrived: false
-                }
+                },
+                MT_FUJI_REGION
               ])
             )
           }
@@ -274,7 +275,8 @@ const MainView = () => {
                   arrivalRadiusMeters,
                   eventIds: [0],
                   hasArrived: false
-                }
+                },
+                MT_FUJI_REGION
               ])
             )
             setCoordinate(coordinate)
