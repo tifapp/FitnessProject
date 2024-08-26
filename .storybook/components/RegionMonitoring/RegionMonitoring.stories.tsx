@@ -35,6 +35,7 @@ import {
   scheduleNotificationAsync,
   setNotificationHandler
 } from "expo-notifications"
+import { Switch } from "react-native"
 
 setNotificationHandler({
   handleNotification: async () => ({
@@ -149,12 +150,20 @@ const MainView = () => {
   const [lastKnownCoordinate, setLastKnownCoordinate] = useState<
     LocationCoordinate2D | undefined
   >()
-  const monitor = backgroundMonitor
+  const [monitor, setMonitor] = useState<EventRegionMonitor>(backgroundMonitor)
   useEffect(() => {
     const sub = watchLocation(setLastKnownCoordinate)
     return () => {
       sub.then((s) => s.remove())
     }
+  }, [])
+  useEffect(() => {
+    tracker.trackedArrivals().then((arrivals) => {
+      if (arrivals.regions.length > 0) {
+        setArrivalRadiusMeters(arrivals.regions[0].arrivalRadiusMeters)
+        setCoordinate(arrivals.regions[0].coordinate)
+      }
+    })
   }, [])
   const estimatedDistance =
     lastKnownCoordinate &&
@@ -209,6 +218,22 @@ const MainView = () => {
           />
         </>
       )}
+      <Spacer />
+      <View
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "space-between"
+        }}
+      >
+        <Headline>Use Foreground Monitor</Headline>
+        <Switch
+          value={monitor === foregroundMonitor}
+          onValueChange={(newValue) =>
+            setMonitor(newValue ? foregroundMonitor : backgroundMonitor)
+          }
+        />
+      </View>
       <Modal visible={isShowingCoordinatePicker}>
         <CoordinatePickerView
           onSelected={(coordinate) => {
@@ -302,8 +327,8 @@ const RegionMonitoringView = ({
         />
       ) : (
         <BodyText>
-          The arrival Banner will appear here when the foreground monitor
-          detects that you've arrived at the region.
+          The arrival Banner will appear here when the app detects that you have
+          arrived at the region, and have stayed there for at least 20 seconds.
         </BodyText>
       )}
     </View>
