@@ -8,20 +8,20 @@ const { MAPS_API_KEY, EXPO_PROJECT_ID, EXPO_PROJECT_OWNER, EAS_BUILD_TYPE } =
 const { bundleIdentifier, icon, splash, name } =
   EAS_BUILD_TYPE === "development"
     ? {
-        bundleIdentifier: "com.tifapp.FitnessAppDevelopment",
+        bundleIdentifier: "com.tif.FitnessAppDevelopment",
         icon: ".storybook/assets/icon.png",
         splash: ".storybook/assets/splash.png",
         name: "FitnessAppDevelopment"
       }
     : EAS_BUILD_TYPE === "preview"
       ? {
-          bundleIdentifier: "com.tifapp.FitnessAppPreview",
+          bundleIdentifier: "com.tif.FitnessAppPreview",
           icon: "./assets/icon.png",
           splash: "./assets/splash.png",
           name: "FitnessAppPreview"
         }
       : {
-          bundleIdentifier: "com.tifapp.FitnessApp",
+          bundleIdentifier: "com.tif.FitnessApp",
           icon: "./assets/icon.png",
           splash: "./assets/splash.png",
           name: "FitnessApp"
