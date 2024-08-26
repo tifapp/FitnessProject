@@ -32,7 +32,7 @@ import {
   scheduleNotificationAsync,
   setNotificationHandler
 } from "expo-notifications"
-import { default as React, useEffect, useMemo, useState } from "react"
+import React, { useEffect, useMemo, useRef, useState } from "react"
 import { Button, Modal, ScrollView, Switch, View } from "react-native"
 import MapView, { MapMarker } from "react-native-maps"
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context"
@@ -178,6 +178,7 @@ const MainView = () => {
   const [coordinate, setCoordinate] = useState<
     LocationCoordinate2D | undefined
   >()
+  const timeoutRef = useRef<NodeJS.Timeout>()
   const region = useMemo(() => {
     if (!coordinate) return undefined
     return { arrivalRadiusMeters, coordinate }
@@ -243,17 +244,20 @@ const MainView = () => {
         minimumValue={5}
         onValueChange={(arrivalRadiusMeters) => {
           if (coordinate) {
-            tracker.replaceArrivals(
-              EventArrivals.fromRegions([
-                {
-                  coordinate,
-                  arrivalRadiusMeters,
-                  eventIds: [0],
-                  hasArrived: false
-                },
-                MT_FUJI_REGION
-              ])
-            )
+            clearTimeout(timeoutRef.current)
+            timeoutRef.current = setTimeout(() => {
+              tracker.replaceArrivals(
+                EventArrivals.fromRegions([
+                  {
+                    coordinate,
+                    arrivalRadiusMeters,
+                    eventIds: [0],
+                    hasArrived: false
+                  },
+                  MT_FUJI_REGION
+                ])
+              )
+            }, 200)
           }
           setArrivalRadiusMeters(arrivalRadiusMeters)
         }}
@@ -329,7 +333,6 @@ const CoordinatePickerView = ({
         longitudeDelta: 0.25,
         latitudeDelta: 0.25
       }}
-      showsUserLocation={true}
       onLongPress={(event) => {
         onSelected(event.nativeEvent.coordinate)
       }}
@@ -343,7 +346,7 @@ const CoordinatePickerView = ({
           stylers: [{ visibility: "off" }]
         }
       ]}
-      followsUserLocation
+      showsUserLocation
       style={{ width: "100%", height: "100%" }}
     />
     <View
