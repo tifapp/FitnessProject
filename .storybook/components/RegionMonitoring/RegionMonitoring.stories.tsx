@@ -9,7 +9,13 @@ import {
   SQLiteEventArrivalsStorage,
   useHasArrivedAtRegion
 } from "@arrival-tracking"
-import { BodyText, Headline, Title } from "@components/Text"
+import {
+  BodyText,
+  Caption,
+  CaptionTitle,
+  Headline,
+  Title
+} from "@components/Text"
 import { EventArrivalBannerView } from "@event-details-boundary/ArrivalBanner"
 import { TiFQueryClientProvider } from "@lib/ReactQuery"
 import { Migrations, TiFSQLite } from "@lib/SQLite"
@@ -29,7 +35,7 @@ import {
 import { default as React, useEffect, useMemo, useState } from "react"
 import { Button, Modal, ScrollView, Switch, View } from "react-native"
 import MapView, { MapMarker } from "react-native-maps"
-import { SafeAreaProvider } from "react-native-safe-area-context"
+import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context"
 import { EventRegion } from "TiFShared/domain-models/Event"
 import {
   coordinateDistance,
@@ -113,12 +119,11 @@ export const Basic = () => (
       }}
     >
       <TiFQueryClientProvider>
-        <ScrollView
-          style={{ width: "100%" }}
-          contentContainerStyle={{ marginTop: 128 }}
-        >
-          <StoryView />
-        </ScrollView>
+        <SafeAreaView>
+          <ScrollView style={{ width: "100%" }}>
+            <StoryView />
+          </ScrollView>
+        </SafeAreaView>
       </TiFQueryClientProvider>
     </View>
   </SafeAreaProvider>
@@ -206,14 +211,31 @@ const MainView = () => {
       style={{
         width: "100%",
         height: "100%",
-        paddingVertical: 24,
         paddingHorizontal: 24
       }}
     >
       <Title>Event Arrival Demo</Title>
       <Spacer />
+      <View
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "space-between"
+        }}
+      >
+        <Headline>Use Foreground Monitor</Headline>
+        <Switch
+          value={monitor === foregroundMonitor}
+          onValueChange={(newValue) =>
+            setMonitor(newValue ? foregroundMonitor : backgroundMonitor)
+          }
+        />
+      </View>
       <Headline>
-        Arrival Radius: <BodyText>{arrivalRadiusMeters} meters</BodyText>
+        Arrival Radius:{" "}
+        <BodyText style={{ color: "brown" }}>
+          {arrivalRadiusMeters} meters
+        </BodyText>
       </Headline>
       <Spacer />
       <Slider
@@ -243,28 +265,16 @@ const MainView = () => {
         title="Change Event Location"
         onPress={() => setIsShowingCoordinatePicker(true)}
       />
+      <Spacer />
       {estimatedDistance && (
         <BodyText>
-          <Headline>Estimated Distance:</Headline>{" "}
-          {Math.trunc(estimatedDistance)} meters
+          <Headline style={{ color: "brown" }}>
+            {Math.trunc(estimatedDistance)}
+            {" meters "}
+          </Headline>
+          from the Event Center
         </BodyText>
       )}
-      <Spacer />
-      <View
-        style={{
-          display: "flex",
-          flexDirection: "row",
-          justifyContent: "space-between"
-        }}
-      >
-        <Headline>Use Foreground Monitor</Headline>
-        <Switch
-          value={monitor === foregroundMonitor}
-          onValueChange={(newValue) =>
-            setMonitor(newValue ? foregroundMonitor : backgroundMonitor)
-          }
-        />
-      </View>
       {region && (
         <>
           <Spacer />
@@ -365,27 +375,15 @@ const RegionMonitoringView = ({
   const hasArrived = useHasArrivedAtRegion(region, monitor)
   return (
     <View>
-      <Spacer />
-      <BodyText>
-        <Headline style={{ color: "brown" }}>
-          {coordinateDistance(
-            lastKnownCoordinate,
-            region.coordinate,
-            "meters"
-          ).toFixed(2)}
-          {" meters "}
-        </Headline>
-        from the Event Center
-      </BodyText>
       <View style={{ flexDirection: "row" }}>
         <View style={{ flex: 1 }}>
-          <Headline>Current Coords</Headline>
+          <CaptionTitle>Current Coords</CaptionTitle>
           {lastKnownCoordinate && (
             <CoordinateLabel coordinate={lastKnownCoordinate} />
           )}
         </View>
         <View style={{ flex: 1 }}>
-          <Headline>Event Center</Headline>
+          <CaptionTitle>Event Center</CaptionTitle>
           <CoordinateLabel coordinate={region.coordinate} />
         </View>
       </View>
@@ -406,6 +404,11 @@ const RegionMonitoringView = ({
       )}
       <Spacer />
       <MapView
+        initialRegion={{
+          ...region.coordinate,
+          longitudeDelta: 0.1,
+          latitudeDelta: 0.1
+        }}
         customMapStyle={[
           {
             featureType: "poi",
@@ -431,11 +434,11 @@ type CoordinateLabelProps = {
 
 const CoordinateLabel = ({ coordinate }: CoordinateLabelProps) => (
   <View>
-    <BodyText>
-      <Headline>Lat:</Headline> {coordinate.latitude.toFixed(7)}
-    </BodyText>
-    <BodyText>
-      <Headline>Lng:</Headline> {coordinate.longitude.toFixed(7)}
-    </BodyText>
+    <Caption>
+      <CaptionTitle>Lat:</CaptionTitle> {coordinate.latitude.toFixed(7)}
+    </Caption>
+    <Caption>
+      <CaptionTitle>Lng:</CaptionTitle> {coordinate.longitude.toFixed(7)}
+    </Caption>
   </View>
 )
