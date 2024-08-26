@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react"
+import React, { useEffect, useMemo, useState } from "react"
 import { SafeAreaProvider } from "react-native-safe-area-context"
 import {
   EventArrivals,
@@ -10,7 +10,7 @@ import {
   SQLiteEventArrivalsStorage,
   useHasArrivedAtRegion
 } from "@arrival-tracking"
-import { Button, Modal, View } from "react-native"
+import { Button, Modal, ScrollView, View } from "react-native"
 import {
   LocationAccuracy,
   requestBackgroundPermissionsAsync,
@@ -23,7 +23,10 @@ import Slider from "@react-native-community/slider"
 import MapView from "react-native-maps"
 import { EventArrivalBannerView } from "@event-details-boundary/ArrivalBanner"
 import { StoryMeta } from ".storybook/HelperTypes"
-import { LocationCoordinate2D } from "TiFShared/domain-models/LocationCoordinate2D"
+import {
+  LocationCoordinate2D,
+  coordinateDistance
+} from "TiFShared/domain-models/LocationCoordinate2D"
 import { EventRegion } from "TiFShared/domain-models/Event"
 import { Migrations, TiFSQLite } from "@lib/SQLite"
 import { useQuery } from "@tanstack/react-query"
@@ -47,7 +50,7 @@ const storage = new SQLiteEventArrivalsStorage(
 const tracker = new EventArrivalsTracker(
   storage,
   ExpoEventArrivalsGeofencer.shared,
-  async (_, kind) => {
+  async (region, kind) => {
     await scheduleNotificationAsync({
       content: {
         title: kind === "arrived" ? "Arrived!" : "Departed!",
@@ -58,7 +61,9 @@ const tracker = new EventArrivalsTracker(
       },
       trigger: null
     })
-    return await storage.current()
+    return EventArrivals.fromRegions([
+      { ...region, hasArrived: kind === "arrived", eventIds: [0] }
+    ])
   }
 )
 tracker.startTracking()
@@ -81,7 +86,12 @@ export const Basic = () => (
       }}
     >
       <TiFQueryClientProvider>
-        <StoryView />
+        <ScrollView
+          style={{ width: "100%" }}
+          contentContainerStyle={{ marginTop: 128 }}
+        >
+          <StoryView />
+        </ScrollView>
       </TiFQueryClientProvider>
     </View>
   </SafeAreaProvider>
@@ -110,6 +120,21 @@ const StoryView = () => {
   }
 }
 
+const watchLocation = async (
+  callback: (coordinate: LocationCoordinate2D) => void
+) => {
+  return await watchPositionAsync(
+    { accuracy: LocationAccuracy.Highest },
+    (location) => callback(location.coords)
+  )
+}
+
+const foregroundMonitor = new ForegroundEventRegionMonitor(watchLocation)
+const backgroundMonitor = new EventArrivalsTrackerRegionMonitor(
+  tracker,
+  foregroundMonitor
+)
+
 const MainView = () => {
   const [arrivalRadiusMeters, setArrivalRadiusMeters] = useState(100)
   const [coordinate, setCoordinate] = useState<
@@ -124,20 +149,17 @@ const MainView = () => {
   const [lastKnownCoordinate, setLastKnownCoordinate] = useState<
     LocationCoordinate2D | undefined
   >()
-  const monitor = useMemo(() => {
-    const foregroundMonitor = new ForegroundEventRegionMonitor(
-      async (callback) => {
-        return await watchPositionAsync(
-          { accuracy: LocationAccuracy.Highest },
-          (location) => {
-            callback(location.coords)
-            setLastKnownCoordinate(location.coords)
-          }
-        )
-      }
-    )
-    return new EventArrivalsTrackerRegionMonitor(tracker, foregroundMonitor)
+  const monitor = backgroundMonitor
+  useEffect(() => {
+    const sub = watchLocation(setLastKnownCoordinate)
+    return () => {
+      sub.then((s) => s.remove())
+    }
   }, [])
+  const estimatedDistance =
+    lastKnownCoordinate &&
+    coordinate &&
+    coordinateDistance(lastKnownCoordinate, coordinate, "meters")
   return (
     <View style={{ width: "100%", paddingHorizontal: 24 }}>
       <Headline>
@@ -170,6 +192,12 @@ const MainView = () => {
         title="Select Coordinate"
         onPress={() => setIsShowingCoordinatePicker(true)}
       />
+      {estimatedDistance && (
+        <BodyText>
+          <Headline>Estimated Distance:</Headline>{" "}
+          {Math.trunc(estimatedDistance)} meters
+        </BodyText>
+      )}
 
       {region && (
         <>
