@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react"
+import React, { useEffect, useMemo, useRef, useState } from "react"
 import { SafeAreaProvider } from "react-native-safe-area-context"
 import {
   EventArrivals,
@@ -170,6 +170,7 @@ const MainView = () => {
   const [coordinate, setCoordinate] = useState<
     LocationCoordinate2D | undefined
   >()
+  const timeoutRef = useRef<NodeJS.Timeout>(undefined)
   const region = useMemo(() => {
     if (!coordinate) return undefined
     return { arrivalRadiusMeters, coordinate }
@@ -209,17 +210,20 @@ const MainView = () => {
         minimumValue={5}
         onValueChange={(arrivalRadiusMeters) => {
           if (coordinate) {
-            tracker.replaceArrivals(
-              EventArrivals.fromRegions([
-                {
-                  coordinate,
-                  arrivalRadiusMeters,
-                  eventIds: [0],
-                  hasArrived: false
-                },
-                MT_FUJI_REGION
-              ])
-            )
+            clearTimeout(timeoutRef.current)
+            timeoutRef.current = setTimeout(() => {
+              tracker.replaceArrivals(
+                EventArrivals.fromRegions([
+                  {
+                    coordinate,
+                    arrivalRadiusMeters,
+                    eventIds: [0],
+                    hasArrived: false
+                  },
+                  MT_FUJI_REGION
+                ])
+              )
+            }, 200)
           }
           setArrivalRadiusMeters(arrivalRadiusMeters)
         }}
@@ -310,7 +314,7 @@ const CoordinatePickerView = ({ onSelected }: CoordinatePickerProps) => (
           stylers: [{ visibility: "off" }]
         }
       ]}
-      followsUserLocation
+      showsUserLocation
       style={{ width: "100%", height: "100%" }}
     />
     <View
