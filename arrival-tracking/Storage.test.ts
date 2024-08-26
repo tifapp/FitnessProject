@@ -42,5 +42,27 @@ describe("UpcomingArrivals tests", () => {
       expectOrderInsensitiveEventArrivals(await storage.current(), arrivals)
       expectOrderInsensitiveEventArrivals(await baseStorage.current(), arrivals)
     })
+
+    it("should use base storage for detecting arrival when permissions are enabled", async () => {
+      const storage = requireBackgroundLocationPermissions(
+        baseStorage,
+        jest.fn().mockResolvedValue(true)
+      )
+      const region = { ...mockEventArrivalRegion(), hasArrived: true }
+      const arrivals = EventArrivals.fromRegions([region])
+      await storage.replace(arrivals)
+      expect(await storage.hasArrivedAt(region)).toEqual(true)
+    })
+
+    it("should return false for detecting arrival when permissions are disabled", async () => {
+      const storage = requireBackgroundLocationPermissions(
+        baseStorage,
+        jest.fn().mockResolvedValue(false)
+      )
+      const region = { ...mockEventArrivalRegion(), hasArrived: true }
+      const arrivals = EventArrivals.fromRegions([region])
+      await storage.replace(arrivals)
+      expect(await storage.hasArrivedAt(region)).toEqual(false)
+    })
   })
 })
