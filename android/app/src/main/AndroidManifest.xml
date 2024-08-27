@@ -33,7 +33,7 @@
         <category android:name="android.intent.category.DEFAULT"/>
         <category android:name="android.intent.category.BROWSABLE"/>
         <data android:scheme="tifapp"/>
-        <data android:scheme="com.tifapp.FitnessApp"/>
+        <data android:scheme="com.tif.FitnessApp"/>
         <data android:scheme="exp+fitnessapp"/>
       </intent-filter>
     </activity>

@@ -1,4 +1,4 @@
-package com.tifapp.FitnessApp
+package com.tif.FitnessApp
 
 import android.os.Build
 import android.os.Bundle

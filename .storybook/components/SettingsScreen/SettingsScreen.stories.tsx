@@ -19,6 +19,7 @@ import {
   useHelpAndSupportSettings
 } from "settings-boundary/HelpAndSupport"
 import { StoryMeta } from "../../HelperTypes"
+import { compileLogs } from "@lib/Logging"
 
 const SettingsMeta: StoryMeta = {
   title: "Settings Screen"
@@ -54,7 +55,7 @@ const Test = () => {
   const state = useHelpAndSupportSettings({
     isMailComposerAvailable: isAvailableAsync,
     composeEmail: presentEmailComposer,
-    compileLogs: async () => "Test"
+    compileLogs
   })
   return (
     <SettingsProvider
