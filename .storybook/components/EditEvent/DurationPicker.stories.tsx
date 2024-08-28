@@ -14,14 +14,14 @@ const PRESETS = [300, 601, 900, 1201, 3601, 5400].sort((a, b) => a - b)
 
 export const Basic = () => {
   const [presets, setPresets] = useState(PRESETS)
-  const [value, setValue] = useState(PRESETS[5])
+  const [value, setValue] = useState(1100)
   console.log(presets)
   return (
     <GestureHandlerRootView>
       <View style={{ marginTop: 256, paddingHorizontal: 24, rowGap: 24 }}>
         <EditEventDurationPickerView
           value={value}
-          onSelected={setValue}
+          onValueChange={setValue}
           presetOptions={presets}
         />
         <Button
