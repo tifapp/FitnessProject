@@ -1,5 +1,5 @@
 import { ReactNode } from "react"
-import { StyleProp, ViewStyle, StyleSheet } from "react-native"
+import { StyleProp, StyleSheet, ViewStyle } from "react-native"
 import Animated from "react-native-reanimated"
 
 export type SettingsScrollViewProps = {
@@ -14,6 +14,7 @@ export const SettingsScrollView = ({
   <Animated.ScrollView
     style={[style, styles.scroll]}
     contentContainerStyle={styles.contentContainer}
+    keyboardShouldPersistTaps={"always"}
   >
     {children}
   </Animated.ScrollView>
