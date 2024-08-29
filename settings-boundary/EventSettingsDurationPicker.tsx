@@ -3,7 +3,6 @@ import { IoniconCloseButton } from "@components/common/Icons"
 import { Headline } from "@components/Text"
 import { TextField } from "@components/TextFields"
 import { BottomSheetBackdrop, BottomSheetModal } from "@gorhom/bottom-sheet"
-import { useFontScale } from "@lib/Fonts"
 import { ReactNode, useMemo, useRef, useState } from "react"
 import {
   LayoutRectangle,
@@ -79,7 +78,7 @@ export const DurationPickerButton = <Children extends ReactNode>({
   const sheetHeight =
     pickerLayout?.height && pickerLayout.height + paddingForNonSafeAreaScreens
   const animatedIndex = useSharedValue(1)
-  const closeButtonHitSlop = 24 * useFontScale()
+  const closeButtonHitSlop = 16
   return (
     <>
       <PrimaryButton {...props} onPress={() => sheetRef.current?.present()} />

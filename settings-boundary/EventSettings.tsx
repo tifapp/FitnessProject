@@ -69,9 +69,6 @@ export const AddDurationCard = () => {
   const [timeInSeconds, setTimeInSeconds] = useState("")
   const fontScale = useFontScale()
 
-  const changeTimeInSeconds = (newTime: string) => {
-    setTimeInSeconds(newTime)
-  }
   return (
     <Animated.View
       style={{ flex: 1 }}
@@ -84,7 +81,6 @@ export const AddDurationCard = () => {
         timeInSeconds={timeInSeconds}
         underlayColor={AppStyles.colorOpacity35}
         onAddPresetTapped={() => {
-          console.log("Current Int: " + parseInt(timeInSeconds))
           if (
             !settings.eventPresetDurations.includes(parseInt(timeInSeconds))
           ) {
@@ -96,7 +92,7 @@ export const AddDurationCard = () => {
             })
           }
         }}
-        onChangeTime={changeTimeInSeconds}
+        onChangeTime={setTimeInSeconds}
       >
         <Ionicon size={36} color={AppStyles.darkColor} name={"add"} />
       </DurationPickerButton>
