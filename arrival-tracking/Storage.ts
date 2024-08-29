@@ -1,6 +1,6 @@
 import { getBackgroundPermissionsAsync } from "expo-location"
 import { TiFSQLite } from "@lib/SQLite"
-import { EventID } from "TiFShared/domain-models/Event"
+import { EventArrivalRegion, EventID } from "TiFShared/domain-models/Event"
 import { LocationCoordinate2D } from "TiFShared/domain-models/LocationCoordinate2D"
 import { EventArrivals } from "./Arrivals"
 
@@ -17,6 +17,16 @@ export interface EventArrivalsStorage {
    * Replaces all stored arrivals with a new instance of {@link EventArrivals}.
    */
   replace: (regions: EventArrivals) => Promise<void>
+
+  /**
+   * Returns true if the user has arrived at the specified {@link EventArrivalRegion}.
+   *
+   * @param region An {@link EventArrivalRegion}.
+   * @returns true if the user has arrived `region`.
+   */
+  hasArrivedAt: (
+    region: Pick<EventArrivalRegion, "coordinate" | "arrivalRadiusMeters">
+  ) => Promise<boolean | undefined>
 }
 
 /**
@@ -97,6 +107,22 @@ export class SQLiteEventArrivalsStorage implements EventArrivalsStorage {
       )
     })
   }
+
+  async hasArrivedAt(
+    region: Pick<EventArrivalRegion, "coordinate" | "arrivalRadiusMeters">
+  ) {
+    return await this.sqlite.withTransaction(async (db) => {
+      const value = await db.queryFirst<{ hasArrived: number }>`
+        SELECT hasArrived FROM LocationArrivals
+        WHERE
+          latitude = ${region.coordinate.latitude} AND
+          longitude = ${region.coordinate.longitude} AND
+          arrivalRadiusMeters = ${region.arrivalRadiusMeters}
+      `
+      if (!value) return undefined
+      return value.hasArrived === 1
+    })
+  }
 }
 
 type SQLiteEventArrival = LocationCoordinate2D & {
@@ -125,5 +151,8 @@ export const requireBackgroundLocationPermissions = (
     if (await loadPermissions()) {
       await base.replace(arrivalRegions)
     }
+  },
+  hasArrivedAt: async (region) => {
+    return (await loadPermissions()) && (await base.hasArrivedAt(region))
   }
 })
