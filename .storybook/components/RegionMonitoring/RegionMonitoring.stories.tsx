@@ -1,27 +1,106 @@
-import { ComponentMeta, ComponentStory } from "@storybook/react-native"
-import React, { useMemo, useState } from "react"
-import { SafeAreaProvider } from "react-native-safe-area-context"
+import { StoryMeta } from ".storybook/HelperTypes"
 import {
+  EventArrivals,
+  EventArrivalsTracker,
+  EventArrivalsTrackerRegionMonitor,
+  EventRegionMonitor,
+  ExpoEventArrivalsGeofencer,
   ForegroundEventRegionMonitor,
+  SQLiteEventArrivalsStorage,
   useHasArrivedAtRegion
 } from "@arrival-tracking"
-import { Button, Modal, View } from "react-native"
+import {
+  BodyText,
+  Caption,
+  CaptionTitle,
+  Headline,
+  Title
+} from "@components/Text"
+import { EventArrivalBannerView } from "@event-details-boundary/ArrivalBanner"
+import { TiFQueryClientProvider } from "@lib/ReactQuery"
+import { Migrations, TiFSQLite } from "@lib/SQLite"
+import Slider from "@react-native-community/slider"
+import { useQuery } from "@tanstack/react-query"
 import {
   LocationAccuracy,
-  getCurrentPositionAsync,
   requestBackgroundPermissionsAsync,
   requestForegroundPermissionsAsync,
   watchPositionAsync
 } from "expo-location"
-import { useRequestForegroundLocationPermissions } from "@location/UserLocation"
-import { BodyText, Headline, Title } from "@components/Text"
-import { TiFQueryClientProvider } from "@lib/ReactQuery"
-import { LocationCoordinate2D } from "@shared-models/Location"
-import Slider from "@react-native-community/slider"
-import MapView from "react-native-maps"
-import { EventRegion } from "@event/ClientSideEvent"
-import { EventArrivalBannerView } from "@event-details-boundary/ArrivalBanner"
-import { StoryMeta } from ".storybook/HelperTypes"
+import {
+  requestPermissionsAsync as requestNotificationPermissionsAsync,
+  scheduleNotificationAsync,
+  setNotificationHandler
+} from "expo-notifications"
+import React, { useEffect, useMemo, useRef, useState } from "react"
+import { Button, Modal, ScrollView, Switch, View } from "react-native"
+import MapView, { MapMarker } from "react-native-maps"
+import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context"
+import { EventRegion } from "TiFShared/domain-models/Event"
+import {
+  coordinateDistance,
+  LocationCoordinate2D
+} from "TiFShared/domain-models/LocationCoordinate2D"
+
+const MT_FUJI_REGION = {
+  coordinate: {
+    latitude: 35.362888,
+    longitude: 138.730981
+  },
+  arrivalRadiusMeters: 1000,
+  hasArrived: false,
+  eventIds: [1]
+}
+
+setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: false
+  })
+})
+
+const storage = new SQLiteEventArrivalsStorage(
+  new TiFSQLite("region-monitoring", Migrations.main)
+)
+const tracker = new EventArrivalsTracker(
+  storage,
+  ExpoEventArrivalsGeofencer.shared,
+  async (region, kind) => {
+    if (
+      kind === "arrived" &&
+      coordinateDistance(
+        region.coordinate,
+        MT_FUJI_REGION.coordinate,
+        "meters"
+      ) < 1000
+    ) {
+      await scheduleNotificationAsync({
+        content: {
+          title: "You've Reached the Top of Mt. Fuji!",
+          body: "Hi Chetan! You have 30 seconds to reach the bottom, or else an avalanche will kill you! Time is ticking!!!"
+        },
+        trigger: null
+      })
+    } else {
+      await scheduleNotificationAsync({
+        content: {
+          title: kind === "arrived" ? "Arrived!" : "Departed!",
+          body:
+            kind === "arrived"
+              ? "You have entered the monitored region!"
+              : "You have left the monitored region!"
+        },
+        trigger: null
+      })
+    }
+    return EventArrivals.fromRegions([
+      { ...region, hasArrived: kind === "arrived", eventIds: [0] }
+    ])
+  }
+)
+tracker.startTracking()
+ExpoEventArrivalsGeofencer.shared.defineTask()
 
 const RegionMonitoringMeta: StoryMeta = {
   title: "Region Monitoring"
@@ -29,9 +108,7 @@ const RegionMonitoringMeta: StoryMeta = {
 
 export default RegionMonitoringMeta
 
-type RegionMonitoringStory = ComponentStory<typeof SettingsScreen>
-
-export const Basic: RegionMonitoringStory = () => (
+export const Basic = () => (
   <SafeAreaProvider>
     <View
       style={{
@@ -42,67 +119,193 @@ export const Basic: RegionMonitoringStory = () => (
       }}
     >
       <TiFQueryClientProvider>
-        <StoryView />
+        <SafeAreaView>
+          <ScrollView style={{ width: "100%" }}>
+            <StoryView />
+          </ScrollView>
+        </SafeAreaView>
       </TiFQueryClientProvider>
     </View>
   </SafeAreaProvider>
 )
 
+const DEFAULT_LOCATION = { latitude: 0, longitude: 0 }
+
 const StoryView = () => {
-  const { data, status } = useRequestForegroundLocationPermissions()
-  if (status === "success" && !data.granted) {
+  const { data: arePermissionsGranted } = useQuery(
+    ["region-monitoring-permissions"],
+    async () => {
+      const notificationsGranted = (await requestNotificationPermissionsAsync())
+        .granted
+      await requestForegroundPermissionsAsync()
+      return (
+        (await requestBackgroundPermissionsAsync()).granted &&
+        notificationsGranted
+      )
+    },
+    {
+      initialData: false
+    }
+  )
+  if (!arePermissionsGranted) {
     return (
       <BodyText>
-        You need to enable foreground location permissions to use this test
-        harness.
+        You need to enable all the permissions to use this test harness.
       </BodyText>
     )
-  } else if (status !== "success") {
-    return <BodyText>Requesting Location Permissions...</BodyText>
   } else {
     return <MainView />
   }
 }
+
+const watchLocation = async (
+  callback: (coordinate: LocationCoordinate2D) => void
+) => {
+  return await watchPositionAsync(
+    { accuracy: LocationAccuracy.Highest },
+    (location) => callback(location.coords)
+  )
+}
+
+const foregroundMonitor = new ForegroundEventRegionMonitor(watchLocation)
+const backgroundMonitor = new EventArrivalsTrackerRegionMonitor(
+  tracker,
+  foregroundMonitor
+)
 
 const MainView = () => {
   const [arrivalRadiusMeters, setArrivalRadiusMeters] = useState(100)
   const [coordinate, setCoordinate] = useState<
     LocationCoordinate2D | undefined
   >()
+  const timeoutRef = useRef<NodeJS.Timeout>()
   const region = useMemo(() => {
     if (!coordinate) return undefined
     return { arrivalRadiusMeters, coordinate }
   }, [arrivalRadiusMeters, coordinate])
   const [isShowingCoordinatePicker, setIsShowingCoordinatePicker] =
     useState(false)
+  const [lastKnownCoordinate, setLastKnownCoordinate] = useState<
+    LocationCoordinate2D | undefined
+  >()
+  const [monitor, setMonitor] = useState<EventRegionMonitor>(backgroundMonitor)
+  useEffect(() => {
+    const sub = watchLocation(setLastKnownCoordinate)
+    return () => {
+      sub.then((s) => s.remove())
+    }
+  }, [])
+  useEffect(() => {
+    tracker.trackedArrivals().then((arrivals) => {
+      if (arrivals.regions.length > 0) {
+        setArrivalRadiusMeters(arrivals.regions[0].arrivalRadiusMeters)
+        setCoordinate(arrivals.regions[0].coordinate)
+      }
+    })
+  }, [])
+  const estimatedDistance =
+    lastKnownCoordinate &&
+    coordinate &&
+    coordinateDistance(lastKnownCoordinate, coordinate, "meters")
   return (
-    <View style={{ width: "100%", paddingHorizontal: 24 }}>
+    <View
+      style={{
+        width: "100%",
+        height: "100%",
+        paddingHorizontal: 24
+      }}
+    >
+      <Title>Event Arrival Demo</Title>
+      <Spacer />
+      <View
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "space-between"
+        }}
+      >
+        <Headline>Use Foreground Monitor</Headline>
+        <Switch
+          value={monitor === foregroundMonitor}
+          onValueChange={(newValue) =>
+            setMonitor(newValue ? foregroundMonitor : backgroundMonitor)
+          }
+        />
+      </View>
       <Headline>
-        Radius: <BodyText>{arrivalRadiusMeters} meters</BodyText>
+        Arrival Radius:{" "}
+        <BodyText style={{ color: "brown" }}>
+          {arrivalRadiusMeters} meters
+        </BodyText>
       </Headline>
       <Spacer />
       <Slider
         maximumValue={1000}
         minimumValue={5}
-        onValueChange={setArrivalRadiusMeters}
+        onValueChange={(arrivalRadiusMeters) => {
+          if (coordinate) {
+            clearTimeout(timeoutRef.current)
+            timeoutRef.current = setTimeout(() => {
+              tracker.replaceArrivals(
+                EventArrivals.fromRegions([
+                  {
+                    coordinate,
+                    arrivalRadiusMeters,
+                    eventIds: [0],
+                    hasArrived: false
+                  },
+                  MT_FUJI_REGION
+                ])
+              )
+            }, 200)
+          }
+          setArrivalRadiusMeters(arrivalRadiusMeters)
+        }}
         step={1}
         value={Math.ceil(arrivalRadiusMeters)}
       />
       <Spacer />
       <Button
-        title="Select Coordinate"
+        title="Change Event Location"
         onPress={() => setIsShowingCoordinatePicker(true)}
       />
-
+      <Spacer />
+      {estimatedDistance && (
+        <BodyText>
+          <Headline style={{ color: "brown" }}>
+            {Math.trunc(estimatedDistance)}
+            {" meters "}
+          </Headline>
+          from the Event Center
+        </BodyText>
+      )}
       {region && (
         <>
           <Spacer />
-          <RegionMonitoringView region={region} />
+          <RegionMonitoringView
+            monitor={monitor}
+            lastKnownCoordinate={lastKnownCoordinate ?? DEFAULT_LOCATION}
+            region={region}
+          />
         </>
       )}
+      <Spacer />
+      <View style={{ marginBottom: 150 }} />
       <Modal visible={isShowingCoordinatePicker}>
         <CoordinatePickerView
+          lastKnownCoordinate={lastKnownCoordinate ?? DEFAULT_LOCATION}
           onSelected={(coordinate) => {
+            tracker.replaceArrivals(
+              EventArrivals.fromRegions([
+                {
+                  coordinate,
+                  arrivalRadiusMeters,
+                  eventIds: [0],
+                  hasArrived: false
+                },
+                MT_FUJI_REGION
+              ])
+            )
             setCoordinate(coordinate)
             setIsShowingCoordinatePicker(false)
           }}
@@ -115,12 +318,21 @@ const MainView = () => {
 const Spacer = () => <View style={{ paddingVertical: 16 }} />
 
 type CoordinatePickerProps = {
+  lastKnownCoordinate: LocationCoordinate2D
   onSelected: (coordinate: LocationCoordinate2D) => void
 }
 
-const CoordinatePickerView = ({ onSelected }: CoordinatePickerProps) => (
+const CoordinatePickerView = ({
+  lastKnownCoordinate,
+  onSelected
+}: CoordinatePickerProps) => (
   <View style={{ position: "relative" }}>
     <MapView
+      initialRegion={{
+        ...lastKnownCoordinate,
+        longitudeDelta: 0.25,
+        latitudeDelta: 0.25
+      }}
       onLongPress={(event) => {
         onSelected(event.nativeEvent.coordinate)
       }}
@@ -134,6 +346,7 @@ const CoordinatePickerView = ({ onSelected }: CoordinatePickerProps) => (
           stylers: [{ visibility: "off" }]
         }
       ]}
+      showsUserLocation
       style={{ width: "100%", height: "100%" }}
     />
     <View
@@ -145,41 +358,38 @@ const CoordinatePickerView = ({ onSelected }: CoordinatePickerProps) => (
       }}
     >
       <View style={{ padding: 24 }}>
-        <Title>Tap and hold to select a location.</Title>
+        <Title>Tap and hold to select a location to arrive at.</Title>
       </View>
     </View>
   </View>
 )
 
 type RegionMonitoringProps = {
+  monitor: EventRegionMonitor
+  lastKnownCoordinate: LocationCoordinate2D
   region: EventRegion
 }
 
-const RegionMonitoringView = ({ region }: RegionMonitoringProps) => {
-  const [lastKnownCoordinate, setLastKnownCoordinate] = useState<
-    LocationCoordinate2D | undefined
-  >()
-  const monitor = useMemo(() => {
-    return new ForegroundEventRegionMonitor(async (callback) => {
-      return await watchPositionAsync(
-        { accuracy: LocationAccuracy.Highest },
-        (location) => {
-          callback(location.coords)
-          setLastKnownCoordinate(location.coords)
-        }
-      )
-    })
-  }, [])
+const RegionMonitoringView = ({
+  monitor,
+  lastKnownCoordinate = DEFAULT_LOCATION,
+  region
+}: RegionMonitoringProps) => {
   const hasArrived = useHasArrivedAtRegion(region, monitor)
   return (
     <View>
-      <Headline>Monitoring Coordinate</Headline>
-      <CoordinateLabel coordinate={region.coordinate} />
-      <Spacer />
-      <Headline>Current Location</Headline>
-      {lastKnownCoordinate && (
-        <CoordinateLabel coordinate={lastKnownCoordinate} />
-      )}
+      <View style={{ flexDirection: "row" }}>
+        <View style={{ flex: 1 }}>
+          <CaptionTitle>Current Coords</CaptionTitle>
+          {lastKnownCoordinate && (
+            <CoordinateLabel coordinate={lastKnownCoordinate} />
+          )}
+        </View>
+        <View style={{ flex: 1 }}>
+          <CaptionTitle>Event Center</CaptionTitle>
+          <CoordinateLabel coordinate={region.coordinate} />
+        </View>
+      </View>
       <Spacer />
       {hasArrived ? (
         <EventArrivalBannerView
@@ -191,10 +401,32 @@ const RegionMonitoringView = ({ region }: RegionMonitoringProps) => {
         />
       ) : (
         <BodyText>
-          The arrival Banner will appear here when the foreground monitor
-          detects that you've arrived at the region.
+          The arrival Banner will appear here when the app detects that you have
+          arrived at the region, and have stayed there for at least 20 seconds.
         </BodyText>
       )}
+      <Spacer />
+      <MapView
+        initialRegion={{
+          ...region.coordinate,
+          longitudeDelta: 0.1,
+          latitudeDelta: 0.1
+        }}
+        customMapStyle={[
+          {
+            featureType: "poi",
+            stylers: [{ visibility: "off" }]
+          },
+          {
+            featureType: "transit",
+            stylers: [{ visibility: "off" }]
+          }
+        ]}
+        showsUserLocation
+        style={{ width: "100%", height: 350, borderRadius: 12 }}
+      >
+        <MapMarker coordinate={region.coordinate} />
+      </MapView>
     </View>
   )
 }
@@ -205,11 +437,11 @@ type CoordinateLabelProps = {
 
 const CoordinateLabel = ({ coordinate }: CoordinateLabelProps) => (
   <View>
-    <BodyText>
-      <Headline>Lat:</Headline> {coordinate.latitude}
-    </BodyText>
-    <BodyText>
-      <Headline>Lng:</Headline> {coordinate.longitude}
-    </BodyText>
+    <Caption>
+      <CaptionTitle>Lat:</CaptionTitle> {coordinate.latitude.toFixed(7)}
+    </Caption>
+    <Caption>
+      <CaptionTitle>Lng:</CaptionTitle> {coordinate.longitude.toFixed(7)}
+    </Caption>
   </View>
 )

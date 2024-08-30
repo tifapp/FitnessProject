@@ -72,6 +72,7 @@ export class SQLiteEventArrivalsStorage implements EventArrivalsStorage {
   async replace(arrivals: EventArrivals) {
     await this.sqlite.withTransaction(async (db) => {
       await db.run`DELETE FROM LocationArrivals`
+      await db.run`DELETE FROM UpcomingEventArrivals`
       await Promise.all(
         arrivals.regions.map(async (region) => {
           await db.run`
