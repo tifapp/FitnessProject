@@ -11,7 +11,7 @@ import React from "react"
 import { StyleSheet, View } from "react-native"
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context"
 import {
-  EventDurationEditModeButton,
+  DurationSettingsEditModeButton,
   EventDurationView
 } from "settings-boundary/EventSettings"
 import { BASE_HEADER_SCREEN_OPTIONS } from "../../../components/Navigation"
@@ -44,7 +44,7 @@ export const Basic: SettingsStory = () => {
             screenOptions={{
               ...BASE_HEADER_SCREEN_OPTIONS,
               headerRight: () => {
-                return <EventDurationEditModeButton />
+                return <DurationSettingsEditModeButton />
               }
             }}
           >

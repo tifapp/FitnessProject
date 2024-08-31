@@ -45,26 +45,20 @@ export type SettingDurationCardProps = {
   onClosePress: () => void
 }
 
-export type EventDurationEditModeButtonProps = {
+export type DurationSettingsEditModeButtonProps = {
   style?: StyleProp<ViewStyle>
 }
 
-export const EventDurationEditModeButton = ({
+export const DurationSettingsEditModeButton = ({
   style
-}: EventDurationEditModeButtonProps) => {
+}: DurationSettingsEditModeButtonProps) => {
   const [editModeOn, setEditModeOn] = useAtom(eventSettingsEditMode)
-  return editModeOn ? (
+  return (
     <TouchableIonicon
-      icon={{ name: "create" }}
-      style={[style, { right: 16 }]}
-      onPress={() => setEditModeOn(false)}
-    ></TouchableIonicon>
-  ) : (
-    <TouchableIonicon
-      icon={{ name: "create" }}
-      style={[style, { right: 16 }]}
-      onPress={() => setEditModeOn(true)}
-    ></TouchableIonicon>
+      icon={editModeOn ? { name: "close" } : { name: "create" }}
+      style={style}
+      onPress={() => setEditModeOn((editModeOn) => !editModeOn)}
+    />
   )
 }
 
