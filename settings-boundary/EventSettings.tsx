@@ -1,5 +1,9 @@
 import { Headline } from "@components/Text"
-import { CircularIonicon, Ionicon } from "@components/common/Icons"
+import {
+  CircularIonicon,
+  Ionicon,
+  TouchableIonicon
+} from "@components/common/Icons"
 import { AppStyles } from "@lib/AppColorStyle"
 import { FontScaleFactors, useFontScale } from "@lib/Fonts"
 import { TiFDefaultLayoutTransition } from "@lib/Reanimated"
@@ -39,6 +43,31 @@ export type SettingDurationCardProps = {
   style?: StyleProp<ViewStyle>
   durationInSeconds: number
   onClosePress: () => void
+}
+
+export type EditModeButtonProps = {
+  style?: StyleProp<ViewStyle>
+}
+
+export const EditModeButton = ({ style }: EditModeButtonProps) => {
+  const [editModeOn, setEditModeOn] = useAtom(eventSettingsEditMode)
+  return editModeOn ? (
+    <TouchableIonicon
+      icon={{ name: "create" }}
+      style={[style, { right: 16 }]}
+      onPress={() => setEditModeOn(false)}
+    >
+      Edit Mode On
+    </TouchableIonicon>
+  ) : (
+    <TouchableIonicon
+      icon={{ name: "create" }}
+      style={[style, { right: 16 }]}
+      onPress={() => setEditModeOn(true)}
+    >
+      Edit Mode Off
+    </TouchableIonicon>
+  )
 }
 
 export const SettingsDurationCard = ({

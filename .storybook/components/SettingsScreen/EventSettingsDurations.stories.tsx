@@ -9,9 +9,10 @@ import { SQLiteUserSettingsStorage } from "@settings-storage/UserSettings"
 import { ComponentStory } from "@storybook/react-native"
 import { useAtom } from "jotai"
 import React from "react"
-import { StyleSheet, View } from "react-native"
+import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context"
 import {
+  EditModeButton,
   EventDurationView,
   eventSettingsEditMode
 } from "settings-boundary/EventSettings"
@@ -34,7 +35,6 @@ type SettingsStory = ComponentStory<typeof View>
 const Stack = createStackNavigator()
 
 export const Basic: SettingsStory = () => {
-  const [editModeOn, setEditModeOn] = useAtom(eventSettingsEditMode)
   return (
     <SafeAreaProvider>
       <SettingsProvider
@@ -46,21 +46,7 @@ export const Basic: SettingsStory = () => {
             screenOptions={{
               ...BASE_HEADER_SCREEN_OPTIONS,
               headerRight: () => {
-                return editModeOn ? (
-                  <PrimaryButton
-                    style={{ left: 16 }}
-                    onPress={() => setEditModeOn(false)}
-                  >
-                    Edit Mode On
-                  </PrimaryButton>
-                ) : (
-                  <PrimaryButton
-                    style={{ left: 16 }}
-                    onPress={() => setEditModeOn(true)}
-                  >
-                    Edit Mode Off
-                  </PrimaryButton>
-                )
+                return <EditModeButton />
               }
             }}
           >
