@@ -3,7 +3,7 @@ import { AppStyles } from "@lib/AppColorStyle"
 import { FontScaleFactors, useFontScale } from "@lib/Fonts"
 import { withTiFDefaultSpring } from "@lib/Reanimated"
 import { useEffectEvent } from "@lib/utils/UseEffectEvent"
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import {
   StyleProp,
   StyleSheet,
@@ -16,8 +16,7 @@ import { Gesture, GestureDetector } from "react-native-gesture-handler"
 import Animated, {
   runOnJS,
   useAnimatedStyle,
-  useSharedValue,
-  withSpring
+  useSharedValue
 } from "react-native-reanimated"
 import { formatEventDurationPreset } from "TiFShared/domain-models/Settings"
 
@@ -66,20 +65,16 @@ export const EditEventDurationPickerView = ({
         sliderPosition.value + (event.translationX - previousTranslation.value)
       )
       previousTranslation.value = event.translationX
-
       const duration = durationAtPosition(presetsState, sliderPosition.value)
-      if (duration !== value) {
-        runOnJS(onValueChange)(duration)
-      }
+      if (duration !== value) runOnJS(onValueChange)(duration)
     })
-    .onEnd(() => {
-      if (sliderPosition.value < 0) {
-        sliderPosition.value = withTiFDefaultSpring(0)
-      } else {
-        sliderPosition.value = withTiFDefaultSpring(
-          dimensionsForDuration(presetsState, value)?.x ?? 0
-        )
-      }
+    .onFinalize(() => {
+      const nextPosition =
+        sliderPosition.value < 0
+          ? 0
+          : dimensionsForDuration(presetsState, value)?.x ?? 0
+      sliderPosition.value = withTiFDefaultSpring(nextPosition)
+      runOnJS(onValueChange)(durationAtPosition(presetsState, nextPosition))
       previousTranslation.value = 0
     })
     .onTouchesDown(() => (isSliding.value = true))
@@ -93,10 +88,22 @@ export const EditEventDurationPickerView = ({
           style={[
             styles.backgroundTrail,
             useAnimatedStyle(() => ({
-              width: sliderPosition.value + INNER_TRACK_GAP,
-              height: height - INNER_TRACK_GAP * 2,
-              marginTop: INNER_TRACK_GAP,
-              marginLeft: INNER_TRACK_GAP
+              width: sliderPosition.value + INNER_TRACK_GAP * 3,
+              height: withTiFDefaultSpring(
+                height - (isSliding.value ? 0 : INNER_TRACK_GAP * 2)
+              ) as number,
+              marginTop: withTiFDefaultSpring(
+                !isSliding.value ? INNER_TRACK_GAP : 0
+              ),
+              marginLeft: withTiFDefaultSpring(
+                !isSliding.value ? INNER_TRACK_GAP : 0
+              ),
+              borderBottomLeftRadius: withTiFDefaultSpring(
+                isSliding.value ? INNER_TRACK_GAP * 2 : INNER_TRACK_GAP
+              ),
+              borderTopLeftRadius: withTiFDefaultSpring(
+                isSliding.value ? INNER_TRACK_GAP * 2 : INNER_TRACK_GAP
+              )
             }))
           ]}
         />
@@ -132,17 +139,22 @@ export const EditEventDurationPickerView = ({
             style={[
               styles.selectedCard,
               useAnimatedStyle(() => ({
-                height: withSpring(
+                borderRadius: withTiFDefaultSpring(
+                  isSliding.value ? INNER_TRACK_GAP * 2 : INNER_TRACK_GAP
+                ),
+                height: withTiFDefaultSpring(
                   height - (isSliding.value ? 0 : INNER_TRACK_GAP * 2)
                 ),
                 width: (selectedDimensions
-                  ? withSpring(
+                  ? withTiFDefaultSpring(
                       isSliding.value
                         ? selectedDimensions.width + INNER_TRACK_GAP * 2
                         : selectedDimensions.width
                     )
                   : undefined) as number | undefined,
-                marginTop: withSpring(isSliding.value ? 0 : INNER_TRACK_GAP),
+                marginTop: withTiFDefaultSpring(
+                  isSliding.value ? 0 : INNER_TRACK_GAP
+                ),
                 marginLeft: INNER_TRACK_GAP,
                 transform: [{ translateX: sliderPosition.value }]
               }))
@@ -154,6 +166,7 @@ export const EditEventDurationPickerView = ({
                   styles.selectedText,
                   { width: selectedDimensions?.width }
                 ]}
+                maxFontSizeMultiplier={FontScaleFactors.xxxLarge}
               >
                 {formatEventDurationPreset(value)}
               </Headline>
@@ -204,13 +217,13 @@ const dimensionsForDuration = (
 ): LayoutRectangle | undefined => {
   "worklet"
   const index = state.presetOptions.findIndex((preset, i, presets) => {
-    if (i === 0) return duration < preset
+    if (i === 0) return duration <= preset
     if (i === presets.length - 1) return duration >= preset
     return duration >= preset && duration < presets[i + 1]
   })
   if (!state.offsets[index]) return undefined
   if (index === state.offsets.length - 1) {
-    return { ...state.offsets[index], x: state.offsets[index].x - 8 }
+    return state.offsets[index]
   }
   return {
     ...state.offsets[index],
@@ -232,8 +245,6 @@ const styles = StyleSheet.create({
   },
   backgroundTrail: {
     position: "absolute",
-    borderBottomLeftRadius: INNER_TRACK_GAP,
-    borderTopLeftRadius: INNER_TRACK_GAP,
     backgroundColor: AppStyles.black.withOpacity(0.15).toString()
   },
   selectedCard: {
@@ -253,7 +264,7 @@ const styles = StyleSheet.create({
   backgroundCard: {
     position: "absolute",
     backgroundColor: AppStyles.eventCardColor,
-    borderRadius: 12,
+    borderRadius: INNER_TRACK_GAP * 2,
     width: "100%"
   },
   presetsRow: {

@@ -10,15 +10,21 @@ const EditEventDurationsMeta: StoryMeta = {
 
 export default EditEventDurationsMeta
 
-const PRESETS = [300, 601, 900, 1201, 3601, 5400].sort((a, b) => a - b)
+const PRESETS = [
+  300 * 15,
+  601 * 15,
+  900 * 15,
+  1201 * 15,
+  3601 * 15,
+  5400 * 15
+].sort((a, b) => a - b)
 
 export const Basic = () => {
   const [presets, setPresets] = useState(PRESETS)
   const [value, setValue] = useState(1100)
-  console.log(presets)
   return (
     <GestureHandlerRootView>
-      <View style={{ marginTop: 256, paddingHorizontal: 24, rowGap: 24 }}>
+      <View style={{ marginTop: 256, paddingHorizontal: 40, rowGap: 24 }}>
         <EditEventDurationPickerView
           value={value}
           onValueChange={setValue}
