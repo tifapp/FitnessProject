@@ -133,20 +133,19 @@ const DurationsRowView = ({
 }: DurationsRowProps) => (
   <View style={[styles.presetsRow, { height }]}>
     {durations.map((duration) => (
-      <View
+      <Pressable
         key={`d-${duration}`}
         style={styles.presetItem}
+        onPress={() => onDurationChange(duration)}
         onLayout={(e) => onDurationLayout(e.nativeEvent.layout)}
       >
-        <Pressable onPress={() => onDurationChange(duration)}>
-          <BodyText
-            maxFontSizeMultiplier={FontScaleFactors.large}
-            style={styles.presetText}
-          >
-            {formatEventDurationPreset(duration)}
-          </BodyText>
-        </Pressable>
-      </View>
+        <BodyText
+          maxFontSizeMultiplier={FontScaleFactors.large}
+          style={styles.presetText}
+        >
+          {formatEventDurationPreset(duration)}
+        </BodyText>
+      </Pressable>
     ))}
   </View>
 )
