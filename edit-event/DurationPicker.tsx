@@ -3,7 +3,7 @@ import { AppStyles } from "@lib/AppColorStyle"
 import { FontScaleFactors, useFontScale } from "@lib/Fonts"
 import { withTiFDefaultSpring } from "@lib/Reanimated"
 import { useEffectEvent } from "@lib/utils/UseEffectEvent"
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useState } from "react"
 import {
   StyleProp,
   StyleSheet,
@@ -41,7 +41,7 @@ export const EditEventDurationPickerView = ({
   const isSliding = useSharedValue(false)
   const sliderPosition = useSharedValue(0)
   const height =
-    80 * useFontScale({ maximumScaleFactor: FontScaleFactors.xxxLarge })
+    80 * useFontScale({ maximumScaleFactor: FontScaleFactors.large })
   useEffect(
     () => setPresetsState(initialPresetsState(presetOptions)),
     [presetOptions]
@@ -125,7 +125,7 @@ export const EditEventDurationPickerView = ({
             >
               <Pressable onPress={() => onValueChange(duration)}>
                 <BodyText
-                  maxFontSizeMultiplier={FontScaleFactors.xxxLarge}
+                  maxFontSizeMultiplier={FontScaleFactors.large}
                   style={styles.presetText}
                 >
                   {formatEventDurationPreset(duration)}
@@ -166,7 +166,7 @@ export const EditEventDurationPickerView = ({
                   styles.selectedText,
                   { width: selectedDimensions?.width }
                 ]}
-                maxFontSizeMultiplier={FontScaleFactors.xxxLarge}
+                maxFontSizeMultiplier={FontScaleFactors.large}
               >
                 {formatEventDurationPreset(value)}
               </Headline>
