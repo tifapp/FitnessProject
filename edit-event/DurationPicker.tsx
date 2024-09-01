@@ -3,6 +3,7 @@ import { AppStyles } from "@lib/AppColorStyle"
 import { FontScaleFactors, useFontScale } from "@lib/Fonts"
 import { withTiFDefaultSpring } from "@lib/Reanimated"
 import { useEffectEvent } from "@lib/utils/UseEffectEvent"
+import { PrimitiveAtom, useAtom, useSetAtom } from "jotai"
 import { useEffect, useState } from "react"
 import {
   StyleProp,
@@ -15,6 +16,7 @@ import {
 import { Gesture, GestureDetector } from "react-native-gesture-handler"
 import Animated, {
   runOnJS,
+  SharedValue,
   useAnimatedStyle,
   useSharedValue
 } from "react-native-reanimated"
@@ -23,18 +25,19 @@ import { formatEventDurationPreset } from "TiFShared/domain-models/Settings"
 const INNER_TRACK_GAP = 8
 
 export type EditEventDurationPickerProps = {
-  value: number
+  // NB: An atom gives us a significant performance boost over using a set of
+  // value/onValueChange props.
+  durationAtom: PrimitiveAtom<number>
   presetOptions: number[]
-  onValueChange: (option: number) => void
   style?: StyleProp<ViewStyle>
 }
 
 export const EditEventDurationPickerView = ({
-  value,
+  durationAtom,
   presetOptions,
-  onValueChange,
   style
 }: EditEventDurationPickerProps) => {
+  const setDuration = useSetAtom(durationAtom)
   const [presetsState, setPresetsState] = useState(
     initialPresetsState(presetOptions)
   )
@@ -46,9 +49,125 @@ export const EditEventDurationPickerView = ({
     () => setPresetsState(initialPresetsState(presetOptions)),
     [presetOptions]
   )
-  const durations = presetOptions.sort((a, b) => a - b)
-  const selectedDimensions = dimensionsForDuration(presetsState, value)
-  const panGestureBounds = bounds(presetsState)
+  return (
+    <View style={style}>
+      <View style={styles.container}>
+        <View style={[styles.backgroundCard, { height }]} />
+        <BackgroundTrailView
+          height={height}
+          isSliding={isSliding}
+          sliderPosition={sliderPosition}
+        />
+        <DurationsRowView
+          durations={presetOptions.sort((a, b) => a - b)}
+          height={height}
+          onDurationLayout={(layout) => {
+            setPresetsState((state) => ({
+              ...state,
+              offsets:
+                state.offsets.length >= state.presetOptions.length
+                  ? [layout]
+                  : state.offsets.concat(layout)
+            }))
+          }}
+          onDurationChange={setDuration}
+        />
+        <SliderKnobView
+          durationAtom={durationAtom}
+          isSliding={isSliding}
+          sliderPosition={sliderPosition}
+          presetsState={presetsState}
+          height={height}
+        />
+      </View>
+    </View>
+  )
+}
+
+type BackgroundTrailProps = {
+  sliderPosition: SharedValue<number>
+  isSliding: SharedValue<boolean>
+  height: number
+}
+
+const BackgroundTrailView = ({
+  sliderPosition,
+  isSliding,
+  height
+}: BackgroundTrailProps) => (
+  <Animated.View
+    style={[
+      styles.backgroundTrail,
+      useAnimatedStyle(() => ({
+        width: sliderPosition.value + INNER_TRACK_GAP * 3,
+        height: withTiFDefaultSpring(
+          height - (isSliding.value ? 0 : INNER_TRACK_GAP * 2)
+        ) as number,
+        marginTop: withTiFDefaultSpring(!isSliding.value ? INNER_TRACK_GAP : 0),
+        marginLeft: withTiFDefaultSpring(
+          !isSliding.value ? INNER_TRACK_GAP : 0
+        ),
+        borderBottomLeftRadius: withTiFDefaultSpring(
+          isSliding.value ? INNER_TRACK_GAP * 2 : INNER_TRACK_GAP
+        ),
+        borderTopLeftRadius: withTiFDefaultSpring(
+          isSliding.value ? INNER_TRACK_GAP * 2 : INNER_TRACK_GAP
+        )
+      }))
+    ]}
+  />
+)
+
+type DurationsRowProps = {
+  durations: number[]
+  height: number
+  onDurationLayout: (layout: LayoutRectangle) => void
+  onDurationChange: (duration: number) => void
+}
+
+const DurationsRowView = ({
+  durations,
+  height,
+  onDurationLayout,
+  onDurationChange
+}: DurationsRowProps) => (
+  <View style={[styles.presetsRow, { height }]}>
+    {durations.map((duration) => (
+      <View
+        key={`d-${duration}`}
+        style={styles.presetItem}
+        onLayout={(e) => onDurationLayout(e.nativeEvent.layout)}
+      >
+        <Pressable onPress={() => onDurationChange(duration)}>
+          <BodyText
+            maxFontSizeMultiplier={FontScaleFactors.large}
+            style={styles.presetText}
+          >
+            {formatEventDurationPreset(duration)}
+          </BodyText>
+        </Pressable>
+      </View>
+    ))}
+  </View>
+)
+
+type SliderKnobProps = {
+  durationAtom: PrimitiveAtom<number>
+  sliderPosition: SharedValue<number>
+  isSliding: SharedValue<boolean>
+  presetsState: PresetsState
+  height: number
+}
+
+const SliderKnobView = ({
+  durationAtom,
+  sliderPosition,
+  isSliding,
+  presetsState,
+  height
+}: SliderKnobProps) => {
+  const [duration, setDuration] = useAtom(durationAtom)
+  const selectedDimensions = dimensionsForDuration(presetsState, duration)
   const event = useEffectEvent((dimensions?: LayoutRectangle) => {
     if (!isSliding.value) {
       sliderPosition.value = withTiFDefaultSpring(dimensions?.x ?? 0)
@@ -56,125 +175,70 @@ export const EditEventDurationPickerView = ({
   })
   const previousTranslation = useSharedValue(0)
   useEffect(() => event(selectedDimensions), [selectedDimensions, event])
+  const panGestureBounds = bounds(presetsState)
   const panGesture = Gesture.Pan()
     .onUpdate((event) => {
-      const { end } = panGestureBounds
       sliderPosition.value = clamp(
         -INNER_TRACK_GAP,
-        end,
+        panGestureBounds.end,
         sliderPosition.value + (event.translationX - previousTranslation.value)
       )
       previousTranslation.value = event.translationX
-      const duration = durationAtPosition(presetsState, sliderPosition.value)
-      if (duration !== value) runOnJS(onValueChange)(duration)
+      const nextDuration = durationAtPosition(
+        presetsState,
+        sliderPosition.value
+      )
+      if (nextDuration !== duration) runOnJS(setDuration)(nextDuration)
     })
     .onFinalize(() => {
       const nextPosition =
         sliderPosition.value < 0
           ? 0
-          : dimensionsForDuration(presetsState, value)?.x ?? 0
+          : dimensionsForDuration(presetsState, duration)?.x ?? 0
       sliderPosition.value = withTiFDefaultSpring(nextPosition)
-      runOnJS(onValueChange)(durationAtPosition(presetsState, nextPosition))
+      runOnJS(setDuration)(durationAtPosition(presetsState, nextPosition))
       previousTranslation.value = 0
     })
     .onTouchesDown(() => (isSliding.value = true))
     .onTouchesUp(() => (isSliding.value = false))
     .onTouchesCancelled(() => (isSliding.value = false))
   return (
-    <View style={style}>
-      <View style={styles.container}>
-        <View style={[styles.backgroundCard, { height }]} />
-        <Animated.View
-          style={[
-            styles.backgroundTrail,
-            useAnimatedStyle(() => ({
-              width: sliderPosition.value + INNER_TRACK_GAP * 3,
-              height: withTiFDefaultSpring(
-                height - (isSliding.value ? 0 : INNER_TRACK_GAP * 2)
-              ) as number,
-              marginTop: withTiFDefaultSpring(
-                !isSliding.value ? INNER_TRACK_GAP : 0
-              ),
-              marginLeft: withTiFDefaultSpring(
-                !isSliding.value ? INNER_TRACK_GAP : 0
-              ),
-              borderBottomLeftRadius: withTiFDefaultSpring(
-                isSliding.value ? INNER_TRACK_GAP * 2 : INNER_TRACK_GAP
-              ),
-              borderTopLeftRadius: withTiFDefaultSpring(
-                isSliding.value ? INNER_TRACK_GAP * 2 : INNER_TRACK_GAP
-              )
-            }))
-          ]}
-        />
-        <View style={[styles.presetsRow, { height }]}>
-          {durations.map((duration) => (
-            <View
-              key={`d-${duration}`}
-              style={styles.presetItem}
-              onLayout={(e) => {
-                const layout = e.nativeEvent.layout
-                setPresetsState((state) => ({
-                  ...state,
-                  offsets:
-                    state.offsets.length >= state.presetOptions.length
-                      ? [layout]
-                      : state.offsets.concat(layout)
-                }))
-              }}
-            >
-              <Pressable onPress={() => onValueChange(duration)}>
-                <BodyText
-                  maxFontSizeMultiplier={FontScaleFactors.large}
-                  style={styles.presetText}
-                >
-                  {formatEventDurationPreset(duration)}
-                </BodyText>
-              </Pressable>
-            </View>
-          ))}
-        </View>
-        <GestureDetector gesture={panGesture}>
-          <Animated.View
-            style={[
-              styles.selectedCard,
-              useAnimatedStyle(() => ({
-                borderRadius: withTiFDefaultSpring(
-                  isSliding.value ? INNER_TRACK_GAP * 2 : INNER_TRACK_GAP
-                ),
-                height: withTiFDefaultSpring(
-                  height - (isSliding.value ? 0 : INNER_TRACK_GAP * 2)
-                ),
-                width: (selectedDimensions
-                  ? withTiFDefaultSpring(
-                      isSliding.value
-                        ? selectedDimensions.width + INNER_TRACK_GAP * 2
-                        : selectedDimensions.width
-                    )
-                  : undefined) as number | undefined,
-                marginTop: withTiFDefaultSpring(
-                  isSliding.value ? 0 : INNER_TRACK_GAP
-                ),
-                marginLeft: INNER_TRACK_GAP,
-                transform: [{ translateX: sliderPosition.value }]
-              }))
-            ]}
+    <GestureDetector gesture={panGesture}>
+      <Animated.View
+        style={[
+          styles.selectedCard,
+          useAnimatedStyle(() => ({
+            borderRadius: withTiFDefaultSpring(
+              isSliding.value ? INNER_TRACK_GAP * 2 : INNER_TRACK_GAP
+            ),
+            height: withTiFDefaultSpring(
+              height - (isSliding.value ? 0 : INNER_TRACK_GAP * 2)
+            ),
+            width: (selectedDimensions
+              ? withTiFDefaultSpring(
+                  isSliding.value
+                    ? selectedDimensions.width + INNER_TRACK_GAP * 2
+                    : selectedDimensions.width
+                )
+              : undefined) as number | undefined,
+            marginTop: withTiFDefaultSpring(
+              isSliding.value ? 0 : INNER_TRACK_GAP
+            ),
+            marginLeft: INNER_TRACK_GAP,
+            transform: [{ translateX: sliderPosition.value }]
+          }))
+        ]}
+      >
+        <View style={[styles.selectedContainer]}>
+          <Headline
+            style={[styles.selectedText, { width: selectedDimensions?.width }]}
+            maxFontSizeMultiplier={FontScaleFactors.large}
           >
-            <View style={[styles.selectedContainer]}>
-              <Headline
-                style={[
-                  styles.selectedText,
-                  { width: selectedDimensions?.width }
-                ]}
-                maxFontSizeMultiplier={FontScaleFactors.large}
-              >
-                {formatEventDurationPreset(value)}
-              </Headline>
-            </View>
-          </Animated.View>
-        </GestureDetector>
-      </View>
-    </View>
+            {formatEventDurationPreset(duration)}
+          </Headline>
+        </View>
+      </Animated.View>
+    </GestureDetector>
   )
 }
 

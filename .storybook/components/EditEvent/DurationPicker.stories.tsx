@@ -1,10 +1,10 @@
-import { StoryMeta } from "../HelperTypes"
-import React, { useEffect, useState } from "react"
+import React, { useState } from "react"
 import { Button, View } from "react-native"
 import { EditEventDurationPickerView } from "@edit-event/DurationPicker"
 import { GestureHandlerRootView } from "react-native-gesture-handler"
+import { Provider, atom } from "jotai"
 
-const EditEventDurationsMeta: StoryMeta = {
+const EditEventDurationsMeta = {
   title: "Edit Event Durations"
 }
 
@@ -19,17 +19,18 @@ const PRESETS = [
   5400 * 15
 ].sort((a, b) => a - b)
 
+const presetsAtom = atom(1100)
 export const Basic = () => {
   const [presets, setPresets] = useState(PRESETS)
-  const [value, setValue] = useState(1100)
   return (
     <GestureHandlerRootView>
-      <View style={{ marginTop: 256, paddingHorizontal: 40, rowGap: 24 }}>
-        <EditEventDurationPickerView
-          value={value}
-          onValueChange={setValue}
-          presetOptions={presets}
-        />
+      <View style={{ marginTop: 256, paddingHorizontal: 24, rowGap: 24 }}>
+        <Provider>
+          <EditEventDurationPickerView
+            durationAtom={presetsAtom}
+            presetOptions={presets}
+          />
+        </Provider>
         <Button
           title="Filter"
           onPress={() => {
