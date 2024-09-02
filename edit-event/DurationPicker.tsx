@@ -254,7 +254,7 @@ export const initialPickerState = (
   durations: number[]
 ): EditEventDurationPickerState => {
   const initialDurations =
-    durations.length > 3
+    durations.length >= 3
       ? durations
       : [...new Set(durations.concat(FALLBACK_DEFAULT_DURATIONS))]
   return new Map(
