@@ -38,15 +38,15 @@ export const EditEventDurationPickerView = ({
   style
 }: EditEventDurationPickerProps) => {
   const setDuration = useSetAtom(durationAtom)
-  const [presetsState, setPresetsState] = useState(
-    initialPresetsState(presetOptions)
+  const [pickerState, setPickerState] = useState(
+    initialPickerState(presetOptions)
   )
   const isSliding = useSharedValue(false)
   const sliderPosition = useSharedValue(0)
   const height =
     80 * useFontScale({ maximumScaleFactor: FontScaleFactors.large })
   useEffect(
-    () => setPresetsState(initialPresetsState(presetOptions)),
+    () => setPickerState(initialPickerState(presetOptions)),
     [presetOptions]
   )
   return (
@@ -59,16 +59,10 @@ export const EditEventDurationPickerView = ({
           sliderPosition={sliderPosition}
         />
         <DurationsRowView
-          durations={presetOptions.sort((a, b) => a - b)}
+          durations={Array.from(pickerState.keys())}
           height={height}
-          onDurationLayout={(layout) => {
-            setPresetsState((state) => ({
-              ...state,
-              offsets:
-                state.offsets.length >= state.presetOptions.length
-                  ? [layout]
-                  : state.offsets.concat(layout)
-            }))
+          onDurationLayout={(duration, layout) => {
+            setPickerState((state) => updateLayout(state, duration, layout))
           }}
           onDurationChange={setDuration}
         />
@@ -76,7 +70,7 @@ export const EditEventDurationPickerView = ({
           durationAtom={durationAtom}
           isSliding={isSliding}
           sliderPosition={sliderPosition}
-          presetsState={presetsState}
+          pickerState={pickerState}
           height={height}
         />
       </View>
@@ -121,7 +115,7 @@ const BackgroundTrailView = ({
 type DurationsRowProps = {
   durations: number[]
   height: number
-  onDurationLayout: (layout: LayoutRectangle) => void
+  onDurationLayout: (duration: number, layout: LayoutRectangle) => void
   onDurationChange: (duration: number) => void
 }
 
@@ -137,7 +131,7 @@ const DurationsRowView = ({
         key={`d-${duration}`}
         style={styles.presetItem}
         onPress={() => onDurationChange(duration)}
-        onLayout={(e) => onDurationLayout(e.nativeEvent.layout)}
+        onLayout={(e) => onDurationLayout(duration, e.nativeEvent.layout)}
       >
         <BodyText
           maxFontSizeMultiplier={FontScaleFactors.large}
@@ -154,7 +148,7 @@ type SliderKnobProps = {
   durationAtom: PrimitiveAtom<number>
   sliderPosition: SharedValue<number>
   isSliding: SharedValue<boolean>
-  presetsState: PresetsState
+  pickerState: EditEventDurationPickerState
   height: number
 }
 
@@ -162,29 +156,33 @@ const SliderKnobView = ({
   durationAtom,
   sliderPosition,
   isSliding,
-  presetsState,
+  pickerState,
   height
 }: SliderKnobProps) => {
   const [duration, setDuration] = useAtom(durationAtom)
-  const selectedDimensions = dimensionsForDuration(presetsState, duration)
-  const event = useEffectEvent((dimensions?: LayoutRectangle) => {
+  const stateEntries = pickerStateEntries(pickerState)
+  const selectedDimensions = layoutForDuration(stateEntries, duration)
+  const animateToPosition = useEffectEvent((dimensions?: LayoutRectangle) => {
     if (!isSliding.value) {
       sliderPosition.value = withTiFDefaultSpring(dimensions?.x ?? 0)
     }
   })
   const previousTranslation = useSharedValue(0)
-  useEffect(() => event(selectedDimensions), [selectedDimensions, event])
-  const panGestureBounds = bounds(presetsState)
+  useEffect(
+    () => animateToPosition(selectedDimensions),
+    [selectedDimensions, animateToPosition]
+  )
+  const panGestureEndBound = endBound(pickerState)
   const panGesture = Gesture.Pan()
     .onUpdate((event) => {
       sliderPosition.value = clamp(
         -INNER_TRACK_GAP,
-        panGestureBounds.end,
+        panGestureEndBound,
         sliderPosition.value + (event.translationX - previousTranslation.value)
       )
       previousTranslation.value = event.translationX
       const nextDuration = durationAtPosition(
-        presetsState,
+        stateEntries,
         sliderPosition.value
       )
       if (nextDuration !== duration) runOnJS(setDuration)(nextDuration)
@@ -193,9 +191,9 @@ const SliderKnobView = ({
       const nextPosition =
         sliderPosition.value < 0
           ? 0
-          : dimensionsForDuration(presetsState, duration)?.x ?? 0
+          : layoutForDuration(stateEntries, duration)?.x ?? 0
       sliderPosition.value = withTiFDefaultSpring(nextPosition)
-      runOnJS(setDuration)(durationAtPosition(presetsState, nextPosition))
+      runOnJS(setDuration)(durationAtPosition(stateEntries, nextPosition))
       previousTranslation.value = 0
     })
     .onTouchesDown(() => (isSliding.value = true))
@@ -241,61 +239,116 @@ const SliderKnobView = ({
   )
 }
 
-type PresetsState = {
-  presetOptions: number[]
-  offsets: LayoutRectangle[]
+export type EditEventDurationPickerState = Map<
+  number,
+  LayoutRectangle | undefined
+>
+export type EditEventDurationPickerStateEntries = [
+  number,
+  LayoutRectangle | undefined
+][]
+
+const FALLBACK_DEFAULT_DURATIONS = [1800, 2700, 3600]
+
+export const initialPickerState = (
+  durations: number[]
+): EditEventDurationPickerState => {
+  const initialDurations =
+    durations.length > 3
+      ? durations
+      : [...new Set(durations.concat(FALLBACK_DEFAULT_DURATIONS))]
+  return new Map(
+    initialDurations.sort((a, b) => a - b).map((d) => [d, undefined])
+  )
 }
 
-const initialPresetsState = (presetOptions: number[]) => ({
-  presetOptions,
-  offsets: [] as LayoutRectangle[]
-})
-
-const bounds = (state: PresetsState) => {
-  if (state.offsets.length < 1) return { start: 0, end: 0 }
-  return {
-    start: state.offsets[0].x,
-    end: state.offsets[state.offsets.length - 1].x
-  }
+export const pickerStateEntries = (state: EditEventDurationPickerState) => {
+  return Array.from(state.entries())
 }
 
-const durationAtPosition = (state: PresetsState, position: number) => {
+export const updateLayout = (
+  state: EditEventDurationPickerState,
+  duration: number,
+  layout: LayoutRectangle
+): EditEventDurationPickerState => {
+  const newState = new Map(state)
+  newState.set(duration, layout)
+  return newState
+}
+
+export const endBound = (state: EditEventDurationPickerState) => {
+  const keys = Array.from(state.keys())
+  return state.get(keys[keys.length - 1])?.x ?? 0
+}
+
+const layout = (
+  entries: EditEventDurationPickerStateEntries,
+  index: number
+) => {
   "worklet"
-  const index = state.offsets.findIndex((offset, i, offsets) => {
-    if (i === offsets.length - 1) {
-      return position >= offset.x - offsets[i - 1].width / 2
+  return entries[index][1] ?? ZEROED_LAYOUT_RECTANGLE
+}
+
+const isPastBeginning = (
+  position: number,
+  l: LayoutRectangle | undefined,
+  index: number,
+  entries: EditEventDurationPickerStateEntries
+) => {
+  "worklet"
+  return position >= (l?.x ?? 0) - (layout(entries, index - 1).width ?? 0) / 2
+}
+
+const isBeforeEnd = (
+  position: number,
+  l: LayoutRectangle | undefined,
+  index: number,
+  entries: EditEventDurationPickerStateEntries
+) => {
+  "worklet"
+  return position < layout(entries, index + 1).x - (l?.width ?? 0) / 2
+}
+
+export const durationAtPosition = (
+  entries: EditEventDurationPickerStateEntries,
+  position: number
+) => {
+  "worklet"
+  const index = entries.findIndex(([_, layout], i, entries) => {
+    if (i === entries.length - 1) {
+      return isPastBeginning(position, layout, i, entries)
     }
-    if (i === 0) return position < offsets[i + 1].x - offset.width / 2
+    if (i === 0) return isBeforeEnd(position, layout, i, entries)
     return (
-      position >= offset.x - offsets[i - 1].width / 2 &&
-      position < offsets[i + 1].x - offset.width / 2
+      isPastBeginning(position, layout, i, entries) &&
+      isBeforeEnd(position, layout, i, entries)
     )
   })
-  return state.presetOptions[index]
+  return entries[index][0]
 }
 
-const dimensionsForDuration = (
-  state: PresetsState,
+export const layoutForDuration = (
+  entries: EditEventDurationPickerStateEntries,
   duration: number
-): LayoutRectangle | undefined => {
+) => {
   "worklet"
-  const index = state.presetOptions.findIndex((preset, i, presets) => {
-    if (i === 0) return duration <= preset
-    if (i === presets.length - 1) return duration >= preset
-    return duration >= preset && duration < presets[i + 1]
+  const index = entries.findIndex(([d, _], i, entries) => {
+    if (i === entries.length - 1) return duration >= d
+    if (i === 0) return duration < entries[i + 1][0]
+    return duration >= d && duration < entries[i + 1][0]
   })
-  if (!state.offsets[index]) return undefined
-  if (index === state.offsets.length - 1) {
-    return state.offsets[index]
-  }
+  if (!entries[index]) return undefined
+  if (index === entries.length - 1) return entries[index][1]
   return {
-    ...state.offsets[index],
+    ...layout(entries, index),
     x:
-      duration <= state.presetOptions[index]
-        ? state.offsets[index].x - INNER_TRACK_GAP
-        : state.offsets[index].x + state.offsets[index].width / 2
+      duration <= entries[index][0]
+        ? layout(entries, index).x - INNER_TRACK_GAP
+        : layout(entries, index).x + layout(entries, index).width / 2
   }
 }
+
+const ZEROED_LAYOUT_RECTANGLE = { width: 0, height: 0, x: 0, y: 0 }
 
 const clamp = (min: number, max: number, value: number) => {
   "worklet"
