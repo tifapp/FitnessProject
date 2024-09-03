@@ -21,6 +21,7 @@ export const SettingsNamedIconRowView = ({
   <View style={style}>
     <View style={styles.container}>
       <CircularIonicon
+        size={24}
         name={iconName}
         backgroundColor={iconBackgroundColor.toString()}
       />

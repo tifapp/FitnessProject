@@ -87,6 +87,7 @@ export const SettingsDurationCard = ({
         >
           <TouchableOpacity activeOpacity={0.8} onPress={onClosePress}>
             <CircularIonicon
+              size={16}
               backgroundColor={AppStyles.darkColor}
               name={"close"}
             />

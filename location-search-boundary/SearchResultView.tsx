@@ -1,12 +1,12 @@
 import { Caption, Headline } from "@components/Text"
 import { CircularIonicon, Ionicon } from "@components/common/Icons"
+import { placemarkToFormattedAddress } from "@lib/AddressFormatting"
 import { AppStyles } from "@lib/AppColorStyle"
 import { compactFormatDistance } from "@lib/DistanceFormatting"
-import { placemarkToFormattedAddress } from "@lib/AddressFormatting"
+import { RecentLocationAnnotation } from "@location/Recents"
 import React from "react"
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 import { LocationSearchResult } from "./SearchClient"
-import { RecentLocationAnnotation } from "@location/Recents"
 
 export type LocationSearchResultProps = {
   result: LocationSearchResult
@@ -28,6 +28,7 @@ export const LocationSearchResultView = ({
   return (
     <View style={[style, styles.container]}>
       <CircularIonicon
+        size={24}
         backgroundColor={
           result.isRecentLocation
             ? AppStyles.colorOpacity35
