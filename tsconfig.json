@@ -46,8 +46,8 @@
       "@settings-storage": ["./settings-storage"],
       "@settings-storage/*": ["./settings-storage/*"],
       "@settings-boundary": ["./settings-boundary"],
-      "@edit-event": ["./edit-event"],
-      "@edit-event/*": ["./edit-event/*"],
+      "@edit-event-boundary": ["./edit-event-boundary"],
+      "@edit-event-boundary/*": ["./edit-event-boundary/*"],
       "env": ["./.env"]
     }
   },
