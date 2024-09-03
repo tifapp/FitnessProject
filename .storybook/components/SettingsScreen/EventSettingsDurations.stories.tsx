@@ -1,5 +1,6 @@
 import { StoryMeta } from ".storybook/HelperTypes"
 import { PrimaryButton } from "@components/Buttons"
+import { BottomSheetModalProvider } from "@gorhom/bottom-sheet"
 import { NavigationContainer } from "@react-navigation/native"
 import { createStackNavigator } from "@react-navigation/stack"
 import { SQLiteLocalSettingsStorage } from "@settings-storage/LocalSettings"
@@ -9,6 +10,8 @@ import { SQLiteUserSettingsStorage } from "@settings-storage/UserSettings"
 import { ComponentStory } from "@storybook/react-native"
 import React from "react"
 import { StyleSheet, View } from "react-native"
+import { Button, View } from "react-native"
+import { GestureHandlerRootView } from "react-native-gesture-handler"
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context"
 import {
   DurationSettingsEditModeButton,
@@ -32,32 +35,31 @@ type SettingsStory = ComponentStory<typeof View>
 
 const Stack = createStackNavigator()
 
-export const Basic: SettingsStory = () => {
-  return (
-    <SafeAreaProvider>
-      <SettingsProvider
-        localSettingsStore={{} as any}
-        userSettingsStore={userStore}
-      >
-        <NavigationContainer>
-          <Stack.Navigator
-            screenOptions={{
+export const Basic: SettingsStory = () => (
+  <SafeAreaProvider>
+    <GestureHandlerRootView>
+      <BottomSheetModalProvider>
+        <SettingsProvider
+          localSettingsStore={{} as any}
+          userSettingsStore={userStore}
+        >
+          <NavigationContainer>
+            <Stack.Navigator
+              screenOptions={{
               ...BASE_HEADER_SCREEN_OPTIONS,
               headerRight: () => {
                 return <DurationSettingsEditModeButton />
               }
             }}
-          >
-            <Stack.Screen
-              name="Duration Presets"
-              component={DurationScreenTest}
-            />
-          </Stack.Navigator>
-        </NavigationContainer>
-      </SettingsProvider>
-    </SafeAreaProvider>
-  )
-}
+            >
+              <Stack.Screen name="Durations" component={DurationScreenTest} />
+            </Stack.Navigator>
+          </NavigationContainer>
+        </SettingsProvider>
+      </BottomSheetModalProvider>
+    </GestureHandlerRootView>
+  </SafeAreaProvider>
+)
 
 const localStore = PersistentSettingsStores.local(
   new SQLiteLocalSettingsStorage(testSQLite)

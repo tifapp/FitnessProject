@@ -1,6 +1,33 @@
 import * as Sentry from "@sentry/react-native"
-import { TiFSQLite } from "./SQLite"
+import { Migrations, SQLITE_IN_MEMORY_PATH, TiFSQLite } from "./SQLite"
 import { LogHandler, LogLevel } from "TiFShared/logging"
+import { ExpoTiFFileSystem } from "@modules/tif-fs"
+
+const LOGS_DATABASE_INFO = ExpoTiFFileSystem?.logsDatabaseInfo()
+
+export const LOGS_SQLITE_PATH = LOGS_DATABASE_INFO?.path
+
+export const sqliteLogs = new TiFSQLite(
+  LOGS_DATABASE_INFO?.databaseName ?? SQLITE_IN_MEMORY_PATH,
+  Migrations.logs
+)
+
+/**
+ * Compiles the logs on this device for sending in emails.
+ */
+export const compileLogs = async () => {
+  if (!ExpoTiFFileSystem) {
+    throw new Error("The native module for ExpoTiFFileSystem must exist.")
+  }
+  if (!LOGS_SQLITE_PATH) {
+    throw new Error("Unable to find Logs Sqlite Path.")
+  }
+  await ExpoTiFFileSystem.zip(
+    LOGS_SQLITE_PATH,
+    ExpoTiFFileSystem.LOGS_ZIP_ARCHIVE_PATH
+  )
+  return ExpoTiFFileSystem.LOGS_ZIP_ARCHIVE_PATH
+}
 
 /**
  * A log handler which tracks info logs as sentry breadcrumbs.

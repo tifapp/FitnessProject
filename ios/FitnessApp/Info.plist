@@ -28,7 +28,7 @@
         <key>CFBundleURLSchemes</key>
         <array>
           <string>tifapp</string>
-          <string>com.tifapp.FitnessApp</string>
+          <string>com.tif.FitnessApp</string>
         </array>
       </dict>
       <dict>

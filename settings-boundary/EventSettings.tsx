@@ -15,10 +15,10 @@ import { repeatElements } from "TiFShared/lib/Array"
 import { useAtom } from "jotai"
 import { atomWithStorage } from "jotai/utils"
 import React from "react"
+import React, { useState } from "react"
 import {
   StyleProp,
   StyleSheet,
-  TouchableHighlight,
   TouchableOpacity,
   View,
   ViewStyle
@@ -29,6 +29,8 @@ import Animated, {
   ZoomIn,
   ZoomOut
 } from "react-native-reanimated"
+import Animated, { FadeInLeft, FadeOutLeft } from "react-native-reanimated"
+import { DurationPickerButton } from "./EventSettingsDurationPicker"
 import { SettingsNamedToggleView } from "./components/NamedToggle"
 import { SettingsNavigationLinkView } from "./components/NavigationLink"
 import { SettingsScrollView } from "./components/ScrollView"
@@ -99,6 +101,10 @@ export const SettingsDurationCard = ({
 }
 
 export const AddDurationCard = () => {
+  const { settings, update } = useUserSettings(
+    settingsSelector("eventPresetDurations")
+  )
+  const [timeInSeconds, setTimeInSeconds] = useState("")
   const fontScale = useFontScale()
 
   return (
@@ -108,12 +114,26 @@ export const AddDurationCard = () => {
       exiting={FadeOutLeft}
       layout={TiFDefaultLayoutTransition}
     >
-      <TouchableHighlight
+      <DurationPickerButton
         style={[styles.addButtonContainer, { height: 64 * fontScale }]}
+        timeInSeconds={timeInSeconds}
         underlayColor={AppStyles.colorOpacity35}
+        onAddPresetTapped={() => {
+          if (
+            !settings.eventPresetDurations.includes(parseInt(timeInSeconds))
+          ) {
+            update({
+              eventPresetDurations: [
+                ...settings.eventPresetDurations,
+                parseInt(timeInSeconds)
+              ]
+            })
+          }
+        }}
+        onChangeTime={setTimeInSeconds}
       >
         <Ionicon size={36} color={AppStyles.darkColor} name={"add"} />
-      </TouchableHighlight>
+      </DurationPickerButton>
     </Animated.View>
   )
 }
@@ -303,8 +323,9 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     borderStyle: "dashed",
-
+    paddingHorizontal: 32,
     borderColor: AppStyles.darkColor,
+    backgroundColor: AppStyles.eventCardColor,
     borderWidth: 2
   },
   presetRowsGridContainer: {
