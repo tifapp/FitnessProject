@@ -14,7 +14,6 @@ import { formatEventDurationPreset } from "TiFShared/domain-models/Settings"
 import { repeatElements } from "TiFShared/lib/Array"
 import { useAtom } from "jotai"
 import { atomWithStorage } from "jotai/utils"
-import React from "react"
 import React, { useState } from "react"
 import {
   StyleProp,
@@ -29,7 +28,7 @@ import Animated, {
   ZoomIn,
   ZoomOut
 } from "react-native-reanimated"
-import Animated, { FadeInLeft, FadeOutLeft } from "react-native-reanimated"
+
 import { DurationPickerButton } from "./EventSettingsDurationPicker"
 import { SettingsNamedToggleView } from "./components/NamedToggle"
 import { SettingsNavigationLinkView } from "./components/NavigationLink"

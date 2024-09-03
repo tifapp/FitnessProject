@@ -10,7 +10,6 @@ import { SQLiteUserSettingsStorage } from "@settings-storage/UserSettings"
 import { ComponentStory } from "@storybook/react-native"
 import React from "react"
 import { StyleSheet, View } from "react-native"
-import { Button, View } from "react-native"
 import { GestureHandlerRootView } from "react-native-gesture-handler"
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context"
 import {
@@ -46,11 +45,11 @@ export const Basic: SettingsStory = () => (
           <NavigationContainer>
             <Stack.Navigator
               screenOptions={{
-              ...BASE_HEADER_SCREEN_OPTIONS,
-              headerRight: () => {
-                return <DurationSettingsEditModeButton />
-              }
-            }}
+                ...BASE_HEADER_SCREEN_OPTIONS,
+                headerRight: () => {
+                  return <DurationSettingsEditModeButton />
+                }
+              }}
             >
               <Stack.Screen name="Durations" component={DurationScreenTest} />
             </Stack.Navigator>
