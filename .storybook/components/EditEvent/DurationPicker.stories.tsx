@@ -1,6 +1,6 @@
 import React, { useState } from "react"
 import { Button, View } from "react-native"
-import { EditEventDurationPickerView } from "@edit-event/DurationPicker"
+import { EditEventDurationPickerView } from "@edit-event-boundary/DurationPicker"
 import { GestureHandlerRootView } from "react-native-gesture-handler"
 import { Provider, atom } from "jotai"
 
