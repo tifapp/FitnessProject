@@ -6,16 +6,16 @@ import {
   TextFieldRef
 } from "@components/TextFields"
 import { CircularIonicon, Ionicon, IoniconName } from "@components/common/Icons"
-import { useFontScale } from "@lib/Fonts"
 import { AppStyles } from "@lib/AppColorStyle"
-import { EmailPhoneTextErrorReason, EmailPhoneTextType } from "./EmailPhoneText"
+import { useFontScale } from "@lib/Fonts"
+import React, { forwardRef } from "react"
 import {
   StyleProp,
-  ViewStyle,
   StyleSheet,
-  TouchableOpacity
+  TouchableOpacity,
+  ViewStyle
 } from "react-native"
-import React, { forwardRef } from "react"
+import { EmailPhoneTextErrorReason, EmailPhoneTextType } from "./EmailPhoneText"
 
 export type AuthShadedTextFieldProps = {
   iconName: IoniconName
@@ -36,6 +36,7 @@ export const AuthShadedTextField = forwardRef(function TextField(
       ref={ref}
       leftAddon={
         <CircularIonicon
+          size={24}
           backgroundColor={iconBackgroundColor}
           name={iconName}
           accessibilityElementsHidden
@@ -72,6 +73,7 @@ export const AuthShadedPasswordTextField = forwardRef(function TextField(
       ref={ref}
       leftAddon={
         <CircularIonicon
+          size={24}
           backgroundColor={iconBackgroundColor}
           name={iconName}
           accessibilityElementsHidden

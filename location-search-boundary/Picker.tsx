@@ -1,9 +1,10 @@
 import { Headline } from "@components/Text"
 import { CircularIonicon } from "@components/common/Icons"
-import { useUserCoordinatesQuery } from "@location/UserLocation"
 import { AppStyles } from "@lib/AppColorStyle"
 import { NamedLocation } from "@location/NamedLocation"
+import { useUserCoordinatesQuery } from "@location/UserLocation"
 import { UseQueryResult, useQuery } from "@tanstack/react-query"
+import { LocationCoordinate2D } from "TiFShared/domain-models/LocationCoordinate2D"
 import { LocationAccuracy, LocationObject } from "expo-location"
 import React from "react"
 import {
@@ -13,15 +14,14 @@ import {
   ViewStyle
 } from "react-native"
 import Animated, { FadeIn } from "react-native-reanimated"
+import { LocationSearchLoadingResult } from "./LoadingResult"
+import { LocationSearchResult, LocationsSearchQueryText } from "./SearchClient"
 import {
   LocationSearchResultProps,
   LocationSearchResultView
 } from "./SearchResultView"
 import { LocationSearchResultsListView } from "./SearchResultsList"
 import { useLocationsSearchQueryTextObject } from "./state"
-import { LocationCoordinate2D } from "TiFShared/domain-models/LocationCoordinate2D"
-import { LocationSearchLoadingResult } from "./LoadingResult"
-import { LocationSearchResult, LocationsSearchQueryText } from "./SearchClient"
 
 export type UseLocationSearchPickerEnvironment = {
   loadSearchResults: (
@@ -135,6 +135,7 @@ export const LocationSearchPicker = ({
               style={styles.userCoordinatesOption}
             >
               <CircularIonicon
+                size={24}
                 backgroundColor={AppStyles.linkColor}
                 name="navigate"
                 accessible={false}
