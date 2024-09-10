@@ -59,8 +59,15 @@ import TextFieldMeta, {
 import VerifcationCodeMeta, {
   Basic as VerifcationCodeBasic
 } from "../components/VerificationCode/VerifyCode.stories"
+import { addLogHandler, consoleLogHandler } from "TiFShared/logging"
+import { sqliteLogHandler, sqliteLogs } from "@lib/Logging"
+import { dayjs } from "TiFShared/lib/Dayjs"
 
 setupCognito(new InMemorySecureStore())
+addLogHandler(consoleLogHandler())
+addLogHandler(
+  sqliteLogHandler(sqliteLogs, dayjs.duration(2, "weeks").asSeconds())
+)
 
 // Create an array of stories
 const stories = [

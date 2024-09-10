@@ -10,7 +10,9 @@ import { Geo } from "@aws-amplify/geo"
 import { ExpoEventArrivalsGeofencer } from "@arrival-tracking/geofencing"
 import {
   sentryBreadcrumbLogHandler,
-  sentryErrorCapturingLogHandler
+  sentryErrorCapturingLogHandler,
+  sqliteLogHandler,
+  sqliteLogs
 } from "@lib/Logging"
 import {
   TiFQueryClientProvider,
@@ -27,6 +29,7 @@ import { registerForPushNotifications } from "./notifications"
 import awsconfig from "./src/aws-exports"
 import { NetInfoInternetConnectionStatus } from "@lib/InternetConnection"
 import { consoleLogHandler, logger, addLogHandler } from "TiFShared/logging"
+import { dayjs } from "TiFShared/lib/Dayjs"
 
 const log = logger("app.root")
 
@@ -39,6 +42,9 @@ export const setupApp = () => {
   addLogHandler(consoleLogHandler())
   addLogHandler(sentryBreadcrumbLogHandler())
   addLogHandler(sentryErrorCapturingLogHandler())
+  addLogHandler(
+    sqliteLogHandler(sqliteLogs, dayjs.duration(2, "weeks").asSeconds())
+  )
   log.info("App launched", { date: new Date() })
   setupCognito()
   Geo.configure(awsconfig)

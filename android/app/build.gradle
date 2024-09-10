@@ -85,9 +85,9 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace 'com.tifapp.FitnessApp'
+    namespace 'com.tif.FitnessApp'
     defaultConfig {
-        applicationId 'com.tifapp.FitnessApp'
+        applicationId 'com.tif.FitnessApp'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
