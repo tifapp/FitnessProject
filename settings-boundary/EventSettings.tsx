@@ -103,7 +103,7 @@ export const AddDurationCard = () => {
   const { settings, update } = useUserSettings(
     settingsSelector("eventPresetDurations")
   )
-  const [timeInSeconds, setTimeInSeconds] = useState("")
+  const [timeInSeconds, setTimeInSeconds] = useState(0)
   const fontScale = useFontScale()
 
   return (
@@ -115,21 +115,19 @@ export const AddDurationCard = () => {
     >
       <DurationPickerButton
         style={[styles.addButtonContainer, { height: 64 * fontScale }]}
-        timeInSeconds={timeInSeconds}
+        duration={timeInSeconds}
         underlayColor={AppStyles.colorOpacity35}
         onAddPresetTapped={() => {
-          if (
-            !settings.eventPresetDurations.includes(parseInt(timeInSeconds))
-          ) {
+          if (!settings.eventPresetDurations.includes(timeInSeconds)) {
             update({
               eventPresetDurations: [
                 ...settings.eventPresetDurations,
-                parseInt(timeInSeconds)
+                timeInSeconds
               ]
             })
           }
         }}
-        onChangeTime={setTimeInSeconds}
+        onDurationChange={setTimeInSeconds}
       >
         <Ionicon size={36} color={AppStyles.darkColor} name={"add"} />
       </DurationPickerButton>

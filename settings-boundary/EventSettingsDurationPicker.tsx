@@ -1,8 +1,7 @@
 import { PrimaryButton } from "@components/Buttons"
 import { IoniconCloseButton } from "@components/common/Icons"
-import { Headline } from "@components/Text"
-import { TextField } from "@components/TextFields"
 import { BottomSheetBackdrop, BottomSheetModal } from "@gorhom/bottom-sheet"
+import { TimePickerView } from "@modules/event-settings-wheel-duration-picker"
 import { ReactNode, useMemo, useRef, useState } from "react"
 import {
   LayoutRectangle,
@@ -16,9 +15,9 @@ import { useSharedValue } from "react-native-reanimated"
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context"
 
 export type DurationPickerProps = {
-  onAddPresetTapped: (timeInSeconds: number) => void
-  timeInSeconds: string
-  onChangeTime: (newTime: string) => void
+  onAddPresetTapped: (duration: number) => void
+  duration: number
+  onDurationChange: (newTime: number) => void
   style?: StyleProp<ViewStyle>
 }
 
@@ -27,22 +26,22 @@ export type DurationPickerProps = {
  */
 export const DurationPickerView = ({
   onAddPresetTapped,
-  timeInSeconds,
-  onChangeTime,
+  duration,
+  onDurationChange,
   style
 }: DurationPickerProps) => {
   return (
     <View style={style}>
       <View style={styles.pickerContainer}>
-        <Headline>Time (in seconds)</Headline>
-        <TextField
-          value={timeInSeconds}
-          onChangeText={onChangeTime}
-          placeholder="600"
-          style={{ padding: 8 }}
+        <TimePickerView
+          initialDuration={6000}
+          onDurationChange={(event) =>
+            onDurationChange(event.nativeEvent.duration)
+          }
+          style={{ width: "100%", height: 400 }}
         />
         <PrimaryButton
-          onPress={() => onAddPresetTapped(parseInt(timeInSeconds))}
+          onPress={() => onAddPresetTapped(duration)}
           style={styles.pickerButton}
         >
           Save Duration
@@ -67,8 +66,8 @@ export type DurationPickerButtonProps<Children extends ReactNode> = Omit<
 export const DurationPickerButton = <Children extends ReactNode>({
   pickerStyle,
   onAddPresetTapped,
-  timeInSeconds,
-  onChangeTime,
+  duration,
+  onDurationChange,
   ...props
 }: DurationPickerButtonProps<Children>) => {
   const sheetRef = useRef<BottomSheetModal>(null)
@@ -84,6 +83,7 @@ export const DurationPickerButton = <Children extends ReactNode>({
       <PrimaryButton {...props} onPress={() => sheetRef.current?.present()} />
       <BottomSheetModal
         ref={sheetRef}
+        enableContentPanningGesture={false}
         snapPoints={useMemo(() => [sheetHeight ?? "50%"], [sheetHeight])}
         handleStyle={styles.bottomSheetHandle}
         keyboardBehavior="interactive"
@@ -114,12 +114,26 @@ export const DurationPickerButton = <Children extends ReactNode>({
               onPress={() => sheetRef.current?.dismiss()}
             />
           </View>
-          <DurationPickerView
-            onAddPresetTapped={onAddPresetTapped}
-            timeInSeconds={timeInSeconds}
-            onChangeTime={onChangeTime}
-            style={[styles.durationPickerSheetStyle, pickerStyle]}
-          />
+          <View style={[styles.durationPickerSheetStyle, pickerStyle]}>
+            <View style={styles.pickerContainer}>
+              <TimePickerView
+                initialDuration={6000}
+                onDurationChange={(event) =>
+                  onDurationChange(event.nativeEvent.duration)
+                }
+                style={{ width: "100%", height: 400 }}
+              />
+              <PrimaryButton
+                onPress={() => {
+                  sheetRef.current?.dismiss()
+                  onAddPresetTapped(duration)
+                }}
+                style={styles.pickerButton}
+              >
+                Save Duration
+              </PrimaryButton>
+            </View>
+          </View>
         </SafeAreaView>
       </BottomSheetModal>
     </>

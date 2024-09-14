@@ -9,9 +9,9 @@ import { settingsSelector } from "@settings-storage/Settings"
 import { SQLiteUserSettingsStorage } from "@settings-storage/UserSettings"
 import { ComponentStory } from "@storybook/react-native"
 import React from "react"
-import { StyleSheet, View } from "react-native"
+import { SafeAreaView, StyleSheet, View } from "react-native"
 import { GestureHandlerRootView } from "react-native-gesture-handler"
-import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context"
+import { SafeAreaProvider } from "react-native-safe-area-context"
 import {
   DurationSettingsEditModeButton,
   EventDurationView
@@ -80,6 +80,11 @@ const DurationScreenTest = () => {
           update({ eventPresetDurations: [600, 1200, 1800, 2400, 4800, 7200] })
         }
       />
+      {/* <TimePickerView
+        initialDuration={0}
+        onDurationChange={() => console.log("Blah")}
+        style={{ width: "100%", height: 400 }}
+      /> */}
       <EventDurationView />
     </SafeAreaView>
   )
