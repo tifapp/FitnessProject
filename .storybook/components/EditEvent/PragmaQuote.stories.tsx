@@ -6,6 +6,25 @@ import {
   createEventQuote
 } from "@edit-event-boundary/PragmaQuotes"
 import { Provider, atom } from "jotai"
+import { EditEventView } from "@edit-event-boundary/EditEvent"
+import { DEFAULT_EDIT_EVENT_FORM_VALUES } from "@edit-event-boundary/FormValues"
+import { SafeAreaProvider } from "react-native-safe-area-context"
+import { SQLiteLocalSettingsStorage } from "@settings-storage/LocalSettings"
+import { PersistentSettingsStores } from "@settings-storage/PersistentStores"
+import { SQLiteUserSettingsStorage } from "@settings-storage/UserSettings"
+import { testSQLite } from "@test-helpers/SQLite"
+import { SettingsProvider } from "@settings-storage/Hooks"
+import {
+  NavigationContainer,
+  NavigationProp,
+  ParamListBase,
+  useNavigation
+} from "@react-navigation/native"
+import { createStackNavigator } from "@react-navigation/stack"
+import {
+  BASE_HEADER_SCREEN_OPTIONS,
+  XMarkBackButton
+} from "@components/Navigation"
 
 const EditEventPragmaQuotesMeta = {
   title: "Edit Event Pragma Quotes"
@@ -13,12 +32,62 @@ const EditEventPragmaQuotesMeta = {
 
 export default EditEventPragmaQuotesMeta
 
+const localStore = PersistentSettingsStores.local(
+  new SQLiteLocalSettingsStorage(testSQLite)
+)
+
+const userStore = PersistentSettingsStores.user(
+  new SQLiteUserSettingsStorage(testSQLite)
+)
+
+const Stack = createStackNavigator()
+
 export const Basic = () => {
   return (
     <GestureHandlerRootView>
-      <View style={{ marginTop: 256, paddingHorizontal: 24, rowGap: 24 }}>
-        <PragmaQuoteView quote={createEventQuote} animationInterval={5} />
-      </View>
+      <SafeAreaProvider>
+        <NavigationContainer>
+          <Stack.Navigator screenOptions={{ ...BASE_HEADER_SCREEN_OPTIONS }}>
+            <Stack.Screen name="Settings" component={TestScreen} />
+            <Stack.Group screenOptions={{ presentation: "modal" }}>
+              <Stack.Screen
+                name="editEvent"
+                options={{ headerTitle: "", headerLeft: XMarkBackButton }}
+                component={EditEventScreen}
+              />
+            </Stack.Group>
+          </Stack.Navigator>
+        </NavigationContainer>
+      </SafeAreaProvider>
     </GestureHandlerRootView>
+  )
+}
+
+const TestScreen = () => {
+  const navigation: NavigationProp<ParamListBase> = useNavigation()
+  return (
+    <Button
+      title="Edit Event"
+      onPress={() => navigation.navigate("editEvent")}
+    />
+  )
+}
+
+const date = new Date("2024-10-30T00:00:00")
+
+const EditEventScreen = () => {
+  return (
+    <View style={{ height: "100%" }}>
+      <SettingsProvider
+        userSettingsStore={userStore}
+        localSettingsStore={localStore}
+      >
+        <EditEventView
+          initialValues={DEFAULT_EDIT_EVENT_FORM_VALUES}
+          currentDate={new Date("2024-10-31T00:00:00")}
+          style={{ height: "100%" }}
+        />
+      </SettingsProvider>
+    </View>
   )
 }

@@ -12,6 +12,7 @@ type BaseSettingsNavigationLinkProps = {
   onTapped: () => void
   isDisabled?: boolean
   rightAccessory?: ReactNode
+  chevronStyle?: StyleProp<ViewStyle>
   style?: StyleProp<ViewStyle>
 }
 
@@ -35,6 +36,7 @@ export const SettingsNavigationLinkView = ({
   onTapped,
   isDisabled,
   rightAccessory,
+  chevronStyle = styles.chevron,
   style
 }: SettingsNavigationLinkProps) => (
   <SettingsButton onTapped={onTapped} isDisabled={isDisabled} style={style}>
@@ -43,17 +45,18 @@ export const SettingsNavigationLinkView = ({
         iconName={iconName}
         iconBackgroundColor={iconBackgroundColor}
         name={title}
+        description={description}
       >
         <View style={styles.accessoryRow}>
           {rightAccessory}
-          <Ionicon name="chevron-forward" style={styles.chevron} />
+          <Ionicon name="chevron-forward" style={chevronStyle} />
         </View>
       </SettingsNamedIconRowView>
     ) : (
       <SettingsRowItemView title={title} description={description}>
         <View style={styles.accessoryRow}>
           {rightAccessory}
-          <Ionicon name="chevron-forward" style={styles.chevron} />
+          <Ionicon name="chevron-forward" style={chevronStyle} />
         </View>
       </SettingsRowItemView>
     )}

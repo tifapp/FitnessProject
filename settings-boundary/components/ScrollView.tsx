@@ -1,6 +1,6 @@
 import { ReactNode } from "react"
 import { StyleProp, ViewStyle, StyleSheet } from "react-native"
-import Animated from "react-native-reanimated"
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
 
 export type SettingsScrollViewProps = {
   children: ReactNode
@@ -11,12 +11,12 @@ export const SettingsScrollView = ({
   children,
   style
 }: SettingsScrollViewProps) => (
-  <Animated.ScrollView
+  <KeyboardAwareScrollView
     style={[style, styles.scroll]}
     contentContainerStyle={styles.contentContainer}
   >
     {children}
-  </Animated.ScrollView>
+  </KeyboardAwareScrollView>
 )
 
 const styles = StyleSheet.create({

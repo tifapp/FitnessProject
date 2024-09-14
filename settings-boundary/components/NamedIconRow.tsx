@@ -1,12 +1,13 @@
-import { Headline } from "@components/Text"
 import { CircularIonicon, IoniconName } from "@components/common/Icons"
 import { ColorString } from "TiFShared/domain-models/ColorString"
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
+import { SettingsLabelView } from "./Label"
 
 export type SettingsNamedIconRowProps = {
   iconName: IoniconName
   iconBackgroundColor: ColorString
   name: string
+  description?: string
   children: JSX.Element
   style?: StyleProp<ViewStyle>
 }
@@ -15,6 +16,7 @@ export const SettingsNamedIconRowView = ({
   iconName,
   iconBackgroundColor,
   name,
+  description,
   children,
   style
 }: SettingsNamedIconRowProps) => (
@@ -25,7 +27,11 @@ export const SettingsNamedIconRowView = ({
         name={iconName}
         backgroundColor={iconBackgroundColor.toString()}
       />
-      <Headline style={styles.name}>{name}</Headline>
+      <SettingsLabelView
+        title={name}
+        description={description}
+        style={styles.name}
+      />
       {children}
     </View>
   </View>

@@ -135,7 +135,7 @@ export type CircularIoniconProps = {
   backgroundColor: string
   name: IoniconName
   style?: StyleProp<ViewStyle>
-  size: number
+  size?: number
 } & Omit<IconProps<IoniconName>, "size">
 
 /**

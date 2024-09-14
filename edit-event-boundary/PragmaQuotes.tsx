@@ -1,4 +1,5 @@
-import { Headline, Subtitle } from "@components/Text"
+import { Subtitle } from "@components/Text"
+import { AppStyles } from "@lib/AppColorStyle"
 import { dayjs } from "TiFShared/lib/Dayjs"
 import { Image } from "expo-image"
 import { useEffect, useState } from "react"
@@ -29,12 +30,14 @@ export const PragmaQuoteView = ({
   return (
     <View style={style}>
       <View style={styles.row}>
-        <Image
-          source={
-            "https://static.wikia.nocookie.net/xenoblade/images/c/cd/XC3FR_Alpha_portrait.png/revision/latest?cb=20230419030915"
-          }
-          style={styles.pragmaImage}
-        />
+        <View style={styles.pragmaContainer}>
+          <Image
+            source={
+              "https://static.wikia.nocookie.net/xenoblade/images/c/cd/XC3FR_Alpha_portrait.png/revision/latest?cb=20230419030915"
+            }
+            style={styles.pragmaImage}
+          />
+        </View>
         <Subtitle style={styles.quote}>{text}</Subtitle>
       </View>
     </View>
@@ -46,11 +49,16 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "row",
     alignItems: "flex-start",
-    columnGap: 8
+    columnGap: 16
+  },
+  pragmaContainer: {
+    borderRadius: 12,
+    backgroundColor: AppStyles.eventCardColor,
+    padding: 8
   },
   pragmaImage: {
-    width: 64,
-    height: 64
+    width: 48,
+    height: 48
   },
   quote: {
     flex: 1

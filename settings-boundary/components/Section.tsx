@@ -20,6 +20,7 @@ export const useCurrentSettingsSection = () => {
 export type SettingsSectionProps = {
   title?: string
   subtitle?: ReactNode
+  rightAddon?: JSX.Element
   isDisabled?: boolean
   children?: ReactNode
   style?: StyleProp<ViewStyle>
@@ -28,6 +29,7 @@ export type SettingsSectionProps = {
 export const SettingsSectionView = ({
   title,
   subtitle,
+  rightAddon,
   isDisabled = false,
   children,
   style
@@ -41,7 +43,12 @@ export const SettingsSectionView = ({
       <View style={style}>
         <View style={[styles.container, { opacity: isDisabled ? 0.5 : 1 }]}>
           <View style={styles.textContainer}>
-            {title && <Subtitle>{title}</Subtitle>}
+            {title && (
+              <View style={styles.titleRow}>
+                <Subtitle>{title}</Subtitle>
+                {rightAddon}
+              </View>
+            )}
             {subtitle && typeof subtitle === "string" && (
               <BodyText style={styles.subtitle}>{subtitle}</BodyText>
             )}
@@ -71,6 +78,12 @@ const styles = StyleSheet.create({
   },
   textContainer: {
     rowGap: 4
+  },
+  titleRow: {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between"
   },
   subtitle: {
     opacity: 0.5

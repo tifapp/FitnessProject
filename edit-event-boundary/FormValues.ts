@@ -28,7 +28,7 @@ export const DEFAULT_EDIT_EVENT_FORM_VALUES = {
   shouldHideAfterStartDate: false
 } as const
 
-const editEventFormValuesAtom = atom<EditEventFormValues>(
+export const editEventFormValuesAtom = atom<EditEventFormValues>(
   DEFAULT_EDIT_EVENT_FORM_VALUES
 )
 
