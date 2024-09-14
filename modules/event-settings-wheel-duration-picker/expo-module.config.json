@@ -4,6 +4,6 @@
     "modules": ["EventSettingsWheelDurationPickerModule"]
   },
   "android": {
-    "modules": ["expo.modules.eventsettingswheeldurationpicker.EventSettingsWheelDurationPickerModule"]
+    "modules": ["expo.modules.timepicker.TimePickerModule"]
   }
 }

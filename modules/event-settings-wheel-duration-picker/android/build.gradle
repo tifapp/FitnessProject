@@ -1,6 +1,6 @@
 apply plugin: 'com.android.library'
 
-group = 'expo.modules.eventsettingswheeldurationpicker'
+group = 'expo.modules.timepicker'
 version = '0.6.0'
 
 def expoModulesCorePlugin = new File(project(":expo-modules-core").projectDir.absolutePath, "ExpoModulesCorePlugin.gradle")
@@ -33,7 +33,15 @@ if (useManagedAndroidSdkVersions) {
 }
 
 android {
-  namespace "expo.modules.eventsettingswheeldurationpicker"
+  namespace "expo.modules.timepicker"
+  buildFeatures {
+    compose true
+  }
+  // Kotlin compiler version must be tied to Kotlin version
+  // according: https://developer.android.com/jetpack/androidx/releases/compose-kotlin
+  composeOptions {
+    kotlinCompilerExtensionVersion = "1.5.10"
+  }
   defaultConfig {
     versionCode 1
     versionName "0.6.0"
@@ -41,4 +49,18 @@ android {
   lintOptions {
     abortOnError false
   }
+}
+
+dependencies {
+  // Importing Jetpack Compose
+  implementation(platform("androidx.compose:compose-bom:2024.09.00"))
+  // and ui library
+  implementation("androidx.compose.material3:material3")
+  // and WheelPickerCompose
+  implementation('com.github.commandiron:WheelPickerCompose:1.1.11')
+  // and ViewModel
+  implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.0")
+  // OPTIONAL - Android Studio Preview support
+  implementation("androidx.compose.ui:ui-tooling-preview")
+  debugImplementation("androidx.compose.ui:ui-tooling")
 }
