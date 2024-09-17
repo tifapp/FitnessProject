@@ -10,7 +10,7 @@ import {
   StyleSheet
 } from "react-native"
 
-export type SettingsPreviewableOptionProps = {
+export type TiFFormPreviewableOptionProps = {
   name: string
   NameComponent?: (props: TextProps) => JSX.Element
   previewStyle?: StyleProp<ViewStyle>
@@ -24,7 +24,7 @@ const DefaultPreviewOptionName = (props: TextProps) => (
   <CaptionTitle {...props} />
 )
 
-export const SettingsPreviewableOptionView = ({
+export const TiFFormPreviewableOptionView = ({
   name,
   NameComponent = DefaultPreviewOptionName,
   previewStyle,
@@ -32,7 +32,7 @@ export const SettingsPreviewableOptionView = ({
   onSelected,
   children,
   style
-}: SettingsPreviewableOptionProps) => (
+}: TiFFormPreviewableOptionProps) => (
   <View style={style}>
     <Pressable onPress={onSelected} style={styles.previewOptionContainer}>
       <View

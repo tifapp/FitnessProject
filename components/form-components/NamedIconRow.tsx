@@ -1,23 +1,25 @@
-import { Headline } from "@components/Text"
 import { CircularIonicon, IoniconName } from "@components/common/Icons"
 import { ColorString } from "TiFShared/domain-models/ColorString"
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
+import { TiFFormLabelView } from "./Label"
 
-export type SettingsNamedIconRowProps = {
+export type TiFFormNamedIconRowProps = {
   iconName: IoniconName
   iconBackgroundColor: ColorString
   name: string
+  description?: string
   children: JSX.Element
   style?: StyleProp<ViewStyle>
 }
 
-export const SettingsNamedIconRowView = ({
+export const TiFFormNamedIconRowView = ({
   iconName,
   iconBackgroundColor,
   name,
+  description,
   children,
   style
-}: SettingsNamedIconRowProps) => (
+}: TiFFormNamedIconRowProps) => (
   <View style={style}>
     <View style={styles.container}>
       <CircularIonicon
@@ -25,7 +27,11 @@ export const SettingsNamedIconRowView = ({
         name={iconName}
         backgroundColor={iconBackgroundColor.toString()}
       />
-      <Headline style={styles.name}>{name}</Headline>
+      <TiFFormLabelView
+        title={name}
+        description={description}
+        style={styles.name}
+      />
       {children}
     </View>
   </View>

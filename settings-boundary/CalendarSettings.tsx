@@ -1,20 +1,20 @@
 import { StyleProp, ViewStyle } from "react-native"
-import { SettingsScrollView } from "./components/ScrollView"
-import { SettingsCardSectionView } from "./components/Section"
+import { TiFFormScrollView } from "@components/form-components/ScrollView"
+import { TiFFormCardSectionView } from "@components/form-components/Section"
 import { settingsSelector } from "@settings-storage/Settings"
 import { useUserSettings } from "@settings-storage/Hooks"
-import { SettingsMenuPickerView } from "./components/MenuPicker"
+import { TiFFormMenuPickerView } from "@components/form-components/MenuPicker"
 import { EventCalendarWeekdayID } from "TiFShared/domain-models/Settings"
-import { SettingsRowItemView } from "./components/RowItem"
+import { TiFFormRowItemView } from "@components/form-components/RowItem"
 
 export type CalendarSettingsProps = {
   style?: StyleProp<ViewStyle>
 }
 
 export const CalendarSettingsView = ({ style }: CalendarSettingsProps) => (
-  <SettingsScrollView style={style}>
+  <TiFFormScrollView style={style}>
     <WeekdayPickerSection />
-  </SettingsScrollView>
+  </TiFFormScrollView>
 )
 
 const WeekdayPickerSection = () => {
@@ -22,17 +22,17 @@ const WeekdayPickerSection = () => {
     settingsSelector("eventCalendarStartOfWeekDay")
   )
   return (
-    <SettingsCardSectionView>
-      <SettingsRowItemView title="Start Week On">
-        <SettingsMenuPickerView
+    <TiFFormCardSectionView>
+      <TiFFormRowItemView title="Start Week On">
+        <TiFFormMenuPickerView
           options={WEEKDAY_PICKER_OPTIONS}
           selectedOption={settings.eventCalendarStartOfWeekDay}
           onOptionSelected={(eventCalendarStartOfWeekDay) => {
             update({ eventCalendarStartOfWeekDay })
           }}
         />
-      </SettingsRowItemView>
-    </SettingsCardSectionView>
+      </TiFFormRowItemView>
+    </TiFFormCardSectionView>
   )
 }
 

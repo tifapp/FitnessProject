@@ -8,12 +8,12 @@ import {
   AlertButton,
   StyleSheet
 } from "react-native"
-import { SettingsScrollView } from "./components/ScrollView"
-import { SettingsCardSectionView } from "./components/Section"
+import { TiFFormScrollView } from "@components/form-components/ScrollView"
+import { TiFFormCardSectionView } from "@components/form-components/Section"
 import { BodyText, Headline } from "@components/Text"
-import { SettingsNavigationLinkView } from "./components/NavigationLink"
+import { TiFFormNavigationLinkView } from "@components/form-components/NavigationLink"
 import { AppStyles } from "@lib/AppColorStyle"
-import { SettingsButton } from "./components/Button"
+import { TiFFormRowButton } from "@components/form-components/Button"
 
 export const ALERTS = {
   signOutConfirmation: {
@@ -83,7 +83,7 @@ export const AccountInfoSettingsView = ({
   onForgotPasswordTapped,
   style
 }: AccountInfoSettingsProps) => (
-  <SettingsScrollView style={style}>
+  <TiFFormScrollView style={style}>
     <ContactInfoSectionView
       isDisabled={state.shouldDisableActions}
       userContactInfo={userContactInfo}
@@ -99,7 +99,7 @@ export const AccountInfoSettingsView = ({
       onSignOutTapped={state.signOutStarted}
       onDeleteAccountTapped={() => console.log("TODO: - Delete Account")}
     />
-  </SettingsScrollView>
+  </TiFFormScrollView>
 )
 
 type ContactInfoSectionProps = {
@@ -114,7 +114,7 @@ const ContactInfoSectionView = ({
   userContactInfo
 }: ContactInfoSectionProps) => (
   <>
-    <SettingsCardSectionView
+    <TiFFormCardSectionView
       title="Contact Info"
       subtitle="Your contact information is only shared with people you explicitly select."
     >
@@ -122,16 +122,16 @@ const ContactInfoSectionView = ({
         <Headline>{userContactInfo.formattedContactInfoType}</Headline>
         <BodyText>{userContactInfo.prettyFormatted}</BodyText>
       </View>
-    </SettingsCardSectionView>
-    <SettingsCardSectionView>
-      <SettingsNavigationLinkView
+    </TiFFormCardSectionView>
+    <TiFFormCardSectionView>
+      <TiFFormNavigationLinkView
         title={`Change ${userContactInfo.formattedContactInfoType}`}
         iconName={userContactInfo.contactInfoTypeIconName}
         iconBackgroundColor={AppStyles.black}
         isDisabled={isDisabled}
         onTapped={onChangeContactInfoTapped}
       />
-    </SettingsCardSectionView>
+    </TiFFormCardSectionView>
   </>
 )
 
@@ -146,22 +146,22 @@ const PasswordSectionView = ({
   onChangePasswordTapped,
   onForgotPasswordTapped
 }: PasswordSectionProps) => (
-  <SettingsCardSectionView title="Password">
-    <SettingsNavigationLinkView
+  <TiFFormCardSectionView title="Password">
+    <TiFFormNavigationLinkView
       title="Change Password"
       iconName="lock-closed"
       iconBackgroundColor={AppStyles.black}
       isDisabled={isDisabled}
       onTapped={onChangePasswordTapped}
     />
-    <SettingsNavigationLinkView
+    <TiFFormNavigationLinkView
       title="Forgot Password"
       iconName="bulb"
       iconBackgroundColor={AppStyles.black}
       isDisabled={isDisabled}
       onTapped={onForgotPasswordTapped}
     />
-  </SettingsCardSectionView>
+  </TiFFormCardSectionView>
 )
 
 type DestructiveSectionProps = {
@@ -175,14 +175,14 @@ const DestructiveSectionView = ({
   onSignOutTapped,
   onDeleteAccountTapped
 }: DestructiveSectionProps) => (
-  <SettingsCardSectionView>
-    <SettingsButton onTapped={onSignOutTapped} isDisabled={isDisabled}>
+  <TiFFormCardSectionView>
+    <TiFFormRowButton onTapped={onSignOutTapped} isDisabled={isDisabled}>
       <Headline style={styles.destructiveButton}>Sign Out</Headline>
-    </SettingsButton>
-    <SettingsButton onTapped={onDeleteAccountTapped} isDisabled={isDisabled}>
+    </TiFFormRowButton>
+    <TiFFormRowButton onTapped={onDeleteAccountTapped} isDisabled={isDisabled}>
       <Headline style={styles.destructiveButton}>Delete Account</Headline>
-    </SettingsButton>
-  </SettingsCardSectionView>
+    </TiFFormRowButton>
+  </TiFFormCardSectionView>
 )
 
 const styles = StyleSheet.create({
