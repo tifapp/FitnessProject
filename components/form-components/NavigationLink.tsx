@@ -2,11 +2,11 @@ import { Ionicon, IoniconName } from "@components/common/Icons"
 import { ColorString } from "TiFShared/domain-models/ColorString"
 import { ReactNode } from "react"
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
-import { SettingsButton } from "./Button"
-import { SettingsNamedIconRowView } from "./NamedIconRow"
-import { SettingsRowItemView } from "./RowItem"
+import { TiFFormRowButton } from "./Button"
+import { TiFFormNamedIconRowView } from "./NamedIconRow"
+import { TiFFormRowItemView } from "./RowItem"
 
-type BaseSettingsNavigationLinkProps = {
+type BaseTiFFormNavigationLinkProps = {
   title: string
   description?: string
   onTapped: () => void
@@ -16,7 +16,7 @@ type BaseSettingsNavigationLinkProps = {
   style?: StyleProp<ViewStyle>
 }
 
-export type SettingsNavigationLinkProps = BaseSettingsNavigationLinkProps &
+export type TiFFormNavigationLinkProps = BaseTiFFormNavigationLinkProps &
   (
     | {
         iconName: IoniconName
@@ -28,7 +28,7 @@ export type SettingsNavigationLinkProps = BaseSettingsNavigationLinkProps &
       }
   )
 
-export const SettingsNavigationLinkView = ({
+export const TiFFormNavigationLinkView = ({
   title,
   description,
   iconName,
@@ -38,10 +38,10 @@ export const SettingsNavigationLinkView = ({
   rightAccessory,
   chevronStyle = styles.chevron,
   style
-}: SettingsNavigationLinkProps) => (
-  <SettingsButton onTapped={onTapped} isDisabled={isDisabled} style={style}>
+}: TiFFormNavigationLinkProps) => (
+  <TiFFormRowButton onTapped={onTapped} isDisabled={isDisabled} style={style}>
     {iconName ? (
-      <SettingsNamedIconRowView
+      <TiFFormNamedIconRowView
         iconName={iconName}
         iconBackgroundColor={iconBackgroundColor}
         name={title}
@@ -51,16 +51,16 @@ export const SettingsNavigationLinkView = ({
           {rightAccessory}
           <Ionicon name="chevron-forward" style={chevronStyle} />
         </View>
-      </SettingsNamedIconRowView>
+      </TiFFormNamedIconRowView>
     ) : (
-      <SettingsRowItemView title={title} description={description}>
+      <TiFFormRowItemView title={title} description={description}>
         <View style={styles.accessoryRow}>
           {rightAccessory}
           <Ionicon name="chevron-forward" style={chevronStyle} />
         </View>
-      </SettingsRowItemView>
+      </TiFFormRowItemView>
     )}
-  </SettingsButton>
+  </TiFFormRowButton>
 )
 
 const styles = StyleSheet.create({

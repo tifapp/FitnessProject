@@ -1,9 +1,9 @@
 import { PrimaryButton } from "@components/Buttons"
 import { BodyText, Headline } from "@components/Text"
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
-import { SettingsCardView } from "./components/Card"
-import { SettingsScrollView } from "./components/ScrollView"
-import { SettingsSectionView } from "./components/Section"
+import { TiFFormCardView } from "@components/form-components/Card"
+import { TiFFormScrollView } from "@components/form-components/ScrollView"
+import { TiFFormSectionView } from "@components/form-components/Section"
 
 import { useUserSettings } from "@settings-storage/Hooks"
 import { settingsSelector } from "@settings-storage/Settings"
@@ -14,7 +14,7 @@ import {
 
 import { SettingsPermission } from "./Permissions"
 
-import { SettingsNamedToggleView } from "./components/NamedToggle"
+import { TiFFormNamedToggleView } from "@components/form-components/NamedToggle"
 
 export type NotificationSettingsProps = {
   notificationPermission: SettingsPermission
@@ -25,7 +25,7 @@ export const NotificationSettingsView = ({
   notificationPermission,
   style
 }: NotificationSettingsProps) => (
-  <SettingsScrollView style={style}>
+  <TiFFormScrollView style={style}>
     {!notificationPermission.isGranted && (
       <PermissionsDisabledSectionView
         onPermissionsRequested={notificationPermission.onToggled}
@@ -35,7 +35,7 @@ export const NotificationSettingsView = ({
     <EventTimingSectionView isEnabled={notificationPermission.isGranted} />
     <EventArrivalsSectionView isEnabled={notificationPermission.isGranted} />
     <ProfileSectionView isEnabled={notificationPermission.isGranted} />
-  </SettingsScrollView>
+  </TiFFormScrollView>
 )
 
 type PermissionsDisabledSectionProps = {
@@ -45,8 +45,8 @@ type PermissionsDisabledSectionProps = {
 const PermissionsDisabledSectionView = ({
   onPermissionsRequested
 }: PermissionsDisabledSectionProps) => (
-  <SettingsSectionView>
-    <SettingsCardView>
+  <TiFFormSectionView>
+    <TiFFormCardView>
       <View style={styles.permissionsDisabledSectionContainer}>
         <View style={styles.permissionsDisabledSectionRow}>
           <View style={styles.permissionsDisabledIllustration} />
@@ -67,8 +67,8 @@ const PermissionsDisabledSectionView = ({
           </PrimaryButton>
         </View>
       </View>
-    </SettingsCardView>
-  </SettingsSectionView>
+    </TiFFormCardView>
+  </TiFFormSectionView>
 )
 
 type EditableSectionBaseProps = {
@@ -76,11 +76,11 @@ type EditableSectionBaseProps = {
 }
 
 const EventChangesSectionView = ({ isEnabled }: EditableSectionBaseProps) => (
-  <SettingsSectionView
+  <TiFFormSectionView
     isDisabled={!isEnabled}
     title="Event Changes Notifications"
   >
-    <SettingsCardView>
+    <TiFFormCardView>
       <NamedTriggerIdToggleView
         name="Event Start Time or Duration Changes"
         id="event-time-changed"
@@ -101,16 +101,16 @@ const EventChangesSectionView = ({ isEnabled }: EditableSectionBaseProps) => (
         name="Event Cancellation"
         id="event-cancelled"
       />
-    </SettingsCardView>
-  </SettingsSectionView>
+    </TiFFormCardView>
+  </TiFFormSectionView>
 )
 
 const EventTimingSectionView = ({ isEnabled }: EditableSectionBaseProps) => (
-  <SettingsSectionView
+  <TiFFormSectionView
     title="Event Timing Notifications"
     isDisabled={!isEnabled}
   >
-    <SettingsCardView>
+    <TiFFormCardView>
       <NamedTriggerIdToggleView
         name="Prior to an Event Starting"
         id="event-starting-soon"
@@ -120,16 +120,16 @@ const EventTimingSectionView = ({ isEnabled }: EditableSectionBaseProps) => (
         id="event-started"
       />
       <NamedTriggerIdToggleView name="When an Event Ends" id="event-ended" />
-    </SettingsCardView>
-  </SettingsSectionView>
+    </TiFFormCardView>
+  </TiFFormSectionView>
 )
 
 const EventArrivalsSectionView = ({ isEnabled }: EditableSectionBaseProps) => (
-  <SettingsSectionView
+  <TiFFormSectionView
     title="Event Arrivals Notifications"
     isDisabled={!isEnabled}
   >
-    <SettingsCardView>
+    <TiFFormCardView>
       <NamedTriggerIdToggleView
         name="When You Arrive at an Event"
         description="Notification is sent when you’ve arrived at an event."
@@ -145,13 +145,13 @@ const EventArrivalsSectionView = ({ isEnabled }: EditableSectionBaseProps) => (
         description="Notification is sent when an event starts."
         id="event-attendance-headcount"
       />
-    </SettingsCardView>
-  </SettingsSectionView>
+    </TiFFormCardView>
+  </TiFFormSectionView>
 )
 
 const ProfileSectionView = ({ isEnabled }: EditableSectionBaseProps) => (
-  <SettingsSectionView isDisabled={!isEnabled} title="Profile Notifications">
-    <SettingsCardView>
+  <TiFFormSectionView isDisabled={!isEnabled} title="Profile Notifications">
+    <TiFFormCardView>
       <NamedTriggerIdToggleView
         name="When You Receive a Friend Request"
         id="friend-request-received"
@@ -160,8 +160,8 @@ const ProfileSectionView = ({ isEnabled }: EditableSectionBaseProps) => (
         name="When Someone Accepts Your Friend Request"
         id="friend-request-accepted"
       />
-    </SettingsCardView>
-  </SettingsSectionView>
+    </TiFFormCardView>
+  </TiFFormSectionView>
 )
 
 type NamedTriggerIdToggleProps = {
@@ -179,7 +179,7 @@ const NamedTriggerIdToggleView = ({
     settingsSelector("pushNotificationTriggerIds")
   )
   return (
-    <SettingsNamedToggleView
+    <TiFFormNamedToggleView
       name={name}
       description={description}
       isOn={settings.pushNotificationTriggerIds.includes(id)}

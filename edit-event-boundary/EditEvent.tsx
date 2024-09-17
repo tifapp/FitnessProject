@@ -19,16 +19,9 @@ import {
   editEventQuote
 } from "./PragmaQuotes"
 import { useAtom, useAtomValue } from "jotai"
-import {
-  SettingsCardSectionView,
-  SettingsSectionView
-} from "settings-boundary/components/Section"
 import { ShadedTextField } from "@components/TextFields"
-import { SettingsScrollView } from "settings-boundary/components/ScrollView"
 import { useFontScale } from "@lib/Fonts"
 import { AppStyles } from "@lib/AppColorStyle"
-import { SettingsNavigationLinkView } from "settings-boundary/components/NavigationLink"
-import { SettingsNamedToggleView } from "settings-boundary/components/NamedToggle"
 import { useCallback, useState } from "react"
 import { useScreenBottomPadding } from "@components/Padding"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
@@ -39,6 +32,10 @@ import { EditEventDurationPickerView } from "./DurationPicker"
 import { Ionicon, TouchableIonicon } from "@components/common/Icons"
 import { dayjs } from "TiFShared/lib/Dayjs"
 import { Headline } from "@components/Text"
+import { TiFFormScrollView } from "@components/form-components/ScrollView"
+import { TiFFormCardSectionView, TiFFormSectionView } from "@components/form-components/Section"
+import { TiFFormNamedToggleView } from "@components/form-components/NamedToggle"
+import { TiFFormNavigationLinkView } from "@components/form-components/NavigationLink"
 
 export type EditEventProps = {
   eventId?: EventID
@@ -60,7 +57,7 @@ export const EditEventView = ({
   return (
     <View style={style}>
       <View style={styles.container}>
-        <SettingsScrollView>
+        <TiFFormScrollView>
           <QuoteSectionView eventId={eventId} currentDate={currentDate} />
           <TitleSectionView />
           <LocationSectionView />
@@ -71,7 +68,7 @@ export const EditEventView = ({
           {footerLayout && (
             <View style={{ marginBottom: footerLayout.height }} />
           )}
-        </SettingsScrollView>
+        </TiFFormScrollView>
         <View
           style={styles.footer}
           onLayout={(e) => setFooterLayout(e.nativeEvent.layout)}
@@ -94,12 +91,12 @@ const QuoteSectionView = ({ eventId, currentDate }: QuoteSectionProps) => {
     [currentDate]
   )
   return (
-    <SettingsSectionView>
+    <TiFFormSectionView>
       <PragmaQuoteView
         quote={eventId ? editEventQuote : createQuote}
         animationInterval={5}
       />
-    </SettingsSectionView>
+    </TiFFormSectionView>
   )
 }
 
@@ -107,21 +104,21 @@ const TitleSectionView = () => {
   const [title, setTitle] = useAtom(editEventFormValueAtoms.title)
   const height = 32 * useFontScale()
   return (
-    <SettingsSectionView title="What?">
+    <TiFFormSectionView title="What?">
       <ShadedTextField
         placeholder="Enter an Event Title"
         value={title}
         onChangeText={setTitle}
         textStyle={{ height }}
       />
-    </SettingsSectionView>
+    </TiFFormSectionView>
   )
 }
 
 const LocationSectionView = () => {
   return (
-    <SettingsSectionView title="Where?">
-      <SettingsNavigationLinkView
+    <TiFFormSectionView title="Where?">
+      <TiFFormNavigationLinkView
         iconName="location"
         iconBackgroundColor={AppStyles.black}
         title="No Location"
@@ -130,7 +127,7 @@ const LocationSectionView = () => {
         chevronStyle={styles.locationNavigationLinkChevron}
         onTapped={() => console.log("TODO")}
       />
-    </SettingsSectionView>
+    </TiFFormSectionView>
   )
 }
 
@@ -138,7 +135,7 @@ const StartDateSectionView = () => {
   const [startDate, setStartDate] = useAtom(editEventFormValueAtoms.startDate)
   const date = dayjs(startDate)
   return (
-    <SettingsSectionView title="When?">
+    <TiFFormSectionView title="When?">
       <View style={styles.startDateRow}>
         <View style={styles.startDateRowItem}>
           <Ionicon name="calendar" />
@@ -149,7 +146,7 @@ const StartDateSectionView = () => {
           <Headline>{date.format("HH:mm A")}</Headline>
         </View>
       </View>
-    </SettingsSectionView>
+    </TiFFormSectionView>
   )
 }
 
@@ -158,7 +155,7 @@ const DurationSectionView = () => {
     settings: { presets }
   } = useUserSettings(durationsSectionSettingsSelector)
   return (
-    <SettingsSectionView
+    <TiFFormSectionView
       title="Length?"
       rightAddon={<TouchableIonicon icon={{ name: "ellipsis-horizontal" }} />}
     >
@@ -166,7 +163,7 @@ const DurationSectionView = () => {
         durationAtom={editEventFormValueAtoms.duration}
         presetOptions={presets}
       />
-    </SettingsSectionView>
+    </TiFFormSectionView>
   )
 }
 
@@ -180,7 +177,7 @@ const DescriptionSectionView = () => {
   )
   const minHeight = 128 * useFontScale()
   return (
-    <SettingsSectionView title="Details?">
+    <TiFFormSectionView title="Details?">
       <ShadedTextField
         placeholder="Enter an Event Description"
         multiline
@@ -189,7 +186,7 @@ const DescriptionSectionView = () => {
         onChangeText={setDescription}
         textStyle={{ minHeight }}
       />
-    </SettingsSectionView>
+    </TiFFormSectionView>
   )
 }
 
@@ -198,14 +195,14 @@ const AdvancedSectionView = () => {
     editEventFormValueAtoms.shouldHideAfterStartDate
   )
   return (
-    <SettingsCardSectionView title="Settings">
-      <SettingsNamedToggleView
+    <TiFFormCardSectionView title="Settings">
+      <TiFFormNamedToggleView
         name="Should Hide After Start Date"
         description="The event will be hidden from the map after it starts when enabled."
         isOn={shouldHideAfterStartDate}
         onIsOnChange={setShouldHideAfterStartDate}
       />
-    </SettingsCardSectionView>
+    </TiFFormCardSectionView>
   )
 }
 

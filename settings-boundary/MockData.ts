@@ -1,5 +1,4 @@
 import { faker } from "@faker-js/faker"
-import { randomlyNull } from "@lib/utils/Random"
 import { uuidString } from "@lib/utils/UUID"
 import { BlockListPage, BlockListUser } from "TiFShared/domain-models/BlockList"
 import { UserHandle } from "TiFShared/domain-models/User"

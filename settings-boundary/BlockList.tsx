@@ -27,10 +27,10 @@ import {
 } from "react-native"
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated"
 import { BoldFootnote, Headline } from "@components/Text"
-import { SettingsSectionView } from "./components/Section"
+import { TiFFormSectionView } from "@components/form-components/Section"
 import { PrimaryButton } from "@components/Buttons"
 import { TiFDefaultLayoutTransition } from "@lib/Reanimated"
-import { SettingsCardView } from "./components/Card"
+import { TiFFormCardView } from "@components/form-components/Card"
 import { TextToastView } from "@components/common/Toasts"
 import ProfileImageAndName from "@components/profileImageComponents/ProfileImageAndName"
 import { Ionicon } from "@components/common/Icons"
@@ -213,7 +213,7 @@ export const BlockListSettingsView = ({
         />
       )}
       ListHeaderComponent={
-        <SettingsSectionView
+        <TiFFormSectionView
           title="Blocked Users"
           subtitle="Listed below are the users that you have blocked. You can choose to unblock them or view their profile."
           style={styles.section}
@@ -282,7 +282,7 @@ const BlockListUserView = memo(function BlockListUserView({
       exiting={Platform.OS === "ios" ? FadeOut : undefined}
       style={styles.container}
     >
-      <SettingsCardView>
+      <TiFFormCardView>
         <View style={styles.userContainer}>
           <View style={styles.profileAndName}>
             <Pressable onPress={() => onProfileTapped(user.id)}>
@@ -310,7 +310,7 @@ const BlockListUserView = memo(function BlockListUserView({
             </View>
           </TouchableOpacity>
         </View>
-      </SettingsCardView>
+      </TiFFormCardView>
     </Animated.View>
   )
 })

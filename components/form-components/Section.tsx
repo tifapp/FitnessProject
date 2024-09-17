@@ -3,21 +3,21 @@ import { TiFDefaultLayoutTransition } from "@lib/Reanimated"
 import { ReactNode, createContext, useContext } from "react"
 import { ViewStyle, View, StyleProp, StyleSheet } from "react-native"
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated"
-import { SettingsCardView } from "./Card"
+import { TiFFormCardView } from "./Card"
 
-export type SettingsSectionContextValues = {
+export type TiFFormSectionContextValues = {
   isDisabled: boolean
 }
 
-const SettingsSectionContext = createContext<SettingsSectionContextValues>({
+const TiFFormSectionContext = createContext<TiFFormSectionContextValues>({
   isDisabled: false
 })
 
-export const useCurrentSettingsSection = () => {
-  return useContext(SettingsSectionContext)
+export const useTiFFormSectionContext = () => {
+  return useContext(TiFFormSectionContext)
 }
 
-export type SettingsSectionProps = {
+export type TiFFormSectionProps = {
   title?: string
   subtitle?: ReactNode
   rightAddon?: JSX.Element
@@ -26,20 +26,20 @@ export type SettingsSectionProps = {
   style?: StyleProp<ViewStyle>
 }
 
-export const SettingsSectionView = ({
+export const TiFFormSectionView = ({
   title,
   subtitle,
   rightAddon,
   isDisabled = false,
   children,
   style
-}: SettingsSectionProps) => (
+}: TiFFormSectionProps) => (
   <Animated.View
     entering={FadeIn}
     exiting={FadeOut}
     layout={TiFDefaultLayoutTransition}
   >
-    <SettingsSectionContext.Provider value={{ isDisabled }}>
+    <TiFFormSectionContext.Provider value={{ isDisabled }}>
       <View style={style}>
         <View style={[styles.container, { opacity: isDisabled ? 0.5 : 1 }]}>
           <View style={styles.textContainer}>
@@ -57,17 +57,17 @@ export const SettingsSectionView = ({
           {children}
         </View>
       </View>
-    </SettingsSectionContext.Provider>
+    </TiFFormSectionContext.Provider>
   </Animated.View>
 )
 
-export const SettingsCardSectionView = ({
+export const TiFFormCardSectionView = ({
   children,
   ...props
-}: SettingsSectionProps) => (
-  <SettingsSectionView {...props}>
-    <SettingsCardView>{children}</SettingsCardView>
-  </SettingsSectionView>
+}: TiFFormSectionProps) => (
+  <TiFFormSectionView {...props}>
+    <TiFFormCardView>{children}</TiFFormCardView>
+  </TiFFormSectionView>
 )
 
 const styles = StyleSheet.create({

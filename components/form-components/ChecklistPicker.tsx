@@ -1,29 +1,29 @@
 import { StyleSheet, StyleProp, ViewStyle, View } from "react-native"
-import { SettingsButton } from "./Button"
+import { TiFFormRowButton } from "./Button"
 import { Headline } from "@components/Text"
 import { Ionicon } from "@components/common/Icons"
 
-export type SettingsChecklistPickerOption<Value> = {
+export type TiFFormChecklistPickerOption<Value> = {
   title: string
   value: Value
 }
 
-export type SettingsChecklistPickerProps<Value> = {
-  options: Readonly<SettingsChecklistPickerOption<Value>[]>
+export type TiFFormChecklistPickerProps<Value> = {
+  options: Readonly<TiFFormChecklistPickerOption<Value>[]>
   selectedOptions: Value[]
   onOptionSelected: (value: Value) => void
   style?: StyleProp<ViewStyle>
 }
 
-export const SettingsChecklistPickerView = <Option,>({
+export const TiFFormChecklistPickerView = <Option,>({
   options,
   selectedOptions,
   onOptionSelected,
   style
-}: SettingsChecklistPickerProps<Option>) => (
+}: TiFFormChecklistPickerProps<Option>) => (
   <View style={style}>
     {options.map((option) => (
-      <SettingsButton
+      <TiFFormRowButton
         key={option.value}
         onTapped={() => onOptionSelected(option.value)}
       >
@@ -34,7 +34,7 @@ export const SettingsChecklistPickerView = <Option,>({
             style={{ opacity: selectedOptions.includes(option.value) ? 1 : 0 }}
           />
         </View>
-      </SettingsButton>
+      </TiFFormRowButton>
     ))}
   </View>
 )
