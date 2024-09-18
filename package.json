@@ -3,8 +3,8 @@
   "main": "AppEntry.js",
   "scripts": {
     "pr": "node --loader ts-node/esm ./node_modules/TiFShared/npm-scripts/auto-pr.ts --env .env.infra",
-    "start": "node enableStorybook.js false && node checkEnv.js && npx expo start --dev-client --clear",
-    "sb_start": "node enableStorybook.js true && sb-rn-get-stories --config-path .storybook/.ondevice && npx expo start --dev-client",
+    "start": "node enableStorybook.js false && node checkEnv.js && npx expo start --dev-client --clear", //CHECK THAT .env and .env.infra are filled out before running expo
+    "sb_start": "node enableStorybook.js true && sb-rn-get-stories --config-path .storybook/.ondevice && npx expo start --dev-client", //CHECK THAT .env and .env.infra are filled out before running expo
     "sb_watcher": "sb-rn-watcher --config-path .storybook/.ondevice",
     "test": "jest --testPathIgnorePatterns \"<rootDir>/roswaal/\" --testPathPattern ",
     "test:ci": "jest --testPathIgnorePatterns \"<rootDir>/roswaal/\" --ci --detectOpenHandles",
@@ -129,7 +129,7 @@
     "react-native-select-dropdown": "^3.2.1",
     "react-native-svg": "15.2.0",
     "regenerator-runtime": "^0.13.11",
-    "TiFShared": "github:tifapp/TiFShared#main",
+    "TiFShared": "github:tifapp/TiFShared#combined2",
     "type-detect": "4.0.8",
     "use-sync-external-store": "^1.2.2",
     "uuid": "^9.0.0",
