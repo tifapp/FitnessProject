@@ -6,6 +6,7 @@ import {
   LayoutRectangle
 } from "react-native"
 import {
+  DEFAULT_EDIT_EVENT_FORM_VALUES,
   EditEventFormValues,
   editEventFormValueAtoms,
   editEventFormValuesAtom,
@@ -33,14 +34,18 @@ import { Ionicon, TouchableIonicon } from "@components/common/Icons"
 import { dayjs } from "TiFShared/lib/Dayjs"
 import { Headline } from "@components/Text"
 import { TiFFormScrollView } from "@components/form-components/ScrollView"
-import { TiFFormCardSectionView, TiFFormSectionView } from "@components/form-components/Section"
+import {
+  TiFFormCardSectionView,
+  TiFFormSectionView
+} from "@components/form-components/Section"
 import { TiFFormNamedToggleView } from "@components/form-components/NamedToggle"
 import { TiFFormNavigationLinkView } from "@components/form-components/NavigationLink"
+import { settingsSelector } from "@settings-storage/Settings"
 
 export type EditEventProps = {
   eventId?: EventID
   currentDate?: Date
-  initialValues: EditEventFormValues
+  initialValues?: EditEventFormValues
   style?: StyleProp<ViewStyle>
 }
 
@@ -50,7 +55,27 @@ export const EditEventView = ({
   initialValues,
   style
 }: EditEventProps) => {
-  useHydrateAtoms([[editEventFormValuesAtom, initialValues]])
+  const { settings } = useUserSettings(
+    settingsSelector(
+      "eventPresetPlacemark",
+      "eventPresetShouldHideAfterStartDate"
+    )
+  )
+  useHydrateAtoms([
+    [
+      editEventFormValuesAtom,
+      initialValues ?? {
+        ...DEFAULT_EDIT_EVENT_FORM_VALUES,
+        location: settings.eventPresetPlacemark
+          ? {
+              placemark: settings.eventPresetPlacemark,
+              coordinate: undefined
+            }
+          : undefined,
+        shouldHideAfterStartDate: settings.eventPresetShouldHideAfterStartDate
+      }
+    ]
+  ])
   const [footerLayout, setFooterLayout] = useState<
     LayoutRectangle | undefined
   >()
