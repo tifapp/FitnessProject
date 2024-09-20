@@ -15,40 +15,10 @@ import { useSharedValue } from "react-native-reanimated"
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context"
 
 export type DurationPickerProps = {
-  onAddPresetTapped: (duration: number) => void
-  duration: number
-  onDurationChange: (newTime: number) => void
+  onAddPresetTapped: (durationSeconds: number) => void
+  durationSeconds: number
+  onDurationChange: (durationSeconds: number) => void
   style?: StyleProp<ViewStyle>
-}
-
-/**
- * What will display on the bottom sheet, to allow for a new duration to be selected.
- */
-export const DurationPickerView = ({
-  onAddPresetTapped,
-  duration,
-  onDurationChange,
-  style
-}: DurationPickerProps) => {
-  return (
-    <View style={style}>
-      <View style={styles.pickerContainer}>
-        <TimePickerView
-          initialDuration={6000}
-          onDurationChange={(event) =>
-            onDurationChange(event.nativeEvent.duration)
-          }
-          style={{ width: "100%", height: 400 }}
-        />
-        <PrimaryButton
-          onPress={() => onAddPresetTapped(duration)}
-          style={styles.pickerButton}
-        >
-          Save Duration
-        </PrimaryButton>
-      </View>
-    </View>
-  )
 }
 
 export type DurationPickerButtonProps<Children extends ReactNode> = Omit<
@@ -66,7 +36,7 @@ export type DurationPickerButtonProps<Children extends ReactNode> = Omit<
 export const DurationPickerButton = <Children extends ReactNode>({
   pickerStyle,
   onAddPresetTapped,
-  duration,
+  durationSeconds,
   onDurationChange,
   ...props
 }: DurationPickerButtonProps<Children>) => {
@@ -115,24 +85,20 @@ export const DurationPickerButton = <Children extends ReactNode>({
             />
           </View>
           <View style={[styles.durationPickerSheetStyle, pickerStyle]}>
-            <View style={styles.pickerContainer}>
-              <TimePickerView
-                initialDuration={6000}
-                onDurationChange={(event) =>
-                  onDurationChange(event.nativeEvent.duration)
-                }
-                style={{ width: "100%", height: 400 }}
-              />
-              <PrimaryButton
-                onPress={() => {
-                  sheetRef.current?.dismiss()
-                  onAddPresetTapped(duration)
-                }}
-                style={styles.pickerButton}
-              >
-                Save Duration
-              </PrimaryButton>
-            </View>
+            <TimePickerView
+              initialDurationSeconds={6000}
+              onDurationChange={onDurationChange}
+              style={styles.timePicker}
+            />
+            <PrimaryButton
+              onPress={() => {
+                sheetRef.current?.dismiss()
+                onAddPresetTapped(durationSeconds)
+              }}
+              style={styles.pickerButton}
+            >
+              Save Duration
+            </PrimaryButton>
           </View>
         </SafeAreaView>
       </BottomSheetModal>
@@ -141,8 +107,10 @@ export const DurationPickerButton = <Children extends ReactNode>({
 }
 
 const styles = StyleSheet.create({
-  pickerContainer: {
-    rowGap: 16
+  timePicker: {
+    width: "100%",
+    alignSelf: "center",
+    height: 400
   },
   pickerTitle: {
     textAlign: "center"
@@ -154,7 +122,8 @@ const styles = StyleSheet.create({
     width: "100%"
   },
   durationPickerSheetStyle: {
-    paddingBottom: 24
+    paddingBottom: 24,
+    rowGap: 16
   },
   bottomSheetHandle: {
     opacity: 0

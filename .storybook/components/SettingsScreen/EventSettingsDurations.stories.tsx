@@ -80,11 +80,6 @@ const DurationScreenTest = () => {
           update({ eventPresetDurations: [600, 1200, 1800, 2400, 4800, 7200] })
         }
       />
-      {/* <TimePickerView
-        initialDuration={0}
-        onDurationChange={() => console.log("Blah")}
-        style={{ width: "100%", height: 400 }}
-      /> */}
       <EventDurationView />
     </SafeAreaView>
   )

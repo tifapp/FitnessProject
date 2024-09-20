@@ -40,7 +40,7 @@ android {
   // Kotlin compiler version must be tied to Kotlin version
   // according: https://developer.android.com/jetpack/androidx/releases/compose-kotlin
   composeOptions {
-    kotlinCompilerExtensionVersion = "1.5.10"
+    kotlinCompilerExtensionVersion = "1.5.14"
   }
   defaultConfig {
     versionCode 1

@@ -115,7 +115,7 @@ export const AddDurationCard = () => {
     >
       <DurationPickerButton
         style={[styles.addButtonContainer, { height: 64 * fontScale }]}
-        duration={timeInSeconds}
+        durationSeconds={timeInSeconds}
         underlayColor={AppStyles.colorOpacity35}
         onAddPresetTapped={() => {
           if (!settings.eventPresetDurations.includes(timeInSeconds)) {

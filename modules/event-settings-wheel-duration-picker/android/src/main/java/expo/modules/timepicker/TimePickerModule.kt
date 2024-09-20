@@ -32,54 +32,9 @@ class TimePickerModule : Module() {
 
     View(TimePickerView::class) {
       Events("onDurationChange")
-      Prop("initialDuration") { view: TimePickerView, initialDuration: Int ->
-        view.state.update { it.copy(initialDuration = initialDuration) }
+      Prop("initialDurationSeconds") { view: TimePickerView, initialDurationSeconds: Int ->
+        view.state.update { it.copy(initialDurationSeconds = initialDurationSeconds) }
       }
     }
   }
 }
-  @RequiresApi(Build.VERSION_CODES.O)
-  @Composable
-  fun TimePicker(
-    initialDuration: Int,
-    onDurationChange: (Int) -> Unit,
-    modifier: Modifier = Modifier
-  ) {
-    Column (
-      Modifier
-        .fillMaxWidth()
-        .fillMaxHeight(),
-      horizontalAlignment = Alignment.CenterHorizontally,
-      verticalArrangement = Arrangement.Center,
-    ) {
-      Card {
-        Column (
-          Modifier.padding(vertical = 15.dp),
-          horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-
-          WheelTimePicker(
-            startTime = LocalTime.of(
-              initialDuration / 3600,
-              (initialDuration / 60) % 60,
-              initialDuration % 60
-            ),
-            size = DpSize(300.dp, 300.dp),
-            modifier = modifier
-          ){ snappedTime -> onDurationChange(snappedTime.toSecondOfDay())}
-
-          Spacer(
-            modifier = Modifier.height(15.dp)
-          )
-        }
-      }
-    }
-  }
-
-@RequiresApi(Build.VERSION_CODES.O)
-@Preview
-@Composable
-fun TimePickerPreview() {
-  TimePicker(0, {})
-}
-
