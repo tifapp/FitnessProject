@@ -4,24 +4,24 @@ import { MenuView } from "@react-native-menu/menu"
 import { ToStringable } from "TiFShared/lib/String"
 import { StyleProp, ViewStyle, StyleSheet, View, Platform } from "react-native"
 
-export type SettingsMenuPickerOption<Value extends ToStringable> = {
+export type TiFFormMenuPickerOption<Value extends ToStringable> = {
   title: string
   value: Value
 }
 
-export type SettingsMenuPickerProps<Value extends ToStringable> = {
+export type TiFFormMenuPickerProps<Value extends ToStringable> = {
   options: Readonly<Map<Value, { title: string }>>
   selectedOption: Value
   onOptionSelected: (value: Value) => void
   style?: StyleProp<ViewStyle>
 }
 
-export const SettingsMenuPickerView = <Value extends ToStringable>({
+export const TiFFormMenuPickerView = <Value extends ToStringable>({
   options,
   selectedOption,
   onOptionSelected,
   style
-}: SettingsMenuPickerProps<Value>) => (
+}: TiFFormMenuPickerProps<Value>) => (
   <View style={style}>
     <MenuView
       onPressAction={(e) => {

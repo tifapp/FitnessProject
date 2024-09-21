@@ -1,8 +1,8 @@
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
-import { SettingsLabelView } from "./Label"
-import { SettingsSwitchView } from "./Switch"
+import { TiFFormLabelView } from "./Label"
+import { TiFFormSwitchView } from "./Switch"
 
-export type SettingsNamedToggleProps = {
+export type TiFFormNamedToggleProps = {
   name: string
   description?: string
   isOn: boolean
@@ -10,21 +10,21 @@ export type SettingsNamedToggleProps = {
   style?: StyleProp<ViewStyle>
 }
 
-export const SettingsNamedToggleView = ({
+export const TiFFormNamedToggleView = ({
   name,
   description,
   isOn,
   onIsOnChange,
   style
-}: SettingsNamedToggleProps) => (
+}: TiFFormNamedToggleProps) => (
   <View style={style}>
     <View style={styles.container}>
-      <SettingsLabelView
+      <TiFFormLabelView
         title={name}
         description={description}
         style={styles.label}
       />
-      <SettingsSwitchView isOn={isOn} onIsOnChange={onIsOnChange} />
+      <TiFFormSwitchView isOn={isOn} onIsOnChange={onIsOnChange} />
     </View>
   </View>
 )

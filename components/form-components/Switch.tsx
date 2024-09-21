@@ -1,21 +1,21 @@
 import { AppStyles } from "@lib/AppColorStyle"
 import { StyleProp, Switch, ViewStyle } from "react-native"
-import { useCurrentSettingsSection } from "./Section"
+import { useTiFFormSectionContext } from "./Section"
 
-export type SettingsSwitchProps = {
+export type TiFFormSwitchProps = {
   isOn: boolean
   onIsOnChange?: (isOn: boolean) => void
   isDisabled?: boolean
   style?: StyleProp<ViewStyle>
 }
 
-export const SettingsSwitchView = ({
+export const TiFFormSwitchView = ({
   isOn,
   onIsOnChange,
   isDisabled,
   style
-}: SettingsSwitchProps) => {
-  const isSectionDisabled = useCurrentSettingsSection().isDisabled
+}: TiFFormSwitchProps) => {
+  const isSectionDisabled = useTiFFormSectionContext().isDisabled
   return (
     <Switch
       value={isOn}

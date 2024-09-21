@@ -1,17 +1,17 @@
 import { Footnote, Headline } from "@components/Text"
 import { StyleProp, ViewStyle, StyleSheet, View } from "react-native"
 
-export type SettingsLabelProps = {
+export type TiFFormLabelProps = {
   title: string
   description?: string
   style?: StyleProp<ViewStyle>
 }
 
-export const SettingsLabelView = ({
+export const TiFFormLabelView = ({
   title,
   description,
   style
-}: SettingsLabelProps) => (
+}: TiFFormLabelProps) => (
   <View style={style}>
     <View style={styles.label}>
       <Headline>{title}</Headline>
@@ -24,7 +24,6 @@ export const SettingsLabelView = ({
 
 const styles = StyleSheet.create({
   label: {
-    flex: 1,
     rowGap: 4
   },
   description: {
