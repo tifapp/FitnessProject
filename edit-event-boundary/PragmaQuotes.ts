@@ -1,5 +1,4 @@
 import { dayjs } from "TiFShared/lib/Dayjs"
-import { Dayjs } from "dayjs"
 
 /**
  * Returns Pragma's Quote when the user is editing an existing event through the edit form.
