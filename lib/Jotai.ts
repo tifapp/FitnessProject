@@ -1,4 +1,8 @@
-import { SetStateAction, atom } from "jotai"
+import { SetStateAction, WritableAtom, atom } from "jotai"
+
+export type Atomize<Obj extends Record<string, any>> = {
+  [K in keyof Obj]: WritableAtom<Obj[K], [Obj[K]], void>
+}
 
 /**
  * Creates a group of atoms that allow for debouncing operations.

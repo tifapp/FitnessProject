@@ -3,12 +3,12 @@ import { IoniconName } from "@components/common/Icons"
 import { AppStyles } from "@lib/AppColorStyle"
 import { ColorString } from "TiFShared/domain-models/ColorString"
 import { Pressable, StyleProp, StyleSheet, View, ViewStyle } from "react-native"
-import { SettingsCardView } from "./Card"
-import { SettingsNamedIconRowView } from "./NamedIconRow"
-import { useCurrentSettingsSection } from "./Section"
-import { SettingsSwitchView } from "./Switch"
+import { TiFFormCardView } from "./Card"
+import { TiFFormNamedIconRowView } from "./NamedIconRow"
+import { useTiFFormSectionContext } from "./Section"
+import { TiFFormSwitchView } from "./Switch"
 
-export type SettingsToggleCardProps = {
+export type TiFFormToggleCardProps = {
   isOn: boolean
   onIsOnChange?: (isOn: boolean) => void
   onToggleTappedWithoutIsOnChange?: () => void
@@ -20,7 +20,7 @@ export type SettingsToggleCardProps = {
   style?: StyleProp<ViewStyle>
 }
 
-export const SettingsToggleCardView = ({
+export const TiFFormToggleCardView = ({
   iconName,
   iconBackgroundColor,
   title,
@@ -30,18 +30,18 @@ export const SettingsToggleCardView = ({
   onIsOnChange,
   onToggleTappedWithoutIsOnChange,
   style
-}: SettingsToggleCardProps) => (
+}: TiFFormToggleCardProps) => (
   <View style={style}>
-    <SettingsCardView>
+    <TiFFormCardView>
       <View style={styles.innerContainer}>
-        <SettingsNamedIconRowView
+        <TiFFormNamedIconRowView
           iconName={iconName}
           iconBackgroundColor={iconBackgroundColor}
           name={title}
         >
           <Pressable
             onPress={
-              !useCurrentSettingsSection().isDisabled
+              !useTiFFormSectionContext().isDisabled
                 ? onToggleTappedWithoutIsOnChange
                 : undefined
             }
@@ -49,17 +49,17 @@ export const SettingsToggleCardView = ({
             <View
               pointerEvents={onToggleTappedWithoutIsOnChange ? "none" : "auto"}
             >
-              <SettingsSwitchView
+              <TiFFormSwitchView
                 isOn={isOn}
                 onIsOnChange={onIsOnChange}
                 isDisabled={isDisabled}
               />
             </View>
           </Pressable>
-        </SettingsNamedIconRowView>
+        </TiFFormNamedIconRowView>
         <Footnote style={styles.bottomText}>{description}</Footnote>
       </View>
-    </SettingsCardView>
+    </TiFFormCardView>
   </View>
 )
 

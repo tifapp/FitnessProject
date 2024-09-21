@@ -1,23 +1,23 @@
 import { ReactNode } from "react"
 import { StyleProp, ViewStyle, View, StyleSheet } from "react-native"
-import { SettingsLabelView } from "./Label"
+import { TiFFormLabelView } from "./Label"
 
-export type SettingsRowItemProps = {
+export type TiFFormRowItemProps = {
   title: string
   description?: string
   children?: ReactNode
   style?: StyleProp<ViewStyle>
 }
 
-export const SettingsRowItemView = ({
+export const TiFFormRowItemView = ({
   title,
   description,
   children,
   style
-}: SettingsRowItemProps) => (
+}: TiFFormRowItemProps) => (
   <View style={style}>
     <View style={styles.row}>
-      <SettingsLabelView
+      <TiFFormLabelView
         title={title}
         description={description}
         style={styles.label}

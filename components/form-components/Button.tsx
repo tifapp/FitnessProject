@@ -6,22 +6,22 @@ import {
   View,
   ViewStyle
 } from "react-native"
-import { useCurrentSettingsSection } from "./Section"
+import { useTiFFormSectionContext } from "./Section"
 
-export type SettingsButtonProps = {
+export type TiFFormRowButtonProps = {
   onTapped?: () => void
   isDisabled?: boolean
   children: JSX.Element
   style?: StyleProp<ViewStyle>
 }
 
-export const SettingsButton = ({
+export const TiFFormRowButton = ({
   onTapped,
   isDisabled,
   children,
   style
-}: SettingsButtonProps) => {
-  const isSectionDisabled = useCurrentSettingsSection().isDisabled
+}: TiFFormRowButtonProps) => {
+  const isSectionDisabled = useTiFFormSectionContext().isDisabled
   const shouldDisable = isDisabled ?? isSectionDisabled
   return (
     <TouchableHighlight
