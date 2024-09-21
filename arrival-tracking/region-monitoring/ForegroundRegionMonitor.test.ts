@@ -3,7 +3,6 @@ import { fakeTimers } from "@test-helpers/Timers"
 import { waitFor } from "@testing-library/react-native"
 import { mockEventRegion } from "../MockData"
 import { ForegroundEventRegionMonitor } from "./ForegroundRegionMonitor"
-import { advanceByForegroundMonitorBufferTime } from "./TestHelpers"
 import { repeatElements } from "TiFShared/lib/Array"
 import { LocationCoordinate2D } from "TiFShared/domain-models/LocationCoordinate2D"
 
@@ -26,11 +25,11 @@ describe("ForegroundEventRegionMonitor tests", () => {
   }
 
   let monitor = createMonitor()
+  fakeTimers()
   beforeEach(() => {
     monitor = createMonitor()
     jest.resetAllMocks()
   })
-  fakeTimers()
 
   it("should return false for arriving in an unmonitored region", () => {
     expect(monitor.hasArrivedAtRegion(mockEventRegion())).toEqual(false)
@@ -49,78 +48,33 @@ describe("ForegroundEventRegionMonitor tests", () => {
     const callback = jest.fn()
     monitor.monitorRegion(TEST_REGION, callback)
     sendLocationUpdate({ latitude: 45.0, longitude: -121.0 })
-    advanceByForegroundMonitorBufferTime()
     await waitFor(() => {
       expect(callback).toHaveBeenCalledWith(true)
     })
     expect(monitor.hasArrivedAtRegion(TEST_REGION)).toEqual(true)
+  })
+
+  test("enter and leave region, emits false after leaving", async () => {
+    const callback = jest.fn()
+    monitor.monitorRegion(TEST_REGION, callback)
+    sendLocationUpdate({ latitude: 45.0, longitude: -121.0 })
+    await waitFor(() => expect(callback).toHaveBeenCalledWith(true))
 
     sendLocationUpdate({ latitude: 57.0, longitude: 42.0 })
-    advanceByForegroundMonitorBufferTime()
-    await waitFor(() => {
-      expect(callback).toHaveBeenCalledWith(false)
-    })
+    await waitFor(() => expect(callback).toHaveBeenCalledWith(false))
     expect(monitor.hasArrivedAtRegion(TEST_REGION)).toEqual(false)
-  })
-
-  it("should buffer updates by 20 seconds when region state change from entering to exiting", async () => {
-    const callback = jest.fn()
-    monitor.monitorRegion(TEST_REGION, callback)
-    expect(monitor.hasArrivedAtRegion(TEST_REGION)).toEqual(false)
-    sendLocationUpdate(TEST_REGION.coordinate)
-    expect(monitor.hasArrivedAtRegion(TEST_REGION)).toEqual(false)
-    advanceByForegroundMonitorBufferTime(0.5)
-    expect(monitor.hasArrivedAtRegion(TEST_REGION)).toEqual(false)
-    sendLocationUpdate({
-      latitude: TEST_REGION.coordinate.latitude + 0.000000001,
-      longitude: TEST_REGION.coordinate.longitude + 0.000000001
-    })
-    advanceByForegroundMonitorBufferTime(0.5)
-    await waitFor(() => {
-      expect(callback).toHaveBeenCalledWith(true)
-    })
-    expect(monitor.hasArrivedAtRegion(TEST_REGION)).toEqual(true)
-    expect(callback).toHaveBeenCalledTimes(2)
-  })
-
-  test("enter region, leave before 20 second buffer period ends, no update to true", async () => {
-    const callback = jest.fn()
-    monitor.monitorRegion(TEST_REGION, callback)
-    sendLocationUpdate(TEST_REGION.coordinate)
-    advanceByForegroundMonitorBufferTime(0.5)
-    sendLocationUpdate({ latitude: 37.0, longitude: -121.0 })
-    advanceByForegroundMonitorBufferTime(0.5)
-    await verifyNeverOccurs(() => expect(callback).toHaveBeenCalledWith(true))
-    expect(monitor.hasArrivedAtRegion(TEST_REGION)).toEqual(false)
-  })
-
-  test("enter region, leave before 20 second buffer period ends, then come back, true after 20 seconds", async () => {
-    const callback = jest.fn()
-    monitor.monitorRegion(TEST_REGION, callback)
-    sendLocationUpdate(TEST_REGION.coordinate)
-    advanceByForegroundMonitorBufferTime(0.5)
-    sendLocationUpdate({ latitude: 37.0, longitude: -121.0 })
-    advanceByForegroundMonitorBufferTime(0.5)
-    sendLocationUpdate(TEST_REGION.coordinate)
-    advanceByForegroundMonitorBufferTime()
-    await waitFor(() => {
-      expect(callback).toHaveBeenCalledWith(true)
-    })
-    expect(monitor.hasArrivedAtRegion(TEST_REGION)).toEqual(true)
   })
 
   it("should filter duplicate updates", async () => {
     const callback = jest.fn()
     monitor.monitorRegion(TEST_REGION, callback)
     sendLocationUpdate(TEST_REGION.coordinate)
-    advanceByForegroundMonitorBufferTime()
     await waitFor(() => {
       expect(callback).toHaveBeenCalledWith(true)
     })
     expect(monitor.hasArrivedAtRegion(TEST_REGION)).toEqual(true)
 
     sendLocationUpdate(TEST_REGION.coordinate)
-    advanceByForegroundMonitorBufferTime()
     await verifyNeverOccurs(() => expect(callback).toHaveBeenCalledTimes(3))
   })
 
@@ -129,7 +83,6 @@ describe("ForegroundEventRegionMonitor tests", () => {
     const unsub = monitor.monitorRegion(TEST_REGION, callback)
     unsub()
     sendLocationUpdate(TEST_REGION.coordinate)
-    advanceByForegroundMonitorBufferTime()
     await verifyNeverOccurs(() => expect(callback).toHaveBeenCalledWith(true))
   })
 
@@ -137,7 +90,6 @@ describe("ForegroundEventRegionMonitor tests", () => {
     const callback = jest.fn()
     const unsub = monitor.monitorRegion(TEST_REGION, callback)
     sendLocationUpdate(TEST_REGION.coordinate)
-    advanceByForegroundMonitorBufferTime()
     await waitFor(() => expect(callback).toHaveBeenCalledWith(true))
     unsub()
     callback.mockReset()
@@ -152,7 +104,6 @@ describe("ForegroundEventRegionMonitor tests", () => {
       callback.mockReset()
     })
     sendLocationUpdate(TEST_REGION.coordinate)
-    advanceByForegroundMonitorBufferTime()
     await Promise.allSettled(
       callbacks.map(async (callback) => {
         await waitFor(() => expect(callback).toHaveBeenCalledWith(true))
@@ -189,25 +140,15 @@ describe("ForegroundEventRegionMonitor tests", () => {
     expect(monitor.hasArrivedAtRegion(testRegion2)).toEqual(false)
 
     sendLocationUpdate(testRegion2.coordinate)
-    advanceByForegroundMonitorBufferTime()
     expect(callbacks[1]).toHaveBeenNthCalledWith(2, true)
     expect(callbacks[1]).toHaveBeenCalledTimes(2)
     expect(callbacks[0]).toHaveBeenCalledTimes(1)
 
     unsub1()
     sendLocationUpdate(TEST_REGION.coordinate)
-    advanceByForegroundMonitorBufferTime()
     expect(callbacks[0]).toHaveBeenCalledTimes(1)
     expect(callbacks[1]).toHaveBeenNthCalledWith(3, false)
     expect(callbacks[1]).toHaveBeenCalledTimes(3)
-  })
-
-  it("should not buffer updates when the last subscriber unsubcribes from region monitoring", async () => {
-    const unsub = monitor.monitorRegion(TEST_REGION, jest.fn())
-    sendLocationUpdate(TEST_REGION.coordinate)
-    advanceByForegroundMonitorBufferTime(0.5)
-    unsub()
-    expect(monitor.hasArrivedAtRegion(TEST_REGION)).toEqual(true)
   })
 
   it("should unsubscribe from the location watcher when no regions subscribed to", async () => {
