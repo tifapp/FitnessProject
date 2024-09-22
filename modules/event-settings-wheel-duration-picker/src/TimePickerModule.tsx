@@ -17,14 +17,14 @@ const IOSTimePickerView = ({
 }: TimePickerProps) => {
   return (
     <DateTimePicker
-      value={Date.fromSeconds(initialDurationSeconds)}
+      value={Date.fromSecondsSince1970(initialDurationSeconds)}
       mode="countdown"
       display="spinner"
       onChange={useCallback(
         (_: any, selectedDate?: Date) => {
           if (selectedDate) {
             onDurationChange(
-              selectedDate.ext.toSeconds()
+              selectedDate.ext.toSecondsSince1970()
             )
           }
         },
