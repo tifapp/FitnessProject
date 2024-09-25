@@ -15,7 +15,7 @@ const IMAGE_URLS = [
 
 export const mockBlockListUser = (): BlockListUser => ({
   id: uuidString(),
-  username: faker.name.fullName(),
+  name: faker.name.fullName(),
   handle: [
     UserHandle.zed,
     UserHandle.alvis,

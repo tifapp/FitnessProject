@@ -223,10 +223,12 @@ describe("DateRangeFormatting tests", () => {
   })
 
   const expectFormattedDateRange = (
-    startDate: Date,
-    endDate: Date,
+    startDateTime: Date,
+    endDateTime: Date,
     expected: string
   ) => {
-    expect(dateRange(startDate, endDate)!.ext.formatted()).toEqual(expected)
+    expect(dateRange(startDateTime, endDateTime)!.ext.formatted()).toEqual(
+      expected
+    )
   }
 })

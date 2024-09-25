@@ -1,32 +1,32 @@
 import { EventMocks } from "@event-details-boundary/MockData"
+import { renderUseLoadEventDetails } from "@event-details-boundary/TestHelpers"
 import {
-  mockExpoLocationObject,
-  mockLocationCoordinate2D,
-  mockRegion
+    mockExpoLocationObject,
+    mockLocationCoordinate2D,
+    mockRegion
 } from "@location/MockData"
 import { UserLocationFunctionsProvider } from "@location/UserLocation"
-import {
-  TestQueryClientProvider,
-  createTestQueryClient
-} from "@test-helpers/ReactQuery"
-import { timeTravel, fakeTimers } from "@test-helpers/Timers"
-import { act, renderHook, waitFor } from "@testing-library/react-native"
-import {
-  ExploreEventsRegion,
-  minRegionMeterRadius,
-  createDefaultMapRegion,
-  SAN_FRANCISCO_DEFAULT_REGION
-} from "./Region"
-import { eventsByRegion, useExploreEvents } from "./ExploreEvents"
-import { renderUseLoadEventDetails } from "@event-details-boundary/TestHelpers"
-import { TestInternetConnectionStatus } from "@test-helpers/InternetConnectionStatus"
-import { neverPromise } from "@test-helpers/Promise"
 import { verifyNeverOccurs } from "@test-helpers/ExpectNeverOccurs"
+import { TestInternetConnectionStatus } from "@test-helpers/InternetConnectionStatus"
 import { mswServer } from "@test-helpers/msw"
+import { neverPromise } from "@test-helpers/Promise"
+import {
+    TestQueryClientProvider,
+    createTestQueryClient
+} from "@test-helpers/ReactQuery"
+import { fakeTimers, timeTravel } from "@test-helpers/Timers"
+import { act, renderHook, waitFor } from "@testing-library/react-native"
 import { HttpResponse, http } from "msw"
 import { TiFAPI } from "TiFShared/api"
 import { EventID } from "TiFShared/domain-models/Event"
+import { eventsByRegion, useExploreEvents } from "./ExploreEvents"
 import { ExploreEventsInitialCenter } from "./InitialCenter"
+import {
+    ExploreEventsRegion,
+    SAN_FRANCISCO_DEFAULT_REGION,
+    createDefaultMapRegion,
+    minRegionMeterRadius
+} from "./Region"
 
 const TEST_EVENTS = [EventMocks.Multiday, EventMocks.PickupBasketball]
 
@@ -41,23 +41,19 @@ describe("ExploreEvents tests", () => {
         {
           attendeeCount: 2,
           isChatExpired: false,
-          createdAt: "2024-03-25T03:31:24.000Z",
+          createdDateTime: "2024-03-25T03:31:24.000Z",
           description: "Dactylomys boliviensis",
           color: "#FFFFFF",
-          endedAt: null,
+          endedDateTime: undefined,
           hasArrived: false,
           host: {
             handle: "marygoodwin3187",
             id: "269851f0-64ae-4fc6-a2e3-e1b957cc7769",
-            profileImageURL: null,
-            relations: {
-              themToYou: "not-friends",
-              youToThem: "not-friends"
-            },
-            username: "Mary Goodwin"
+            relationStatus: "friends",
+            name: "Mary Goodwin"
           },
           id: 19160,
-          joinDate: "2024-03-25T03:31:26.000Z",
+          joinedDateTime: "2024-03-25T03:31:26.000Z",
           location: {
             arrivalRadiusMeters: 120,
             coordinate: {
@@ -76,12 +72,10 @@ describe("ExploreEvents tests", () => {
           },
           previewAttendees: [
             {
-              id: "269851f0-64ae-4fc6-a2e3-e1b957cc7769",
-              profileImageURL: null
+              id: "269851f0-64ae-4fc6-a2e3-e1b957cc7769"
             },
             {
-              id: "b144faae-8519-40ab-9af4-99a27bf7bccd",
-              profileImageURL: null
+              id: "b144faae-8519-40ab-9af4-99a27bf7bccd"
             }
           ],
           settings: {
@@ -97,29 +91,25 @@ describe("ExploreEvents tests", () => {
             todayOrTomorrow: "today"
           },
           title: "quince",
-          updatedAt: "2024-03-25T03:31:24.000Z",
+          updatedDateTime: "2024-03-25T03:31:24.000Z",
           userAttendeeStatus: "attending"
         },
         {
           attendeeCount: 2,
           isChatExpired: false,
-          createdAt: "2024-03-25T03:31:24.000Z",
+          createdDateTime: "2024-03-25T03:31:24.000Z",
           description: "Dactylomys boliviensis",
           color: "#FFFFFF",
-          endedAt: null,
+          endedDateTime: undefined,
           hasArrived: false,
           host: {
             handle: "marygoodwin3187",
             id: "269851f0-64ae-4fc6-a2e3-e1b957cc7769",
-            profileImageURL: null,
-            relations: {
-              themToYou: "not-friends",
-              youToThem: "not-friends"
-            },
-            username: "Mary Goodwin"
+            relationStatus: "friends",
+            name: "Mary Goodwin"
           },
           id: 19161,
-          joinDate: "2024-03-25T03:31:26.000Z",
+          joinedDateTime: "2024-03-25T03:31:26.000Z",
           location: {
             arrivalRadiusMeters: 120,
             coordinate: {
@@ -138,12 +128,10 @@ describe("ExploreEvents tests", () => {
           },
           previewAttendees: [
             {
-              id: "269851f0-64ae-4fc6-a2e3-e1b957cc7769",
-              profileImageURL: null
+              id: "269851f0-64ae-4fc6-a2e3-e1b957cc7769"
             },
             {
-              id: "b144faae-8519-40ab-9af4-99a27bf7bccd",
-              profileImageURL: null
+              id: "b144faae-8519-40ab-9af4-99a27bf7bccd"
             }
           ],
           settings: {
@@ -155,11 +143,10 @@ describe("ExploreEvents tests", () => {
               endDateTime: "2025-03-25T03:31:22.000Z",
               startDateTime: "2024-03-24T15:31:22.000Z"
             },
-            secondsToStart: -43204.922,
-            todayOrTomorrow: null
+            secondsToStart: -43204.922
           },
           title: "quince",
-          updatedAt: "2024-03-25T03:31:24.000Z",
+          updatedDateTime: "2024-03-25T03:31:24.000Z",
           userAttendeeStatus: "attending"
         }
       ]

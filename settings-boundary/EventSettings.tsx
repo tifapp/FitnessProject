@@ -268,7 +268,7 @@ const PresetSectionView = ({
 }: PresetSectionProps) => {
   const { settings, update } = useUserSettings(
     settingsSelector(
-      "eventPresetPlacemark",
+      "eventPresetLocation",
       "eventPresetShouldHideAfterStartDate"
     )
   )
@@ -289,8 +289,8 @@ const PresetSectionView = ({
       />
       <TiFFormNavigationLinkView
         title={"Location"}
-        description={settings.eventPresetPlacemark?.name ?? "No Location"}
-        onTapped={() => onLocationPresetTapped(settings.eventPresetPlacemark!)}
+        description={settings.eventPresetLocation?.name ?? "No Location"}
+        onTapped={() => onLocationPresetTapped(settings.eventPresetLocation!)}
       />
       <TiFFormNavigationLinkView
         title={"Durations"}

@@ -1,17 +1,17 @@
 import React from "react"
 import {
-  ImageStyle,
-  StyleProp,
-  StyleSheet,
-  View,
-  ViewStyle
+    ImageStyle,
+    StyleProp,
+    StyleSheet,
+    View,
+    ViewStyle
 } from "react-native"
+import { UserHandle } from "TiFShared/domain-models/User"
 import { Caption, Headline } from "../Text"
 import ProfileImage from "./ProfileImage"
-import { UserHandle } from "TiFShared/domain-models/User"
 
 interface ImageAndNameProps {
-  username: string
+  name: string
   handle: UserHandle
   imageURL: string | null
   style?: StyleProp<ViewStyle>
@@ -19,7 +19,7 @@ interface ImageAndNameProps {
 }
 
 const ProfileImageAndName = ({
-  username,
+  name,
   handle,
   imageURL,
   style
@@ -27,7 +27,7 @@ const ProfileImageAndName = ({
   <View style={[style, styles.container]}>
     <ProfileImage imageURL={imageURL ?? undefined} style={styles.image} />
     <View style={styles.textContainer}>
-      <Headline style={styles.handle}>{username}</Headline>
+      <Headline style={styles.handle}>{name}</Headline>
       <Caption>{handle.toString()}</Caption>
     </View>
   </View>

@@ -1,4 +1,4 @@
-import { Placemark } from "TiFShared/domain-models/Placemark"
+import { EventEditLocation } from "TiFShared/domain-models/Event"
 
 export type SettingsStoreUnsubscribe = () => void
 
@@ -6,7 +6,7 @@ export type SettingValue =
   | string
   | boolean
   | number
-  | Placemark
+  | EventEditLocation
   | SettingValue[]
   | Date
   | null

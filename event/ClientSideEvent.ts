@@ -25,8 +25,8 @@ export type ClientSideEventTime = EventResponse["time"] & {
  * `previewAttendees` array as the primary purpose is to use them to display a couple of avatar images
  * to make the event more enticing. See {@link EventPreviewAttendee} for more information.
  *
- * Additionally, there should be a noted difference between `hasArrived` and `joinDate`. `hasArrived` is
- * a simple property that tells us that the user is physically present at the event location whereas `joinDate`
+ * Additionally, there should be a noted difference between `hasArrived` and `joinedDateTime`. `hasArrived` is
+ * a simple property that tells us that the user is physically present at the event location whereas `joinedDateTime`
  * is the exact date that they pressed the join button through the UI.
  *
  * Every event has the option of getting a specific group chat enabled just for it. This group chat can only
