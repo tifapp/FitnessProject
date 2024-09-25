@@ -1,12 +1,11 @@
-import { TiFAPI } from "TiFShared/api"
 import { randomFloatInRange } from "@lib/utils/Random"
 import { mockLocationCoordinate2D } from "@location/MockData"
-import { mswServer } from "@test-helpers/msw"
-import { DefaultBodyType, HttpResponse, StrictRequest, http } from "msw"
+import { TiFAPI } from "TiFShared/api"
+import { repeatElements } from "TiFShared/lib/Array"
+import { mockTiFServer } from "TiFShared/test-helpers/mockAPIServer"
+import { EventArrivals } from "./Arrivals"
 import { performEventArrivalsOperation } from "./ArrivalsOperation"
 import { mockEventArrivalRegion } from "./MockData"
-import { repeatElements } from "TiFShared/lib/Array"
-import { EventArrivals } from "./Arrivals"
 
 describe("ArrivalsOperation tests", () => {
   describe("PerformEventArrivalsOperation tests", () => {
@@ -23,19 +22,20 @@ describe("ArrivalsOperation tests", () => {
       EXPECTED_ARRIVAL_REGIONS
     )
 
-    const testBodyHandler = async ({
-      request
-    }: {
-      request: StrictRequest<DefaultBodyType>
-    }) => {
-      expect(await request.json()).toEqual(TEST_REGION)
-      return HttpResponse.json({ trackableRegions: EXPECTED_ARRIVAL_REGIONS })
-    }
+    const mockAPI = (endpoint: "departFromRegion" | "arriveAtRegion") =>
+      mockTiFServer({
+        [endpoint]: {
+          expectedRequest: { body: TEST_REGION },
+          mockResponse: {
+            status: 200,
+            data: { trackableRegions: EXPECTED_ARRIVAL_REGIONS }
+          }
+        }
+      })
 
     test("arrived", async () => {
-      mswServer.use(
-        http.post(TiFAPI.testPath("/event/arrived"), testBodyHandler)
-      )
+      mockAPI("arriveAtRegion")
+
       const results = await performEventArrivalsOperation(
         TEST_REGION,
         "arrived",
@@ -45,9 +45,8 @@ describe("ArrivalsOperation tests", () => {
     })
 
     test("departed", async () => {
-      mswServer.use(
-        http.post(TiFAPI.testPath("/event/departed"), testBodyHandler)
-      )
+      mockAPI("departFromRegion")
+
       const results = await performEventArrivalsOperation(
         TEST_REGION,
         "departed",
