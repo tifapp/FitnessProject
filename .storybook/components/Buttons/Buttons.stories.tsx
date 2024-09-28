@@ -2,7 +2,7 @@ import { AuthBannerButton } from "@components/AuthBanner"
 import { PrimaryButton, SecondaryOutlinedButton } from "@components/Buttons"
 import { CircularIonicon } from "@components/common/Icons"
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet"
-import { EventColors } from "@lib/events"
+import { AppStyles } from "@lib/AppColorStyle"
 import { ComponentMeta, ComponentStory } from "@storybook/react-native"
 import { ScrollView, View } from "react-native"
 import { GestureHandlerRootView } from "react-native-gesture-handler"
@@ -25,7 +25,7 @@ export const Basic: ButtonsStory = () => (
             <CircularIonicon
               size={24}
               name="airplane"
-              backgroundColor={EventColors.Orange}
+              backgroundColor={AppStyles.orange.toString()}
             />
           </PrimaryButton>
           <View style={{ marginVertical: 16 }} />
@@ -37,7 +37,10 @@ export const Basic: ButtonsStory = () => (
           <View style={{ marginVertical: 16 }} />
           <PrimaryButton
             title="Max Width"
-            style={{ width: "100%", backgroundColor: EventColors.Orange }}
+            style={{
+              width: "100%",
+              backgroundColor: AppStyles.orange.toString()
+            }}
           />
           <View style={{ marginVertical: 16 }} />
           <SecondaryOutlinedButton>Hello World</SecondaryOutlinedButton>
