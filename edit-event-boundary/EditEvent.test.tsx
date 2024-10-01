@@ -40,5 +40,18 @@ describe("EditEvent tests", () => {
       const { result } = renderUseHydrateEditEvent(values, settings)
       expect(result.current).toEqual(values)
     })
+
+    it("should be able to hydrate twice in a row", async () => {
+      const values = {
+        ...DEFAULT_EDIT_EVENT_FORM_VALUES,
+        name: "Test Event",
+        description: "We are a test event!"
+      }
+      const { result: result1 } = renderUseHydrateEditEvent(values, settings)
+      const newValues = { ...values, shouldHideAfterStartDate: true }
+      const { result: result2 } = renderUseHydrateEditEvent(newValues, settings)
+      expect(result1.current).toEqual(result2.current)
+      expect(result1.current).toEqual(newValues)
+    })
   })
 })

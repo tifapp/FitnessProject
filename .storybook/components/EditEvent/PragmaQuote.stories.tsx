@@ -5,9 +5,12 @@ import {
   PragmaQuoteView,
   createEventQuote
 } from "@edit-event-boundary/PragmaQuotes"
-import { Provider, atom } from "jotai"
+import { Provider, atom, useAtomValue } from "jotai"
 import { EditEventView } from "@edit-event-boundary/EditEvent"
-import { DEFAULT_EDIT_EVENT_FORM_VALUES } from "@edit-event-boundary/FormValues"
+import {
+  DEFAULT_EDIT_EVENT_FORM_VALUES,
+  editEventFormValuesAtom
+} from "@edit-event-boundary/FormValues"
 import { SafeAreaProvider } from "react-native-safe-area-context"
 import { SQLiteLocalSettingsStorage } from "@settings-storage/LocalSettings"
 import { PersistentSettingsStores } from "@settings-storage/PersistentStores"
@@ -66,10 +69,14 @@ export const Basic = () => {
 
 const TestScreen = () => {
   const navigation: NavigationProp<ParamListBase> = useNavigation()
+  const values = useAtomValue(editEventFormValuesAtom)
   return (
     <Button
       title="Edit Event"
-      onPress={() => navigation.navigate("editEvent")}
+      onPress={() => {
+        console.log(DEFAULT_EDIT_EVENT_FORM_VALUES, values)
+        navigation.navigate("editEvent")
+      }}
     />
   )
 }
@@ -89,7 +96,7 @@ const EditEventScreen = () => {
         localSettingsStore={localStore}
       >
         <EditEventView
-          initialValues={DEFAULT_EDIT_EVENT_FORM_VALUES}
+          initialValues={{ ...DEFAULT_EDIT_EVENT_FORM_VALUES, title: "Blob" }}
           currentDate={new Date("2024-10-31T00:00:00")}
           style={{ height: "100%" }}
         />

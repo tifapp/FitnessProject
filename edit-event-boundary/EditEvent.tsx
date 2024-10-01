@@ -13,18 +13,17 @@ import {
   editEventFormValuesAtom,
   eventEditAtom
 } from "./FormValues"
-import { useHydrateAtoms } from "jotai/utils"
 import { EventID } from "TiFShared/domain-models/Event"
 import {
   PragmaQuoteView,
   createEventQuote,
   editEventQuote
 } from "./PragmaQuotes"
-import { useAtom, useAtomValue } from "jotai"
+import { useAtom, useAtomValue, useStore } from "jotai"
 import { ShadedTextField } from "@components/TextFields"
 import { useFontScale } from "@lib/Fonts"
 import { AppStyles } from "@lib/AppColorStyle"
-import { useCallback, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { useScreenBottomPadding } from "@components/Padding"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { PrimaryButton } from "@components/Buttons"
@@ -42,6 +41,7 @@ import {
 import { TiFFormNamedToggleView } from "@components/form-components/NamedToggle"
 import { TiFFormNavigationLinkView } from "@components/form-components/NavigationLink"
 import { settingsSelector } from "@settings-storage/Settings"
+import { useEffectEvent } from "@lib/utils/UseEffectEvent"
 
 export type EditEventProps = {
   eventId?: EventID
@@ -67,10 +67,12 @@ export const useHydrateEditEvent = (initialValues?: EditEventFormValues) => {
       : undefined,
     shouldHideAfterStartDate: settings.eventPresetShouldHideAfterStartDate
   }
-  useHydrateAtoms([
-    [editEventFormValuesAtom, initialFormValues],
-    [editEventFormInitialValuesAtom, initialFormValues]
-  ])
+  const store = useStore()
+  const hydrate = useEffectEvent(() => {
+    store.set(editEventFormValuesAtom, { ...initialFormValues })
+    store.set(editEventFormInitialValuesAtom, { ...initialFormValues })
+  })
+  useEffect(() => hydrate(), [hydrate])
 }
 
 export const EditEventView = ({
