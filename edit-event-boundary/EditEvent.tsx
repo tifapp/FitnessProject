@@ -49,12 +49,7 @@ export type EditEventProps = {
   style?: StyleProp<ViewStyle>
 }
 
-export const EditEventView = ({
-  eventId,
-  currentDate = new Date(),
-  initialValues,
-  style
-}: EditEventProps) => {
+export const useHydrateEditEvent = (initialValues?: EditEventFormValues) => {
   const { settings } = useUserSettings(
     settingsSelector(
       "eventPresetPlacemark",
@@ -76,6 +71,15 @@ export const EditEventView = ({
       }
     ]
   ])
+}
+
+export const EditEventView = ({
+  eventId,
+  currentDate = new Date(),
+  initialValues,
+  style
+}: EditEventProps) => {
+  useHydrateEditEvent(initialValues)
   const [footerLayout, setFooterLayout] = useState<
     LayoutRectangle | undefined
   >()
