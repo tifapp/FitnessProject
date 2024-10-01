@@ -1,8 +1,4 @@
-import {
-  Ionicons,
-  MaterialCommunityIcons,
-  MaterialIcons
-} from "@expo/vector-icons"
+import { Ionicons } from "@expo/vector-icons"
 import { AppStyles } from "@lib/AppColorStyle"
 import { useFontScale } from "@lib/Fonts"
 import React, { ComponentProps } from "react"
@@ -26,52 +22,6 @@ export type IconProps<IconName extends string> = {
   style?: StyleProp<ViewStyle>
   color?: string
 } & ViewProps
-
-export type MaterialIconName = ComponentProps<typeof MaterialIcons>["name"]
-
-/**
- * A Material icon component that automatically adjusts with the user's font settings.
- */
-export const MaterialIcon = ({
-  name,
-  size = 24,
-  style,
-  color,
-  maximumFontScaleFactor,
-  ...props
-}: IconProps<MaterialIconName>) => (
-  <MaterialIcons
-    name={name}
-    size={size * useFontScale({ maximumScaleFactor: maximumFontScaleFactor })}
-    color={color}
-    style={style}
-    {...props}
-  />
-)
-
-export type MaterialCommunityIconName = ComponentProps<
-  typeof MaterialCommunityIcons
->["name"]
-
-/**
- * A Material Community icon component that automatically adjusts with the user's font settings.
- */
-export const MaterialCommunityIcon = ({
-  name,
-  size = 24,
-  style,
-  color,
-  maximumFontScaleFactor,
-  ...props
-}: IconProps<MaterialCommunityIconName>) => (
-  <MaterialCommunityIcons
-    name={name}
-    size={size * useFontScale({ maximumScaleFactor: maximumFontScaleFactor })}
-    color={color}
-    style={style}
-    {...props}
-  />
-)
 
 export const DEFAULT_ICON_SIZE = 24
 

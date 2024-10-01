@@ -1,8 +1,7 @@
 import { PrimaryButton } from "@components/Buttons"
 import { IoniconCloseButton } from "@components/common/Icons"
-import { Headline } from "@components/Text"
-import { TextField } from "@components/TextFields"
 import { BottomSheetBackdrop, BottomSheetModal } from "@gorhom/bottom-sheet"
+import { DurationPickerView } from "@modules/tif-duration-picker"
 import { ReactNode, useMemo, useRef, useState } from "react"
 import {
   LayoutRectangle,
@@ -16,40 +15,10 @@ import { useSharedValue } from "react-native-reanimated"
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context"
 
 export type DurationPickerProps = {
-  onAddPresetTapped: (timeInSeconds: number) => void
-  timeInSeconds: string
-  onChangeTime: (newTime: string) => void
+  onAddPresetTapped: (durationSeconds: number) => void
+  durationSeconds: number
+  onDurationChange: (durationSeconds: number) => void
   style?: StyleProp<ViewStyle>
-}
-
-/**
- * What will display on the bottom sheet, to allow for a new duration to be selected.
- */
-export const DurationPickerView = ({
-  onAddPresetTapped,
-  timeInSeconds,
-  onChangeTime,
-  style
-}: DurationPickerProps) => {
-  return (
-    <View style={style}>
-      <View style={styles.pickerContainer}>
-        <Headline>Time (in seconds)</Headline>
-        <TextField
-          value={timeInSeconds}
-          onChangeText={onChangeTime}
-          placeholder="600"
-          style={{ padding: 8 }}
-        />
-        <PrimaryButton
-          onPress={() => onAddPresetTapped(parseInt(timeInSeconds))}
-          style={styles.pickerButton}
-        >
-          Save Duration
-        </PrimaryButton>
-      </View>
-    </View>
-  )
 }
 
 export type DurationPickerButtonProps<Children extends ReactNode> = Omit<
@@ -67,8 +36,8 @@ export type DurationPickerButtonProps<Children extends ReactNode> = Omit<
 export const DurationPickerButton = <Children extends ReactNode>({
   pickerStyle,
   onAddPresetTapped,
-  timeInSeconds,
-  onChangeTime,
+  durationSeconds,
+  onDurationChange,
   ...props
 }: DurationPickerButtonProps<Children>) => {
   const sheetRef = useRef<BottomSheetModal>(null)
@@ -84,6 +53,7 @@ export const DurationPickerButton = <Children extends ReactNode>({
       <PrimaryButton {...props} onPress={() => sheetRef.current?.present()} />
       <BottomSheetModal
         ref={sheetRef}
+        enableContentPanningGesture={false}
         snapPoints={useMemo(() => [sheetHeight ?? "50%"], [sheetHeight])}
         handleStyle={styles.bottomSheetHandle}
         keyboardBehavior="interactive"
@@ -114,12 +84,22 @@ export const DurationPickerButton = <Children extends ReactNode>({
               onPress={() => sheetRef.current?.dismiss()}
             />
           </View>
-          <DurationPickerView
-            onAddPresetTapped={onAddPresetTapped}
-            timeInSeconds={timeInSeconds}
-            onChangeTime={onChangeTime}
-            style={[styles.durationPickerSheetStyle, pickerStyle]}
-          />
+          <View style={[styles.durationPickerSheetStyle, pickerStyle]}>
+            <DurationPickerView
+              initialDurationSeconds={6000}
+              onDurationChange={onDurationChange}
+              style={styles.timePicker}
+            />
+            <PrimaryButton
+              onPress={() => {
+                sheetRef.current?.dismiss()
+                onAddPresetTapped(durationSeconds)
+              }}
+              style={styles.pickerButton}
+            >
+              Save Duration
+            </PrimaryButton>
+          </View>
         </SafeAreaView>
       </BottomSheetModal>
     </>
@@ -127,8 +107,10 @@ export const DurationPickerButton = <Children extends ReactNode>({
 }
 
 const styles = StyleSheet.create({
-  pickerContainer: {
-    rowGap: 16
+  timePicker: {
+    width: "100%",
+    alignSelf: "center",
+    height: 256
   },
   pickerTitle: {
     textAlign: "center"
@@ -140,7 +122,8 @@ const styles = StyleSheet.create({
     width: "100%"
   },
   durationPickerSheetStyle: {
-    paddingBottom: 24
+    paddingBottom: 24,
+    rowGap: 16
   },
   bottomSheetHandle: {
     opacity: 0
