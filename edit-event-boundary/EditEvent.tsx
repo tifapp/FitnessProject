@@ -8,6 +8,7 @@ import {
 import {
   DEFAULT_EDIT_EVENT_FORM_VALUES,
   EditEventFormValues,
+  editEventFormInitialValuesAtom,
   editEventFormValueAtoms,
   editEventFormValuesAtom,
   eventEditAtom
@@ -56,20 +57,19 @@ export const useHydrateEditEvent = (initialValues?: EditEventFormValues) => {
       "eventPresetShouldHideAfterStartDate"
     )
   )
+  const initialFormValues = initialValues ?? {
+    ...DEFAULT_EDIT_EVENT_FORM_VALUES,
+    location: settings.eventPresetPlacemark
+      ? {
+          placemark: settings.eventPresetPlacemark,
+          coordinate: undefined
+        }
+      : undefined,
+    shouldHideAfterStartDate: settings.eventPresetShouldHideAfterStartDate
+  }
   useHydrateAtoms([
-    [
-      editEventFormValuesAtom,
-      initialValues ?? {
-        ...DEFAULT_EDIT_EVENT_FORM_VALUES,
-        location: settings.eventPresetPlacemark
-          ? {
-              placemark: settings.eventPresetPlacemark,
-              coordinate: undefined
-            }
-          : undefined,
-        shouldHideAfterStartDate: settings.eventPresetShouldHideAfterStartDate
-      }
-    ]
+    [editEventFormValuesAtom, initialFormValues],
+    [editEventFormInitialValuesAtom, initialFormValues]
   ])
 }
 

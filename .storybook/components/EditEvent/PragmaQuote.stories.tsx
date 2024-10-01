@@ -25,6 +25,7 @@ import {
   BASE_HEADER_SCREEN_OPTIONS,
   XMarkBackButton
 } from "@components/Navigation"
+import { EditEventFormDismissButton } from "@edit-event-boundary/Dismiss"
 
 const EditEventPragmaQuotesMeta = {
   title: "Edit Event Pragma Quotes"
@@ -52,7 +53,7 @@ export const Basic = () => {
             <Stack.Group screenOptions={{ presentation: "modal" }}>
               <Stack.Screen
                 name="editEvent"
-                options={{ headerTitle: "", headerLeft: XMarkBackButton }}
+                options={{ headerTitle: "", headerLeft: DismissButton }}
                 component={EditEventScreen}
               />
             </Stack.Group>
@@ -71,6 +72,11 @@ const TestScreen = () => {
       onPress={() => navigation.navigate("editEvent")}
     />
   )
+}
+
+const DismissButton = () => {
+  const navigation = useNavigation()
+  return <EditEventFormDismissButton onDismiss={() => navigation.goBack()} />
 }
 
 const date = new Date("2024-10-30T00:00:00")

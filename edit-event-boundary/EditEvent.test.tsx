@@ -1,16 +1,9 @@
-import {
-  DEFAULT_EDIT_EVENT_FORM_VALUES,
-  EditEventFormValues,
-  editEventFormValuesAtom
-} from "./FormValues"
-import { renderHook } from "@testing-library/react-native"
-import { useHydrateEditEvent } from "./EditEvent"
-import { Provider, useAtomValue } from "jotai"
-import { SettingsProvider } from "@settings-storage/Hooks"
+import { DEFAULT_EDIT_EVENT_FORM_VALUES } from "./FormValues"
 import { PersistentSettingsStores } from "@settings-storage/PersistentStores"
 import { resetTestSQLiteBeforeEach, testSQLite } from "@test-helpers/SQLite"
 import { SQLiteUserSettingsStorage } from "@settings-storage/UserSettings"
 import { mockPlacemark } from "@location/MockData"
+import { renderUseHydrateEditEvent } from "./TestHelpers"
 
 describe("EditEvent tests", () => {
   describe("UseHydrateEditEvent tests", () => {
@@ -25,7 +18,7 @@ describe("EditEvent tests", () => {
         eventPresetShouldHideAfterStartDate: true,
         eventPresetPlacemark: placemark
       })
-      const { result } = renderUseHydrateEditEvent(undefined)
+      const { result } = renderUseHydrateEditEvent(undefined, settings)
       expect(result.current).toEqual({
         ...DEFAULT_EDIT_EVENT_FORM_VALUES,
         shouldHideAfterStartDate: true,
@@ -44,26 +37,8 @@ describe("EditEvent tests", () => {
         eventPresetShouldHideAfterStartDate: true,
         eventPresetPlacemark: placemark
       })
-      const { result } = renderUseHydrateEditEvent(values)
+      const { result } = renderUseHydrateEditEvent(values, settings)
       expect(result.current).toEqual(values)
     })
-
-    const useTest = (initialValues: EditEventFormValues | undefined) => {
-      const values = useAtomValue(editEventFormValuesAtom)
-      useHydrateEditEvent(initialValues)
-      return values
-    }
-
-    const renderUseHydrateEditEvent = (
-      initialValues: EditEventFormValues | undefined
-    ) => {
-      return renderHook(() => useTest(initialValues), {
-        wrapper: ({ children }: any) => (
-          <SettingsProvider userSettingsStore={settings}>
-            <Provider>{children}</Provider>
-          </SettingsProvider>
-        )
-      })
-    }
   })
 })
