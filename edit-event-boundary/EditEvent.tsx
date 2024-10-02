@@ -13,7 +13,7 @@ import {
   editEventFormValuesAtom,
   eventEditAtom
 } from "./FormValues"
-import { EventID } from "TiFShared/domain-models/Event"
+import { EventEdit, EventID } from "TiFShared/domain-models/Event"
 import {
   PragmaQuoteView,
   createEventQuote,
@@ -42,9 +42,12 @@ import { TiFFormNamedToggleView } from "@components/form-components/NamedToggle"
 import { TiFFormNavigationLinkView } from "@components/form-components/NavigationLink"
 import { settingsSelector } from "@settings-storage/Settings"
 import { useEffectEvent } from "@lib/utils/UseEffectEvent"
+import { EditEventFormSubmitButton, useEditEventFormSubmission } from "./Submit"
 
 export type EditEventProps = {
   eventId?: EventID
+  submit: (eventId: EventID | undefined, edit: EventEdit) => Promise<void>
+  onSuccess: () => void
   currentDate?: Date
   initialValues?: EditEventFormValues
   style?: StyleProp<ViewStyle>
@@ -78,6 +81,8 @@ export const useHydrateEditEvent = (initialValues?: EditEventFormValues) => {
 export const EditEventView = ({
   eventId,
   currentDate = new Date(),
+  submit,
+  onSuccess,
   initialValues,
   style
 }: EditEventProps) => {
@@ -104,7 +109,7 @@ export const EditEventView = ({
           style={styles.footer}
           onLayout={(e) => setFooterLayout(e.nativeEvent.layout)}
         >
-          <FooterView eventId={eventId} />
+          <FooterView eventId={eventId} submit={submit} onSuccess={onSuccess} />
         </View>
       </View>
     </View>
@@ -183,8 +188,8 @@ const StartDateSectionView = () => {
 
 const DurationSectionView = () => {
   const {
-    settings: { presets }
-  } = useUserSettings(durationsSectionSettingsSelector)
+    settings: { eventPresetDurations }
+  } = useUserSettings(settingsSelector("eventPresetDurations"))
   return (
     <TiFFormSectionView
       title="Length?"
@@ -192,15 +197,11 @@ const DurationSectionView = () => {
     >
       <EditEventDurationPickerView
         durationAtom={editEventFormValueAtoms.duration}
-        presetOptions={presets}
+        presetOptions={eventPresetDurations}
       />
     </TiFFormSectionView>
   )
 }
-
-const durationsSectionSettingsSelector = (settings: UserSettings) => ({
-  presets: settings.eventPresetDurations
-})
 
 const DescriptionSectionView = () => {
   const [description, setDescription] = useAtom(
@@ -239,14 +240,15 @@ const AdvancedSectionView = () => {
 
 type FooterProps = {
   eventId?: EventID
+  submit: (eventId: EventID | undefined, edit: EventEdit) => Promise<void>
+  onSuccess: () => void
 }
 
-const FooterView = ({ eventId }: FooterProps) => {
+const FooterView = ({ eventId, onSuccess, submit }: FooterProps) => {
   const bottomPadding = useScreenBottomPadding({
     safeAreaScreens: 8,
     nonSafeAreaScreens: 24
   })
-  const eventEdit = useAtomValue(eventEditAtom)
   return (
     <View
       style={{
@@ -254,10 +256,8 @@ const FooterView = ({ eventId }: FooterProps) => {
         paddingBottom: useSafeAreaInsets().bottom + bottomPadding
       }}
     >
-      <PrimaryButton
-        title={!eventId ? "Create Event" : "Update Event"}
-        disabled={!eventEdit}
-        style={styles.submitButton}
+      <EditEventFormSubmitButton
+        state={useEditEventFormSubmission({ eventId, submit, onSuccess })}
       />
     </View>
   )

@@ -1,5 +1,9 @@
 import { Atomize } from "@lib/Jotai"
-import { EventEdit, EventEditSchema } from "TiFShared/domain-models/Event"
+import {
+  EventEdit,
+  EventEditSchema,
+  EventID
+} from "TiFShared/domain-models/Event"
 import { LocationCoordinate2D } from "TiFShared/domain-models/LocationCoordinate2D"
 import { Placemark } from "TiFShared/domain-models/Placemark"
 import { shallowEquals } from "TiFShared/lib/ShallowEquals"
@@ -76,3 +80,15 @@ export const eventEditAtom = atom<EventEdit | undefined>((get) => {
   })
   return result.success ? result.data : undefined
 })
+
+export const submitFormAtom = (
+  eventId: EventID | undefined,
+  submit: (id: EventID | undefined, edit: EventEdit) => Promise<void>
+) => {
+  return atom((get) => {
+    const isDirty = get(isEditEventFormDirtyAtom)
+    const eventEdit = get(eventEditAtom)
+    if (!isDirty || !eventEdit) return undefined
+    return async () => await submit(eventId, eventEdit)
+  })
+}

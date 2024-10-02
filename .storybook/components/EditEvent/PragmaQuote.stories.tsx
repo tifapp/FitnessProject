@@ -29,6 +29,8 @@ import {
   XMarkBackButton
 } from "@components/Navigation"
 import { EditEventFormDismissButton } from "@edit-event-boundary/Dismiss"
+import { mockLocationCoordinate2D } from "@location/MockData"
+import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
 
 const EditEventPragmaQuotesMeta = {
   title: "Edit Event Pragma Quotes"
@@ -48,22 +50,24 @@ const Stack = createStackNavigator()
 
 export const Basic = () => {
   return (
-    <GestureHandlerRootView>
-      <SafeAreaProvider>
-        <NavigationContainer>
-          <Stack.Navigator screenOptions={{ ...BASE_HEADER_SCREEN_OPTIONS }}>
-            <Stack.Screen name="Settings" component={TestScreen} />
-            <Stack.Group screenOptions={{ presentation: "modal" }}>
-              <Stack.Screen
-                name="editEvent"
-                options={{ headerTitle: "", headerLeft: DismissButton }}
-                component={EditEventScreen}
-              />
-            </Stack.Group>
-          </Stack.Navigator>
-        </NavigationContainer>
-      </SafeAreaProvider>
-    </GestureHandlerRootView>
+    <TestQueryClientProvider>
+      <GestureHandlerRootView>
+        <SafeAreaProvider>
+          <NavigationContainer>
+            <Stack.Navigator screenOptions={{ ...BASE_HEADER_SCREEN_OPTIONS }}>
+              <Stack.Screen name="Settings" component={TestScreen} />
+              <Stack.Group screenOptions={{ presentation: "modal" }}>
+                <Stack.Screen
+                  name="editEvent"
+                  options={{ headerTitle: "", headerLeft: DismissButton }}
+                  component={EditEventScreen}
+                />
+              </Stack.Group>
+            </Stack.Navigator>
+          </NavigationContainer>
+        </SafeAreaProvider>
+      </GestureHandlerRootView>
+    </TestQueryClientProvider>
   )
 }
 
@@ -96,7 +100,17 @@ const EditEventScreen = () => {
         localSettingsStore={localStore}
       >
         <EditEventView
-          initialValues={{ ...DEFAULT_EDIT_EVENT_FORM_VALUES, title: "Blob" }}
+          initialValues={{
+            ...DEFAULT_EDIT_EVENT_FORM_VALUES,
+            title: "Blob",
+            location: {
+              coordinate: mockLocationCoordinate2D(),
+              placemark: undefined
+            }
+          }}
+          submit={async (id, edit) => {
+            throw new Error("LOL")
+          }}
           currentDate={new Date("2024-10-31T00:00:00")}
           style={{ height: "100%" }}
         />
