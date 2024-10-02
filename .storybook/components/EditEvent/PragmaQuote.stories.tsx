@@ -118,6 +118,7 @@ const EditEventScreen = () => {
           }}
           submit={async (id, edit) => {
             await sleep(3000)
+            throw new Error()
             return EventMocks.PickupBasketball
           }}
           onSuccess={(event) => {

@@ -238,8 +238,6 @@ const StartDateSectionView = () => {
           ref={bottomSheetRef}
           handleStyle={styles.sheetHandle}
           snapPoints={SNAP_POINTS}
-          enableContentPanningGesture={false}
-          enablePanDownToClose={false}
           backdropComponent={(props) => (
             <BottomSheetBackdrop
               {...props}
@@ -300,8 +298,6 @@ const DurationSectionView = () => {
         ref={bottomSheetRef}
         handleStyle={styles.sheetHandle}
         snapPoints={SNAP_POINTS}
-        enableContentPanningGesture={false}
-        enablePanDownToClose={false}
         backdropComponent={(props) => (
           <BottomSheetBackdrop
             {...props}
