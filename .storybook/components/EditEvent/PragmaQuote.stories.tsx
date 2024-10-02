@@ -31,6 +31,9 @@ import {
 import { EditEventFormDismissButton } from "@edit-event-boundary/Dismiss"
 import { mockLocationCoordinate2D } from "@location/MockData"
 import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
+import { sleep } from "@lib/utils/DelayData"
+import { EventMocks } from "@event-details-boundary/MockData"
+import { BottomSheetModalProvider } from "@gorhom/bottom-sheet"
 
 const EditEventPragmaQuotesMeta = {
   title: "Edit Event Pragma Quotes"
@@ -52,20 +55,24 @@ export const Basic = () => {
   return (
     <TestQueryClientProvider>
       <GestureHandlerRootView>
-        <SafeAreaProvider>
-          <NavigationContainer>
-            <Stack.Navigator screenOptions={{ ...BASE_HEADER_SCREEN_OPTIONS }}>
-              <Stack.Screen name="Settings" component={TestScreen} />
-              <Stack.Group screenOptions={{ presentation: "modal" }}>
-                <Stack.Screen
-                  name="editEvent"
-                  options={{ headerTitle: "", headerLeft: DismissButton }}
-                  component={EditEventScreen}
-                />
-              </Stack.Group>
-            </Stack.Navigator>
-          </NavigationContainer>
-        </SafeAreaProvider>
+        <BottomSheetModalProvider>
+          <SafeAreaProvider>
+            <NavigationContainer>
+              <Stack.Navigator
+                screenOptions={{ ...BASE_HEADER_SCREEN_OPTIONS }}
+              >
+                <Stack.Screen name="Settings" component={TestScreen} />
+                <Stack.Group screenOptions={{ presentation: "modal" }}>
+                  <Stack.Screen
+                    name="editEvent"
+                    options={{ headerTitle: "", headerLeft: DismissButton }}
+                    component={EditEventScreen}
+                  />
+                </Stack.Group>
+              </Stack.Navigator>
+            </NavigationContainer>
+          </SafeAreaProvider>
+        </BottomSheetModalProvider>
       </GestureHandlerRootView>
     </TestQueryClientProvider>
   )
@@ -93,6 +100,7 @@ const DismissButton = () => {
 const date = new Date("2024-10-30T00:00:00")
 
 const EditEventScreen = () => {
+  const navigation = useNavigation()
   return (
     <View style={{ height: "100%" }}>
       <SettingsProvider
@@ -109,7 +117,12 @@ const EditEventScreen = () => {
             }
           }}
           submit={async (id, edit) => {
-            throw new Error("LOL")
+            await sleep(3000)
+            return EventMocks.PickupBasketball
+          }}
+          onSuccess={(event) => {
+            console.log("Edited", event)
+            navigation.goBack()
           }}
           currentDate={new Date("2024-10-31T00:00:00")}
           style={{ height: "100%" }}

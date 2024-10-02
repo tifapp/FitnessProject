@@ -53,7 +53,7 @@
     "@expo/ngrok": "^4.1.0",
     "@expo/prebuild-config": "~7.0.0",
     "@fragaria/address-formatter": "^5.0.1",
-    "@gorhom/bottom-sheet": "^4.4.5",
+    "@gorhom/bottom-sheet": "^4.6.4",
     "@jest/reporters": "29.4.1",
     "@react-native-async-storage/async-storage": "1.23.1",
     "@react-native-community/checkbox": "^0.5.5",

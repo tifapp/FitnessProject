@@ -18,16 +18,20 @@ import {
   createEventQuote,
   editEventQuote
 } from "./PragmaQuotes"
-import { useAtom, useStore } from "jotai"
+import { useAtom, useSetAtom, useStore } from "jotai"
 import { ShadedTextField } from "@components/TextFields"
 import { useFontScale } from "@lib/Fonts"
 import { AppStyles } from "@lib/AppColorStyle"
-import { useCallback, useEffect, useState } from "react"
+import React, { useCallback, useEffect, useRef, useState } from "react"
 import { useScreenBottomPadding } from "@components/Padding"
-import { useSafeAreaInsets } from "react-native-safe-area-context"
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context"
 import { useUserSettings } from "@settings-storage/Hooks"
 import { EditEventDurationPickerView } from "./DurationPicker"
-import { Ionicon, TouchableIonicon } from "@components/common/Icons"
+import {
+  Ionicon,
+  IoniconCloseButton,
+  TouchableIonicon
+} from "@components/common/Icons"
 import { dayjs } from "TiFShared/lib/Dayjs"
 import { Headline } from "@components/Text"
 import { TiFFormScrollView } from "@components/form-components/ScrollView"
@@ -41,6 +45,11 @@ import { settingsSelector } from "@settings-storage/Settings"
 import { useEffectEvent } from "@lib/utils/UseEffectEvent"
 import { EditEventFormSubmitButton, useEditEventFormSubmission } from "./Submit"
 import { ClientSideEvent } from "@event/ClientSideEvent"
+import { BottomSheetModal, BottomSheetBackdrop } from "@gorhom/bottom-sheet"
+import { useSharedValue } from "react-native-reanimated"
+import { PrimaryButton } from "@components/Buttons"
+import { DurationPickerView } from "@modules/tif-duration-picker"
+import { setDeviceFamily } from "@expo/config-plugins/build/ios/DeviceFamily"
 
 export type EditEventProps = {
   eventId?: EventID
@@ -191,18 +200,61 @@ const DurationSectionView = () => {
   const {
     settings: { eventPresetDurations }
   } = useUserSettings(settingsSelector("eventPresetDurations"))
+  const [duration, setDuration] = useAtom(editEventFormValueAtoms.duration)
+  const bottomSheetRef = useRef<BottomSheetModal>(null)
+  const animatedIndex = useSharedValue(1)
   return (
-    <TiFFormSectionView
-      title="Length?"
-      rightAddon={<TouchableIonicon icon={{ name: "ellipsis-horizontal" }} />}
-    >
-      <EditEventDurationPickerView
-        durationAtom={editEventFormValueAtoms.duration}
-        presetOptions={eventPresetDurations}
-      />
-    </TiFFormSectionView>
+    <>
+      <TiFFormSectionView
+        title="Length?"
+        rightAddon={
+          <TouchableIonicon
+            icon={{ name: "ellipsis-horizontal" }}
+            onPress={() => bottomSheetRef.current?.present()}
+          />
+        }
+      >
+        <EditEventDurationPickerView
+          durationAtom={editEventFormValueAtoms.duration}
+          presetOptions={eventPresetDurations}
+        />
+      </TiFFormSectionView>
+      <BottomSheetModal
+        ref={bottomSheetRef}
+        handleStyle={styles.sheetHandle}
+        snapPoints={SNAP_POINTS}
+        enableContentPanningGesture={false}
+        enablePanDownToClose={false}
+        backdropComponent={(props) => (
+          <BottomSheetBackdrop
+            {...props}
+            appearsOnIndex={1}
+            animatedIndex={animatedIndex}
+          />
+        )}
+      >
+        <SafeAreaView edges={["bottom"]} style={styles.bottomSheetView}>
+          <View style={styles.bottonSheetTopRow}>
+            <View style={styles.bottomSheetTopRowSpacer} />
+            <IoniconCloseButton
+              size={20}
+              onPress={() => bottomSheetRef.current?.dismiss()}
+            />
+          </View>
+          <View style={styles.durationPickerSheetStyle}>
+            <DurationPickerView
+              initialDurationSeconds={duration}
+              onDurationChange={setDuration}
+              style={styles.durationPicker}
+            />
+          </View>
+        </SafeAreaView>
+      </BottomSheetModal>
+    </>
   )
 }
+
+const SNAP_POINTS = ["50%"]
 
 const DescriptionSectionView = () => {
   const [description, setDescription] = useAtom(
@@ -242,7 +294,7 @@ const AdvancedSectionView = () => {
 type FooterProps = {
   eventId?: EventID
   submit: (eventId: EventID | undefined, edit: EventEdit) => Promise<void>
-  onSuccess: () => void
+  onSuccess: (event: ClientSideEvent) => void
 }
 
 const FooterView = ({ eventId, onSuccess, submit }: FooterProps) => {
@@ -251,16 +303,13 @@ const FooterView = ({ eventId, onSuccess, submit }: FooterProps) => {
     nonSafeAreaScreens: 24
   })
   return (
-    <View
+    <EditEventFormSubmitButton
+      state={useEditEventFormSubmission({ eventId, submit, onSuccess })}
       style={{
         paddingTop: 8,
         paddingBottom: useSafeAreaInsets().bottom + bottomPadding
       }}
-    >
-      <EditEventFormSubmitButton
-        state={useEditEventFormSubmission({ eventId, submit, onSuccess })}
-      />
-    </View>
+    />
   )
 }
 
@@ -276,9 +325,6 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     bottom: 0,
     paddingHorizontal: 24
-  },
-  submitButton: {
-    width: "100%"
   },
   locationNavigationLink: {
     width: "100%",
@@ -304,5 +350,27 @@ const styles = StyleSheet.create({
     columnGap: 8,
     padding: 16,
     backgroundColor: AppStyles.eventCardColor
+  },
+  sheetHandle: {
+    opacity: 0
+  },
+  bottomSheetView: {
+    rowGap: 16,
+    paddingHorizontal: 24
+  },
+  bottonSheetTopRow: {
+    display: "flex",
+    flexDirection: "row"
+  },
+  bottomSheetTopRowSpacer: {
+    flex: 1
+  },
+  durationPickerSheetStyle: {
+    paddingBottom: 24
+  },
+  durationPicker: {
+    width: "100%",
+    alignSelf: "center",
+    height: 256
   }
 })
