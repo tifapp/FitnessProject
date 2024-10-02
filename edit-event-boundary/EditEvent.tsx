@@ -10,8 +10,7 @@ import {
   EditEventFormValues,
   editEventFormInitialValuesAtom,
   editEventFormValueAtoms,
-  editEventFormValuesAtom,
-  eventEditAtom
+  editEventFormValuesAtom
 } from "./FormValues"
 import { EventEdit, EventID } from "TiFShared/domain-models/Event"
 import {
@@ -19,16 +18,14 @@ import {
   createEventQuote,
   editEventQuote
 } from "./PragmaQuotes"
-import { useAtom, useAtomValue, useStore } from "jotai"
+import { useAtom, useStore } from "jotai"
 import { ShadedTextField } from "@components/TextFields"
 import { useFontScale } from "@lib/Fonts"
 import { AppStyles } from "@lib/AppColorStyle"
 import { useCallback, useEffect, useState } from "react"
 import { useScreenBottomPadding } from "@components/Padding"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
-import { PrimaryButton } from "@components/Buttons"
 import { useUserSettings } from "@settings-storage/Hooks"
-import { UserSettings } from "TiFShared/domain-models/Settings"
 import { EditEventDurationPickerView } from "./DurationPicker"
 import { Ionicon, TouchableIonicon } from "@components/common/Icons"
 import { dayjs } from "TiFShared/lib/Dayjs"
@@ -43,11 +40,15 @@ import { TiFFormNavigationLinkView } from "@components/form-components/Navigatio
 import { settingsSelector } from "@settings-storage/Settings"
 import { useEffectEvent } from "@lib/utils/UseEffectEvent"
 import { EditEventFormSubmitButton, useEditEventFormSubmission } from "./Submit"
+import { ClientSideEvent } from "@event/ClientSideEvent"
 
 export type EditEventProps = {
   eventId?: EventID
-  submit: (eventId: EventID | undefined, edit: EventEdit) => Promise<void>
-  onSuccess: () => void
+  submit: (
+    eventId: EventID | undefined,
+    edit: EventEdit
+  ) => Promise<ClientSideEvent>
+  onSuccess: (event: ClientSideEvent) => void
   currentDate?: Date
   initialValues?: EditEventFormValues
   style?: StyleProp<ViewStyle>

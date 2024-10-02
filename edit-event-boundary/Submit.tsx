@@ -5,20 +5,23 @@ import { submitFormAtom } from "./FormValues"
 import { useFormSubmission } from "@lib/utils/Form"
 import { Alert, StyleProp, ViewStyle, StyleSheet, View } from "react-native"
 import { PrimaryButton } from "@components/Buttons"
+import { ClientSideEvent } from "@event/ClientSideEvent"
+import { useQueryClient } from "@tanstack/react-query"
+import { setEventDetailsQueryEvent } from "@event/DetailsQuery"
 
 export const ALERTS = {
   submissionError: (eventId?: EventID) => ({
     title: "Oh No!",
     message: eventId
-      ? "What could've possibly gone wrong creating this event???"
-      : "What could've possibly gone wrong editing this event???"
+      ? "It seems that we weren't able to create the event. Please try again."
+      : "It seems that we weren't able to update the event. Please try again."
   })
 }
 
 export type UseEditEventFormSubmissionEnvironment = {
   eventId?: EventID
-  onSuccess: () => void
-  submit: (id: EventID | undefined, edit: EventEdit) => Promise<void>
+  onSuccess: (event: ClientSideEvent) => void
+  submit: (id: EventID | undefined, edit: EventEdit) => Promise<ClientSideEvent>
 }
 
 export const useEditEventFormSubmission = ({
@@ -29,10 +32,11 @@ export const useEditEventFormSubmission = ({
   const submitForm = useAtomValue(
     useMemo(() => submitFormAtom(eventId, submit), [eventId, submit])
   )
+  const queryClient = useQueryClient()
   return {
     eventId,
     submission: useFormSubmission(
-      async (submit) => await submit?.(),
+      async (submit: () => Promise<ClientSideEvent>) => await submit(),
       () => {
         if (submitForm) {
           return { status: "submittable", submissionValues: submitForm }
@@ -40,7 +44,10 @@ export const useEditEventFormSubmission = ({
         return { status: "invalid" }
       },
       {
-        onSuccess,
+        onSuccess: (event) => {
+          setEventDetailsQueryEvent(queryClient, event)
+          onSuccess(event)
+        },
         onError: () => {
           const alertContents = ALERTS.submissionError(eventId)
           Alert.alert(alertContents.title, alertContents.message)
@@ -58,22 +65,20 @@ export type EditEventFormSubmitButtonProps = {
 export const EditEventFormSubmitButton = ({
   state,
   style
-}: EditEventFormSubmitButtonProps) => {
-  return (
-    <View style={style}>
-      <PrimaryButton
-        title={!state.eventId ? "Create Event" : "Update Event"}
-        disabled={state.submission.status !== "submittable"}
-        onPress={() => {
-          if (state.submission.status === "submittable") {
-            state.submission.submit()
-          }
-        }}
-        style={styles.submitButton}
-      />
-    </View>
-  )
-}
+}: EditEventFormSubmitButtonProps) => (
+  <View style={style}>
+    <PrimaryButton
+      title={!state.eventId ? "Create Event" : "Update Event"}
+      disabled={state.submission.status !== "submittable"}
+      onPress={() => {
+        if (state.submission.status === "submittable") {
+          state.submission.submit()
+        }
+      }}
+      style={styles.submitButton}
+    />
+  </View>
+)
 
 const styles = StyleSheet.create({
   submitButton: {

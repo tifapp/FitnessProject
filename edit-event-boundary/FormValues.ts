@@ -1,3 +1,4 @@
+import { ClientSideEvent } from "@event/ClientSideEvent"
 import { Atomize } from "@lib/Jotai"
 import {
   EventEdit,
@@ -83,7 +84,7 @@ export const eventEditAtom = atom<EventEdit | undefined>((get) => {
 
 export const submitFormAtom = (
   eventId: EventID | undefined,
-  submit: (id: EventID | undefined, edit: EventEdit) => Promise<void>
+  submit: (id: EventID | undefined, edit: EventEdit) => Promise<ClientSideEvent>
 ) => {
   return atom((get) => {
     const isDirty = get(isEditEventFormDirtyAtom)

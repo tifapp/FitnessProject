@@ -32,7 +32,10 @@ import {
   createDefaultMapRegion,
   minRegionMeterRadius
 } from "./Region"
-import { eventDetailsQueryKey } from "@event/DetailsQuery"
+import {
+  eventDetailsQueryKey,
+  setEventDetailsQueryEvent
+} from "@event/DetailsQuery"
 
 export const eventsByRegion = async (
   api: TiFAPI,
@@ -157,14 +160,7 @@ const useExploreEventsQuery = (
       queryKey,
       async ({ signal }) => {
         const events = await fetchEvents(region, signal)
-
-        events.forEach((event) => {
-          queryClient.setQueryData(eventDetailsQueryKey(event.id), {
-            status: "success",
-            event
-          })
-        })
-
+        events.forEach((event) => setEventDetailsQueryEvent(queryClient, event))
         return events
       },
       options

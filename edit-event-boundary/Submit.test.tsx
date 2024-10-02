@@ -16,8 +16,15 @@ import { SettingsProvider } from "@settings-storage/Hooks"
 import { Provider } from "jotai"
 import { mockPlacemark } from "@location/MockData"
 import { captureAlerts } from "@test-helpers/Alerts"
-import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
+import {
+  TestQueryClientProvider,
+  createTestQueryClient
+} from "@test-helpers/ReactQuery"
 import { EventID } from "TiFShared/domain-models/Event"
+import { EventMocks } from "@event-details-boundary/MockData"
+import { renderUseLoadEventDetails } from "@event-details-boundary/TestHelpers"
+import { TestInternetConnectionStatus } from "@test-helpers/InternetConnectionStatus"
+import { neverPromise } from "@test-helpers/Promise"
 
 describe("EditEventSubmit tests", () => {
   describe("UseEditEventSubmission tests", () => {
@@ -27,8 +34,10 @@ describe("EditEventSubmit tests", () => {
     )
     const onSuccess = jest.fn()
     const submit = jest.fn()
+    const queryClient = createTestQueryClient()
 
     beforeEach(() => {
+      queryClient.resetQueries()
       onSuccess.mockReset()
       submit.mockReset()
     })
@@ -53,6 +62,7 @@ describe("EditEventSubmit tests", () => {
     })
 
     it("should submit a changed valid event", async () => {
+      submit.mockResolvedValueOnce(EventMocks.PickupBasketball)
       renderUseHydrateEditEvent(TEST_VALUES, settings)
       const { result } = renderUseEditEventSubmission(10)
       const newValues = { ...TEST_VALUES, title: "Something different" }
@@ -64,7 +74,9 @@ describe("EditEventSubmit tests", () => {
           location: { type: "placemark", value: newValues.location.placemark }
         })
       })
-      await waitFor(() => expect(onSuccess).toHaveBeenCalled())
+      await waitFor(() => {
+        expect(onSuccess).toHaveBeenCalledWith(EventMocks.PickupBasketball)
+      })
       expect(submit).toHaveBeenCalledTimes(1)
       expect(onSuccess).toHaveBeenCalledTimes(1)
     })
@@ -86,6 +98,26 @@ describe("EditEventSubmit tests", () => {
       expect(onSuccess).not.toHaveBeenCalled()
     })
 
+    it("should update the details of an event after it has been edited", async () => {
+      submit.mockResolvedValueOnce(EventMocks.PickupBasketball)
+      renderUseHydrateEditEvent(TEST_VALUES, settings)
+      const { result } = renderUseEditEventSubmission(
+        EventMocks.PickupBasketball.id
+      )
+      const { result: eventDetails } = renderEventDetails(
+        EventMocks.PickupBasketball.id
+      )
+      const newValues = { ...TEST_VALUES, title: "Something different" }
+      editValues(newValues)
+      act(() => (result.current.submission as any).submit())
+      await waitFor(() => {
+        expect(eventDetails.current).toMatchObject({
+          status: "success",
+          event: EventMocks.PickupBasketball
+        })
+      })
+    })
+
     it("should present an edit error alert when the submission fails", async () => {
       submit.mockRejectedValueOnce(new Error())
       renderUseHydrateEditEvent(TEST_VALUES, settings)
@@ -105,6 +137,15 @@ describe("EditEventSubmit tests", () => {
 
     const { alertPresentationSpy } = captureAlerts()
 
+    const renderEventDetails = (id: EventID) => {
+      return renderUseLoadEventDetails(
+        id,
+        new TestInternetConnectionStatus(true),
+        neverPromise,
+        queryClient
+      )
+    }
+
     const editValues = (values: EditEventFormValues) => {
       act(() => TEST_EDIT_EVENT_FORM_STORE.set(editEventFormValuesAtom, values))
     }
@@ -114,7 +155,7 @@ describe("EditEventSubmit tests", () => {
         () => useEditEventFormSubmission({ eventId, submit, onSuccess }),
         {
           wrapper: ({ children }: any) => (
-            <TestQueryClientProvider>
+            <TestQueryClientProvider client={queryClient}>
               <SettingsProvider userSettingsStore={settings}>
                 <Provider store={TEST_EDIT_EVENT_FORM_STORE}>
                   {children}
