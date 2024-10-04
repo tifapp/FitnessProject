@@ -1,13 +1,13 @@
-import { AuthFormView } from "../AuthLayout"
-import { AuthShadedTextField } from "../AuthTextFields"
 import { Ionicon } from "@components/common/Icons"
-import { useFormSubmission } from "@lib/utils/Form"
-import { sleep } from "@lib/utils/DelayData"
 import { QueryHookOptions } from "@lib/ReactQuery"
+import { sleep } from "@lib/utils/DelayData"
+import { useFormSubmission } from "@lib/utils/Form"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import React, { useRef, useState } from "react"
 import { ActivityIndicator, Alert, StyleProp, ViewStyle } from "react-native"
 import { UserHandle, UserHandleError } from "TiFShared/domain-models/User"
+import { AuthFormView } from "../AuthLayout"
+import { AuthShadedTextField } from "../AuthTextFields"
 
 export type UseSignUpChangeUserHandleFormEnvironment = {
   checkIfUserHandleTaken: (
@@ -124,8 +124,8 @@ export const SignUpChangeUserHandleFormView = ({
   style
 }: SignUpChangeUserHandleFormProps) => (
   <AuthFormView
-    title="Choose your Username"
-    description="We have created a username for you, but you can customize it if you don't like it. It's also possible to change it later if you want to."
+    title="Choose your name"
+    description="We have created a name for you, but you can customize it if you don't like it. It's also possible to change it later if you want to."
     submissionTitle="I like this name!"
     submission={submission}
     style={style}
@@ -151,7 +151,7 @@ export const SignUpChangeUserHandleFormView = ({
           ? errorTextForInvalidHandleReason(submission.reason)
           : undefined
       }
-      placeholder="Enter a username"
+      placeholder="Enter a name"
       keyboardType="twitter"
       value={handleText}
       onChangeText={onHandleTextChanged}
@@ -163,12 +163,12 @@ const errorTextForInvalidHandleReason = (
   invalidHandleReason: UserHandleError
 ) => {
   if (invalidHandleReason === "already-taken") {
-    return "This username is already taken."
+    return "This name is already taken."
   } else if (invalidHandleReason === "empty") {
-    return "Your username cannot be empty."
+    return "Your name cannot be empty."
   } else if (invalidHandleReason === "too-long") {
-    return "Your username cannot be longer than 15 characters"
+    return "Your name cannot be longer than 15 characters"
   } else {
-    return "Your username can only contain letters, numbers, and underscores."
+    return "Your name can only contain letters, numbers, and underscores."
   }
 }

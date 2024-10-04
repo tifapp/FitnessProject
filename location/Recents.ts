@@ -1,8 +1,8 @@
-import { NamedLocation } from "@location/NamedLocation"
 import { TiFSQLite } from "@lib/SQLite"
-import { DeepNullable } from "TiFShared/lib/HelperTypes"
+import { NamedLocation } from "@location/NamedLocation"
 import { LocationCoordinate2D } from "TiFShared/domain-models/LocationCoordinate2D"
 import { Placemark } from "TiFShared/domain-models/Placemark"
+import { DeepNullable } from "TiFShared/lib/HelperTypes"
 
 /**
  * An interface for storing locations that the user has interacted with
@@ -46,7 +46,7 @@ export class SQLiteRecentLocationsStorage implements RecentLocationsStorage {
     return await this.sqlite.withTransaction(async (db) => {
       const results = await db.queryAll<SQLiteLocationPlacemark>`
       SELECT * FROM LocationPlacemarks
-      ORDER BY recentUpdatedAt DESC
+      ORDER BY recentupdatedDateTime DESC
       LIMIT ${amount}
       `
       return results.map(recentLocationFromSQLite)
@@ -62,7 +62,7 @@ export class SQLiteRecentLocationsStorage implements RecentLocationsStorage {
       SELECT * FROM LocationPlacemarks
       WHERE '|' || ${stringifiedCoordinates} || '|'
         LIKE '%|' || latitude || ',' || longitude || '|%'
-      ORDER BY recentUpdatedAt DESC
+      ORDER BY recentupdatedDateTime DESC
       `
       return results.map(recentLocationFromSQLite)
     })
@@ -106,7 +106,7 @@ export class SQLiteRecentLocationsStorage implements RecentLocationsStorage {
         isoCountryCode = ${location.placemark.isoCountryCode},
         city = ${location.placemark.city},
         recentAnnotation = ${annotation},
-        recentUpdatedAt = unixepoch('now', 'subsec')
+        recentupdatedDateTime = unixepoch('now', 'subsec')
       `
     })
   }

@@ -4,7 +4,7 @@ import { faker } from "@faker-js/faker"
 import {
   randomBool,
   randomIntegerInRange,
-  randomlyNull
+  randomlyUndefined
 } from "@lib/utils/Random"
 import { uuidString } from "@lib/utils/UUID"
 import { mockLocationCoordinate2D, mockPlacemark } from "@location/MockData"
@@ -21,7 +21,7 @@ export const mockEventLocation = (): EventLocation => ({
   arrivalRadiusMeters: parseInt(faker.random.numeric(3)),
   isInArrivalTrackingPeriod: randomBool(),
   timezoneIdentifier: faker.address.timeZone(),
-  placemark: randomlyNull(mockPlacemark())
+  placemark: randomlyUndefined(mockPlacemark())
 })
 
 export const mockEventChatTokenRequest = (): ChatTokenRequest => ({
@@ -44,36 +44,28 @@ export const mockEventChatTokenRequest = (): ChatTokenRequest => ({
 export namespace EventAttendeeMocks {
   export const Alivs = {
     id: uuidString(),
-    username: "Alvis",
+    name: "Alvis",
     handle: UserHandle.optionalParse("alvis")!,
     profileImageURL:
       "https://www.escapistmagazine.com/wp-content/uploads/2023/05/xc3-future-redeemed-alvis.jpg?resize=1200%2C673",
-    relations: {
-      themToYou: "not-friends",
-      youToThem: "not-friends"
-    }
+    relationStatus: "not-friends",
+    joinedDateTime: new Date(1000)
   } as EventAttendee
 
   export const BlobJr = {
     id: uuidString(),
-    username: "Blob Jr.",
+    name: "Blob Jr.",
     handle: UserHandle.optionalParse("SmallBlob")!,
-    profileImageURL: null,
-    relations: {
-      themToYou: "not-friends",
-      youToThem: "not-friends"
-    }
+    relationStatus: "not-friends",
+    joinedDateTime: new Date(2000)
   } as EventAttendee
 
   export const BlobSr = {
     id: uuidString(),
-    username: "Blob Sr.",
+    name: "Blob Sr.",
     handle: UserHandle.optionalParse("OriginalBlob")!,
-    profileImageURL: null,
-    relations: {
-      themToYou: "not-friends",
-      youToThem: "not-friends"
-    }
+    relationStatus: "not-friends",
+    joinedDateTime: new Date(3000)
   } as EventAttendee
 
   // NB: Unfortunately, we can't reuse Harrison's legendary
@@ -82,24 +74,18 @@ export namespace EventAttendeeMocks {
 
   export const AnnaAttendee = {
     id: uuidString(),
-    username: "Anna Attendee",
+    name: "Anna Attendee",
     handle: UserHandle.optionalParse("AnnaAttendee")!,
-    profileImageURL: null,
-    relations: {
-      themToYou: "not-friends",
-      youToThem: "not-friends"
-    }
+    relationStatus: "not-friends",
+    joinedDateTime: new Date(4000)
   } as EventAttendee
 
   export const HaleyHost = {
     id: uuidString(),
-    username: "Haley Host",
+    name: "Haley Host",
     handle: UserHandle.optionalParse("HaleyHost")!,
-    profileImageURL: null,
-    relations: {
-      themToYou: "not-friends",
-      youToThem: "not-friends"
-    }
+    relationStatus: "not-friends",
+    joinedDateTime: new Date(5000)
   } as EventAttendee
 }
 
@@ -130,9 +116,9 @@ export namespace EventMocks {
     attendeeCount: 10,
     userAttendeeStatus: "attending",
     hasArrived: false,
-    joinDate: new Date(),
+    joinedDateTime: new Date(),
     isChatExpired: false,
-    endedAt: null
+    endedDateTime: undefined
   } as ClientSideEvent
 
   export const Multiday = {
@@ -157,9 +143,9 @@ export namespace EventMocks {
     attendeeCount: 3,
     userAttendeeStatus: "attending",
     hasArrived: false,
-    joinDate: new Date(),
+    joinedDateTime: new Date(),
     isChatExpired: false,
-    endedAt: null
+    endedDateTime: undefined
   } as ClientSideEvent
 
   export const NoPlacemarkInfo = {
@@ -185,8 +171,8 @@ export namespace EventMocks {
     },
     userAttendeeStatus: "attending",
     hasArrived: false,
-    joinDate: new Date(),
+    joinedDateTime: new Date(),
     isChatExpired: false,
-    endedAt: null
+    endedDateTime: undefined
   } as ClientSideEvent
 }

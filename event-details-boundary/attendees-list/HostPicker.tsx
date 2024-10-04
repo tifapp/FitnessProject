@@ -3,16 +3,16 @@ import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { UserID } from "aws-sdk/clients/personalizeruntime"
 import { useState } from "react"
 import {
-  Alert,
-  StyleProp,
-  TouchableOpacity,
-  View,
-  ViewStyle
+    Alert,
+    StyleProp,
+    TouchableOpacity,
+    View,
+    ViewStyle
 } from "react-native"
 import {
-  AttendeesListView,
-  UseAttendeesListProps,
-  useAttendeesList
+    AttendeesListView,
+    UseAttendeesListProps,
+    useAttendeesList
 } from "./AttendeesList"
 import { updateAttendeesListQueryEvent } from "./Query"
 
@@ -65,7 +65,7 @@ export const EventHostPickerView = ({
                       : "white"
                 }}
               >
-                <Subtitle> {attendee.username} </Subtitle>
+                <Subtitle> {attendee.name} </Subtitle>
                 <BodyText> {attendee.handle.toString()} </BodyText>
               </TouchableOpacity>
             </View>

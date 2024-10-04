@@ -1,9 +1,10 @@
 /* eslint-disable @typescript-eslint/naming-convention */
+import { createSignUpEnvironment } from "@auth-boundary/sign-up"
 import { uuidString } from "@lib/utils/UUID"
 import {
-  NavigationContainer,
-  NavigatorScreenParams,
-  useFocusEffect
+    NavigationContainer,
+    NavigatorScreenParams,
+    useFocusEffect
 } from "@react-navigation/native"
 import { StackScreenProps, createStackNavigator } from "@react-navigation/stack"
 import { captureAlerts } from "@test-helpers/Alerts"
@@ -11,19 +12,18 @@ import "@test-helpers/Matchers"
 import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
 import { mswServer } from "@test-helpers/msw"
 import {
-  act,
-  fireEvent,
-  render,
-  screen,
-  waitFor
+    act,
+    fireEvent,
+    render,
+    screen,
+    waitFor
 } from "@testing-library/react-native"
+import { TiFAPI } from "TiFShared/api"
+import { UserHandle } from "TiFShared/domain-models/User"
 import { HttpResponse, http } from "msw"
 import { useCallback, useState } from "react"
 import { Button, View } from "react-native"
-import { createSignUpEnvironment } from "@auth-boundary/sign-up"
 import { SignUpParamsList, createSignUpScreens } from "./SignUp"
-import { UserHandle } from "TiFShared/domain-models/User"
-import { TiFAPI } from "TiFShared/api"
 
 type TestSignUpParamsList = {
   test: undefined
@@ -110,7 +110,7 @@ describe("SignUpNavigation tests", () => {
     await waitFor(() => expect(isAtEnd()).toEqual(true))
   })
 
-  test("get to end of sign-up flow, go back to change username again, finish sign-up flow", async () => {
+  test("get to end of sign-up flow, go back to change name again, finish sign-up flow", async () => {
     mswServer.use(
       http.patch(TiFAPI.testPath("/user/self"), async () => {
         return new HttpResponse(null, {
@@ -227,7 +227,7 @@ describe("SignUpNavigation tests", () => {
     fireEvent.press(screen.getByLabelText("Verify me!"))
   }
 
-  const changeUserHandleForm = () => screen.queryByText("Choose your Username")
+  const changeUserHandleForm = () => screen.queryByText("Choose your name")
 
   const replaceUserHandleText = (
     originalHandleText: string,
