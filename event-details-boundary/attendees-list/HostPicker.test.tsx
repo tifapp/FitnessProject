@@ -6,7 +6,7 @@ import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
 import { fakeTimers } from "@test-helpers/Timers"
 import { renderHook, waitFor } from "@testing-library/react-native"
 import { act } from "react-test-renderer"
-import { HOST_PICKER_ERROR_ALERTS, useEventHostPicker } from "./HostPicker"
+import { HOST_PICKER_ALERTS, useEventHostPicker } from "./HostPicker"
 
 describe("EventHostPicker tests", () => {
   describe("UseLeaveEventHostPicker tests", () => {
@@ -118,9 +118,8 @@ describe("EventHostPicker tests", () => {
       testEnv.promoteToHost.mockResolvedValueOnce("user-not-attending")
       act(() => (result.current as any).submitted())
       await waitFor(() =>
-        expect(alertPresentationSpy).toHaveBeenCalledWith(
-          HOST_PICKER_ERROR_ALERTS["user-not-attending"].title,
-          HOST_PICKER_ERROR_ALERTS["user-not-attending"].description
+        expect(alertPresentationSpy).toHaveBeenPresentedWith(
+          HOST_PICKER_ALERTS["user-not-attending"]
         )
       )
     })

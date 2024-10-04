@@ -22,6 +22,7 @@ import {
 } from "@auth-boundary/sign-up"
 import { UserHandle } from "TiFShared/domain-models/User"
 import { EmailAddress, USPhoneNumber } from "@user/privacy"
+import { presentAlert } from "@lib/Alerts"
 
 export type SignUpParamsList = {
   signUpCredentialsForm: undefined
@@ -197,10 +198,10 @@ const SignUpExitButton = () => {
       icon={{ name: "close" }}
       accessibilityLabel="Go Back"
       onPress={() => {
-        Alert.alert(
-          "Cancel Sign Up?",
-          "Are you sure you want to cancel your sign-up?",
-          [
+        presentAlert({
+          title: "Cancel Sign Up?",
+          description: "Are you sure you want to cancel your sign-up?",
+          buttons: [
             {
               text: "Cancel Sign Up",
               style: "destructive",
@@ -208,7 +209,7 @@ const SignUpExitButton = () => {
             },
             { text: "Dismiss" }
           ]
-        )
+        })
       }}
       style={styles.exitButtonPadding}
     />

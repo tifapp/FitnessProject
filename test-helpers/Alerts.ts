@@ -115,17 +115,22 @@ export const captureAlerts = () => {
 
       const mostRecentCall = unhandledCalls[unhandledCalls.length - 1]
 
-      // TODO: Handle default button case, when no buttons provided
-      const targetButton = mostRecentCall[2].find(
-        (button: AlertButton) => button.text === text
-      )
+      if (!mostRecentCall[2]) {
+        if (text !== "Ok") {
+          throw new Error(`No button with text ${text}`)
+        }
+      } else {
+        const targetButton = mostRecentCall[2].find(
+          (button: AlertButton) => button.text === text
+        )
 
-      if (!targetButton) {
-        throw new Error(`No button with text ${text}`)
-      }
+        if (!targetButton) {
+          throw new Error(`No button with text ${text}`)
+        }
 
-      if (targetButton.onPress) {
-        await act(async () => await targetButton.onPress())
+        if (targetButton.onPress) {
+          await act(async () => await targetButton.onPress())
+        }
       }
 
       dismissedCalls = [...dismissedCalls, mostRecentCall]

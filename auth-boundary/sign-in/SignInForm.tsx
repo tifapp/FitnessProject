@@ -23,6 +23,20 @@ import {
 import { useFormSubmission } from "@lib/utils/Form"
 import { SignInResult } from "./Authenticator"
 import { EmailAddress, USPhoneNumber } from "@user/privacy"
+import { AlertsObject, presentAlert } from "@lib/Alerts"
+
+export const SIGN_IN_ALERTS = {
+  "incorrect-credentials": {
+    title: "Incorrect Credentials",
+    description:
+      "Your email, phone number, or password entered was incorrectly entered."
+  },
+  genericError: {
+    title: "Ouch!",
+    description:
+      "Something went wrong when trying to sign you in... Please try again..."
+  }
+} satisfies AlertsObject
 
 export type UseSignInFormEnvironment = {
   signIn: (
@@ -71,20 +85,12 @@ export const useSignInForm = ({
       {
         onSuccess: (result, args) => {
           if (result === "incorrect-credentials") {
-            Alert.alert(
-              "Incorrect Credentials",
-              "Your email, phone number, or password entered was incorrectly entered."
-            )
+            presentAlert(SIGN_IN_ALERTS[result])
           } else {
             onSuccess(result, args.emailOrPhoneNumber)
           }
         },
-        onError: () => {
-          Alert.alert(
-            "Ouch!",
-            "Something went wrong when trying to sign you in... Please try again..."
-          )
-        }
+        onError: () => presentAlert(SIGN_IN_ALERTS.genericError)
       }
     )
   }
