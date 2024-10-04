@@ -2,8 +2,8 @@ import { captureAlerts } from "@test-helpers/Alerts"
 import { verifyNeverOccurs } from "@test-helpers/ExpectNeverOccurs"
 import { neverPromise } from "@test-helpers/Promise"
 import {
-    TestQueryClientProvider,
-    createTestQueryClient
+  TestQueryClientProvider,
+  createTestQueryClient
 } from "@test-helpers/ReactQuery"
 import { fakeTimers } from "@test-helpers/Timers"
 import { act, renderHook, waitFor } from "@testing-library/react-native"
@@ -124,14 +124,8 @@ describe("BlockListSettings tests", () => {
       const page = mockBlockListPage(2)
       const { result } = await renderUseBlockListSettingsWithInitialPage(page)
       act(() => result.current.userUnblocked(page.users[0]))
-      expect(alertPresentationSpy).toHaveBeenCalledWith(
-        BLOCK_LIST_SETTINGS_ALERTS.unblockUserConfirmation.title(
-          page.users[0].name
-        ),
-        BLOCK_LIST_SETTINGS_ALERTS.unblockUserConfirmation.description(
-          page.users[0]
-        ),
-        expect.any(Array)
+      expect(alertPresentationSpy).toHaveBeenPresentedWith(
+        BLOCK_LIST_SETTINGS_ALERTS.unblockUserConfirmation(page.users[0])
       )
       await confirmUnblockUser()
       await waitFor(() => {
@@ -181,10 +175,8 @@ describe("BlockListSettings tests", () => {
       act(() => result.current.userUnblocked(page.users[1]))
       await confirmUnblockUser()
       await waitFor(() => {
-        expect(alertPresentationSpy).toHaveBeenCalledWith(
-          BLOCK_LIST_SETTINGS_ALERTS.unblockUserFailed.title,
-          BLOCK_LIST_SETTINGS_ALERTS.unblockUserFailed.description,
-          expect.any(Array)
+        expect(alertPresentationSpy).toHaveBeenPresentedWith(
+          BLOCK_LIST_SETTINGS_ALERTS.unblockUserFailed()
         )
       })
     })
@@ -200,11 +192,9 @@ describe("BlockListSettings tests", () => {
       act(() => result.current.userUnblocked(page.users[2]))
       await confirmUnblockUser()
       await verifyNeverOccurs(() => {
-        expect(alertPresentationSpy).toHaveBeenNthCalledWith(
+        expect(alertPresentationSpy).toHaveBeenNthPresentedWith(
           4,
-          BLOCK_LIST_SETTINGS_ALERTS.unblockUserFailed.title,
-          BLOCK_LIST_SETTINGS_ALERTS.unblockUserFailed.description,
-          expect.any(Array)
+          BLOCK_LIST_SETTINGS_ALERTS.unblockUserFailed()
         )
       })
       expect(alertPresentationSpy).toHaveBeenCalledTimes(3)
@@ -223,11 +213,9 @@ describe("BlockListSettings tests", () => {
       act(() => result.current.userUnblocked(page.users[2]))
       await confirmUnblockUser()
       await waitFor(() => {
-        expect(alertPresentationSpy).toHaveBeenNthCalledWith(
+        expect(alertPresentationSpy).toHaveBeenNthPresentedWith(
           4,
-          BLOCK_LIST_SETTINGS_ALERTS.unblockUserFailed.title,
-          BLOCK_LIST_SETTINGS_ALERTS.unblockUserFailed.description,
-          expect.any(Array)
+          BLOCK_LIST_SETTINGS_ALERTS.unblockUserFailed()
         )
       })
     })
