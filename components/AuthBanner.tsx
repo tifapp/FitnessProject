@@ -18,6 +18,7 @@ import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context"
 import { useFontScale } from "@lib/Fonts"
 import { AppStyles } from "@lib/AppColorStyle"
 import { IoniconCloseButton } from "./common/Icons"
+import { TiFBottomSheet } from "./BottomSheet"
 
 export type AuthBannerProps = {
   onSignInTapped: () => void
@@ -70,34 +71,18 @@ export const AuthBannerButton = <Children extends ReactNode>({
   onSignUpTapped,
   ...props
 }: AuthBannerButtonProps<Children>) => {
-  const sheetRef = useRef<BottomSheetModal>(null)
-  const [bannerLayout, setBannerLayout] = useState<LayoutRectangle>()
-  const { bottom } = useSafeAreaInsets()
-  const paddingForNonSafeAreaScreens = bottom === 0 ? 24 : 0
-  const sheetHeight =
-    bannerLayout?.height && bannerLayout.height + paddingForNonSafeAreaScreens
-  const animatedIndex = useSharedValue(1)
+  const [isShowingSheet, setIsShowingSheet] = useState(false)
   const closeButtonHitSlop = 24 * useFontScale()
   return (
     <>
-      <PrimaryButton {...props} onPress={() => sheetRef.current?.present()} />
-      <BottomSheetModal
-        ref={sheetRef}
-        snapPoints={useMemo(() => [sheetHeight ?? "50%"], [sheetHeight])}
-        handleStyle={styles.bottomSheetHandle}
-        backdropComponent={(props) => (
-          <BottomSheetBackdrop
-            {...props}
-            appearsOnIndex={1}
-            animatedIndex={animatedIndex}
-          />
-        )}
+      <PrimaryButton {...props} onPress={() => setIsShowingSheet(true)} />
+      <TiFBottomSheet
+        isPresented={isShowingSheet}
+        handleStyle="hidden"
+        sizing="content-size"
+        onDismiss={() => setIsShowingSheet(false)}
       >
-        <SafeAreaView
-          edges={["bottom"]}
-          onLayout={(e) => setBannerLayout(e.nativeEvent.layout)}
-          style={styles.bottomSheetView}
-        >
+        <SafeAreaView edges={["bottom"]} style={styles.bottomSheetView}>
           <View style={styles.bottonSheetTopRow}>
             <View style={styles.bottomSheetTopRowSpacer} />
             <IoniconCloseButton
@@ -108,22 +93,22 @@ export const AuthBannerButton = <Children extends ReactNode>({
                 right: closeButtonHitSlop,
                 bottom: closeButtonHitSlop
               }}
-              onPress={() => sheetRef.current?.dismiss()}
+              onPress={() => setIsShowingSheet(false)}
             />
           </View>
           <AuthBannerView
             onSignInTapped={() => {
               onSignInTapped()
-              sheetRef.current?.dismiss()
+              setIsShowingSheet(false)
             }}
             onSignUpTapped={() => {
               onSignUpTapped()
-              sheetRef.current?.dismiss()
+              setIsShowingSheet(false)
             }}
             style={[styles.bottomSheetBannerStyle, bannerStyle]}
           />
         </SafeAreaView>
-      </BottomSheetModal>
+      </TiFBottomSheet>
     </>
   )
 }

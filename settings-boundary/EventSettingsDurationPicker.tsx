@@ -1,18 +1,16 @@
+import { TiFBottomSheet } from "@components/BottomSheet"
 import { PrimaryButton } from "@components/Buttons"
 import { IoniconCloseButton } from "@components/common/Icons"
-import { BottomSheetBackdrop, BottomSheetModal } from "@gorhom/bottom-sheet"
 import { DurationPickerView } from "@modules/tif-duration-picker"
-import { ReactNode, useMemo, useRef, useState } from "react"
+import { ReactNode, useState } from "react"
 import {
-  LayoutRectangle,
   StyleProp,
   StyleSheet,
   TouchableHighlightProps,
   View,
   ViewStyle
 } from "react-native"
-import { useSharedValue } from "react-native-reanimated"
-import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context"
+import { SafeAreaView } from "react-native-safe-area-context"
 
 export type DurationPickerProps = {
   onAddPresetTapped: (durationSeconds: number) => void
@@ -40,37 +38,19 @@ export const DurationPickerButton = <Children extends ReactNode>({
   onDurationChange,
   ...props
 }: DurationPickerButtonProps<Children>) => {
-  const sheetRef = useRef<BottomSheetModal>(null)
-  const [pickerLayout, setpickerLayout] = useState<LayoutRectangle>()
-  const { bottom } = useSafeAreaInsets()
-  const paddingForNonSafeAreaScreens = bottom === 0 ? 24 : 0
-  const sheetHeight =
-    pickerLayout?.height && pickerLayout.height + paddingForNonSafeAreaScreens
-  const animatedIndex = useSharedValue(1)
+  const [isShowingSheet, setIsShowingSheet] = useState(false)
   const closeButtonHitSlop = 16
   return (
     <>
-      <PrimaryButton {...props} onPress={() => sheetRef.current?.present()} />
-      <BottomSheetModal
-        ref={sheetRef}
+      <PrimaryButton {...props} onPress={() => setIsShowingSheet(true)} />
+      <TiFBottomSheet
+        sizing="content-size"
+        isPresented={isShowingSheet}
+        onDismiss={() => setIsShowingSheet(false)}
         enableContentPanningGesture={false}
-        snapPoints={useMemo(() => [sheetHeight ?? "50%"], [sheetHeight])}
-        handleStyle={styles.bottomSheetHandle}
-        keyboardBehavior="interactive"
-        keyboardBlurBehavior="restore"
-        backdropComponent={(props) => (
-          <BottomSheetBackdrop
-            {...props}
-            appearsOnIndex={1}
-            animatedIndex={animatedIndex}
-          />
-        )}
+        handleStyle="hidden"
       >
-        <SafeAreaView
-          edges={["bottom"]}
-          onLayout={(e) => setpickerLayout(e.nativeEvent.layout)}
-          style={styles.bottomSheetView}
-        >
+        <SafeAreaView edges={["bottom"]} style={styles.bottomSheetView}>
           <View style={styles.bottonSheetTopRow}>
             <View style={styles.bottomSheetTopRowSpacer} />
             <IoniconCloseButton
@@ -81,7 +61,7 @@ export const DurationPickerButton = <Children extends ReactNode>({
                 right: closeButtonHitSlop,
                 bottom: closeButtonHitSlop
               }}
-              onPress={() => sheetRef.current?.dismiss()}
+              onPress={() => setIsShowingSheet(false)}
             />
           </View>
           <View style={[styles.durationPickerSheetStyle, pickerStyle]}>
@@ -92,7 +72,7 @@ export const DurationPickerButton = <Children extends ReactNode>({
             />
             <PrimaryButton
               onPress={() => {
-                sheetRef.current?.dismiss()
+                setIsShowingSheet(false)
                 onAddPresetTapped(durationSeconds)
               }}
               style={styles.pickerButton}
@@ -101,7 +81,7 @@ export const DurationPickerButton = <Children extends ReactNode>({
             </PrimaryButton>
           </View>
         </SafeAreaView>
-      </BottomSheetModal>
+      </TiFBottomSheet>
     </>
   )
 }
