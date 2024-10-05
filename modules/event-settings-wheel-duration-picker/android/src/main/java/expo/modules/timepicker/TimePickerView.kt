@@ -10,6 +10,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.unit.DpSize
+import androidx.compose.ui.unit.dp
 import expo.modules.kotlin.AppContext
 import expo.modules.kotlin.viewevent.EventDispatcher
 import expo.modules.kotlin.views.ExpoView
@@ -19,7 +21,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 class TimePickerView(context: Context, appContext: AppContext) :
     ExpoView(context, appContext) {
     val onDurationChange by EventDispatcher()
-    val state = MutableStateFlow(TimePickerState(0))
+    val state = MutableStateFlow(TimePickerState(0, DpSize(0.dp, 0.dp)))
     internal val composeView = ComposeView(context).also { it ->
 
         it.layoutParams = LayoutParams(
@@ -27,14 +29,16 @@ class TimePickerView(context: Context, appContext: AppContext) :
         )
         it.setContent {
             val state by this.state.collectAsState()
+            println("TestSize$state.size")
             TimePicker(
                 initialDuration = state.initialDuration,
-                onDurationChange = { onDurationChange(mapOf("duration" to it)) }
-
+                onDurationChange = { onDurationChange(mapOf("duration" to it)) },
+                size = state.size
             )
+
         }
         addView(it)
     }
 }
 
-data class TimePickerState(val initialDuration: Int)
+data class TimePickerState(val initialDuration: Int, val size: DpSize)

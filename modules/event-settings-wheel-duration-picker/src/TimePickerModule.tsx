@@ -1,6 +1,12 @@
 import { requireNativeViewManager } from "expo-modules-core"
-import React from "react"
-import { StyleProp, ViewProps, ViewStyle } from "react-native"
+import React, { useState } from "react"
+import {
+  LayoutRectangle,
+  StyleProp,
+  View,
+  ViewProps,
+  ViewStyle
+} from "react-native"
 import { NativeViewGestureHandler } from "react-native-gesture-handler"
 
 type OnDurationChangeEvent = {
@@ -21,13 +27,23 @@ export const TimePickerView = ({
   onDurationChange,
   ...props
 }: TimePickerProps) => {
+  const [layout, setLayout] = useState<LayoutRectangle>({
+    x: 0,
+    y: 0,
+    width: 0,
+    height: 0
+  })
+  console.log(layout)
   return (
-    <NativeViewGestureHandler disallowInterruption>
-      <NativeView
-        style={style}
-        onDurationChange={onDurationChange}
-        {...props}
-      />
-    </NativeViewGestureHandler>
+    <View style={style} onLayout={(e) => setLayout(e.nativeEvent.layout)}>
+      <NativeViewGestureHandler disallowInterruption>
+        <NativeView
+          style={style}
+          size={layout}
+          onDurationChange={onDurationChange}
+          {...props}
+        />
+      </NativeViewGestureHandler>
+    </View>
   )
 }
