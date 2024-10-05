@@ -41,10 +41,7 @@ export class ExpoEventArrivalsGeofencer implements EventArrivalsGeofencer {
         ExpoEventArrivalsGeofencer.taskName,
         regions.map((region) => ({
           ...region.coordinate,
-          radius: region.arrivalRadiusMeters,
-          state: region.hasArrived
-            ? LocationGeofencingRegionState.Inside
-            : LocationGeofencingRegionState.Outside
+          radius: region.arrivalRadiusMeters
         }))
       )
     }

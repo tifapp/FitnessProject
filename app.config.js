@@ -1,4 +1,5 @@
 import dotenv from "dotenv"
+import withTiFNativePod from "./injectTiFNativePod.js"
 
 dotenv.config({ path: ".env.infra" })
 
@@ -119,4 +120,4 @@ const config = {
   }
 }
 
-export default config
+export default withTiFNativePod(config)

@@ -8,9 +8,9 @@ import { useOpenWeblink } from "@modules/tif-weblinks"
 import { useQuery } from "@tanstack/react-query"
 import React from "react"
 import { Alert, StyleProp, ViewStyle } from "react-native"
-import { SettingsNavigationLinkView } from "./components/NavigationLink"
-import { SettingsScrollView } from "./components/ScrollView"
-import { SettingsCardSectionView } from "./components/Section"
+import { TiFFormNavigationLinkView } from "@components/form-components/NavigationLink"
+import { TiFFormScrollView } from "@components/form-components/ScrollView"
+import { TiFFormCardSectionView } from "@components/form-components/Section"
 
 export const COMPILING_LOGS_INFO_URL = "https://logs.com"
 
@@ -166,9 +166,9 @@ export type EventSettingsProps = {
 }
 
 export const HelpAndSupportView = ({ style, state }: EventSettingsProps) => (
-  <SettingsScrollView style={style}>
+  <TiFFormScrollView style={style}>
     <HelpSectionView state={state} />
-  </SettingsScrollView>
+  </TiFFormScrollView>
 )
 
 export type UseHelpAndSupportSettingsEnvironment = {
@@ -272,41 +272,41 @@ export const HelpSectionView = ({ state }: PresetSectionProps) => {
   const open = useOpenWeblink()
   return (
     <>
-      <SettingsCardSectionView
+      <TiFFormCardSectionView
         title="Help Center"
         subtitle="You can find additional resources and answers to your questions by visiting the Help Center."
       >
-        <SettingsNavigationLinkView
+        <TiFFormNavigationLinkView
           title={"View Help Center"}
           onTapped={() => open("https://www.google.com")}
           iconName="information-circle"
           iconBackgroundColor={AppStyles.black}
         />
-      </SettingsCardSectionView>
+      </TiFFormCardSectionView>
       {state.isShowingContactSection && (
-        <SettingsCardSectionView
+        <TiFFormCardSectionView
           title="Contact Us"
           subtitle="Submit your requests below."
         >
-          <SettingsNavigationLinkView
+          <TiFFormNavigationLinkView
             title="Report a Bug"
             onTapped={state.bugReported}
             iconName="bug"
             iconBackgroundColor={AppStyles.black}
           />
-          <SettingsNavigationLinkView
+          <TiFFormNavigationLinkView
             title="Submit Feedback"
             onTapped={state.feedbackSubmitted}
             iconName="build"
             iconBackgroundColor={AppStyles.black}
           />
-          <SettingsNavigationLinkView
+          <TiFFormNavigationLinkView
             title="Ask Question"
             onTapped={state.questionSubmitted}
             iconName="help-circle"
             iconBackgroundColor={AppStyles.black}
           />
-        </SettingsCardSectionView>
+        </TiFFormCardSectionView>
       )}
     </>
   )

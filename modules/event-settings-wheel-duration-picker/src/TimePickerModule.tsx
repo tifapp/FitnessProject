@@ -1,49 +1,64 @@
+import DateTimePicker from "@react-native-community/datetimepicker"
 import { requireNativeViewManager } from "expo-modules-core"
-import React, { useState } from "react"
-import {
-  LayoutRectangle,
-  StyleProp,
-  View,
-  ViewProps,
-  ViewStyle
-} from "react-native"
+import React, { useCallback } from "react"
+import { Platform, StyleProp, ViewProps, ViewStyle } from "react-native"
 import { NativeViewGestureHandler } from "react-native-gesture-handler"
 
-type OnDurationChangeEvent = {
-  duration: number
-}
-
 export type TimePickerProps = {
-  initialDuration: number
-  onDurationChange: (event: { nativeEvent: OnDurationChangeEvent }) => void
+  initialDurationSeconds: number
+  onDurationChange: (durationSeconds: number) => void
   style?: StyleProp<ViewStyle>
 } & ViewProps
 
-const NativeView: React.ComponentType<TimePickerProps> =
-  requireNativeViewManager("TimePicker")
+const IOSTimePickerView = ({
+  initialDurationSeconds,
+  onDurationChange,
+  ...props
+}: TimePickerProps) => {
+  return (
+    <DateTimePicker
+      value={Date.fromSecondsSince1970(initialDurationSeconds)}
+      mode="countdown"
+      display="spinner"
+      onChange={useCallback(
+        (_: any, selectedDate?: Date) => {
+          if (selectedDate) {
+            onDurationChange(selectedDate.ext.toSecondsSince1970())
+          }
+        },
+        [onDurationChange]
+      )}
+      {...props}
+    />
+  )
+}
 
-export const TimePickerView = ({
+const NativeAndroidView: React.ComponentType<
+  Omit<TimePickerProps, "onDurationChange"> & {
+    onDurationChange: (event: { nativeEvent: { duration: number } }) => void
+  }
+> = requireNativeViewManager("TimePicker")
+
+const AndroidTimePickerView = ({
   style,
   onDurationChange,
   ...props
 }: TimePickerProps) => {
-  const [layout, setLayout] = useState<LayoutRectangle>({
-    x: 0,
-    y: 0,
-    width: 0,
-    height: 0
-  })
-  console.log(layout)
   return (
-    <View style={style} onLayout={(e) => setLayout(e.nativeEvent.layout)}>
-      <NativeViewGestureHandler disallowInterruption>
-        <NativeView
-          style={style}
-          size={layout}
-          onDurationChange={onDurationChange}
-          {...props}
-        />
-      </NativeViewGestureHandler>
-    </View>
+    <NativeViewGestureHandler disallowInterruption>
+      <NativeAndroidView
+        style={style}
+        onDurationChange={useCallback(
+          (event: { nativeEvent: { duration: number } }) => {
+            onDurationChange(event.nativeEvent.duration)
+          },
+          [onDurationChange]
+        )}
+        {...props}
+      />
+    </NativeViewGestureHandler>
   )
 }
+
+export const TimePickerView =
+  Platform.OS === "android" ? AndroidTimePickerView : IOSTimePickerView

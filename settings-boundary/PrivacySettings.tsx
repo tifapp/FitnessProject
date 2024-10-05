@@ -1,17 +1,17 @@
 import { useUserSettings } from "@settings-storage/Hooks"
 import { StyleProp, ViewStyle, StyleSheet, View } from "react-native"
-import { SettingsSectionView } from "./components/Section"
+import { TiFFormSectionView } from "@components/form-components/Section"
 import { BodyText } from "@components/Text"
 import {
   useBackgroundPermissions as useBackgroundLocationPermissions,
   useForegroundPermissions as useForegroundLocationPermissions
 } from "expo-location"
 import { usePermissions as useNotificationPermissions } from "expo-notifications"
-import { SettingsToggleCardView } from "./components/ToggleCard"
+import { TiFFormToggleCardView } from "@components/form-components/ToggleCard"
 import { AppStyles } from "@lib/AppColorStyle"
-import { SettingsNavigationLinkView } from "./components/NavigationLink"
-import { SettingsCardView } from "./components/Card"
-import { SettingsScrollView } from "./components/ScrollView"
+import { TiFFormNavigationLinkView } from "@components/form-components/NavigationLink"
+import { TiFFormCardView } from "@components/form-components/Card"
+import { TiFFormScrollView } from "@components/form-components/ScrollView"
 import { settingsPermission } from "./Permissions"
 import { settingsSelector } from "@settings-storage/Settings"
 
@@ -41,24 +41,24 @@ export const PrivacySettingsView = ({
   style
 }: PrivacySettingsProps) => {
   return (
-    <SettingsScrollView style={style}>
+    <TiFFormScrollView style={style}>
       <PreabmleSectionView />
       <LearnMoreSectionView onPrivacyPolicyTapped={onPrivacyPolicyTapped} />
       <ShareSectionView />
       <PermissionsSectionView permissions={permissions} />
-    </SettingsScrollView>
+    </TiFFormScrollView>
   )
 }
 
 const PreabmleSectionView = () => (
-  <SettingsSectionView>
+  <TiFFormSectionView>
     <View style={styles.privacyIllustration} />
     <BodyText>
       We are committed to protecting your data and prioritize your privacy at
       all times. Your data is only used to enhance the app with you remaining in
       control of it.
     </BodyText>
-  </SettingsSectionView>
+  </TiFFormSectionView>
 )
 
 type LearnMoreSectionProps = {
@@ -68,16 +68,16 @@ type LearnMoreSectionProps = {
 const LearnMoreSectionView = ({
   onPrivacyPolicyTapped
 }: LearnMoreSectionProps) => (
-  <SettingsSectionView title="Learn More">
-    <SettingsCardView>
-      <SettingsNavigationLinkView
+  <TiFFormSectionView title="Learn More">
+    <TiFFormCardView>
+      <TiFFormNavigationLinkView
         title="Privacy Policy"
         onTapped={onPrivacyPolicyTapped}
         iconName="lock-closed"
         iconBackgroundColor={AppStyles.black}
       />
-    </SettingsCardView>
-  </SettingsSectionView>
+    </TiFFormCardView>
+  </TiFFormSectionView>
 )
 
 const ShareSectionView = () => {
@@ -89,8 +89,8 @@ const ShareSectionView = () => {
     )
   )
   return (
-    <SettingsSectionView title="Control What You Share">
-      <SettingsToggleCardView
+    <TiFFormSectionView title="Control What You Share">
+      <TiFFormToggleCardView
         title="Anonymous Analytics"
         description="To improve your app experience, we collect anonymous usage data to enhance the quality of the app. This data is not linked to you."
         iconName="bar-chart"
@@ -98,7 +98,7 @@ const ShareSectionView = () => {
         isOn={settings.isAnalyticsEnabled}
         onIsOnChange={(isAnalyticsEnabled) => update({ isAnalyticsEnabled })}
       />
-      <SettingsToggleCardView
+      <TiFFormToggleCardView
         title="Crash Reports"
         description="To reduce bugs, crashes, and errors, we collect anonymous usage data regarding app issues. This data is not linked to you."
         iconName="warning"
@@ -108,7 +108,7 @@ const ShareSectionView = () => {
           update({ isCrashReportingEnabled })
         }}
       />
-      <SettingsToggleCardView
+      <TiFFormToggleCardView
         title="Event Arrivals"
         description="You can stay connected with participants by notifying them of your arrival at an event’s designated location."
         iconName="footsteps"
@@ -118,7 +118,7 @@ const ShareSectionView = () => {
           update({ canShareArrivalStatus })
         }}
       />
-    </SettingsSectionView>
+    </TiFFormSectionView>
   )
 }
 
@@ -127,8 +127,8 @@ type PermissionsSectionProps = {
 }
 
 const PermissionsSectionView = ({ permissions }: PermissionsSectionProps) => (
-  <SettingsSectionView title="Device Permissions">
-    <SettingsToggleCardView
+  <TiFFormSectionView title="Device Permissions">
+    <TiFFormToggleCardView
       title="Location While Using the App"
       description="Your location is used to discover events, select current location, and precisely detect your arrival at an event’s designated location."
       iconName="location"
@@ -136,7 +136,7 @@ const PermissionsSectionView = ({ permissions }: PermissionsSectionProps) => (
       isOn={permissions.foregroundLocation.isGranted}
       onToggleTappedWithoutIsOnChange={permissions.foregroundLocation.onToggled}
     />
-    <SettingsToggleCardView
+    <TiFFormToggleCardView
       title="Location While Not Using the App"
       description="Your location is used to precisely detect your arrival at an event’s designated location. You can share your arrival status without having the app open."
       iconName="golf"
@@ -144,7 +144,7 @@ const PermissionsSectionView = ({ permissions }: PermissionsSectionProps) => (
       isOn={permissions.backgroundLocation.isGranted}
       onToggleTappedWithoutIsOnChange={permissions.backgroundLocation.onToggled}
     />
-    <SettingsToggleCardView
+    <TiFFormToggleCardView
       title="Notifications"
       description="Enable app notifications to receive important event updates, arrivals notifications, and profile notifications."
       iconName="notifications"
@@ -152,7 +152,7 @@ const PermissionsSectionView = ({ permissions }: PermissionsSectionProps) => (
       isOn={permissions.notifications.isGranted}
       onToggleTappedWithoutIsOnChange={permissions.notifications.onToggled}
     />
-  </SettingsSectionView>
+  </TiFFormSectionView>
 )
 
 const styles = StyleSheet.create({

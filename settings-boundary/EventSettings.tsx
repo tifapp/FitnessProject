@@ -30,13 +30,13 @@ import Animated, {
 } from "react-native-reanimated"
 
 import { DurationPickerButton } from "./EventSettingsDurationPicker"
-import { SettingsNamedToggleView } from "./components/NamedToggle"
-import { SettingsNavigationLinkView } from "./components/NavigationLink"
-import { SettingsScrollView } from "./components/ScrollView"
+import { TiFFormNamedToggleView } from "@components/form-components/NamedToggle"
+import { TiFFormNavigationLinkView } from "@components/form-components/NavigationLink"
+import { TiFFormScrollView } from "@components/form-components/ScrollView"
 import {
-  SettingsCardSectionView,
-  SettingsSectionView
-} from "./components/Section"
+  TiFFormCardSectionView,
+  TiFFormSectionView
+} from "@components/form-components/Section"
 
 export const eventSettingsEditMode = atomWithStorage("OFF", false)
 
@@ -115,7 +115,7 @@ export const AddDurationCard = () => {
     >
       <DurationPickerButton
         style={[styles.addButtonContainer, { height: 64 * fontScale }]}
-        duration={timeInSeconds}
+        durationSeconds={timeInSeconds}
         underlayColor={AppStyles.colorOpacity35}
         onAddPresetTapped={() => {
           if (!settings.eventPresetDurations.includes(timeInSeconds)) {
@@ -185,7 +185,7 @@ export const DurationSectionView = () => {
   const fontScale = useFontScale()
   const sortedDurations = settings.eventPresetDurations.sort((a, b) => a - b)
   return (
-    <SettingsSectionView>
+    <TiFFormSectionView>
       <View style={styles.presetRowsGridContainer}>
         {fontScale < FontScaleFactors.accessibility1 ? (
           <>
@@ -220,7 +220,7 @@ export const DurationSectionView = () => {
           </>
         )}
       </View>
-    </SettingsSectionView>
+    </TiFFormSectionView>
   )
 }
 
@@ -236,12 +236,12 @@ export const EventSettingsView = ({
   onDurationTapped
 }: EventSettingsProps) => {
   return (
-    <SettingsScrollView style={style}>
+    <TiFFormScrollView style={style}>
       <PresetSectionView
         onLocationPresetTapped={onLocationPresetTapped}
         onDurationTapped={onDurationTapped}
       />
-    </SettingsScrollView>
+    </TiFFormScrollView>
   )
 }
 
@@ -251,9 +251,9 @@ export type EventDurationsProps = {
 
 export const EventDurationView = ({ style }: EventDurationsProps) => {
   return (
-    <SettingsScrollView style={style}>
+    <TiFFormScrollView style={style}>
       <DurationSectionView />
-    </SettingsScrollView>
+    </TiFFormScrollView>
   )
 }
 
@@ -273,11 +273,11 @@ const PresetSectionView = ({
     )
   )
   return (
-    <SettingsCardSectionView
+    <TiFFormCardSectionView
       title="Presets"
       subtitle="These presets will be populated when you create an event."
     >
-      <SettingsNamedToggleView
+      <TiFFormNamedToggleView
         name={"Hide After Start Date"}
         description={
           "The event will no longer be publicly visible to other users once it starts."
@@ -287,17 +287,17 @@ const PresetSectionView = ({
           update({ eventPresetShouldHideAfterStartDate })
         }
       />
-      <SettingsNavigationLinkView
+      <TiFFormNavigationLinkView
         title={"Location"}
         description={settings.eventPresetPlacemark?.name ?? "No Location"}
         onTapped={() => onLocationPresetTapped(settings.eventPresetPlacemark!)}
       />
-      <SettingsNavigationLinkView
+      <TiFFormNavigationLinkView
         title={"Durations"}
         description={"Set Durations"}
         onTapped={() => onDurationTapped()}
       />
-    </SettingsCardSectionView>
+    </TiFFormCardSectionView>
   )
 }
 
