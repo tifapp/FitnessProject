@@ -60,6 +60,7 @@ import { TiFBottomSheet } from "@components/BottomSheet"
 import { useConst } from "@lib/utils/UseConst"
 import { TiFFormCardView } from "@components/form-components/Card"
 import { formatDateTimeFromBasis } from "@date-time"
+import { EditEventFormLocationView, useEditEventFormLocation } from "./Location"
 
 export type EditEventProps = {
   eventId?: EventID
@@ -175,21 +176,14 @@ const TitleSectionView = () => {
   )
 }
 
-const LocationSectionView = () => {
-  return (
-    <TiFFormSectionView title="Where?">
-      <TiFFormNavigationLinkView
-        iconName="location"
-        iconBackgroundColor={AppStyles.black}
-        title="No Location"
-        description="You must select a location to create this event."
-        style={styles.locationNavigationLink}
-        chevronStyle={styles.locationNavigationLinkChevron}
-        onTapped={() => console.log("TODO")}
-      />
-    </TiFFormSectionView>
-  )
-}
+const LocationSectionView = () => (
+  <TiFFormSectionView title="Where?">
+    <EditEventFormLocationView
+      location={useEditEventFormLocation()}
+      onSelectLocationTapped={() => console.log("Select Location")}
+    />
+  </TiFFormSectionView>
+)
 
 const StartDateSectionView = () => {
   const [startDate, setStartDate] = useAtom(
@@ -432,16 +426,6 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     bottom: 0,
     paddingHorizontal: 24
-  },
-  locationNavigationLink: {
-    width: "100%",
-    borderStyle: "dashed",
-    borderRadius: 12,
-    borderColor: AppStyles.darkColor,
-    borderWidth: 2
-  },
-  locationNavigationLinkChevron: {
-    opacity: 1
   },
   startDateRow: {
     display: "flex",

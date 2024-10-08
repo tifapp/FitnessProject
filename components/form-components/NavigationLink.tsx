@@ -10,6 +10,7 @@ type BaseTiFFormNavigationLinkProps = {
   title: string
   description?: string
   onTapped: () => void
+  maximumFontScaleFactor?: number
   isDisabled?: boolean
   rightAccessory?: ReactNode
   chevronStyle?: StyleProp<ViewStyle>
@@ -33,6 +34,7 @@ export const TiFFormNavigationLinkView = ({
   description,
   iconName,
   iconBackgroundColor,
+  maximumFontScaleFactor: maximumFontSizeMultiplier,
   onTapped,
   isDisabled,
   rightAccessory,
@@ -45,18 +47,31 @@ export const TiFFormNavigationLinkView = ({
         iconName={iconName}
         iconBackgroundColor={iconBackgroundColor}
         name={title}
+        maximumFontScaleFactor={maximumFontSizeMultiplier}
         description={description}
       >
         <View style={styles.accessoryRow}>
           {rightAccessory}
-          <Ionicon name="chevron-forward" style={chevronStyle} />
+          <Ionicon
+            name="chevron-forward"
+            maximumFontScaleFactor={maximumFontSizeMultiplier}
+            style={chevronStyle}
+          />
         </View>
       </TiFFormNamedIconRowView>
     ) : (
-      <TiFFormRowItemView title={title} description={description}>
+      <TiFFormRowItemView
+        title={title}
+        description={description}
+        maximumFontScaleFactor={maximumFontSizeMultiplier}
+      >
         <View style={styles.accessoryRow}>
           {rightAccessory}
-          <Ionicon name="chevron-forward" style={chevronStyle} />
+          <Ionicon
+            name="chevron-forward"
+            maximumFontScaleFactor={maximumFontSizeMultiplier}
+            style={chevronStyle}
+          />
         </View>
       </TiFFormRowItemView>
     )}

@@ -26,7 +26,7 @@ export const useReverseGeocodeQuery = (
 }
 
 /**
- * Reverse geocodes the most accurrate location for the given coordinates.
+ * Geocodes the most accurrate location for the given coordinates.
  */
 export const useGeocodeQuery = (
   placemark: Placemark,
@@ -80,13 +80,11 @@ const GeocodingFunctionsContext = createContext<GeocodingFunctions>({
     if (!addressString) return undefined
     const geocodeResults = await geocodeAsync(addressString)
     if (geocodeResults.length === 0) return undefined
-    return {
-      coordinate: {
-        latitude: geocodeResults[0].latitude,
-        longitude: geocodeResults[0].longitude
-      },
-      placemark
+    const coordinate = {
+      latitude: geocodeResults[0].latitude,
+      longitude: geocodeResults[0].longitude
     }
+    return { coordinate, placemark }
   }
 })
 

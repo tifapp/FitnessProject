@@ -29,11 +29,17 @@ import {
   XMarkBackButton
 } from "@components/Navigation"
 import { EditEventFormDismissButton } from "@edit-event-boundary/Dismiss"
-import { mockLocationCoordinate2D } from "@location/MockData"
+import {
+  LocationCoordinatesMocks,
+  mockLocationCoordinate2D,
+  mockPlacemark
+} from "@location/MockData"
 import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
 import { sleep } from "@lib/utils/DelayData"
 import { EventMocks } from "@event-details-boundary/MockData"
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet"
+import { GeocodingFunctionsProvider } from "@location/Geocoding"
+import { neverPromise } from "@test-helpers/Promise"
 
 const EditEventPragmaQuotesMeta = {
   title: "Edit Event Pragma Quotes"
@@ -53,28 +59,33 @@ const Stack = createStackNavigator()
 
 export const Basic = () => {
   return (
-    <TestQueryClientProvider>
-      <GestureHandlerRootView>
-        <BottomSheetModalProvider>
-          <SafeAreaProvider>
-            <NavigationContainer>
-              <Stack.Navigator
-                screenOptions={{ ...BASE_HEADER_SCREEN_OPTIONS }}
-              >
-                <Stack.Screen name="Settings" component={TestScreen} />
-                <Stack.Group screenOptions={{ presentation: "modal" }}>
-                  <Stack.Screen
-                    name="editEvent"
-                    options={{ headerTitle: "", headerLeft: DismissButton }}
-                    component={EditEventScreen}
-                  />
-                </Stack.Group>
-              </Stack.Navigator>
-            </NavigationContainer>
-          </SafeAreaProvider>
-        </BottomSheetModalProvider>
-      </GestureHandlerRootView>
-    </TestQueryClientProvider>
+    <GeocodingFunctionsProvider
+      reverseGeocode={neverPromise}
+      geocode={neverPromise}
+    >
+      <TestQueryClientProvider>
+        <GestureHandlerRootView>
+          <BottomSheetModalProvider>
+            <SafeAreaProvider>
+              <NavigationContainer>
+                <Stack.Navigator
+                  screenOptions={{ ...BASE_HEADER_SCREEN_OPTIONS }}
+                >
+                  <Stack.Screen name="Settings" component={TestScreen} />
+                  <Stack.Group screenOptions={{ presentation: "modal" }}>
+                    <Stack.Screen
+                      name="editEvent"
+                      options={{ headerTitle: "", headerLeft: DismissButton }}
+                      component={EditEventScreen}
+                    />
+                  </Stack.Group>
+                </Stack.Navigator>
+              </NavigationContainer>
+            </SafeAreaProvider>
+          </BottomSheetModalProvider>
+        </GestureHandlerRootView>
+      </TestQueryClientProvider>
+    </GeocodingFunctionsProvider>
   )
 }
 
@@ -99,6 +110,9 @@ const DismissButton = () => {
 
 const date = new Date("2024-10-30T00:00:00")
 
+const placemark = mockPlacemark()
+const coordinate = LocationCoordinatesMocks.SanFrancisco
+
 const EditEventScreen = () => {
   const navigation = useNavigation()
   return (
@@ -111,10 +125,7 @@ const EditEventScreen = () => {
           initialValues={{
             ...DEFAULT_EDIT_EVENT_FORM_VALUES,
             title: "Blob",
-            location: {
-              coordinate: mockLocationCoordinate2D(),
-              placemark: undefined
-            }
+            location: { coordinate: undefined, placemark }
           }}
           submit={async (id, edit) => {
             await sleep(3000)
