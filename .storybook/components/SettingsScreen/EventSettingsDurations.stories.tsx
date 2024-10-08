@@ -7,7 +7,6 @@ import { SQLiteLocalSettingsStorage } from "@settings-storage/LocalSettings"
 import { PersistentSettingsStores } from "@settings-storage/PersistentStores"
 import { settingsSelector } from "@settings-storage/Settings"
 import { SQLiteUserSettingsStorage } from "@settings-storage/UserSettings"
-import { ComponentStory } from "@storybook/react-native"
 import React from "react"
 import { StyleSheet, View } from "react-native"
 import { GestureHandlerRootView } from "react-native-gesture-handler"
@@ -22,6 +21,7 @@ import {
   useUserSettings
 } from "../../../settings-storage/Hooks"
 import { testSQLite } from "../../../test-helpers/SQLite"
+import { TiFBottomSheetProvider } from "@components/BottomSheet"
 
 const EventSettingsDurationMeta: StoryMeta = {
   title: "Durations Screen",
@@ -37,7 +37,7 @@ const Stack = createStackNavigator()
 export const Basic: SettingsStory = () => (
   <SafeAreaProvider>
     <GestureHandlerRootView>
-      <BottomSheetModalProvider>
+      <TiFBottomSheetProvider>
         <SettingsProvider
           localSettingsStore={{} as any}
           userSettingsStore={userStore}
@@ -55,7 +55,7 @@ export const Basic: SettingsStory = () => (
             </Stack.Navigator>
           </NavigationContainer>
         </SettingsProvider>
-      </BottomSheetModalProvider>
+      </TiFBottomSheetProvider>
     </GestureHandlerRootView>
   </SafeAreaProvider>
 )

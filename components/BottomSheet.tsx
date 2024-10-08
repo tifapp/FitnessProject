@@ -2,7 +2,6 @@ import {
   BottomSheetBackdropProps,
   BottomSheetModal,
   BottomSheetModalProvider,
-  BottomSheetView,
   useBottomSheetModal
 } from "@gorhom/bottom-sheet"
 import { AppStyles } from "@lib/AppColorStyle"

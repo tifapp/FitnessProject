@@ -1,21 +1,9 @@
-import {
-  StyleProp,
-  ViewStyle,
-  StyleSheet,
-  LayoutRectangle,
-  View
-} from "react-native"
+import { StyleProp, ViewStyle, StyleSheet, View } from "react-native"
 import { ButtonProps, PrimaryButton } from "./Buttons"
-import { ReactNode, useMemo, useRef, useState } from "react"
+import { ReactNode, useState } from "react"
 import { BodyText, Headline, Title } from "./Text"
-import {
-  BottomSheetBackdrop,
-  BottomSheetModal,
-  BottomSheetView,
-  TouchableHighlight
-} from "@gorhom/bottom-sheet"
-import { useSharedValue } from "react-native-reanimated"
-import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context"
+import { BottomSheetView, TouchableHighlight } from "@gorhom/bottom-sheet"
+import { SafeAreaView } from "react-native-safe-area-context"
 import { useFontScale } from "@lib/Fonts"
 import { AppStyles } from "@lib/AppColorStyle"
 import { IoniconCloseButton } from "./common/Icons"

@@ -1,4 +1,5 @@
 import { AuthBannerButton } from "@components/AuthBanner"
+import { TiFBottomSheetProvider } from "@components/BottomSheet"
 import { PrimaryButton, SecondaryOutlinedButton } from "@components/Buttons"
 import { CircularIonicon } from "@components/common/Icons"
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet"
@@ -19,7 +20,7 @@ type ButtonsStory = ComponentStory<typeof View>
 export const Basic: ButtonsStory = () => (
   <SafeAreaProvider>
     <GestureHandlerRootView>
-      <BottomSheetModalProvider>
+      <TiFBottomSheetProvider>
         <ScrollView style={{ height: "100%" }}>
           <PrimaryButton>
             <CircularIonicon
@@ -57,7 +58,7 @@ export const Basic: ButtonsStory = () => (
             Auth Banner
           </AuthBannerButton>
         </ScrollView>
-      </BottomSheetModalProvider>
+      </TiFBottomSheetProvider>
     </GestureHandlerRootView>
   </SafeAreaProvider>
 )

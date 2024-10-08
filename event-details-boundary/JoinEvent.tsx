@@ -13,18 +13,13 @@ import {
   getPermissionsAsync as getNotificationPermissions,
   requestPermissionsAsync as requestNotificationPermissions
 } from "expo-notifications"
-import React, { useEffect, useRef, useState } from "react"
+import React, { useState } from "react"
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
-import { IoniconCloseButton, TouchableIonicon } from "@components/common/Icons"
+import { IoniconCloseButton } from "@components/common/Icons"
 import { BodyText, Title } from "@components/Text"
-import { useSafeAreaInsets } from "react-native-safe-area-context"
-import { useSharedValue } from "react-native-reanimated"
+import { useSafeAreaInsets } from "react-native-safe-area-context""
 import { FontScaleFactors } from "@lib/Fonts"
-import {
-  BottomSheetBackdrop,
-  BottomSheetModal,
-  BottomSheetView
-} from "@gorhom/bottom-sheet"
+import { BottomSheetView } from "@gorhom/bottom-sheet"
 import { TiFAPI } from "TiFShared/api"
 import { RecentLocationsStorage } from "@location/Recents"
 import { EventLocation } from "TiFShared/domain-models/Event"

@@ -1,4 +1,3 @@
-import { ComponentMeta, ComponentStory } from "@storybook/react-native"
 import React, { useEffect } from "react"
 import { SafeAreaProvider } from "react-native-safe-area-context"
 import {
@@ -18,25 +17,20 @@ import { NavigationContainer } from "@react-navigation/native"
 import { createStackNavigator } from "@react-navigation/stack"
 import { BASE_HEADER_SCREEN_OPTIONS } from "@components/Navigation"
 import { createTestQueryClient } from "@test-helpers/ReactQuery"
-import {
-  EventDetailsMenuView,
-  useEventDetailsMenuActions
-} from "@event-details-boundary/Menu"
 import { View } from "react-native"
 import { ClientSideEvent } from "@event/ClientSideEvent"
 import { useLoadEventDetails } from "@event-details-boundary/Details"
-import { UserSessionProvider } from "@user/Session"
 import { TiFQueryClientProvider } from "@lib/ReactQuery"
 import { dateRange } from "TiFShared/domain-models/FixedDateRange"
 import { dayjs, now } from "TiFShared/lib/Dayjs"
 import { StoryMeta } from ".storybook/HelperTypes"
 import {
   JoinEventStagesView,
-  loadJoinEventPermissions,
   useJoinEventStages
 } from "@event-details-boundary/JoinEvent"
 import { TrueRegionMonitor } from "@arrival-tracking/region-monitoring/MockRegionMonitors"
 import { GestureHandlerRootView } from "react-native-gesture-handler"
+import { TiFBottomSheetProvider } from "@components/BottomSheet"
 
 const EventDetailsMeta: StoryMeta = {
   title: "Event Details"
@@ -72,7 +66,7 @@ export const Basic: EventDetailsStory = () => {
           requestForegroundPermissions={requestForegroundPermissionsAsync}
         >
           <TiFQueryClientProvider>
-            <BottomSheetModalProvider>
+            <TiFBottomSheetProvider>
               <NavigationContainer>
                 <Stack.Navigator
                   screenOptions={{ ...BASE_HEADER_SCREEN_OPTIONS }}
@@ -80,7 +74,7 @@ export const Basic: EventDetailsStory = () => {
                   <Stack.Screen name="test" component={Test} />
                 </Stack.Navigator>
               </NavigationContainer>
-            </BottomSheetModalProvider>
+            </TiFBottomSheetProvider>
           </TiFQueryClientProvider>
         </UserLocationFunctionsProvider>
       </SafeAreaProvider>
