@@ -20,7 +20,7 @@ export type EditEventFormLocation =
   | { placemark: Placemark; coordinate: LocationCoordinate2D }
 
 export type EditEventFormValues = Reassign<
-  EventEdit,
+  Required<EventEdit>,
   "location",
   EditEventFormLocation | undefined
 >

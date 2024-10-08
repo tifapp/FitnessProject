@@ -14,7 +14,11 @@ import {
   editEventFormValueAtoms,
   editEventFormValuesAtom
 } from "./FormValues"
-import { EventEdit, EventID } from "TiFShared/domain-models/Event"
+import {
+  EventEdit,
+  EventEditLocation,
+  EventID
+} from "TiFShared/domain-models/Event"
 import {
   PragmaQuoteView,
   createEventQuote,
@@ -24,7 +28,7 @@ import { useAtom, useStore } from "jotai"
 import { ShadedTextField } from "@components/TextFields"
 import { useFontScale } from "@lib/Fonts"
 import { AppStyles } from "@lib/AppColorStyle"
-import React, { useCallback, useEffect, useRef, useState } from "react"
+import React, { useCallback, useEffect, useState } from "react"
 import { useScreenBottomPadding } from "@components/Padding"
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context"
 import { useUserSettings } from "@settings-storage/Hooks"
@@ -47,12 +51,13 @@ import { settingsSelector } from "@settings-storage/Settings"
 import { useEffectEvent } from "@lib/utils/UseEffectEvent"
 import { EditEventFormSubmitButton, useEditEventFormSubmission } from "./Submit"
 import { ClientSideEvent } from "@event/ClientSideEvent"
-import { BottomSheetModal, BottomSheetBackdrop } from "@gorhom/bottom-sheet"
-import { useSharedValue } from "react-native-reanimated"
+import { BottomSheetView } from "@gorhom/bottom-sheet"
 import { DurationPickerView } from "@modules/tif-duration-picker"
 import RNDateTimePicker, {
   DateTimePickerAndroid as RNDateTimePickerAndroid
 } from "@react-native-community/datetimepicker"
+import { TiFBottomSheet } from "@components/BottomSheet"
+import { useConst } from "@lib/utils/UseConst"
 
 export type EditEventProps = {
   eventId?: EventID
@@ -69,17 +74,14 @@ export type EditEventProps = {
 export const useHydrateEditEvent = (initialValues?: EditEventFormValues) => {
   const { settings } = useUserSettings(
     settingsSelector(
-      "eventPresetPlacemark",
+      "eventPresetLocation",
       "eventPresetShouldHideAfterStartDate"
     )
   )
   const initialFormValues = initialValues ?? {
     ...DEFAULT_EDIT_EVENT_FORM_VALUES,
-    location: settings.eventPresetPlacemark
-      ? {
-          placemark: settings.eventPresetPlacemark,
-          coordinate: undefined
-        }
+    location: settings.eventPresetLocation
+      ? formLocation(settings.eventPresetLocation)
       : undefined,
     shouldHideAfterStartDate: settings.eventPresetShouldHideAfterStartDate
   }
@@ -89,6 +91,13 @@ export const useHydrateEditEvent = (initialValues?: EditEventFormValues) => {
     store.set(editEventFormInitialValuesAtom, { ...initialFormValues })
   })
   useEffect(() => hydrate(), [hydrate])
+}
+
+const formLocation = (location: EventEditLocation) => {
+  if (location.type === "placemark") {
+    return { placemark: location.value, coordinate: undefined }
+  }
+  return { placemark: undefined, coordinate: location.value }
 }
 
 export const EditEventView = ({
@@ -181,14 +190,18 @@ const LocationSectionView = () => {
 }
 
 const StartDateSectionView = () => {
-  const [startDate, setStartDate] = useAtom(editEventFormValueAtoms.startDate)
+  const [startDate, setStartDate] = useAtom(
+    editEventFormValueAtoms.startDateTime
+  )
   const date = dayjs(startDate)
-  const bottomSheetRef = useRef<BottomSheetModal>(null)
-  const [datePickerMode, setDatePickerMode] = useState<"date" | "time">("date")
-  const animatedIndex = useSharedValue(1)
+  const [datePickerMode, setDatePickerMode] = useState<
+    "date" | "time" | undefined
+  >()
+  const now = useConst(new Date())
 
   const presentAndroidDatePicker = (mode: "date" | "time") => {
     RNDateTimePickerAndroid.open({
+      minimumDate: now,
       value: startDate,
       onChange: (_, date) => {
         if (date) setStartDate(date)
@@ -206,7 +219,6 @@ const StartDateSectionView = () => {
             onPress={() => {
               if (Platform.OS === "ios") {
                 setDatePickerMode("date")
-                bottomSheetRef.current?.present()
               } else {
                 presentAndroidDatePicker("date")
               }
@@ -221,7 +233,6 @@ const StartDateSectionView = () => {
             onPress={() => {
               if (Platform.OS === "ios") {
                 setDatePickerMode("time")
-                bottomSheetRef.current?.present()
               } else {
                 presentAndroidDatePicker("time")
               }
@@ -234,38 +245,37 @@ const StartDateSectionView = () => {
         </View>
       </TiFFormSectionView>
       {Platform.OS === "ios" && (
-        <BottomSheetModal
-          ref={bottomSheetRef}
-          handleStyle={styles.sheetHandle}
-          snapPoints={SNAP_POINTS}
-          backdropComponent={(props) => (
-            <BottomSheetBackdrop
-              {...props}
-              appearsOnIndex={1}
-              animatedIndex={animatedIndex}
-            />
-          )}
+        <TiFBottomSheet
+          item={datePickerMode}
+          sizing="content-size"
+          handleStyle="hidden"
+          onDismiss={() => setDatePickerMode(undefined)}
         >
-          <SafeAreaView edges={["bottom"]} style={styles.bottomSheetView}>
-            <View style={styles.bottonSheetTopRow}>
-              <View style={styles.bottomSheetTopRowSpacer} />
-              <IoniconCloseButton
-                size={20}
-                onPress={() => bottomSheetRef.current?.dismiss()}
-              />
-            </View>
-            <View style={styles.durationPickerSheetStyle}>
-              <RNDateTimePicker
-                mode={datePickerMode}
-                value={startDate}
-                display={datePickerMode === "date" ? "inline" : "spinner"}
-                onChange={(_, date) => {
-                  if (date) setStartDate(date)
-                }}
-              />
-            </View>
-          </SafeAreaView>
-        </BottomSheetModal>
+          {(datePickerMode) => (
+            <BottomSheetView>
+              <SafeAreaView edges={["bottom"]} style={styles.bottomSheetView}>
+                <View style={styles.bottonSheetTopRow}>
+                  <View style={styles.bottomSheetTopRowSpacer} />
+                  <IoniconCloseButton
+                    size={20}
+                    onPress={() => setDatePickerMode(undefined)}
+                  />
+                </View>
+                <View style={styles.durationPickerSheetStyle}>
+                  <RNDateTimePicker
+                    minimumDate={now}
+                    mode={datePickerMode}
+                    value={startDate}
+                    display={datePickerMode === "date" ? "inline" : "spinner"}
+                    onChange={(_, date) => {
+                      if (date) setStartDate(date)
+                    }}
+                  />
+                </View>
+              </SafeAreaView>
+            </BottomSheetView>
+          )}
+        </TiFBottomSheet>
       )}
     </>
   )
@@ -276,8 +286,7 @@ const DurationSectionView = () => {
     settings: { eventPresetDurations }
   } = useUserSettings(settingsSelector("eventPresetDurations"))
   const [duration, setDuration] = useAtom(editEventFormValueAtoms.duration)
-  const bottomSheetRef = useRef<BottomSheetModal>(null)
-  const animatedIndex = useSharedValue(1)
+  const [isShowingSheet, setIsShowingSheet] = useState(false)
   return (
     <>
       <TiFFormSectionView
@@ -285,7 +294,7 @@ const DurationSectionView = () => {
         rightAddon={
           <TouchableIonicon
             icon={{ name: "ellipsis-horizontal" }}
-            onPress={() => bottomSheetRef.current?.present()}
+            onPress={() => setIsShowingSheet(true)}
           />
         }
       >
@@ -294,40 +303,32 @@ const DurationSectionView = () => {
           presetOptions={eventPresetDurations}
         />
       </TiFFormSectionView>
-      <BottomSheetModal
-        ref={bottomSheetRef}
-        handleStyle={styles.sheetHandle}
-        snapPoints={SNAP_POINTS}
-        backdropComponent={(props) => (
-          <BottomSheetBackdrop
-            {...props}
-            appearsOnIndex={1}
-            animatedIndex={animatedIndex}
-          />
-        )}
+      <TiFBottomSheet
+        isPresented={isShowingSheet}
+        onDismiss={() => setIsShowingSheet(false)}
+        enableContentPanningGesture={false}
+        handleStyle="hidden"
+        sizing="content-size"
       >
-        <SafeAreaView edges={["bottom"]} style={styles.bottomSheetView}>
-          <View style={styles.bottonSheetTopRow}>
-            <View style={styles.bottomSheetTopRowSpacer} />
-            <IoniconCloseButton
-              size={20}
-              onPress={() => bottomSheetRef.current?.dismiss()}
-            />
-          </View>
-          <View style={styles.durationPickerSheetStyle}>
-            <DurationPickerView
-              initialDurationSeconds={duration}
-              onDurationChange={setDuration}
-              style={styles.durationPicker}
-            />
-          </View>
-        </SafeAreaView>
-      </BottomSheetModal>
+        <BottomSheetView>
+          <SafeAreaView edges={["bottom"]} style={styles.bottomSheetView}>
+            <View style={styles.bottonSheetTopRow}>
+              <View style={styles.bottomSheetTopRowSpacer} />
+              <IoniconCloseButton onPress={() => setIsShowingSheet(false)} />
+            </View>
+            <View style={styles.durationPickerSheetStyle}>
+              <DurationPickerView
+                initialDurationSeconds={duration}
+                onDurationChange={setDuration}
+                style={styles.durationPicker}
+              />
+            </View>
+          </SafeAreaView>
+        </BottomSheetView>
+      </TiFBottomSheet>
     </>
   )
 }
-
-const SNAP_POINTS = ["50%"]
 
 const DescriptionSectionView = () => {
   const [description, setDescription] = useAtom(

@@ -16,7 +16,7 @@ describe("EditEvent tests", () => {
       const placemark = mockPlacemark()
       settings.update({
         eventPresetShouldHideAfterStartDate: true,
-        eventPresetPlacemark: placemark
+        eventPresetLocation: { type: "placemark", value: placemark }
       })
       const { result } = renderUseHydrateEditEvent(undefined, settings)
       expect(result.current).toEqual({
@@ -35,7 +35,7 @@ describe("EditEvent tests", () => {
       const placemark = mockPlacemark()
       settings.update({
         eventPresetShouldHideAfterStartDate: true,
-        eventPresetPlacemark: placemark
+        eventPresetLocation: { type: "placemark", value: placemark }
       })
       const { result } = renderUseHydrateEditEvent(values, settings)
       expect(result.current).toEqual(values)
