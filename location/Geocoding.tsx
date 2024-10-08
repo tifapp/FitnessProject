@@ -13,9 +13,7 @@ import { mergeWithPartial } from "TiFShared/lib/Object"
  */
 export const useReverseGeocodeQuery = (
   coordinates: LocationCoordinate2D,
-  options: QueryHookOptions<
-    NamedLocation | undefined
-  > = DEFAULT_GEOCODE_QUERY_OPTIONS
+  options: QueryHookOptions<NamedLocation | null> = DEFAULT_GEOCODE_QUERY_OPTIONS
 ) => {
   const { reverseGeocode } = useGeocodingFunctions()
   return useQuery(
@@ -26,13 +24,11 @@ export const useReverseGeocodeQuery = (
 }
 
 /**
- * Geocodes the most accurrate location for the given coordinates.
+ * Geocodes the most accurrate location for the given placemark.
  */
 export const useGeocodeQuery = (
   placemark: Placemark,
-  options: QueryHookOptions<
-    NamedLocation | undefined
-  > = DEFAULT_GEOCODE_QUERY_OPTIONS
+  options: QueryHookOptions<NamedLocation | null> = DEFAULT_GEOCODE_QUERY_OPTIONS
 ) => {
   const { geocode } = useGeocodingFunctions()
   return useQuery(
@@ -55,14 +51,14 @@ export const DEFAULT_GEOCODE_QUERY_OPTIONS = {
 export type GeocodingFunctions = {
   reverseGeocode: (
     coordinates: LocationCoordinate2D
-  ) => Promise<NamedLocation | undefined>
-  geocode: (placemark: Placemark) => Promise<NamedLocation | undefined>
+  ) => Promise<NamedLocation | null>
+  geocode: (placemark: Placemark) => Promise<NamedLocation | null>
 }
 
 const GeocodingFunctionsContext = createContext<GeocodingFunctions>({
   reverseGeocode: async (coordinate) => {
     const geocodeResults = await reverseGeocodeAsync(coordinate)
-    if (geocodeResults.length === 0) return undefined
+    if (geocodeResults.length === 0) return null
     const placemark = {
       name: geocodeResults[0].name ?? undefined,
       country: geocodeResults[0].country ?? undefined,
@@ -77,9 +73,9 @@ const GeocodingFunctionsContext = createContext<GeocodingFunctions>({
   },
   geocode: async (placemark) => {
     const addressString = placemarkToFormattedAddress(placemark)
-    if (!addressString) return undefined
+    if (!addressString) return null
     const geocodeResults = await geocodeAsync(addressString)
-    if (geocodeResults.length === 0) return undefined
+    if (geocodeResults.length === 0) return null
     const coordinate = {
       latitude: geocodeResults[0].latitude,
       longitude: geocodeResults[0].longitude
