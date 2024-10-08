@@ -24,7 +24,7 @@ import {
   createEventQuote,
   editEventQuote
 } from "./PragmaQuotes"
-import { useAtom, useStore } from "jotai"
+import { useAtom, useAtomValue, useStore } from "jotai"
 import { ShadedTextField } from "@components/TextFields"
 import { useFontScale } from "@lib/Fonts"
 import { AppStyles } from "@lib/AppColorStyle"
@@ -39,7 +39,7 @@ import {
   TouchableIonicon
 } from "@components/common/Icons"
 import { dayjs } from "TiFShared/lib/Dayjs"
-import { Headline } from "@components/Text"
+import { BodyText, Headline } from "@components/Text"
 import { TiFFormScrollView } from "@components/form-components/ScrollView"
 import {
   TiFFormCardSectionView,
@@ -58,6 +58,8 @@ import RNDateTimePicker, {
 } from "@react-native-community/datetimepicker"
 import { TiFBottomSheet } from "@components/BottomSheet"
 import { useConst } from "@lib/utils/UseConst"
+import { TiFFormCardView } from "@components/form-components/Card"
+import { formatDateTimeFromBasis } from "@date-time"
 
 export type EditEventProps = {
   eventId?: EventID
@@ -198,6 +200,10 @@ const StartDateSectionView = () => {
     "date" | "time" | undefined
   >()
   const now = useConst(new Date())
+  const sheetBottomPadding = useScreenBottomPadding({
+    safeAreaScreens: 48,
+    nonSafeAreaScreens: 24
+  })
 
   const presentAndroidDatePicker = (mode: "date" | "time") => {
     RNDateTimePickerAndroid.open({
@@ -243,6 +249,7 @@ const StartDateSectionView = () => {
             <Ionicon name="chevron-forward" />
           </TouchableOpacity>
         </View>
+        <EndTimeView />
       </TiFFormSectionView>
       {Platform.OS === "ios" && (
         <TiFBottomSheet
@@ -272,6 +279,7 @@ const StartDateSectionView = () => {
                     }}
                   />
                 </View>
+                <EndTimeView style={{ paddingBottom: sheetBottomPadding }} />
               </SafeAreaView>
             </BottomSheetView>
           )}
@@ -287,6 +295,10 @@ const DurationSectionView = () => {
   } = useUserSettings(settingsSelector("eventPresetDurations"))
   const [duration, setDuration] = useAtom(editEventFormValueAtoms.duration)
   const [isShowingSheet, setIsShowingSheet] = useState(false)
+  const sheetBottomPadding = useScreenBottomPadding({
+    safeAreaScreens: 48,
+    nonSafeAreaScreens: 24
+  })
   return (
     <>
       <TiFFormSectionView
@@ -316,13 +328,12 @@ const DurationSectionView = () => {
               <View style={styles.bottomSheetTopRowSpacer} />
               <IoniconCloseButton onPress={() => setIsShowingSheet(false)} />
             </View>
-            <View style={styles.durationPickerSheetStyle}>
-              <DurationPickerView
-                initialDurationSeconds={duration}
-                onDurationChange={setDuration}
-                style={styles.durationPicker}
-              />
-            </View>
+            <DurationPickerView
+              initialDurationSeconds={duration}
+              onDurationChange={setDuration}
+              style={styles.durationPicker}
+            />
+            <EndTimeView style={{ paddingBottom: sheetBottomPadding }} />
           </SafeAreaView>
         </BottomSheetView>
       </TiFBottomSheet>
@@ -362,6 +373,28 @@ const AdvancedSectionView = () => {
         onIsOnChange={setShouldHideAfterStartDate}
       />
     </TiFFormCardSectionView>
+  )
+}
+
+type EndTimeProps = {
+  style?: StyleProp<ViewStyle>
+}
+
+const EndTimeView = ({ style }: EndTimeProps) => {
+  const startDateTime = useAtomValue(editEventFormValueAtoms.startDateTime)
+  const duration = useAtomValue(editEventFormValueAtoms.duration)
+  return (
+    <TiFFormCardView style={style}>
+      <View style={styles.eventTimeRangeRow}>
+        <Headline style={styles.eventTimeRangeLabel}>End Time</Headline>
+        <BodyText style={styles.eventTimeRangeText}>
+          {formatDateTimeFromBasis(
+            startDateTime,
+            startDateTime.ext.addSeconds(duration)
+          )}
+        </BodyText>
+      </View>
+    </TiFFormCardView>
   )
 }
 
@@ -446,5 +479,17 @@ const styles = StyleSheet.create({
     width: "100%",
     alignSelf: "center",
     height: 256
+  },
+  eventTimeRangeRow: {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 16
+  },
+  eventTimeRangeLabel: {
+    marginRight: 16
+  },
+  eventTimeRangeText: {
+    flex: 1
   }
 })
