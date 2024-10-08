@@ -1,3 +1,10 @@
+import { Ionicon } from "@components/common/Icons"
+import { ClientSideEvent } from "@event/ClientSideEvent"
+import { updateEventDetailsQueryEvent } from "@event/DetailsQuery"
+import { useFontScale } from "@lib/Fonts"
+import { MenuAction, MenuView } from "@react-native-menu/menu"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { useIsSignedIn } from "@user/Session"
 import {
   Platform,
   Share,
@@ -5,17 +12,10 @@ import {
   StyleProp,
   ViewStyle
 } from "react-native"
-import { MenuView, MenuAction } from "@react-native-menu/menu"
-import { Ionicon } from "@components/common/Icons"
-import { ClientSideEvent } from "@event/ClientSideEvent"
-import { useFontScale } from "@lib/Fonts"
-import { useIsSignedIn } from "@user/Session"
-import { useMutation, useQueryClient } from "@tanstack/react-query"
 import {
-  UserID,
-  UnblockedBidirectionalUserRelations
+  UnblockedUserRelationsStatus,
+  UserID
 } from "TiFShared/domain-models/User"
-import { updateEventDetailsQueryEvent } from "@event/DetailsQuery"
 
 export type EventMenuActionsListKey = keyof typeof EVENT_MENU_ACTIONS_LISTS
 
@@ -27,7 +27,7 @@ export type UseEventDetailsMenuActionsEnvironment = {
 type ToggleBlockMutationArgs = {
   hostId: UserID
   isBlocking: boolean
-  originalRelations: UnblockedBidirectionalUserRelations
+  originalRelations: UnblockedUserRelationsStatus
 }
 
 /**
@@ -50,7 +50,7 @@ export const useEventDetailsMenuActions = (
       onError: (_, { originalRelations }) => {
         updateEventDetailsQueryEvent(queryClient, event.id, (e) => ({
           ...e,
-          host: { ...e.host, relations: originalRelations }
+          host: { ...e.host, relationStatus: originalRelations }
         }))
       }
     }
@@ -61,23 +61,18 @@ export const useEventDetailsMenuActions = (
       : ("not-signed-in" as EventMenuActionsListKey),
     isToggleBlockHostError: toggleBlockMutation.isError,
     blockHostToggled: () => {
-      const isBlocking = event.host.relations.youToThem !== "blocked"
+      const isBlocking = event.host.relationStatus !== "blocked-them"
       updateEventDetailsQueryEvent(queryClient, event.id, (e) => ({
         ...e,
         host: {
           ...e.host,
-          relations: {
-            youToThem: isBlocking ? "blocked" : "not-friends",
-            // NB: Either the block removes the friendship status, or if they
-            // are unblocking then the only possible value is not friends.
-            themToYou: "not-friends"
-          } as const
+          relationStatus: isBlocking ? "blocked-them" : "not-friends" as const
         }
       }))
       toggleBlockMutation.mutate({
         isBlocking,
         hostId: event.host.id,
-        originalRelations: event.host.relations
+        originalRelations: event.host.relationStatus
       })
     }
   }
@@ -214,7 +209,7 @@ export const EVENT_MENU_ACTION = {
   },
   contactHost: {
     id: "contact-host",
-    title: (event) => `Contact ${event.host.username}`,
+    title: (event) => `Contact ${event.host.name}`,
     image: Platform.select({
       ios: "person.fill",
       android: "ic_menu_call"
@@ -231,14 +226,14 @@ export const EVENT_MENU_ACTION = {
   toggleBlockHost: {
     id: "toggle-block-host",
     title: (event) => {
-      if (event.host.relations.youToThem === "blocked") {
-        return `Unblock ${event.host.username}`
+      if (event.host.relationStatus === "blocked-them") {
+        return `Unblock ${event.host.name}`
       } else {
-        return `Block ${event.host.username}`
+        return `Block ${event.host.name}`
       }
     },
     image: (event) => {
-      if (event.host.relations.youToThem !== "blocked") {
+      if (event.host.relationStatus !== "blocked-them") {
         return Platform.select({
           ios: "person.slash.fill",
           android: "ic_menu_delete"

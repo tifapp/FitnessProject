@@ -6,6 +6,19 @@ import React, { useState } from "react"
 import { Alert, StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 import { Divider } from "react-native-elements"
 import { ScrollView } from "react-native-gesture-handler"
+import { AlertsObject, presentAlert } from "@lib/Alerts"
+
+export const REPORTING_ERRORS = {
+  genericError: (tryAgain?: () => void, ok?: () => void) => ({
+    title: "Oh No!",
+    message:
+      "Sorry, something went wrong when submitting your report. Please try again.",
+    buttons: [
+      { text: "Try Again", onPress: tryAgain },
+      { text: "Ok", onPress: ok }
+    ]
+  })
+} satisfies AlertsObject
 
 export type ReportFormProps = {
   contentType: ReportableContentType
@@ -29,13 +42,11 @@ export const ReportFormView = ({
       setAllowSubmissions(false)
       await onSubmitWithReason(reason)
     } catch {
-      Alert.alert(
-        "Oh No!",
-        "Sorry, something went wrong when submitting your report. Please try again.",
-        [
-          { text: "Try Again", onPress: () => submitReport(reason) },
-          { text: "Ok", onPress: () => setAllowSubmissions(true) }
-        ]
+      presentAlert(
+        REPORTING_ERRORS.genericError(
+          () => submitReport(reason),
+          () => setAllowSubmissions(true)
+        )
       )
     }
   }

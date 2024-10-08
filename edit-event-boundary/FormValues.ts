@@ -29,7 +29,7 @@ export const DEFAULT_EDIT_EVENT_FORM_VALUES = {
   title: "",
   description: "",
   location: undefined,
-  startDate: new Date(),
+  startDateTime: new Date(),
   duration: 3600,
   shouldHideAfterStartDate: false
 } as const

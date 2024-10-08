@@ -13,14 +13,13 @@ import {
   getPermissionsAsync as getNotificationPermissions,
   requestPermissionsAsync as requestNotificationPermissions
 } from "expo-notifications"
-import React, { useEffect, useRef, useState } from "react"
-import { Alert, StyleProp, StyleSheet, View, ViewStyle } from "react-native"
-import { TouchableIonicon } from "@components/common/Icons"
+import React, { useState } from "react"
+import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
+import { IoniconCloseButton } from "@components/common/Icons"
 import { BodyText, Title } from "@components/Text"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
-import { useSharedValue } from "react-native-reanimated"
 import { FontScaleFactors } from "@lib/Fonts"
-import { BottomSheetBackdrop, BottomSheetModal } from "@gorhom/bottom-sheet"
+import { BottomSheetView } from "@gorhom/bottom-sheet"
 import { TiFAPI } from "TiFShared/api"
 import { RecentLocationsStorage } from "@location/Recents"
 import { EventLocation } from "TiFShared/domain-models/Event"
@@ -28,6 +27,8 @@ import { updateEventDetailsQueryEvent } from "@event/DetailsQuery"
 import { EventArrivals } from "@arrival-tracking"
 import { EventLocationIdentifier } from "./LocationIdentifier"
 import { ChatTokenRequest } from "TiFShared/api/models/Chat"
+import { AlertsObject, presentAlert } from "@lib/Alerts"
+import { TiFBottomSheet } from "@components/BottomSheet"
 
 export const JOIN_EVENT_ERROR_ALERTS = {
   "event-has-ended": {
@@ -46,14 +47,7 @@ export const JOIN_EVENT_ERROR_ALERTS = {
     title: "Uh-oh!",
     description: "Something went wrong. Please try again"
   }
-}
-
-const presentErrorAlert = (key: keyof typeof JOIN_EVENT_ERROR_ALERTS) => {
-  Alert.alert(
-    JOIN_EVENT_ERROR_ALERTS[key].title,
-    JOIN_EVENT_ERROR_ALERTS[key].description
-  )
-}
+} satisfies AlertsObject
 
 export const loadJoinEventPermissions = async () => [
   {
@@ -208,7 +202,7 @@ export const useJoinEventStages = (
     {
       onSuccess: (status) => {
         if (status !== "success") {
-          presentErrorAlert(status)
+          presentAlert(JOIN_EVENT_ERROR_ALERTS[status])
         } else {
           updateEventDetailsQueryEvent(queryClient, event.id, (e) => ({
             ...e,
@@ -216,7 +210,7 @@ export const useJoinEventStages = (
           }))
         }
       },
-      onError: () => presentErrorAlert("generic")
+      onError: () => presentAlert(JOIN_EVENT_ERROR_ALERTS.generic)
     }
   )
   const hasJoined =
@@ -291,75 +285,31 @@ export type JoinEventPermissionBannerModalProps = {
   currentStage: UseJoinEventStage
 }
 
-const DEFAULT_SNAP_POINTS = ["50%"]
-
 const JoinEventPermissionBannerModal = ({
   currentStage
 }: JoinEventPermissionBannerModalProps) => {
-  const permissionsBannerRef = useRef<BottomSheetModal>(null)
-  const [displayedPermissionId, setDisplayedPermissionId] = useState<
-    JoinEventPermissionKind | undefined
-  >()
   const permissionStage =
     currentStage.stage === "permission" ? currentStage : undefined
-  const [snapPoints, setSnapPoints] = useState<number[] | undefined>()
-  const currentPermissionId =
-    currentStage.stage === "permission" && currentStage.permissionKind
-
-  const animatedIndex = useSharedValue(1)
-
-  useEffect(() => {
-    if (!currentPermissionId) return
-    if (!displayedPermissionId) {
-      permissionsBannerRef.current?.present()
-      setDisplayedPermissionId(currentPermissionId)
-    }
-    const ref = permissionsBannerRef.current
-    return () => ref?.dismiss()
-  }, [currentPermissionId, displayedPermissionId])
-
   return (
-    <BottomSheetModal
-      ref={permissionsBannerRef}
-      snapPoints={snapPoints ?? DEFAULT_SNAP_POINTS}
+    <TiFBottomSheet
+      item={permissionStage?.permissionKind}
+      sizing="content-size"
       handleStyle={styles.sheetHandle}
-      enablePanDownToClose={false}
+      canSwipeToDismiss={false}
       onDismiss={() => {
-        if (currentStage.stage !== "permission") {
-          setDisplayedPermissionId(undefined)
-          return
-        }
-        if (currentStage.permissionKind === displayedPermissionId) {
-          currentStage.dismissButtonTapped()
-          setDisplayedPermissionId(undefined)
-        } else {
-          setDisplayedPermissionId(currentStage.permissionKind)
-          permissionsBannerRef.current?.present()
-        }
+        if (currentStage.stage !== "permission") return
+        currentStage.dismissButtonTapped()
       }}
-      backdropComponent={(props) => (
-        <BottomSheetBackdrop
-          {...props}
-          appearsOnIndex={1}
-          animatedIndex={animatedIndex}
-        />
-      )}
     >
-      <View
-        onLayout={(e) => {
-          if (e.nativeEvent.layout.height > 0) {
-            setSnapPoints([e.nativeEvent.layout.height])
-          }
-        }}
-      >
-        {displayedPermissionId && (
+      {(permissionKind) => (
+        <BottomSheetView>
           <JoinEventPermissionBanner
             {...permissionStage}
-            permissionKind={displayedPermissionId}
+            permissionKind={permissionKind}
           />
-        )}
-      </View>
-    </BottomSheetModal>
+        </BottomSheetView>
+      )}
+    </TiFBottomSheet>
   )
 }
 
@@ -405,15 +355,7 @@ const JoinEventPermissionBanner = ({
     >
       <View style={styles.topRow}>
         <View style={styles.topRowSpacer} />
-        <TouchableIonicon
-          icon={{
-            name: "close",
-            style: styles.dismissButton
-          }}
-          onPress={dismissButtonTapped}
-          accessibilityLabel="Dismiss"
-          accessibilityRole="button"
-        />
+        <IoniconCloseButton onPress={dismissButtonTapped} />
       </View>
       <Title style={styles.titleText}>{title}</Title>
       <BodyText style={styles.bodyText}>{description}</BodyText>
@@ -433,7 +375,7 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "row",
     alignItems: "center",
-    paddingBottom: 8
+    paddingBottom: 16
   },
   topRowSpacer: {
     flex: 1

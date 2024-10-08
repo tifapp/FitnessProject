@@ -2,9 +2,18 @@ import { AuthFormView } from "../AuthLayout"
 import { AuthShadedPasswordTextField } from "../AuthTextFields"
 import { useFormSubmission } from "@lib/utils/Form"
 import React, { useState } from "react"
-import { Alert, StyleProp, ViewStyle } from "react-native"
+import { StyleProp, ViewStyle } from "react-native"
 import { Password } from ".."
 import { ResetPasswordResult } from "./Environment"
+import { AlertsObject, presentAlert } from "@lib/Alerts"
+
+export const RESET_PASSWORD_ALERTS = {
+  genericError: {
+    title: "Whoops",
+    description:
+      "Sorry, something went wrong when trying to reset your password. Please try again."
+  }
+} satisfies AlertsObject
 
 /**
  * A type to help show what props need to be given in order to utilize {@link useForgotPasswordForm}.
@@ -47,12 +56,7 @@ export const useResetPasswordForm = (
       },
       {
         onSuccess: (data, args) => onSuccess(data, args.newPass),
-        onError: () =>
-          Alert.alert(
-            "Whoops",
-            "Sorry, something went wrong when trying to reset your password. Please try again.",
-            [{ text: "Ok" }]
-          )
+        onError: () => presentAlert(RESET_PASSWORD_ALERTS.genericError)
       }
     ),
     onTextChanged: (text: string) => setNewPasswordField(text)

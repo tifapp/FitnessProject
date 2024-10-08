@@ -222,10 +222,9 @@ describe("JoinEvent tests", () => {
     ) => {
       act(() => (result.current as any).joinButtonTapped())
       await waitFor(() => {
-        expect(alertPresentationSpy).toHaveBeenNthCalledWith(
+        expect(alertPresentationSpy).toHaveBeenNthPresentedWith(
           callIndex,
-          JOIN_EVENT_ERROR_ALERTS[key].title,
-          JOIN_EVENT_ERROR_ALERTS[key].description
+          JOIN_EVENT_ERROR_ALERTS[key]
         )
       })
       expect(result.current).toEqual({

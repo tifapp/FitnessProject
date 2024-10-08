@@ -32,12 +32,11 @@ describe("HelpAndSupportSettings tests", () => {
     test("Successful submit feedback flow", async () => {
       const result = await renderSuccessfulEmailCompositionFlow()
       act(() => result.current.feedbackSubmitted())
-      await waitFor(async () =>
-        expect(alertPresentationSpy).toHaveBeenCalledWith(
-          HELP_AND_SUPPORT_EMAIL_SUCCESS_ALERTS.submitFeedback.title,
-          HELP_AND_SUPPORT_EMAIL_SUCCESS_ALERTS.submitFeedback.description
+      await waitFor(async () => {
+        expect(alertPresentationSpy).toHaveBeenPresentedWith(
+          HELP_AND_SUPPORT_EMAIL_SUCCESS_ALERTS.submitFeedback
         )
-      )
+      })
       expect(composeEmail).toHaveBeenCalledWith(
         HELP_AND_SUPPORT_EMAILS.feedbackSubmitted
       )
@@ -46,10 +45,9 @@ describe("HelpAndSupportSettings tests", () => {
     test("Unsuccessful submit feedback flow", async () => {
       const result = await renderUnsuccessfulEmailCompositionFlow()
       act(() => result.current.feedbackSubmitted())
-      await waitFor(async () =>
-        expect(alertPresentationSpy).toHaveBeenCalledWith(
-          HELP_AND_SUPPORT_EMAIL_ERROR_ALERTS.submitFeedback.title,
-          HELP_AND_SUPPORT_EMAIL_ERROR_ALERTS.submitFeedback.description
+      await waitFor(() =>
+        expect(alertPresentationSpy).toHaveBeenPresentedWith(
+          HELP_AND_SUPPORT_EMAIL_ERROR_ALERTS.submitFeedback
         )
       )
     })
@@ -59,10 +57,9 @@ describe("HelpAndSupportSettings tests", () => {
       const result = await renderSuccessfulEmailCompositionFlow()
       act(() => result.current.bugReported())
       await reportWithoutLogs()
-      await waitFor(async () =>
-        expect(alertPresentationSpy).toHaveBeenCalledWith(
-          HELP_AND_SUPPORT_EMAIL_SUCCESS_ALERTS.reportBug.title,
-          HELP_AND_SUPPORT_EMAIL_SUCCESS_ALERTS.reportBug.description
+      await waitFor(() =>
+        expect(alertPresentationSpy).toHaveBeenPresentedWith(
+          HELP_AND_SUPPORT_EMAIL_SUCCESS_ALERTS.reportBug
         )
       )
       expect(composeEmail).toHaveBeenCalledWith(
@@ -75,10 +72,9 @@ describe("HelpAndSupportSettings tests", () => {
       const result = await renderSuccessfulEmailCompositionFlow()
       act(() => result.current.bugReported())
       await reportWithLogs()
-      await waitFor(async () =>
-        expect(alertPresentationSpy).toHaveBeenCalledWith(
-          HELP_AND_SUPPORT_EMAIL_SUCCESS_ALERTS.reportBug.title,
-          HELP_AND_SUPPORT_EMAIL_SUCCESS_ALERTS.reportBug.description
+      await waitFor(() =>
+        expect(alertPresentationSpy).toHaveBeenPresentedWith(
+          HELP_AND_SUPPORT_EMAIL_SUCCESS_ALERTS.reportBug
         )
       )
       expect(composeEmail).toHaveBeenCalledWith(
@@ -91,18 +87,15 @@ describe("HelpAndSupportSettings tests", () => {
       const result = await renderSuccessfulEmailCompositionFlow()
       act(() => result.current.bugReported())
       await reportWithLogs()
-      await waitFor(async () =>
-        expect(alertPresentationSpy).toHaveBeenCalledWith(
-          HELP_AND_SUPPORT_ALERTS.compileLogError.title,
-          HELP_AND_SUPPORT_ALERTS.compileLogError.description,
-          expect.any(Array)
+      await waitFor(() =>
+        expect(alertPresentationSpy).toHaveBeenPresentedWith(
+          HELP_AND_SUPPORT_ALERTS.compileLogError()
         )
       )
       await reportWithoutLogsAfterFailure()
-      await waitFor(async () =>
-        expect(alertPresentationSpy).toHaveBeenCalledWith(
-          HELP_AND_SUPPORT_EMAIL_SUCCESS_ALERTS.reportBug.title,
-          HELP_AND_SUPPORT_EMAIL_SUCCESS_ALERTS.reportBug.description
+      await waitFor(() =>
+        expect(alertPresentationSpy).toHaveBeenPresentedWith(
+          HELP_AND_SUPPORT_EMAIL_SUCCESS_ALERTS.reportBug
         )
       )
       expect(composeEmail).toHaveBeenCalledWith(
@@ -113,10 +106,9 @@ describe("HelpAndSupportSettings tests", () => {
     test("Successful submit question flow", async () => {
       const result = await renderSuccessfulEmailCompositionFlow()
       act(() => result.current.questionSubmitted())
-      await waitFor(async () =>
-        expect(alertPresentationSpy).toHaveBeenCalledWith(
-          HELP_AND_SUPPORT_EMAIL_SUCCESS_ALERTS.submitQuestion.title,
-          HELP_AND_SUPPORT_EMAIL_SUCCESS_ALERTS.submitQuestion.description
+      await waitFor(() =>
+        expect(alertPresentationSpy).toHaveBeenPresentedWith(
+          HELP_AND_SUPPORT_EMAIL_SUCCESS_ALERTS.submitQuestion
         )
       )
 
@@ -132,10 +124,9 @@ describe("HelpAndSupportSettings tests", () => {
         expect(result.current.isShowingContactSection).toEqual(true)
       )
       act(() => result.current.questionSubmitted())
-      await waitFor(async () =>
-        expect(alertPresentationSpy).toHaveBeenCalledWith(
-          HELP_AND_SUPPORT_EMAIL_ERROR_ALERTS.submitQuestion.title,
-          HELP_AND_SUPPORT_EMAIL_ERROR_ALERTS.submitQuestion.description
+      await waitFor(() =>
+        expect(alertPresentationSpy).toHaveBeenPresentedWith(
+          HELP_AND_SUPPORT_EMAIL_ERROR_ALERTS.submitQuestion
         )
       )
     })

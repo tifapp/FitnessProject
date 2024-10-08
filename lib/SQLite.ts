@@ -246,7 +246,7 @@ export namespace Migrations {
         isoCountryCode TEXT,
         city TEXT,
         recentAnnotation TEXT,
-        recentUpdatedAt DOUBLE NOT NULL DEFAULT (unixepoch('now', 'subsec')),
+        recentupdatedDateTime DOUBLE NOT NULL DEFAULT (unixepoch('now', 'subsec')),
         CHECK(
           recentAnnotation IN (
             'attended-event',
@@ -278,7 +278,7 @@ export namespace Migrations {
         canShareArrivalStatus INT2 NOT NULL,
         eventPresetShouldHideAfterStartDate INT2 NOT NULL,
         eventPresetDurations TEXT NOT NULL,
-        eventPresetPlacemark TEXT,
+        eventPresetLocation TEXT,
         pushNotificationTriggerIds TEXT NOT NULL,
         eventCalendarStartOfWeekDay TEXT NOT NULL,
         eventCalendarDefaultLayout TEXT NOT NULL,

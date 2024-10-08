@@ -1,14 +1,14 @@
-import React from "react"
-import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
-import { ClientSideEvent } from "@event/ClientSideEvent"
-import { placemarkToAbbreviatedAddress } from "@lib/AddressFormatting"
-import { Ionicon, IoniconName } from "@components/common/Icons"
 import { BodyText, Caption, Headline } from "@components/Text"
 import ConfirmationDialogue from "@components/common/ConfirmationDialogue"
+import { Ionicon, IoniconName } from "@components/common/Icons"
 import ProfileImageAndName from "@components/profileImageComponents/ProfileImageAndName"
+import { ClientSideEvent } from "@event/ClientSideEvent"
+import { placemarkToAbbreviatedAddress } from "@lib/AddressFormatting"
 import { ColorString } from "TiFShared/domain-models/ColorString"
 import { now } from "TiFShared/lib/Dayjs"
 import dayjs from "dayjs"
+import React from "react"
+import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 
 export type EventCardProps = {
   event: ClientSideEvent
@@ -18,14 +18,14 @@ export type EventCardProps = {
 export const EventCard = ({ event, style }: EventCardProps) => {
   const formattedStartDate = event.time.dateRange.ext.formattedDate(
     now(),
-    dayjs(event.time.dateRange.startDate)
+    dayjs(event.time.dateRange.startDateTime)
   )
 
   return (
     <View style={[style, styles.container]}>
       <View style={[styles.topRow, styles.flexRow]}>
         <ProfileImageAndName
-          username={event.host.username}
+          name={event.host.name}
           handle={event.host.handle}
           imageURL={event.host.profileImageURL}
         />

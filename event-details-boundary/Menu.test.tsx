@@ -1,5 +1,5 @@
-import { UserSessionProvider } from "@user/Session"
 import { ClientSideEvent } from "@event/ClientSideEvent"
+import { uuidString } from "@lib/utils/UUID"
 import { setPlatform } from "@test-helpers/Platform"
 import {
   TestQueryClientProvider,
@@ -7,6 +7,9 @@ import {
 } from "@test-helpers/ReactQuery"
 import { fakeTimers } from "@test-helpers/Timers"
 import { act, renderHook, waitFor } from "@testing-library/react-native"
+import { EmailAddress } from "@user/privacy"
+import { UserSessionProvider } from "@user/Session"
+import { UnblockedUserRelationsStatus } from "TiFShared/domain-models/User"
 import { UseLoadEventDetailsResult } from "./Details"
 import {
   EVENT_MENU_ACTION,
@@ -15,9 +18,6 @@ import {
 } from "./Menu"
 import { EventAttendeeMocks, EventMocks } from "./MockData"
 import { renderSuccessfulUseLoadEventDetails } from "./TestHelpers"
-import { UnblockedBidirectionalUserRelations } from "TiFShared/domain-models/User"
-import { uuidString } from "@lib/utils/UUID"
-import { EmailAddress } from "@user/privacy"
 
 describe("EventDetailsMenu tests", () => {
   describe("FormatEventMenuActions tests", () => {
@@ -53,7 +53,7 @@ describe("EventDetailsMenu tests", () => {
         {
           host: {
             ...EventAttendeeMocks.Alivs,
-            relations: { themToYou: "not-friends", youToThem: "blocked" }
+            relationStatus: "blocked-them"
           }
         } as ClientSideEvent,
         [EVENT_MENU_ACTION.toggleBlockHost]
@@ -120,43 +120,25 @@ describe("EventDetailsMenu tests", () => {
 
     test("successful block host flow, updates event details hook", async () => {
       ensureUserIsSignedIn()
-      const event = testEventWithRelations({
-        youToThem: "friends",
-        themToYou: "friends"
-      })
+      const event = testEventWithRelations("friends")
       const { result: eventDetailsResult } = renderUseEventDetails(event)
       const { result: eventMenuActionsResult } =
         renderUseEventDetailsMenuActions(event)
-      await waitForDetailsRelations(eventDetailsResult, {
-        youToThem: "friends",
-        themToYou: "friends"
-      })
+      await waitForDetailsRelations(eventDetailsResult, "friends")
       act(() => eventMenuActionsResult.current.blockHostToggled())
-      await waitForDetailsRelations(eventDetailsResult, {
-        youToThem: "blocked",
-        themToYou: "not-friends"
-      })
+      await waitForDetailsRelations(eventDetailsResult, "blocked-them")
       await waitFor(() => expect(blockHost).toHaveBeenCalledWith(event.host.id))
     })
 
     test("successful unblock host flow, updates event details hook", async () => {
       ensureUserIsSignedIn()
-      const event = testEventWithRelations({
-        youToThem: "blocked",
-        themToYou: "not-friends"
-      })
+      const event = testEventWithRelations("blocked-them")
       const { result: eventDetailsResult } = renderUseEventDetails(event)
       const { result: eventMenuActionsResult } =
         renderUseEventDetailsMenuActions(event)
-      await waitForDetailsRelations(eventDetailsResult, {
-        youToThem: "blocked",
-        themToYou: "not-friends"
-      })
+      await waitForDetailsRelations(eventDetailsResult, "blocked-them")
       act(() => eventMenuActionsResult.current.blockHostToggled())
-      await waitForDetailsRelations(eventDetailsResult, {
-        youToThem: "not-friends",
-        themToYou: "not-friends"
-      })
+      await waitForDetailsRelations(eventDetailsResult, "not-friends")
       await waitFor(() => {
         expect(unblockHost).toHaveBeenCalledWith(event.host.id)
       })
@@ -167,34 +149,22 @@ describe("EventDetailsMenu tests", () => {
         await Promise.reject(new Error())
       })
       ensureUserIsSignedIn()
-      const event = testEventWithRelations({
-        youToThem: "friends",
-        themToYou: "friends"
-      })
+      const event = testEventWithRelations("friends")
       const { result: eventDetailsResult } = renderUseEventDetails(event)
       const { result: eventMenuActionsResult } =
         renderUseEventDetailsMenuActions(event)
-      await waitForDetailsRelations(eventDetailsResult, {
-        youToThem: "friends",
-        themToYou: "friends"
-      })
+      await waitForDetailsRelations(eventDetailsResult, "friends")
       expect(eventMenuActionsResult.current.isToggleBlockHostError).toEqual(
         false
       )
       act(() => eventMenuActionsResult.current.blockHostToggled())
-      await waitForDetailsRelations(eventDetailsResult, {
-        youToThem: "blocked",
-        themToYou: "not-friends"
-      })
+      await waitForDetailsRelations(eventDetailsResult, "blocked-them")
       await waitFor(() => {
         expect(eventMenuActionsResult.current.isToggleBlockHostError).toEqual(
           true
         )
       })
-      await waitForDetailsRelations(eventDetailsResult, {
-        youToThem: "friends",
-        themToYou: "friends"
-      })
+      await waitForDetailsRelations(eventDetailsResult, "friends")
     })
 
     const ensureUserIsSignedIn = () => {
@@ -202,24 +172,24 @@ describe("EventDetailsMenu tests", () => {
     }
 
     const testEventWithRelations = (
-      relations: UnblockedBidirectionalUserRelations
+      relationStatus: UnblockedUserRelationsStatus
     ) => ({
       ...TEST_EVENT,
       host: {
         ...TEST_EVENT.host,
-        relations
+        relationStatus
       }
     })
 
     const waitForDetailsRelations = async (
       result: { current: UseLoadEventDetailsResult },
-      relations: UnblockedBidirectionalUserRelations
+      relationStatus: UnblockedUserRelationsStatus
     ) => {
       await waitFor(() => {
         expect(result.current).toMatchObject({
           event: {
             host: {
-              relations
+              relationStatus
             }
           }
         })

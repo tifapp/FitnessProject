@@ -40,13 +40,13 @@ const EventSettingsScreen = memo(function Screen({
   navigation,
   route
 }: EventSettingsScreenProps) {
-  const { settings } = useUserSettings(settingsSelector("eventPresetPlacemark"))
+  const { settings } = useUserSettings(settingsSelector("eventPresetLocation"))
   return (
     <EventSettingsView
       onLocationPresetTapped={(locationPreset: Placemark) =>
         navigation.navigate(
           "locationPresetSearch",
-          settings.eventPresetPlacemark!
+          settings.eventPresetLocation!
         )
       }
     />
