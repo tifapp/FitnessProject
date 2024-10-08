@@ -11,6 +11,7 @@ import { BodyText, Headline, Title } from "./Text"
 import {
   BottomSheetBackdrop,
   BottomSheetModal,
+  BottomSheetView,
   TouchableHighlight
 } from "@gorhom/bottom-sheet"
 import { useSharedValue } from "react-native-reanimated"
@@ -82,32 +83,34 @@ export const AuthBannerButton = <Children extends ReactNode>({
         sizing="content-size"
         onDismiss={() => setIsShowingSheet(false)}
       >
-        <SafeAreaView edges={["bottom"]} style={styles.bottomSheetView}>
-          <View style={styles.bottonSheetTopRow}>
-            <View style={styles.bottomSheetTopRowSpacer} />
-            <IoniconCloseButton
-              size={20}
-              hitSlop={{
-                top: closeButtonHitSlop,
-                left: closeButtonHitSlop,
-                right: closeButtonHitSlop,
-                bottom: closeButtonHitSlop
+        <BottomSheetView>
+          <SafeAreaView edges={["bottom"]} style={styles.bottomSheetView}>
+            <View style={styles.bottonSheetTopRow}>
+              <View style={styles.bottomSheetTopRowSpacer} />
+              <IoniconCloseButton
+                size={20}
+                hitSlop={{
+                  top: closeButtonHitSlop,
+                  left: closeButtonHitSlop,
+                  right: closeButtonHitSlop,
+                  bottom: closeButtonHitSlop
+                }}
+                onPress={() => setIsShowingSheet(false)}
+              />
+            </View>
+            <AuthBannerView
+              onSignInTapped={() => {
+                onSignInTapped()
+                setIsShowingSheet(false)
               }}
-              onPress={() => setIsShowingSheet(false)}
+              onSignUpTapped={() => {
+                onSignUpTapped()
+                setIsShowingSheet(false)
+              }}
+              style={[styles.bottomSheetBannerStyle, bannerStyle]}
             />
-          </View>
-          <AuthBannerView
-            onSignInTapped={() => {
-              onSignInTapped()
-              setIsShowingSheet(false)
-            }}
-            onSignUpTapped={() => {
-              onSignUpTapped()
-              setIsShowingSheet(false)
-            }}
-            style={[styles.bottomSheetBannerStyle, bannerStyle]}
-          />
-        </SafeAreaView>
+          </SafeAreaView>
+        </BottomSheetView>
       </TiFBottomSheet>
     </>
   )

@@ -1,6 +1,7 @@
 import { TiFBottomSheet } from "@components/BottomSheet"
 import { PrimaryButton } from "@components/Buttons"
 import { IoniconCloseButton } from "@components/common/Icons"
+import { BottomSheetView } from "@gorhom/bottom-sheet"
 import { DurationPickerView } from "@modules/tif-duration-picker"
 import { ReactNode, useState } from "react"
 import {
@@ -50,37 +51,39 @@ export const DurationPickerButton = <Children extends ReactNode>({
         enableContentPanningGesture={false}
         handleStyle="hidden"
       >
-        <SafeAreaView edges={["bottom"]} style={styles.bottomSheetView}>
-          <View style={styles.bottonSheetTopRow}>
-            <View style={styles.bottomSheetTopRowSpacer} />
-            <IoniconCloseButton
-              size={20}
-              hitSlop={{
-                top: closeButtonHitSlop,
-                left: closeButtonHitSlop,
-                right: closeButtonHitSlop,
-                bottom: closeButtonHitSlop
-              }}
-              onPress={() => setIsShowingSheet(false)}
-            />
-          </View>
-          <View style={[styles.durationPickerSheetStyle, pickerStyle]}>
-            <DurationPickerView
-              initialDurationSeconds={6000}
-              onDurationChange={onDurationChange}
-              style={styles.timePicker}
-            />
-            <PrimaryButton
-              onPress={() => {
-                setIsShowingSheet(false)
-                onAddPresetTapped(durationSeconds)
-              }}
-              style={styles.pickerButton}
-            >
-              Save Duration
-            </PrimaryButton>
-          </View>
-        </SafeAreaView>
+        <BottomSheetView>
+          <SafeAreaView edges={["bottom"]} style={styles.bottomSheetView}>
+            <View style={styles.bottonSheetTopRow}>
+              <View style={styles.bottomSheetTopRowSpacer} />
+              <IoniconCloseButton
+                size={20}
+                hitSlop={{
+                  top: closeButtonHitSlop,
+                  left: closeButtonHitSlop,
+                  right: closeButtonHitSlop,
+                  bottom: closeButtonHitSlop
+                }}
+                onPress={() => setIsShowingSheet(false)}
+              />
+            </View>
+            <View style={[styles.durationPickerSheetStyle, pickerStyle]}>
+              <DurationPickerView
+                initialDurationSeconds={6000}
+                onDurationChange={onDurationChange}
+                style={styles.timePicker}
+              />
+              <PrimaryButton
+                onPress={() => {
+                  setIsShowingSheet(false)
+                  onAddPresetTapped(durationSeconds)
+                }}
+                style={styles.pickerButton}
+              >
+                Save Duration
+              </PrimaryButton>
+            </View>
+          </SafeAreaView>
+        </BottomSheetView>
       </TiFBottomSheet>
     </>
   )

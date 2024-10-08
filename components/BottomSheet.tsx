@@ -27,6 +27,9 @@ export const TiFBottomSheetProvider = BottomSheetModalProvider
 
 type BaseTiFBottomSheetProps = {
   sizing: TiFBottomSheetSizing
+  initialSnapPointIndex?: number
+  canSwipeToDismiss?: boolean
+  shouldIncludeBackdrop?: boolean
   enableContentPanningGesture?: boolean
   onDismiss?: () => void
   handleStyle?: StyleProp<ViewStyle> | "hidden"
@@ -50,7 +53,10 @@ export type TiFBottomSheetProps<Item = boolean> = BaseTiFBottomSheetProps &
 
 export const TiFBottomSheet = <Item = boolean,>({
   sizing,
+  canSwipeToDismiss = true,
   enableContentPanningGesture = true,
+  shouldIncludeBackdrop = true,
+  initialSnapPointIndex = 0,
   onDismiss,
   handleStyle,
   children,
@@ -66,7 +72,7 @@ export const TiFBottomSheet = <Item = boolean,>({
       bottomSheetRef.current?.dismiss()
     }
   }, [anchor, onDismiss])
-  const animatedIndex = useSharedValue(0)
+  const animatedIndex = useSharedValue(initialSnapPointIndex)
   const bottomSheetHandleStyle =
     handleStyle === "hidden" ? styles.hiddenHandle : handleStyle
   const sizeProp =
@@ -83,14 +89,16 @@ export const TiFBottomSheet = <Item = boolean,>({
   return (
     <BottomSheetModal
       ref={bottomSheetRef}
+      enablePanDownToClose={canSwipeToDismiss}
       enableContentPanningGesture={enableContentPanningGesture}
       handleStyle={bottomSheetHandleStyle}
       animatedIndex={animatedIndex}
       onDismiss={onDismiss}
-      backdropComponent={TiFBackdropView}
+      backdropComponent={shouldIncludeBackdrop ? TiFBackdropView : null}
+      style={style}
       {...sizeProp}
     >
-      <BottomSheetView style={style}>{renderedChildren}</BottomSheetView>
+      {renderedChildren}
     </BottomSheetModal>
   )
 }
