@@ -30,6 +30,13 @@ import { TiFQueryClientProvider } from "@lib/ReactQuery"
 import { dateRange } from "TiFShared/domain-models/FixedDateRange"
 import { dayjs, now } from "TiFShared/lib/Dayjs"
 import { StoryMeta } from ".storybook/HelperTypes"
+import {
+  JoinEventStagesView,
+  loadJoinEventPermissions,
+  useJoinEventStages
+} from "@event-details-boundary/JoinEvent"
+import { TrueRegionMonitor } from "@arrival-tracking/region-monitoring/MockRegionMonitors"
+import { GestureHandlerRootView } from "react-native-gesture-handler"
 
 const EventDetailsMeta: StoryMeta = {
   title: "Event Details"
@@ -57,14 +64,13 @@ export const Basic: EventDetailsStory = () => {
   }, [])
 
   return (
-    <SafeAreaProvider>
-      {/* <SafeAreaView edges={["bottom"]}> */}
-      <UserLocationFunctionsProvider
-        getCurrentLocation={getCurrentPositionAsync}
-        requestBackgroundPermissions={requestBackgroundPermissionsAsync}
-        requestForegroundPermissions={requestForegroundPermissionsAsync}
-      >
-        <UserSessionProvider isSignedIn={async () => true}>
+    <GestureHandlerRootView>
+      <SafeAreaProvider>
+        <UserLocationFunctionsProvider
+          getCurrentLocation={getCurrentPositionAsync}
+          requestBackgroundPermissions={requestBackgroundPermissionsAsync}
+          requestForegroundPermissions={requestForegroundPermissionsAsync}
+        >
           <TiFQueryClientProvider>
             <BottomSheetModalProvider>
               <NavigationContainer>
@@ -76,10 +82,9 @@ export const Basic: EventDetailsStory = () => {
               </NavigationContainer>
             </BottomSheetModalProvider>
           </TiFQueryClientProvider>
-        </UserSessionProvider>
-      </UserLocationFunctionsProvider>
-      {/* </SafeAreaView> */}
-    </SafeAreaProvider>
+        </UserLocationFunctionsProvider>
+      </SafeAreaProvider>
+    </GestureHandlerRootView>
   )
 }
 
@@ -102,15 +107,22 @@ const Test = () => {
 }
 
 const Menu = ({ event }: { event: ClientSideEvent }) => {
-  const state = useEventDetailsMenuActions(event, {
-    blockHost: async () => {
-      console.log("Blocked")
-    },
-    unblockHost: async () => {
-      console.log("Unblocked")
-    }
+  const stage = useJoinEventStages(event, {
+    monitor: TrueRegionMonitor,
+    joinEvent: async () => "success",
+    loadPermissions: async () => [
+      {
+        kind: "notifications",
+        canRequestPermission: true,
+        requestPermission: async () => {}
+      } as const,
+      {
+        kind: "backgroundLocation",
+        canRequestPermission: true,
+        requestPermission: async () => {}
+      } as const
+    ]
   })
-  console.error("isToggleBlockError", state.isToggleBlockHostError)
   return (
     <View
       style={{
@@ -118,20 +130,7 @@ const Menu = ({ event }: { event: ClientSideEvent }) => {
         justifyContent: "center"
       }}
     >
-      <EventDetailsMenuView
-        event={event}
-        state={state}
-        eventShareContent={async () => ({
-          title: "Test",
-          url: "https://www.google.com",
-          message: "Hello There"
-        })}
-        onCopyEventTapped={() => console.log("Copy")}
-        onInviteFriendsTapped={() => console.log("Invite")}
-        onContactHostTapped={() => console.log("Contact Host")}
-        onReportEventTapped={() => console.log("Report")}
-        onAssignNewHostTapped={() => console.log("Assign Host")}
-      />
+      <JoinEventStagesView stage={stage} />
     </View>
   )
 }
