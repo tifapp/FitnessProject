@@ -63,7 +63,7 @@ export const EditEventFormLocationView = ({
     {!location ? (
       <TiFFormNavigationLinkView
         iconName="location"
-        iconBackgroundColor={AppStyles.black}
+        iconBackgroundColor={AppStyles.primary}
         title="No Location"
         description="You must select a location to create this event."
         style={styles.locationNavigationLink}
@@ -147,7 +147,7 @@ const LocationView = ({ location, onSelectLocationTapped }: LocationProps) => {
             {!location.placemark ? (
               <TiFFormNavigationLinkView
                 iconName="location"
-                iconBackgroundColor={AppStyles.black}
+                iconBackgroundColor={AppStyles.primary}
                 maximumFontScaleFactor={FontScaleFactors.xxxLarge}
                 style={styles.locationMapNavigationLink}
                 title={`${location.coordinate.latitude}, ${location.coordinate.longitude}`}
@@ -156,7 +156,7 @@ const LocationView = ({ location, onSelectLocationTapped }: LocationProps) => {
             ) : (
               <TiFFormNavigationLinkView
                 iconName="location"
-                iconBackgroundColor={AppStyles.black}
+                iconBackgroundColor={AppStyles.primary}
                 style={styles.locationMapNavigationLink}
                 title={location.placemark.name ?? "Unknown Location"}
                 maximumFontScaleFactor={FontScaleFactors.xxxLarge}
@@ -179,7 +179,7 @@ const styles = StyleSheet.create({
     width: "100%",
     borderStyle: "dashed",
     borderRadius: 12,
-    borderColor: AppStyles.darkColor,
+    borderColor: AppStyles.primaryColor,
     borderWidth: 2
   },
   locationNavigationLinkChevron: {

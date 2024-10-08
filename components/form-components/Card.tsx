@@ -20,7 +20,7 @@ export const TiFFormCardView = ({
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: AppStyles.eventCardColor,
+    backgroundColor: AppStyles.cardColor,
     overflow: "hidden"
   }
 })

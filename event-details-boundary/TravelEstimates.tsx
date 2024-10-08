@@ -336,7 +336,7 @@ const TravelTypeButton = ({
           color="black"
           maximumFontScaleFactor={FontScaleFactors.xxxLarge}
           borderRadius={12}
-          backgroundColor={AppStyles.eventCardColor}
+          backgroundColor={AppStyles.cardColor}
           accessibilityLabel={TRAVEL_KEYS_INFO[travelKey].accessibilityLabel}
         />
         {result.status !== "loading" ? (
@@ -455,7 +455,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     padding: 16,
-    backgroundColor: AppStyles.eventCardColor,
+    backgroundColor: AppStyles.cardColor,
     borderRadius: 12
   },
   noticeLabelText: {

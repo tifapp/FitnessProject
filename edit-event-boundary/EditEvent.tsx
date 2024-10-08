@@ -264,6 +264,8 @@ const StartDateSectionView = () => {
                 </View>
                 <View style={styles.durationPickerSheetStyle}>
                   <RNDateTimePicker
+                    accentColor={AppStyles.primaryColor}
+                    textColor={AppStyles.primaryColor}
                     minimumDate={now}
                     mode={datePickerMode}
                     value={startDate}
@@ -440,7 +442,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "space-between",
     padding: 16,
-    backgroundColor: AppStyles.eventCardColor
+    backgroundColor: AppStyles.cardColor
   },
   sheetHandle: {
     opacity: 0

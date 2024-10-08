@@ -59,10 +59,7 @@ const Stack = createStackNavigator()
 
 export const Basic = () => {
   return (
-    <GeocodingFunctionsProvider
-      reverseGeocode={neverPromise}
-      geocode={neverPromise}
-    >
+    <GeocodingFunctionsProvider>
       <TestQueryClientProvider>
         <GestureHandlerRootView>
           <BottomSheetModalProvider>
