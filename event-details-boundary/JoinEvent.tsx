@@ -28,6 +28,7 @@ import { updateEventDetailsQueryEvent } from "@event/DetailsQuery"
 import { EventArrivals } from "@arrival-tracking"
 import { EventLocationIdentifier } from "./LocationIdentifier"
 import { ChatTokenRequest } from "TiFShared/api/models/Chat"
+import { AlertsObject, presentAlert } from "@lib/Alerts"
 
 export const JOIN_EVENT_ERROR_ALERTS = {
   "event-has-ended": {
@@ -46,14 +47,7 @@ export const JOIN_EVENT_ERROR_ALERTS = {
     title: "Uh-oh!",
     description: "Something went wrong. Please try again"
   }
-}
-
-const presentErrorAlert = (key: keyof typeof JOIN_EVENT_ERROR_ALERTS) => {
-  Alert.alert(
-    JOIN_EVENT_ERROR_ALERTS[key].title,
-    JOIN_EVENT_ERROR_ALERTS[key].description
-  )
-}
+} satisfies AlertsObject
 
 export const loadJoinEventPermissions = async () => [
   {
@@ -208,7 +202,7 @@ export const useJoinEventStages = (
     {
       onSuccess: (status) => {
         if (status !== "success") {
-          presentErrorAlert(status)
+          presentAlert(JOIN_EVENT_ERROR_ALERTS[status])
         } else {
           updateEventDetailsQueryEvent(queryClient, event.id, (e) => ({
             ...e,
@@ -216,7 +210,7 @@ export const useJoinEventStages = (
           }))
         }
       },
-      onError: () => presentErrorAlert("generic")
+      onError: () => presentAlert(JOIN_EVENT_ERROR_ALERTS.generic)
     }
   )
   const hasJoined =

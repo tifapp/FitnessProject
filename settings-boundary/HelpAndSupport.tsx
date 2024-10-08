@@ -11,6 +11,7 @@ import { Alert, StyleProp, ViewStyle } from "react-native"
 import { TiFFormNavigationLinkView } from "@components/form-components/NavigationLink"
 import { TiFFormScrollView } from "@components/form-components/ScrollView"
 import { TiFFormCardSectionView } from "@components/form-components/Section"
+import { AlertsObject, presentAlert } from "@lib/Alerts"
 
 export const COMPILING_LOGS_INFO_URL = "https://logs.com"
 
@@ -87,15 +88,15 @@ export const HELP_AND_SUPPORT_ALERTS = {
     description:
       "Something went wrong while submitting your feedback. Please try again."
   },
-  reportBugTapped: {
+  reportBugTapped: (
+    reportWithLogs?: () => Promise<void>,
+    reportWithoutLogs?: () => Promise<void>,
+    openLogsHelpCenter?: () => void
+  ) => ({
     title: "Attach Logs?",
     description:
       "Adding these logs will help make it easier for us to pinpoint the bug you're having.",
-    buttons: (
-      reportWithLogs: () => Promise<void>,
-      reportWithoutLogs: () => Promise<void>,
-      openLogsHelpCenter: () => void
-    ) => [
+    buttons: [
       {
         text: "Yes",
         onPress: reportWithLogs
@@ -110,19 +111,19 @@ export const HELP_AND_SUPPORT_ALERTS = {
         onPress: openLogsHelpCenter
       }
     ]
-  },
-  compileLogError: {
+  }),
+  compileLogError: (confirmLogsCompileError?: () => void) => ({
     title: "Oops!",
     description:
       "We're sorry, we had an error compiling logs. Sending bug report without logs.",
-    buttons: (confirmLogsCompileError: () => void) => [
+    buttons: [
       {
         text: "OK",
         onPress: confirmLogsCompileError
       }
     ]
-  }
-}
+  })
+} satisfies AlertsObject
 
 export const HELP_AND_SUPPORT_EMAIL_SUCCESS_ALERTS = {
   submitFeedback: {
@@ -140,7 +141,7 @@ export const HELP_AND_SUPPORT_EMAIL_SUCCESS_ALERTS = {
     description:
       "Thank you for submitting your question. We’ll get back to you shortly. In the meantime, please visit our Help Center for FAQ’s and additional resources."
   }
-}
+} satisfies AlertsObject
 
 export const HELP_AND_SUPPORT_EMAIL_ERROR_ALERTS = {
   submitFeedback: {
@@ -158,7 +159,7 @@ export const HELP_AND_SUPPORT_EMAIL_ERROR_ALERTS = {
     description:
       "Something went wrong while submitting your question. Please try again."
   }
-}
+} satisfies AlertsObject
 
 export type EventSettingsProps = {
   style?: StyleProp<ViewStyle>
@@ -197,10 +198,8 @@ export const useHelpAndSupportSettings = (
       )
     },
     bugReported: () => {
-      Alert.alert(
-        HELP_AND_SUPPORT_ALERTS.reportBugTapped.title,
-        HELP_AND_SUPPORT_ALERTS.reportBugTapped.description,
-        HELP_AND_SUPPORT_ALERTS.reportBugTapped.buttons(
+      presentAlert(
+        HELP_AND_SUPPORT_ALERTS.reportBugTapped(
           async () => {
             try {
               await tryComposeBugReportEmail(
@@ -208,10 +207,8 @@ export const useHelpAndSupportSettings = (
                 await env.compileLogs()
               )
             } catch {
-              Alert.alert(
-                HELP_AND_SUPPORT_ALERTS.compileLogError.title,
-                HELP_AND_SUPPORT_ALERTS.compileLogError.description,
-                HELP_AND_SUPPORT_ALERTS.compileLogError.buttons(() => {
+              presentAlert(
+                HELP_AND_SUPPORT_ALERTS.compileLogError(() => {
                   tryComposeBugReportEmail(env.composeEmail)
                 })
               )
@@ -251,16 +248,10 @@ const tryComposeEmail = async (
   try {
     const status = await composeEmail(emailTemplate)
     if (status === "success") {
-      Alert.alert(
-        HELP_AND_SUPPORT_EMAIL_SUCCESS_ALERTS[alertsKey].title,
-        HELP_AND_SUPPORT_EMAIL_SUCCESS_ALERTS[alertsKey].description
-      )
+      presentAlert(HELP_AND_SUPPORT_EMAIL_SUCCESS_ALERTS[alertsKey])
     }
   } catch {
-    Alert.alert(
-      HELP_AND_SUPPORT_EMAIL_ERROR_ALERTS[alertsKey].title,
-      HELP_AND_SUPPORT_EMAIL_ERROR_ALERTS[alertsKey].description
-    )
+    presentAlert(HELP_AND_SUPPORT_EMAIL_ERROR_ALERTS[alertsKey])
   }
 }
 

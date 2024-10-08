@@ -1,9 +1,10 @@
 import { ClientSideEvent } from "@event/ClientSideEvent"
 import { updateEventDetailsQueryEvent } from "@event/DetailsQuery"
+import { AlertsObject, presentAlert } from "@lib/Alerts"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { Alert } from "react-native"
 
-export const LEAVE_EVENT_ERROR_ALERTS = {
+export const LEAVE_EVENT_ALERTS = {
   "event-has-ended": {
     title: "Event has ended",
     description:
@@ -19,18 +20,26 @@ export const LEAVE_EVENT_ERROR_ALERTS = {
     description:
       "This event has no co-host. To leave, you will need to select a new host."
   },
-  generic: {
+  genericError: {
     title: "Uh-oh!",
     description: "Something went wrong. Please try again"
-  }
-}
-
-const presentErrorAlert = (key: keyof typeof LEAVE_EVENT_ERROR_ALERTS) => {
-  Alert.alert(
-    LEAVE_EVENT_ERROR_ALERTS[key].title,
-    LEAVE_EVENT_ERROR_ALERTS[key].description
-  )
-}
+  },
+  confirmDelete: (deleteEvent?: () => void) => ({
+    title: "Delete Event",
+    description: "Are you sure you want to delete this event?",
+    buttons: [
+      {
+        text: "Delete",
+        style: "destructive",
+        onPress: deleteEvent
+      },
+      {
+        text: "Cancel",
+        style: "cancel"
+      }
+    ]
+  })
+} satisfies AlertsObject
 
 export type LeaveEventResult =
   | "success"
@@ -71,7 +80,7 @@ export const useLeaveEvent = (
     {
       onSuccess: (status) => {
         if (status === "co-host-not-found") {
-          presentErrorAlert(status)
+          presentAlert(LEAVE_EVENT_ALERTS[status])
           updateEventDetailsQueryEvent(queryClient, event.id, (e) => ({
             ...e,
             userAttendeeStatus: "hosting"
@@ -83,10 +92,10 @@ export const useLeaveEvent = (
             userAttendeeStatus: "not-participating"
           }))
         } else {
-          presentErrorAlert(status)
+          presentAlert(LEAVE_EVENT_ALERTS[status])
         }
       },
-      onError: () => presentErrorAlert("generic")
+      onError: () => presentAlert(LEAVE_EVENT_ALERTS.genericError)
     }
   )
 
@@ -100,9 +109,7 @@ export const useLeaveEvent = (
       status: "select",
       isLoading: leaveEventMutation.isLoading,
       attendeeStatus: event.userAttendeeStatus,
-      confirmButtonTapped: () => {
-        leaveEventMutation.mutate()
-      }
+      confirmButtonTapped: () => leaveEventMutation.mutate()
     }
   } else if (event.userAttendeeStatus === "hosting") {
     return {
@@ -110,20 +117,8 @@ export const useLeaveEvent = (
       isLoading: leaveEventMutation.isLoading,
       attendeeStatus: event.userAttendeeStatus,
       deleteButtonTapped: () => {
-        Alert.alert(
-          "Delete Event",
-          "Are you sure you want to delete this event?",
-          [
-            {
-              text: "Delete",
-              style: "destructive",
-              onPress: () => leaveEventMutation.mutate()
-            },
-            {
-              text: "Cancel",
-              style: "cancel"
-            }
-          ]
+        presentAlert(
+          LEAVE_EVENT_ALERTS.confirmDelete(() => leaveEventMutation.mutate())
         )
       }
     }

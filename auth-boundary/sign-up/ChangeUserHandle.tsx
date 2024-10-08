@@ -8,6 +8,14 @@ import { ActivityIndicator, Alert, StyleProp, ViewStyle } from "react-native"
 import { UserHandle, UserHandleError } from "TiFShared/domain-models/User"
 import { AuthFormView } from "../AuthLayout"
 import { AuthShadedTextField } from "../AuthTextFields"
+import { AlertsObject, presentAlert } from "@lib/Alerts"
+
+export const CHANGE_HANDLE_ALERTS = {
+  genericError: {
+    title: "Oh No!",
+    description: "Something went wrong, please try again."
+  }
+} satisfies AlertsObject
 
 export type UseSignUpChangeUserHandleFormEnvironment = {
   checkIfUserHandleTaken: (
@@ -80,9 +88,7 @@ export const useSignUpChangeUserHandleForm = (
       },
       {
         onSuccess,
-        onError: () => {
-          Alert.alert("Oh No!", "Something went wrong, please try again.")
-        }
+        onError: () => presentAlert(CHANGE_HANDLE_ALERTS.genericError)
       }
     )
   }

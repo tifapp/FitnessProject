@@ -1,6 +1,6 @@
 import { renderHook, waitFor } from "@testing-library/react-native"
 import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
-import { useSignInForm } from "./SignInForm"
+import { SIGN_IN_ALERTS, useSignInForm } from "./SignInForm"
 import { act } from "react-test-renderer"
 import { captureAlerts } from "@test-helpers/Alerts"
 import { USPhoneNumber } from "@user/privacy"
@@ -66,9 +66,8 @@ describe("SignInForm tests", () => {
       act(() => (result.current.submission as any).submit())
 
       await waitFor(() => {
-        expect(alertPresentationSpy).toHaveBeenCalledWith(
-          "Incorrect Credentials",
-          "Your email, phone number, or password entered was incorrectly entered."
+        expect(alertPresentationSpy).toHaveBeenPresentedWith(
+          SIGN_IN_ALERTS["incorrect-credentials"]
         )
       })
     })
@@ -82,9 +81,8 @@ describe("SignInForm tests", () => {
       act(() => (result.current.submission as any).submit())
 
       await waitFor(() => {
-        expect(alertPresentationSpy).toHaveBeenCalledWith(
-          "Ouch!",
-          "Something went wrong when trying to sign you in... Please try again..."
+        expect(alertPresentationSpy).toHaveBeenPresentedWith(
+          SIGN_IN_ALERTS.genericError
         )
       })
     })

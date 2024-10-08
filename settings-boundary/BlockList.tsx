@@ -5,35 +5,35 @@ import { TextToastView } from "@components/common/Toasts"
 import { TiFFormCardView } from "@components/form-components/Card"
 import { TiFFormSectionView } from "@components/form-components/Section"
 import ProfileImageAndName from "@components/profileImageComponents/ProfileImageAndName"
+import { AlertsObject, presentAlert } from "@lib/Alerts"
 import { AppStyles } from "@lib/AppColorStyle"
 import { TiFDefaultLayoutTransition } from "@lib/Reanimated"
 import { useLastDefinedValue } from "@lib/utils/UseLastDefinedValue"
 import {
-    InfiniteData,
-    QueryClient,
-    useInfiniteQuery,
-    useMutation,
-    useQueryClient
+  InfiniteData,
+  QueryClient,
+  useInfiniteQuery,
+  useMutation,
+  useQueryClient
 } from "@tanstack/react-query"
 import {
-    BlockListPage,
-    BlockListUser,
-    removeUsersFromBlockListPages
+  BlockListPage,
+  BlockListUser,
+  removeUsersFromBlockListPages
 } from "TiFShared/domain-models/BlockList"
 import { UserID } from "TiFShared/domain-models/User"
 import { memo, useCallback, useMemo, useState } from "react"
 import {
-    ActivityIndicator,
-    Alert,
-    FlatList,
-    Platform,
-    Pressable,
-    RefreshControl,
-    StyleProp,
-    StyleSheet,
-    TouchableOpacity,
-    View,
-    ViewStyle
+  ActivityIndicator,
+  FlatList,
+  Platform,
+  Pressable,
+  RefreshControl,
+  StyleProp,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+  ViewStyle
 } from "react-native"
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated"
 
@@ -43,16 +43,18 @@ export type UseBlockListSettingsEnvironment = {
 }
 
 export const BLOCK_LIST_SETTINGS_ALERTS = {
-  unblockUserConfirmation: {
-    title: (name: string) => `Unblock ${name}?`,
-    description: (
-      user: Pick<BlockListUser, "name" | "handle">
-    ) => `Are you sure you want to unblock ${user.name} (${user.handle})? You will need to wait 48 hours to block them again.
+  unblockUserConfirmation: (
+    user: Pick<BlockListUser, "name" | "handle">,
+    cancel?: () => void,
+    unblock?: () => void
+  ) => ({
+    title: `Unblock ${user.name}?`,
+    description: `Are you sure you want to unblock ${user.name} (${user.handle})? You will need to wait 48 hours to block them again.
 
     They will be able to view your profile and see your activity, including the events you attend.
 
     You can continue to report them for any inappropriate behavior.`,
-    buttons: (cancel: () => void, unblock: () => void) => [
+    buttons: [
       {
         text: "Cancel",
         style: "cancel" as const,
@@ -63,12 +65,13 @@ export const BLOCK_LIST_SETTINGS_ALERTS = {
         onPress: unblock
       }
     ]
-  },
-  unblockUserFailed: {
+  }),
+  unblockUserFailed: (ok?: () => void) => ({
     title: "Uh Oh!",
-    description: "Unable to unblock user. Please try again later."
-  }
-}
+    description: "Unable to unblock user. Please try again later.",
+    buttons: [{ text: "Ok", onPress: ok }]
+  })
+} satisfies AlertsObject
 
 const BLOCK_LIST_QUERY_KEY = ["block-list"]
 
@@ -140,10 +143,10 @@ const useBlocklistSettingsUnblocking = ({
       onError: () => {
         if (isShowingErrorAlert) return
         setIsShowingErrorAlert(true)
-        Alert.alert(
-          BLOCK_LIST_SETTINGS_ALERTS.unblockUserFailed.title,
-          BLOCK_LIST_SETTINGS_ALERTS.unblockUserFailed.description,
-          [{ text: "Ok", onPress: () => setIsShowingErrorAlert(false) }]
+        presentAlert(
+          BLOCK_LIST_SETTINGS_ALERTS.unblockUserFailed(() => {
+            setIsShowingErrorAlert(false)
+          })
         )
       },
       onSettled: (_, __, user) => {
@@ -160,12 +163,9 @@ const useBlocklistSettingsUnblocking = ({
       (user: BlockListUser) => {
         setMostRecentUnblockedUser(undefined)
         setActiveUnblockingIds((ids) => [...ids, user.id])
-        Alert.alert(
-          BLOCK_LIST_SETTINGS_ALERTS.unblockUserConfirmation.title(
-            user.name
-          ),
-          BLOCK_LIST_SETTINGS_ALERTS.unblockUserConfirmation.description(user),
-          BLOCK_LIST_SETTINGS_ALERTS.unblockUserConfirmation.buttons(
+        presentAlert(
+          BLOCK_LIST_SETTINGS_ALERTS.unblockUserConfirmation(
+            user,
             () => {
               setActiveUnblockingIds((ids) => {
                 return ids.filter((id) => id !== user.id)

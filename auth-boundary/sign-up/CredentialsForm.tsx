@@ -19,6 +19,23 @@ import { TiFDefaultLayoutTransition } from "@lib/Reanimated"
 import { CreateAccountResult } from "./Environment"
 import { EmailAddress, USPhoneNumber } from "@user/privacy"
 import { Password } from ".."
+import { AlertsObject, presentAlert } from "@lib/Alerts"
+
+export const CREDENTIALS_ALERTS = {
+  "email-already-exists": {
+    title: "Email already exists",
+    description: "This email is being used for another account."
+  },
+  "phone-number-already-exists": {
+    title: "Phone number already exists",
+    description: "This phone number is being used for another account."
+  },
+  genericError: {
+    title: "Whoops!",
+    description:
+      "Something went wrong when trying to create your account, please try again."
+  }
+} satisfies AlertsObject
 
 export type SignUpCredentialsFormFields = {
   name: string
@@ -106,22 +123,10 @@ export const useSignUpCredentialsForm = ({
           if (result === "success") {
             onSuccess(args.emailOrPhoneNumber)
           } else {
-            Alert.alert(
-              result === "email-already-exists"
-                ? "Email already exists"
-                : "Phone number already exists",
-              result === "email-already-exists"
-                ? "This email is being used for another account."
-                : "This phone number is being used for another account."
-            )
+            presentAlert(CREDENTIALS_ALERTS[result])
           }
         },
-        onError: () => {
-          Alert.alert(
-            "Whoops!",
-            "Something went wrong when trying to create your account, please try again."
-          )
-        }
+        onError: () => presentAlert(CREDENTIALS_ALERTS.genericError)
       }
     )
   }

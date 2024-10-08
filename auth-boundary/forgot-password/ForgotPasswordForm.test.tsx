@@ -2,7 +2,10 @@ import { captureAlerts } from "@test-helpers/Alerts"
 import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
 import { fakeTimers } from "@test-helpers/Timers"
 import { act, renderHook, waitFor } from "@testing-library/react-native"
-import { useForgotPasswordForm } from "./ForgotPasswordForm"
+import {
+  FORGOT_PASSWORD_ALERTS,
+  useForgotPasswordForm
+} from "./ForgotPasswordForm"
 import { USPhoneNumber } from "@user/privacy"
 
 describe("ForgotPasswordForm tests", () => {
@@ -114,9 +117,8 @@ describe("ForgotPasswordForm tests", () => {
       act(() => (result.current.submission as any).submit())
 
       await waitFor(() => {
-        expect(alertPresentationSpy).toHaveBeenCalledWith(
-          "Invalid Email",
-          "No account exists with the email that you entered."
+        expect(alertPresentationSpy).toHaveBeenPresentedWith(
+          FORGOT_PASSWORD_ALERTS["invalid-email"]
         )
       })
       expect(onSuccess).not.toHaveBeenCalled()
@@ -135,9 +137,8 @@ describe("ForgotPasswordForm tests", () => {
       act(() => (result.current.submission as any).submit())
 
       await waitFor(() => {
-        expect(alertPresentationSpy).toHaveBeenCalledWith(
-          "Invalid Phone Number",
-          "No account exists with the phone number that you entered."
+        expect(alertPresentationSpy).toHaveBeenPresentedWith(
+          FORGOT_PASSWORD_ALERTS["invalid-phone-number"]
         )
       })
       expect(onSuccess).not.toHaveBeenCalled()
