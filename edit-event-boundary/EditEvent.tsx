@@ -46,7 +46,6 @@ import {
   TiFFormSectionView
 } from "@components/form-components/Section"
 import { TiFFormNamedToggleView } from "@components/form-components/NamedToggle"
-import { TiFFormNavigationLinkView } from "@components/form-components/NavigationLink"
 import { settingsSelector } from "@settings-storage/Settings"
 import { useEffectEvent } from "@lib/utils/UseEffectEvent"
 import { EditEventFormSubmitButton, useEditEventFormSubmission } from "./Submit"
@@ -63,12 +62,14 @@ import { formatDateTimeFromBasis } from "@date-time"
 import { EditEventFormLocationView, useEditEventFormLocation } from "./Location"
 
 export type EditEventProps = {
+  hostProfileImageURL?: string
   eventId?: EventID
   submit: (
     eventId: EventID | undefined,
     edit: EventEdit
   ) => Promise<ClientSideEvent>
   onSuccess: (event: ClientSideEvent) => void
+  onSelectLocationTapped: () => void
   currentDate?: Date
   initialValues?: EditEventFormValues
   style?: StyleProp<ViewStyle>
@@ -104,8 +105,10 @@ const formLocation = (location: EventEditLocation) => {
 }
 
 export const EditEventView = ({
+  hostProfileImageURL,
   eventId,
   currentDate = new Date(),
+  onSelectLocationTapped,
   submit,
   onSuccess,
   initialValues,
@@ -121,7 +124,10 @@ export const EditEventView = ({
         <TiFFormScrollView>
           <QuoteSectionView eventId={eventId} currentDate={currentDate} />
           <TitleSectionView />
-          <LocationSectionView />
+          <LocationSectionView
+            hostProfileImageURL={hostProfileImageURL}
+            onSelectLocationTapped={onSelectLocationTapped}
+          />
           <StartDateSectionView />
           <DurationSectionView />
           <DescriptionSectionView />
@@ -176,11 +182,16 @@ const TitleSectionView = () => {
   )
 }
 
-const LocationSectionView = () => (
+type LocationSectionProps = {
+  onSelectLocationTapped: () => void
+  hostProfileImageURL?: string
+}
+
+const LocationSectionView = (props: LocationSectionProps) => (
   <TiFFormSectionView title="Where?">
     <EditEventFormLocationView
       location={useEditEventFormLocation()}
-      onSelectLocationTapped={() => console.log("Select Location")}
+      {...props}
     />
   </TiFFormSectionView>
 )
