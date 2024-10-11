@@ -114,7 +114,7 @@ const useExploreEventsRegion = (initialCenter: ExploreEventsInitialCenter) => {
   const exploreRegion =
     userRegion === "loading"
       ? pannedRegion
-      : pannedRegion ?? userRegion ?? SAN_FRANCISCO_DEFAULT_REGION
+      : (pannedRegion ?? userRegion ?? SAN_FRANCISCO_DEFAULT_REGION)
   return { region: exploreRegion, panToRegion: setPannedRegion }
 }
 
@@ -256,11 +256,9 @@ const ErrorView = ({ onRetried }: ErrorProps) => (
     <BodyText style={styles.emptyEventsText}>
       An error occurred, please try again.
     </BodyText>
-    <PrimaryButton
-      style={styles.tryAgainButton}
-      title="Try Again"
-      onPress={onRetried}
-    />
+    <PrimaryButton style={styles.tryAgainButton} onPress={onRetried}>
+      Try Again
+    </PrimaryButton>
   </View>
 )
 

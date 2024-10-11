@@ -83,7 +83,6 @@ export const AuthLayoutView = ({
           {footer}
           <Animated.View layout={TiFDefaultLayoutTransition}>
             <PrimaryButton
-              title={callToActionTitle}
               style={[
                 styles.callToActionButton,
                 { opacity: isCallToActionDisabled ? 0.5 : 1 }
@@ -91,7 +90,9 @@ export const AuthLayoutView = ({
               disabled={isCallToActionDisabled}
               onPress={onCallToActionTapped}
               accessibilityLabel={callToActionTitle}
-            />
+            >
+              {callToActionTitle}
+            </PrimaryButton>
           </Animated.View>
         </View>
       </KeyboardAvoidingView>
@@ -125,17 +126,17 @@ export const AuthFormView = <Submission extends { status: "invalid" }>({
   submissionTitle,
   ...props
 }: AuthFormProps<Submission>) => (
-    <AuthLayoutView
-      callToActionTitle={submissionTitle}
-      isCallToActionDisabled={submission.status !== "submittable"}
-      onCallToActionTapped={() => {
-        if (submission.status === "submittable") {
-          submission.submit()
-        }
-      }}
-      {...props}
-    />
-  )
+  <AuthLayoutView
+    callToActionTitle={submissionTitle}
+    isCallToActionDisabled={submission.status !== "submittable"}
+    onCallToActionTapped={() => {
+      if (submission.status === "submittable") {
+        submission.submit()
+      }
+    }}
+    {...props}
+  />
+)
 
 const styles = StyleSheet.create({
   container: {

@@ -1,6 +1,5 @@
 import { Headline } from "@components/Text"
 import { AppStyles } from "@lib/AppColorStyle"
-import { useFontScale } from "@lib/Fonts"
 import React, { ReactNode } from "react"
 import {
   StyleProp,
@@ -26,14 +25,9 @@ export type LegacyButtonProps = {
 
 /**
  * Props for a button.
- *
- * If you just want a text button, you can either pass in a `title` prop or use `children`.
- * In this case, always use the `children` prop as `title` is only kept around for legacy reasons.
  */
-export type ButtonProps<Children extends ReactNode> = (
-  | LegacyButtonProps
-  | (TouchableOpacityProps & ContentStyle<Children>)
-) & {
+export type ButtonProps<Children extends ReactNode> = (TouchableOpacityProps &
+  ContentStyle<Children>) & {
   maximumFontSizeMultiplier?: number
 }
 
@@ -98,25 +92,9 @@ const BaseButton = <Children extends ReactNode>({
   maximumFontSizeMultiplier,
   ...props
 }: ButtonProps<Children>) => (
-  <TouchableOpacity
-    {...props}
-    style={[
-      style,
-      {
-        height:
-          48 * useFontScale({ maximumScaleFactor: maximumFontSizeMultiplier })
-      }
-    ]}
-  >
-    {"title" in props ? (
-      <Headline
-        maxFontSizeMultiplier={maximumFontSizeMultiplier}
-        style={props.contentStyle}
-      >
-        {props.title}
-      </Headline>
-    ) : typeof props.children === "string" ||
-      typeof props.children === "number" ? (
+  <TouchableOpacity {...props} style={style}>
+    {typeof props.children === "string" ||
+    typeof props.children === "number" ? (
       <Headline
         maxFontSizeMultiplier={maximumFontSizeMultiplier}
         style={props.contentStyle}
@@ -135,7 +113,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     borderRadius: 12,
-    paddingHorizontal: 16
+    padding: 16
   },
   primaryContent: {
     color: "white"
