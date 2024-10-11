@@ -15,14 +15,6 @@ type ContentStyle<Children extends ReactNode> = Children extends string | number
   ? { contentStyle?: StyleProp<TextStyle> }
   : { contentStyle?: StyleProp<ViewStyle> }
 
-export type LegacyButtonProps = {
-  /**
-   * @deprecated Use `children` to render just text instead.
-   */
-  title: string
-  contentStyle?: StyleProp<TextStyle>
-} & Omit<TouchableOpacityProps, "children">
-
 /**
  * Props for a button.
  */
