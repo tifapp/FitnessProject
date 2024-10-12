@@ -54,7 +54,7 @@ export const BottomNavTabBar = ({ state, navigation }: BottomTabBarProps) => {
                 getIconName(route.name) === "add-outline"
                   ? "white"
                   : isFocused
-                    ? AppStyles.darkColor
+                    ? AppStyles.primaryColor
                     : AppStyles.colorOpacity35
             }}
             style={
@@ -110,6 +110,6 @@ const styles = StyleSheet.create({
     height: 48,
     padding: 4,
     borderRadius: 12,
-    backgroundColor: AppStyles.darkColor
+    backgroundColor: AppStyles.primaryColor
   }
 })

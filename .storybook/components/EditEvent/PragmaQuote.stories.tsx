@@ -59,10 +59,7 @@ const Stack = createStackNavigator()
 
 export const Basic = () => {
   return (
-    <GeocodingFunctionsProvider
-      reverseGeocode={neverPromise}
-      geocode={neverPromise}
-    >
+    <GeocodingFunctionsProvider>
       <TestQueryClientProvider>
         <GestureHandlerRootView>
           <BottomSheetModalProvider>
@@ -122,6 +119,7 @@ const EditEventScreen = () => {
         localSettingsStore={localStore}
       >
         <EditEventView
+          hostProfileImageURL="https://image.civitai.com/xG1nkqKTMzGDvpLrqFT7WA/13a3f4c3-cc99-40b2-ab5e-3d052a1e9286/width=450/00047-375332095-a%20_(xenoblade_),%201girl,%20%20_lora_A-v1.0-000020_0.4_1.4_.jpeg"
           initialValues={{
             ...DEFAULT_EDIT_EVENT_FORM_VALUES,
             title: "Blob",
@@ -136,6 +134,7 @@ const EditEventScreen = () => {
             console.log("Edited", event)
             navigation.goBack()
           }}
+          onSelectLocationTapped={() => console.log("Select Location")}
           currentDate={new Date("2024-10-31T00:00:00")}
           style={{ height: "100%" }}
         />

@@ -53,7 +53,7 @@ const styles = StyleSheet.create({
   },
   pragmaContainer: {
     borderRadius: 12,
-    backgroundColor: AppStyles.eventCardColor,
+    backgroundColor: AppStyles.cardColor,
     padding: 8
   },
   pragmaImage: {

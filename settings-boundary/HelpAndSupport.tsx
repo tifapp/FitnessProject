@@ -271,7 +271,7 @@ export const HelpSectionView = ({ state }: PresetSectionProps) => {
           title={"View Help Center"}
           onTapped={() => open("https://www.google.com")}
           iconName="information-circle"
-          iconBackgroundColor={AppStyles.black}
+          iconBackgroundColor={AppStyles.primary}
         />
       </TiFFormCardSectionView>
       {state.isShowingContactSection && (
@@ -283,19 +283,19 @@ export const HelpSectionView = ({ state }: PresetSectionProps) => {
             title="Report a Bug"
             onTapped={state.bugReported}
             iconName="bug"
-            iconBackgroundColor={AppStyles.black}
+            iconBackgroundColor={AppStyles.primary}
           />
           <TiFFormNavigationLinkView
             title="Submit Feedback"
             onTapped={state.feedbackSubmitted}
             iconName="build"
-            iconBackgroundColor={AppStyles.black}
+            iconBackgroundColor={AppStyles.primary}
           />
           <TiFFormNavigationLinkView
             title="Ask Question"
             onTapped={state.questionSubmitted}
             iconName="help-circle"
-            iconBackgroundColor={AppStyles.black}
+            iconBackgroundColor={AppStyles.primary}
           />
         </TiFFormCardSectionView>
       )}
