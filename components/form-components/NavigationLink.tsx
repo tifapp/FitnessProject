@@ -1,0 +1,78 @@
+import { Ionicon, IoniconName } from "@components/common/Icons"
+import { ColorString } from "TiFShared/domain-models/ColorString"
+import { ReactNode } from "react"
+import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
+import { TiFFormRowButton } from "./Button"
+import { TiFFormNamedIconRowView } from "./NamedIconRow"
+import { TiFFormRowItemView } from "./RowItem"
+
+type BaseTiFFormNavigationLinkProps = {
+  title: string
+  description?: string
+  onTapped: () => void
+  isDisabled?: boolean
+  rightAccessory?: ReactNode
+  chevronStyle?: StyleProp<ViewStyle>
+  style?: StyleProp<ViewStyle>
+}
+
+export type TiFFormNavigationLinkProps = BaseTiFFormNavigationLinkProps &
+  (
+    | {
+        iconName: IoniconName
+        iconBackgroundColor: ColorString
+      }
+    | {
+        iconName?: undefined
+        iconBackgroundColor?: undefined
+      }
+  )
+
+export const TiFFormNavigationLinkView = ({
+  title,
+  description,
+  iconName,
+  iconBackgroundColor,
+  onTapped,
+  isDisabled,
+  rightAccessory,
+  chevronStyle = styles.chevron,
+  style
+}: TiFFormNavigationLinkProps) => (
+  <TiFFormRowButton onTapped={onTapped} isDisabled={isDisabled} style={style}>
+    {iconName ? (
+      <TiFFormNamedIconRowView
+        iconName={iconName}
+        iconBackgroundColor={iconBackgroundColor}
+        name={title}
+        description={description}
+      >
+        <View style={styles.accessoryRow}>
+          {rightAccessory}
+          <Ionicon name="chevron-forward" style={chevronStyle} />
+        </View>
+      </TiFFormNamedIconRowView>
+    ) : (
+      <TiFFormRowItemView title={title} description={description}>
+        <View style={styles.accessoryRow}>
+          {rightAccessory}
+          <Ionicon name="chevron-forward" style={chevronStyle} />
+        </View>
+      </TiFFormRowItemView>
+    )}
+  </TiFFormRowButton>
+)
+
+const styles = StyleSheet.create({
+  titleText: {
+    flex: 1
+  },
+  chevron: {
+    opacity: 0.15
+  },
+  accessoryRow: {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center"
+  }
+})

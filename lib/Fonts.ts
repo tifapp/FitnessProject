@@ -1,5 +1,5 @@
-import { useWindowDimensions } from "react-native"
 import { useFonts } from "expo-font"
+import { useWindowDimensions } from "react-native"
 
 /**
  * Loads all fonts for the app. (Currently just open sans variants).
@@ -12,8 +12,8 @@ export const useAppFonts = () => {
     OpenSansSemiBold: require("../assets/fonts/OpenSans-SemiBold.ttf"),
     OpenSans: require("../assets/fonts/OpenSans-Regular.ttf"),
     OpenSansBold: require("../assets/fonts/OpenSans-Bold.ttf"),
-    OpenDyslexic: require("../assets/fonts/OpenDyslexic3-Regular.ttf"),
-    OpenDyslexicBold: require("../assets/fonts/OpenDyslexic3-Bold.ttf")
+    OpenDyslexic3: require("../assets/fonts/OpenDyslexic3-Regular.ttf"),
+    OpenDyslexic3Bold: require("../assets/fonts/OpenDyslexic3-Bold.ttf")
   })
 }
 
@@ -24,6 +24,8 @@ export const useAppFonts = () => {
  */
 export namespace FontScaleFactors {
   export const xxxLarge = 1.5
+  export const large = 1.0
+  export const accessibility1 = 1.75
   export const accessibility2 = 2.2
 }
 

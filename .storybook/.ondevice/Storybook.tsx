@@ -1,13 +1,12 @@
 import React, { useState } from "react"
-import { Text, TouchableOpacity, View } from "react-native"
+import { FlatList, Text, TouchableOpacity, View } from "react-native"
+import { useAppFonts } from "../../lib/Fonts"
 
 // Import your stories
-import { setupCognito } from "@auth/CognitoHelpers"
-import { InMemorySecureStore } from "@auth/CognitoSecureStorage"
-import { FlatList } from "react-native-gesture-handler"
-import { useAppFonts } from "../../lib/Fonts"
+import { setupCognito } from "@auth-boundary/CognitoHelpers"
+import { InMemorySecureStore } from "@auth-boundary/CognitoSecureStorage"
 import AttendeesListMeta, {
-  Basic as AttendeesListScreenBasic
+  Basic as AttendeesListBasic
 } from "../components/AttendeesList/AttendeesList.stories"
 import ButtonsMeta, {
   Basic as ButtonsBasic
@@ -21,6 +20,9 @@ import ContentReportingMeta, {
 import ContentTextMeta, {
   Basic as ContentTextBasic
 } from "../components/ContentText/ContextText.stories"
+import EventDetailsMeta, {
+  Basic as EventDetailsBasic
+} from "../components/EventDetails/EventDetails.stories"
 import ExploreEventsMeta, {
   Basic as ExploreEventsBasic
 } from "../components/Explore/Explore.stories"
@@ -30,9 +32,18 @@ import ForgotPasswordMeta, {
 import LocationSearchMeta, {
   Basic as LocationSearchBasic
 } from "../components/LocationSearch/LocationSearch.stories"
+import RegionMonitoringMeta, {
+  Basic as RegionMonitoringBasic
+} from "../components/RegionMonitoring/RegionMonitoring.stories"
 import SearchBarMeta, {
   Default as SearchBarBasic
 } from "../components/SearchBar/SearchBar.stories"
+import EventSettingsDurationMeta, {
+  Basic as EventSettingsDurationBasic
+} from "../components/SettingsScreen/EventSettingsDurations.stories"
+import EventSettingsMeta, {
+  Basic as EventSettingsBasic
+} from "../components/SettingsScreen/EventSettingsScreen.stories"
 import SettingsMeta, {
   Basic as SettingsScreenBasic
 } from "../components/SettingsScreen/SettingsScreen.stories"
@@ -48,8 +59,18 @@ import TextFieldMeta, {
 import VerifcationCodeMeta, {
   Basic as VerifcationCodeBasic
 } from "../components/VerificationCode/VerifyCode.stories"
+import EditEventDurationsMeta, {
+  Basic as EditEventDurationsBasic
+} from "../components/EditEvent/DurationPicker.stories"
+import { addLogHandler, consoleLogHandler } from "TiFShared/logging"
+import { sqliteLogHandler, sqliteLogs } from "@lib/Logging"
+import { dayjs } from "TiFShared/lib/Dayjs"
 
 setupCognito(new InMemorySecureStore())
+addLogHandler(consoleLogHandler())
+addLogHandler(
+  sqliteLogHandler(sqliteLogs, dayjs.duration(2, "weeks").asSeconds())
+)
 
 // Create an array of stories
 const stories = [
@@ -69,14 +90,19 @@ const stories = [
     args: ContentTextMeta.args
   },
   {
-    name: AttendeesListMeta.title,
-    component: AttendeesListScreenBasic,
-    args: AttendeesListMeta.args
-  },
-  {
     name: ExploreEventsMeta.title,
     component: ExploreEventsBasic,
     args: ExploreEventsMeta.args
+  },
+  {
+    name: EventSettingsMeta.title,
+    component: EventSettingsBasic,
+    args: EventSettingsMeta.args
+  },
+  {
+    name: EventSettingsDurationMeta.title,
+    component: EventSettingsDurationBasic,
+    args: EventSettingsDurationMeta.args
   },
   {
     name: TextFieldMeta.title,
@@ -122,15 +148,42 @@ const stories = [
     name: ButtonsMeta.title,
     component: ButtonsBasic,
     args: ButtonsMeta.args
+  },
+  {
+    name: EventDetailsMeta.title,
+    component: EventDetailsBasic,
+    args: EventDetailsMeta.args
+  },
+  {
+    name: RegionMonitoringMeta.title,
+    component: RegionMonitoringBasic,
+    args: RegionMonitoringMeta.args
+  },
+  {
+    name: AttendeesListMeta.title,
+    component: AttendeesListBasic,
+    args: AttendeesListMeta.args
+  },
+  {
+    name: EditEventDurationsMeta.title,
+    component: EditEventDurationsBasic,
+    args: EditEventDurationsMeta.args
   }
   // Add more stories here...
 ]
 
 const CustomStorybookUI = () => {
-  const [isFontsLoaded] = useAppFonts()
+  const [isFontsLoaded, error] = useAppFonts()
   const [selectedStory, setSelectedStory] = useState(-1)
 
-  if (!isFontsLoaded) return null
+  console.log(error)
+  if (!isFontsLoaded)
+    return (
+      <Text style={{ marginTop: 128 }}>
+        The fonts did not load. You are trapped here forever!
+        {JSON.stringify(error)}
+      </Text>
+    )
 
   // Render the selected story
   if (selectedStory !== -1) {
@@ -140,7 +193,7 @@ const CustomStorybookUI = () => {
         <StoryComponent {...args} />
         <Text
           onPress={() => setSelectedStory(-1)}
-          style={{ position: "absolute", bottom: 10, left: 10 }}
+          style={{ position: "absolute", bottom: 30, left: 10 }}
         >
           Close
         </Text>

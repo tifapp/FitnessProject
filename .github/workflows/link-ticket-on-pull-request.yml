@@ -1,0 +1,19 @@
+name: Attach PR to Trello Ticket
+
+on:
+  pull_request:
+    types: [opened, edited]
+    branches:
+      - development
+
+jobs:
+  link-ticket:
+    uses: tifapp/TiFShared/.github/workflows/link-ticket.yml@main
+    secrets: inherit
+    with:
+      pullRequestCommentsUrl: ${{ github.event.pull_request.comments_url }}
+      pullRequestBody: ${{ github.event.pull_request.body }}
+      pullRequestHtmlUrl: ${{ github.event.pull_request.html_url }}
+      pullRequestNumber: ${{ github.event.pull_request.number }}
+      headRef: ${{ github.head_ref }}
+      repository: ${{ github.repository }}

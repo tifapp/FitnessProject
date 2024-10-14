@@ -1,0 +1,25 @@
+name: Roswaal Branch Operations
+
+on:
+  pull_request:
+    types: [closed]
+    branches:
+      - development
+
+jobs:
+  merge-close-trigger:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Make a roswaal request if merged
+        if: github.event.pull_request.merged == true && startsWith(github.head_ref, 'roswaal')
+        run: |
+          curl -I -X POST 'https://roswaal.onetask.day/merge?branch=${{ github.head_ref }}&password=${{ secrets.ROSWAAL_PASSWORD }}'
+
+      - name: Make a roswaal request if closed without merging
+        if: github.event.pull_request.merged == false && startsWith(github.head_ref, 'roswaal')
+        run: |
+          curl -I -X POST 'https://roswaal.onetask.day/close?branch=${{ github.head_ref }}&password=${{ secrets.ROSWAAL_PASSWORD }}'

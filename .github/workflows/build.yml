@@ -17,6 +17,7 @@ concurrency:
 
 jobs:
   setup_and_lint:
+    if: github.actor != 'roswaaltifbot' && !startsWith(github.event.pull_request.title, 'IGNORE_BUILD')
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -43,6 +44,7 @@ jobs:
         run: npm run staged-lint
 
   unit_tests:
+    if: github.actor != 'roswaaltifbot' && !startsWith(github.event.pull_request.title, 'IGNORE_BUILD')
     needs: setup_and_lint
     runs-on: ubuntu-latest
     timeout-minutes: 5
@@ -59,12 +61,13 @@ jobs:
             ${{ runner.os }}-node-
 
       - name: Add Env
-        run: echo "API_URL= https://623qsegfb9.execute-api.us-west-2.amazonaws.com/prod/" >> .env
+        run: echo "API_URL=${{ secrets.API_ENDPOINT }}" >> .env
 
       - name: Run tests
         run: npm run test:ci
 
   build:
+    if: github.actor != 'roswaaltifbot' && !startsWith(github.event.pull_request.title, 'IGNORE_BUILD')
     needs: unit_tests
     runs-on: ubuntu-latest
     steps:
@@ -87,6 +90,9 @@ jobs:
       - name: Install Dependencies
         run: |
           npm ci
+          find node_modules/TiFShared -name "*.ts" -type f -delete
+        env:
+          TIFSHARED_JS: true
 
       - name: Bundle project
         run: npx expo export

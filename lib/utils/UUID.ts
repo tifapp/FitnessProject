@@ -1,9 +1,10 @@
-import { polyfillWebCrypto } from "expo-standard-web-crypto"
-import * as _uuid from "uuid"
-
-polyfillWebCrypto()
-
 /**
  * Generates a v4 UUID string.
  */
-export const uuidString = () => _uuid.v4()
+export const uuidString = () => {
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (char) => {
+    const random = (Math.random() * 16) | 0
+    const value = char === "x" ? random : (random & 0x3) | 0x8
+    return value.toString(16)
+  })
+}
