@@ -1,16 +1,14 @@
 import React, { useState } from "react"
-import { Text } from "react-native"
 import { useAppFonts } from "../../lib/Fonts"
 
 // Import your stories
 import { setupCognito } from "@auth-boundary/CognitoHelpers"
 import { InMemorySecureStore } from "@auth-boundary/CognitoSecureStorage"
 import { sqliteLogHandler, sqliteLogs } from "@lib/Logging"
+import Game from "Game/Game"
+import GameMeta from "Game/Game.stories"
 import { dayjs } from "TiFShared/lib/Dayjs"
 import { addLogHandler, consoleLogHandler } from "TiFShared/logging"
-import RegionMonitoringMeta, {
-  Basic as RegionMonitoringBasic
-} from "../components/RegionMonitoring/RegionMonitoring.stories"
 
 setupCognito(new InMemorySecureStore())
 addLogHandler(consoleLogHandler())
@@ -20,9 +18,9 @@ addLogHandler(
 
 // Create an array of stories
 const story = {
-  name: RegionMonitoringMeta.title,
-  component: RegionMonitoringBasic,
-  args: RegionMonitoringMeta.args
+  name: GameMeta.title,
+  component: Game,
+  args: GameMeta.args
 }
 
 const CustomStorybookUI = () => {
@@ -30,14 +28,7 @@ const CustomStorybookUI = () => {
   const [selectedStory, setSelectedStory] = useState(-1)
 
   console.log(error)
-  if (!isFontsLoaded)
-    return (
-      <Text style={{ marginTop: 128 }}>
-        The fonts did not load. You are trapped here forever!
-        {JSON.stringify(error)}
-      </Text>
-    )
-
+  
   const { component: StoryComponent, args } = story
   return (
     <>

@@ -3,8 +3,8 @@
   "main": "AppEntry.js",
   "scripts": {
     "pr": "node --loader ts-node/esm ./node_modules/TiFShared/npm-scripts/auto-pr.ts --env .env.infra",
-    "start": "node enableStorybook.js false && node checkEnv.js && npx expo start --dev-client --clear", //CHECK THAT .env and .env.infra are filled out before running expo
-    "sb_start": "node enableStorybook.js true && sb-rn-get-stories --config-path .storybook/.ondevice && npx expo start --dev-client", //CHECK THAT .env and .env.infra are filled out before running expo
+    "start": "node enableStorybook.js false && node checkEnv.js && npx expo start --dev-client --clear",
+    "sb_start": "node enableStorybook.js true && sb-rn-get-stories --config-path .storybook/.ondevice && npx expo start --dev-client",
     "sb_watcher": "sb-rn-watcher --config-path .storybook/.ondevice",
     "test": "jest --testPathIgnorePatterns \"<rootDir>/roswaal/\" --testPathPattern ",
     "test:ci": "jest --testPathIgnorePatterns \"<rootDir>/roswaal/\" --ci --detectOpenHandles",
