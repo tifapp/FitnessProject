@@ -1,9 +1,16 @@
-import { PrimaryButton } from "@components/Buttons"
+import { EventArrivals } from "@arrival-tracking"
 import {
   EventRegionMonitor,
   useHasArrivedAtRegion
 } from "@arrival-tracking/region-monitoring"
+import { PrimaryButton } from "@components/Buttons"
+import { TouchableIonicon } from "@components/common/Icons"
+import { BodyText, Title } from "@components/Text"
 import { ClientSideEvent } from "@event/ClientSideEvent"
+import { updateEventDetailsQueryEvent } from "@event/DetailsQuery"
+import { BottomSheetBackdrop, BottomSheetModal } from "@gorhom/bottom-sheet"
+import { FontScaleFactors } from "@lib/Fonts"
+import { RecentLocationsStorage } from "@location/Recents"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import {
   getBackgroundPermissionsAsync as getBackgroundLocationPermissions,
@@ -15,17 +22,10 @@ import {
 } from "expo-notifications"
 import React, { useEffect, useRef, useState } from "react"
 import { Alert, StyleProp, StyleSheet, View, ViewStyle } from "react-native"
-import { TouchableIonicon } from "@components/common/Icons"
-import { BodyText, Title } from "@components/Text"
-import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { useSharedValue } from "react-native-reanimated"
-import { FontScaleFactors } from "@lib/Fonts"
-import { BottomSheetBackdrop, BottomSheetModal } from "@gorhom/bottom-sheet"
+import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { TiFAPI } from "TiFShared/api"
-import { RecentLocationsStorage } from "@location/Recents"
 import { EventLocation } from "TiFShared/domain-models/Event"
-import { updateEventDetailsQueryEvent } from "@event/DetailsQuery"
-import { EventArrivals } from "@arrival-tracking"
 import { EventLocationIdentifier } from "./LocationIdentifier"
 import { ChatTokenRequest } from "TiFShared/api/models/Chat"
 import { AlertsObject, presentAlert } from "@lib/Alerts"
@@ -83,6 +83,7 @@ export type JoinEventResult =
   | "event-has-ended"
   | "event-was-cancelled"
   | "user-is-blocked"
+  | "event-not-found"
 
 export type JoinEventRequest = Pick<ClientSideEvent, "id"> & {
   location: Omit<EventLocation, "timezoneIdentifier">
@@ -94,7 +95,6 @@ export type JoinEventRequest = Pick<ClientSideEvent, "id"> & {
  * successfully.
  */
 export type JoinEventSuccess = {
-  chatToken: ChatTokenRequest
   locationIdentifier: EventLocationIdentifier
   arrivals: EventArrivals
 }
@@ -120,20 +120,23 @@ export const joinEvent = async (
     coordinate: request.location.coordinate,
     arrivalRadiusMeters: request.location.arrivalRadiusMeters
   }
-  const resp = await tifAPI.joinEvent(
-    request.id,
-    shouldIncludeArrivalRegion ? arrivalRegion : null
-  )
-  if (resp.status === 403) {
+  const resp = await tifAPI.joinEvent({
+    params: {
+      eventId: request.id
+    },
+    body: shouldIncludeArrivalRegion ? { region: arrivalRegion } : undefined
+  })
+  if (resp.status === 403 || resp.status === 404) {
     return resp.data.error
   }
-  onSuccessHandlers.forEach((handler) => {
-    handler({
-      chatToken: resp.data.chatToken,
-      arrivals: EventArrivals.fromRegions(resp.data.trackableRegions),
-      locationIdentifier: request.location
+  if (resp.status === 201 || resp.status === 200) {
+    onSuccessHandlers.forEach((handler) => {
+      handler({
+        arrivals: EventArrivals.fromRegions(resp.data.trackableRegions),
+        locationIdentifier: request.location
+      })
     })
-  })
+  }
   return "success"
 }
 

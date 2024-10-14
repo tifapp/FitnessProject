@@ -1,17 +1,16 @@
-import { fakeTimers } from "@test-helpers/Timers"
-import { EventArrivalsRefresher } from "./Refresh"
-import { resetTestSQLiteBeforeEach, testSQLite } from "@test-helpers/SQLite"
-import { EventArrivalsTracker } from "./Tracker"
-import { SQLiteEventArrivalsStorage } from "./Storage"
-import { TestEventArrivalsGeofencer } from "./geofencing/TestGeofencer"
-import { TiFAPI } from "TiFShared/api"
-import { mswServer } from "@test-helpers/msw"
-import { HttpResponse, http } from "msw"
-import { repeatElements } from "TiFShared/lib/Array"
-import { mockEventArrivalRegion } from "./MockData"
-import { expectOrderInsensitiveEventArrivals } from "./TestHelpers"
-import { EventArrivals } from "./Arrivals"
 import { SQLiteLocalSettingsStorage } from "@settings-storage/LocalSettings"
+import { resetTestSQLiteBeforeEach, testSQLite } from "@test-helpers/SQLite"
+import { fakeTimers } from "@test-helpers/Timers"
+import { TiFAPI } from "TiFShared/api"
+import { repeatElements } from "TiFShared/lib/Array"
+import { mockTiFEndpoint } from "TiFShared/test-helpers/mockAPIServer"
+import { EventArrivals } from "./Arrivals"
+import { TestEventArrivalsGeofencer } from "./geofencing/TestGeofencer"
+import { mockEventArrivalRegion } from "./MockData"
+import { EventArrivalsRefresher } from "./Refresh"
+import { SQLiteEventArrivalsStorage } from "./Storage"
+import { expectOrderInsensitiveEventArrivals } from "./TestHelpers"
+import { EventArrivalsTracker } from "./Tracker"
 
 describe("EventArrivalsRefresher tests", () => {
   resetTestSQLiteBeforeEach()
@@ -104,17 +103,13 @@ describe("EventArrivalsRefresher tests", () => {
       storage,
       20
     )
-    const regions = repeatElements(3, () => mockEventArrivalRegion())
-    mswServer.use(
-      http.get(TiFAPI.testPath("/event/upcoming"), async () => {
-        return HttpResponse.json({ trackableRegions: regions })
-      })
-    )
+    const trackableRegions = repeatElements(3, () => mockEventArrivalRegion())
+    mockTiFEndpoint("upcomingEventArrivalRegions", 200, { trackableRegions })
 
     await refresher.forceRefresh()
     expectOrderInsensitiveEventArrivals(
       await tracker.trackedArrivals(),
-      EventArrivals.fromRegions(regions)
+      EventArrivals.fromRegions(trackableRegions)
     )
   })
 

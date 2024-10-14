@@ -20,7 +20,7 @@ export const performEventArrivalsOperation = async (
   tifAPI: TiFAPI
 ) => {
   const methodKey = kind === "arrived" ? "arriveAtRegion" : "departFromRegion"
-  return await tifAPI[methodKey](region).then((result) =>
+  return await tifAPI[methodKey]({ body: region }).then((result) =>
     EventArrivals.fromRegions(result.data.trackableRegions)
   )
 }

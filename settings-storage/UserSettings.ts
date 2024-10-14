@@ -145,7 +145,7 @@ export const addAPIUserSettingsExponentialBackoff = (
 ) => {
   const saveMutation = new MutationObserver(queryClient, {
     mutationFn: async (request: UpdateUserSettingsRequest) => {
-      return (await api.saveUserSettings(request)).data
+      return (await api.saveUserSettings({ body: request })).data
     },
     retry: saveRetryCount
   })
