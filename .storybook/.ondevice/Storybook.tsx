@@ -27,7 +27,7 @@ const CustomStorybookUI = () => {
   const [isFontsLoaded, error] = useAppFonts()
   const [selectedStory, setSelectedStory] = useState(-1)
 
-  console.log(error)
+  console.error(error)
   
   const { component: StoryComponent, args } = story
   return (
