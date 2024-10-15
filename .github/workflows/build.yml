@@ -40,6 +40,10 @@ jobs:
         run: |
           npm ci
 
+      - name: Rebuild
+        run: |
+          npm rebuild
+
       - name: Lint
         run: npm run staged-lint
 
