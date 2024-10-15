@@ -5,7 +5,7 @@ import {
   StyleSheet,
   ViewStyle
 } from "react-native";
-import { ITEM_SIZE, PickerItem } from "./PickerItem";
+import { Doll, ITEM_SIZE } from "./EmptyVessel";
 
 // Define the Colors enum
 export enum Options {
@@ -90,7 +90,7 @@ export const VesselPicker = ({
   const renderItem = useMemo(() => {
     return ({ item }: { item: Data }) => {  
       return (
-        <PickerItem
+        <Doll
           color={item.color}
           rotation={item.rotation}
           onSelect={() => onSelect(item.color)}
