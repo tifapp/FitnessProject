@@ -1,7 +1,7 @@
 // PickerItem.tsx
 import { Ionicons } from '@expo/vector-icons';
 import React, { useEffect, useState } from 'react';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import {
   Gesture,
   GestureDetector,
@@ -19,26 +19,34 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useHaptics } from '../../../modules/tif-haptics';
 import { createHeartbeatPattern } from './Haptics';
+import { HeartProgress } from "./Meter";
 
 export const ITEM_SIZE = 125;
-const INITIAL_DURATION = 2000;
+const HEARTBEAT_INTERVAL = 2000;
+const PROGRESS_DURATION = 2000;
 
 export type Item = {
   color: string;
   rotation: number;
-  onPress: () => void;
-  onLongPress: () => void;
-  onPressOut: () => void;
+  onSelect?: () => void;
+  onPress?: () => void;
+  onLongPress?: () => void;
+  onPressOut?: () => void;
+  onGestureStart?: () => void;
+  onGestureEnd?: () => void;
   opacity?: number;
 };
 
 export const PickerItem = ({
   color,
   rotation,
-  onPress,
-  onLongPress,
-  onPressOut,
+  onSelect = () => {},
+  onPress = () => {},
+  onLongPress= () => {},
+  onPressOut= () => {},
   opacity,
+  onGestureStart= () => {},
+  onGestureEnd= () => {},  
 }: Item) => {
   const haptics = useHaptics();
 
@@ -51,9 +59,6 @@ export const PickerItem = ({
   // Additional shared values for bouncy jump animation
   const translateY = useSharedValue(0);
   const scale = useSharedValue(1);
-
-  // Duration for the progress meter to fill up (e.g., 5 seconds)
-  const PROGRESS_DURATION = 5000;
 
   // Handle haptic feedback
   const triggerHapticBurst = () => {
@@ -81,21 +86,19 @@ export const PickerItem = ({
     };
   });
 
-  // Animated styles for the progress meter
-  const animatedProgressStyle = useAnimatedStyle(() => {
-    return {
-      width: `${progress.value * 100}%`,
-    };
-  });
-
   // Gesture handling using LongPress
   const gesture = Gesture.LongPress()
-    .minDuration(0) // Detect press immediately
-    .maxDistance(50)
+    .minDuration(100) // Slight delay before recognizing press
+    .maxDistance(20) // Allow slight finger movements
     .shouldCancelWhenOutside(false) // Prevent cancellation on movement outside
     .onStart(() => {
       isPressed.value = true;
       runOnJS(onPress)();
+
+      // Notify parent that gesture has started
+      if (onGestureStart) {
+        runOnJS(onGestureStart)();
+      }
 
       // Start progress meter animation
       progress.value = withTiming(
@@ -125,11 +128,20 @@ export const PickerItem = ({
               easing: Easing.out(Easing.ease),
             });
 
+            if (progress.value === 1) {
+              runOnJS(onSelect)();
+            }
+
             // Reset states
             isPressed.value = false;
             progress.value = 0;
             pulse.value = 0;
             runOnJS(onPressOut)();
+
+            // Notify parent that gesture has ended
+            if (onGestureEnd) {
+              runOnJS(onGestureEnd)();
+            }
           }
         }
       );
@@ -140,6 +152,14 @@ export const PickerItem = ({
         isPressed.value = false;
         progress.value = withTiming(0, { duration: 300 });
         runOnJS(onPressOut)();
+
+        // Reset pulse
+        pulse.value = withTiming(0, { duration: 300 });
+
+        // Notify parent that gesture has ended
+        if (onGestureEnd) {
+          runOnJS(onGestureEnd)();
+        }
       }
     });
 
@@ -164,7 +184,7 @@ export const PickerItem = ({
       const elapsedTime = Date.now() - startTime;
 
       // Decrease interval duration over time
-      const newInterval = Math.max(INITIAL_DURATION - elapsedTime / 5, 200);
+      const newInterval = Math.max(HEARTBEAT_INTERVAL - elapsedTime / 5, 200);
 
       // Play haptic feedback
       triggerHapticBurst();
@@ -200,14 +220,13 @@ export const PickerItem = ({
   return (
     <GestureDetector gesture={gesture}>
       <Animated.View style={styles.optionContainer}>
+        {/* Heart Progress Meter */}
+        <View style={styles.heartContainer}>
+          <HeartProgress progress={progress} size={80} color={color} />
+        </View>
+
+        {/* Person Icon */}
         <AnimatedIcon name="accessibility" style={animatedIconStyle} size={90} />
-        <Animated.View
-          style={[
-            styles.progressBar,
-            { backgroundColor: color },
-            animatedProgressStyle,
-          ]}
-        />
       </Animated.View>
     </GestureDetector>
   );
@@ -233,5 +252,11 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     height: 5,
+  },
+  heartContainer: {
+    position: 'absolute',
+    top: -ITEM_SIZE/2, // Position the heart above the icon
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });

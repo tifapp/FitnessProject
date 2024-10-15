@@ -1,4 +1,16 @@
 import {
+  AuthVerificationCodeFormView,
+  useAuthVerificationCodeForm
+} from "@auth-boundary"
+import {
+  SignUpChangeUserHandleFormView,
+  SignUpCredentialsFormView,
+  SignUpEndingView,
+  SignUpEnvironment,
+  useSignUpChangeUserHandleForm,
+  useSignUpCredentialsForm
+} from "@auth-boundary/sign-up"
+import {
   ChevronBackButton,
   StackNavigatorType,
   XMarkBackButton
@@ -6,22 +18,10 @@ import {
 import { TouchableIonicon } from "@components/common/Icons"
 import { useNavigation } from "@react-navigation/native"
 import { StackScreenProps } from "@react-navigation/stack"
+import { EmailAddress, USPhoneNumber } from "@user/privacy"
+import { UserHandle } from "TiFShared/domain-models/User"
 import React, { memo } from "react"
 import { Alert, StyleSheet } from "react-native"
-import {
-  AuthVerificationCodeFormView,
-  useAuthVerificationCodeForm
-} from "@auth-boundary"
-import {
-  SignUpChangeUserHandleFormView,
-  useSignUpChangeUserHandleForm,
-  SignUpCredentialsFormView,
-  useSignUpCredentialsForm,
-  SignUpEndingView,
-  SignUpEnvironment
-} from "@auth-boundary/sign-up"
-import { UserHandle } from "TiFShared/domain-models/User"
-import { EmailAddress, USPhoneNumber } from "@user/privacy"
 
 export type SignUpParamsList = {
   signUpCredentialsForm: undefined

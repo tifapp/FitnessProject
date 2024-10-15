@@ -1,6 +1,6 @@
 // VesselPicker.tsx
 import { Title } from "@components/Text";
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef } from "react";
 import {
   Animated,
   StyleSheet,
@@ -20,8 +20,7 @@ export enum Options {
 }
 
 type VesselPickerProps = {
-  onPress: (option: string) => void;
-  //onLongPress: (option: string, layout: { x: number; y: number; width: number; height: number }) => void;
+  onSelect: (option: string) => void;
   style?: ViewStyle;
 };
 
@@ -55,13 +54,11 @@ const data = (() => {
   return repeatedData;
 })();
 
-export const VesselPicker: React.FC<VesselPickerProps> = ({
-  onPress,
-  //onLongPress,
+export const VesselPicker = ({
+  onSelect,
   style,
-}) => {
+}: VesselPickerProps) => {
   const flatListRef = useRef<Animated.FlatList>(null);
-  const [scrollEnabled, setScrollEnabled] = useState(true); // Manage scroll state
 
   useEffect(() => {
     if (flatListRef.current && data.length > 0) {
@@ -97,33 +94,28 @@ export const VesselPicker: React.FC<VesselPickerProps> = ({
         <PickerItem
           color={item.color}
           rotation={item.rotation}
-          onPress={() => onPress(item.color)}
-          onLongPress={() => {}}
-          onPressOut={() => { /* Optional: Handle press out if needed */ }}
-          opacity={1} // Optionally pass opacity if needed
-          onGestureStart={() => setScrollEnabled(false)} // Disable scrolling on gesture start
-          onGestureEnd={() => setScrollEnabled(true)}   // Enable scrolling on gesture end
+          onSelect={() => onSelect(item.color)}
         />
       );
     };
-  }, [onPress]);  
+  }, [onSelect]);  
 
   return (
     <>
-      <Animated.View
+    <Animated.View
         style={{
           opacity: style?.opacity, // Apply animated opacity if provided
         }}
       >
-        <Title
-          style={{
-            alignItems: "center",
-            textAlign: "center",
-            fontStyle: "italic",
-          }}
-        >
-          Please select an avatar.
-        </Title>
+      <Title
+        style={{
+          alignItems: "center",
+          textAlign: "center",
+          fontStyle: "italic",
+        }}
+      >
+        Please select an avatar.
+      </Title>
       </Animated.View>
       <Animated.FlatList
         decelerationRate={"fast"}
@@ -143,7 +135,6 @@ export const VesselPicker: React.FC<VesselPickerProps> = ({
         windowSize={10}
         style={[style]}
         contentContainerStyle={styles.contentContainer}
-        scrollEnabled={scrollEnabled} // Control scrolling
         onScrollToIndexFailed={(info: any) => {
           const wait = new Promise((resolve) => setTimeout(resolve, 500));
           wait.then(() => {

@@ -25,6 +25,9 @@ import ExploreEventsMeta, {
 import ForgotPasswordMeta, {
   Basic as ForgotPasswordBasic
 } from "../components/ForgotPassword/ForgotPasswordForm.stories"
+import GameNavigationMeta, {
+  Basic as GameNavigationBasic
+} from "../components/Game/Navigation.stories"
 import LocationSearchMeta, {
   Basic as LocationSearchBasic
 } from "../components/LocationSearch/LocationSearch.stories"
@@ -67,6 +70,11 @@ const stories = [
     name: GameMeta.title,
     component: Game,
     args: GameMeta.args
+  },
+  {
+    name: GameNavigationMeta.title,
+    component: GameNavigationBasic,
+    args: GameNavigationMeta.args
   },
   {
     name: VesselPickerMeta.title,
@@ -174,9 +182,7 @@ const CustomStorybookUI = () => {
       </>
     )
   }
-
-  console.log("this is how the story goes")
-
+  
   // Render the story list
   return (
     <View style={{ flex: 1, margin: 20 }}>
