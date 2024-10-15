@@ -73,6 +73,7 @@ export const TiFFormScrollableLayoutView = ({
 const styles = StyleSheet.create({
   container: {
     position: "relative",
+    height: "100%",
     flex: 1
   },
   footer: {
