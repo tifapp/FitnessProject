@@ -403,7 +403,7 @@ type FooterProps = {
 }
 
 const FooterView = ({ eventId, onSuccess, submit }: FooterProps) => (
-  <TiFFooterView style={{ width: "100%" }}>
+  <TiFFooterView>
     <EditEventFormSubmitButton
       state={useEditEventFormSubmission({ eventId, submit, onSuccess })}
     />
