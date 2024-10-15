@@ -199,7 +199,7 @@ export const IoniconCloseButton = ({
       name="close"
       size={size}
       borderRadius={32}
-      backgroundColor={AppStyles.eventCardColor}
+      backgroundColor={AppStyles.cardColor}
     />
   </TouchableOpacity>
 )

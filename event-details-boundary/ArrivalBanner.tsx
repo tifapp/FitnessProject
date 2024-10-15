@@ -221,7 +221,7 @@ const styles = StyleSheet.create({
     transform: [{ translateX: 4 }]
   },
   container: {
-    backgroundColor: AppStyles.eventCardColor,
+    backgroundColor: AppStyles.cardColor,
     padding: 16,
     borderRadius: 12,
     width: "100%"

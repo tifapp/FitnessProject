@@ -24,7 +24,7 @@ import {
   createEventQuote,
   editEventQuote
 } from "./PragmaQuotes"
-import { useAtom, useStore } from "jotai"
+import { useAtom, useAtomValue, useStore } from "jotai"
 import { ShadedTextField } from "@components/TextFields"
 import { useFontScale } from "@lib/Fonts"
 import { AppStyles } from "@lib/AppColorStyle"
@@ -39,14 +39,13 @@ import {
   TouchableIonicon
 } from "@components/common/Icons"
 import { dayjs } from "TiFShared/lib/Dayjs"
-import { Headline } from "@components/Text"
+import { BodyText, Headline } from "@components/Text"
 import { TiFFormScrollView } from "@components/form-components/ScrollView"
 import {
   TiFFormCardSectionView,
   TiFFormSectionView
 } from "@components/form-components/Section"
 import { TiFFormNamedToggleView } from "@components/form-components/NamedToggle"
-import { TiFFormNavigationLinkView } from "@components/form-components/NavigationLink"
 import { settingsSelector } from "@settings-storage/Settings"
 import { useEffectEvent } from "@lib/utils/UseEffectEvent"
 import { EditEventFormSubmitButton, useEditEventFormSubmission } from "./Submit"
@@ -58,14 +57,19 @@ import RNDateTimePicker, {
 } from "@react-native-community/datetimepicker"
 import { TiFBottomSheet } from "@components/BottomSheet"
 import { useConst } from "@lib/utils/UseConst"
+import { TiFFormCardView } from "@components/form-components/Card"
+import { formatDateTimeFromBasis } from "@date-time"
+import { EditEventFormLocationView, useEditEventFormLocation } from "./Location"
 
 export type EditEventProps = {
+  hostProfileImageURL?: string
   eventId?: EventID
   submit: (
     eventId: EventID | undefined,
     edit: EventEdit
   ) => Promise<ClientSideEvent>
   onSuccess: (event: ClientSideEvent) => void
+  onSelectLocationTapped: () => void
   currentDate?: Date
   initialValues?: EditEventFormValues
   style?: StyleProp<ViewStyle>
@@ -101,8 +105,10 @@ const formLocation = (location: EventEditLocation) => {
 }
 
 export const EditEventView = ({
+  hostProfileImageURL,
   eventId,
   currentDate = new Date(),
+  onSelectLocationTapped,
   submit,
   onSuccess,
   initialValues,
@@ -118,7 +124,10 @@ export const EditEventView = ({
         <TiFFormScrollView>
           <QuoteSectionView eventId={eventId} currentDate={currentDate} />
           <TitleSectionView />
-          <LocationSectionView />
+          <LocationSectionView
+            hostProfileImageURL={hostProfileImageURL}
+            onSelectLocationTapped={onSelectLocationTapped}
+          />
           <StartDateSectionView />
           <DurationSectionView />
           <DescriptionSectionView />
@@ -173,21 +182,19 @@ const TitleSectionView = () => {
   )
 }
 
-const LocationSectionView = () => {
-  return (
-    <TiFFormSectionView title="Where?">
-      <TiFFormNavigationLinkView
-        iconName="location"
-        iconBackgroundColor={AppStyles.black}
-        title="No Location"
-        description="You must select a location to create this event."
-        style={styles.locationNavigationLink}
-        chevronStyle={styles.locationNavigationLinkChevron}
-        onTapped={() => console.log("TODO")}
-      />
-    </TiFFormSectionView>
-  )
+type LocationSectionProps = {
+  onSelectLocationTapped: () => void
+  hostProfileImageURL?: string
 }
+
+const LocationSectionView = (props: LocationSectionProps) => (
+  <TiFFormSectionView title="Where?">
+    <EditEventFormLocationView
+      location={useEditEventFormLocation()}
+      {...props}
+    />
+  </TiFFormSectionView>
+)
 
 const StartDateSectionView = () => {
   const [startDate, setStartDate] = useAtom(
@@ -198,6 +205,10 @@ const StartDateSectionView = () => {
     "date" | "time" | undefined
   >()
   const now = useConst(new Date())
+  const sheetBottomPadding = useScreenBottomPadding({
+    safeAreaScreens: 48,
+    nonSafeAreaScreens: 24
+  })
 
   const presentAndroidDatePicker = (mode: "date" | "time") => {
     RNDateTimePickerAndroid.open({
@@ -243,6 +254,7 @@ const StartDateSectionView = () => {
             <Ionicon name="chevron-forward" />
           </TouchableOpacity>
         </View>
+        <EndTimeView />
       </TiFFormSectionView>
       {Platform.OS === "ios" && (
         <TiFBottomSheet
@@ -263,6 +275,8 @@ const StartDateSectionView = () => {
                 </View>
                 <View style={styles.durationPickerSheetStyle}>
                   <RNDateTimePicker
+                    accentColor={AppStyles.primaryColor}
+                    textColor={AppStyles.primaryColor}
                     minimumDate={now}
                     mode={datePickerMode}
                     value={startDate}
@@ -272,6 +286,7 @@ const StartDateSectionView = () => {
                     }}
                   />
                 </View>
+                <EndTimeView style={{ paddingBottom: sheetBottomPadding }} />
               </SafeAreaView>
             </BottomSheetView>
           )}
@@ -287,6 +302,10 @@ const DurationSectionView = () => {
   } = useUserSettings(settingsSelector("eventPresetDurations"))
   const [duration, setDuration] = useAtom(editEventFormValueAtoms.duration)
   const [isShowingSheet, setIsShowingSheet] = useState(false)
+  const sheetBottomPadding = useScreenBottomPadding({
+    safeAreaScreens: 48,
+    nonSafeAreaScreens: 24
+  })
   return (
     <>
       <TiFFormSectionView
@@ -316,13 +335,12 @@ const DurationSectionView = () => {
               <View style={styles.bottomSheetTopRowSpacer} />
               <IoniconCloseButton onPress={() => setIsShowingSheet(false)} />
             </View>
-            <View style={styles.durationPickerSheetStyle}>
-              <DurationPickerView
-                initialDurationSeconds={duration}
-                onDurationChange={setDuration}
-                style={styles.durationPicker}
-              />
-            </View>
+            <DurationPickerView
+              initialDurationSeconds={duration}
+              onDurationChange={setDuration}
+              style={styles.durationPicker}
+            />
+            <EndTimeView style={{ paddingBottom: sheetBottomPadding }} />
           </SafeAreaView>
         </BottomSheetView>
       </TiFBottomSheet>
@@ -365,6 +383,28 @@ const AdvancedSectionView = () => {
   )
 }
 
+type EndTimeProps = {
+  style?: StyleProp<ViewStyle>
+}
+
+const EndTimeView = ({ style }: EndTimeProps) => {
+  const startDateTime = useAtomValue(editEventFormValueAtoms.startDateTime)
+  const duration = useAtomValue(editEventFormValueAtoms.duration)
+  return (
+    <TiFFormCardView style={style}>
+      <View style={styles.eventTimeRangeRow}>
+        <Headline style={styles.eventTimeRangeLabel}>End Time</Headline>
+        <BodyText style={styles.eventTimeRangeText}>
+          {formatDateTimeFromBasis(
+            startDateTime,
+            startDateTime.ext.addSeconds(duration)
+          )}
+        </BodyText>
+      </View>
+    </TiFFormCardView>
+  )
+}
+
 type FooterProps = {
   eventId?: EventID
   submit: (eventId: EventID | undefined, edit: EventEdit) => Promise<void>
@@ -400,16 +440,6 @@ const styles = StyleSheet.create({
     bottom: 0,
     paddingHorizontal: 24
   },
-  locationNavigationLink: {
-    width: "100%",
-    borderStyle: "dashed",
-    borderRadius: 12,
-    borderColor: AppStyles.darkColor,
-    borderWidth: 2
-  },
-  locationNavigationLinkChevron: {
-    opacity: 1
-  },
   startDateRow: {
     display: "flex",
     flexDirection: "row",
@@ -423,7 +453,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "space-between",
     padding: 16,
-    backgroundColor: AppStyles.eventCardColor
+    backgroundColor: AppStyles.cardColor
   },
   sheetHandle: {
     opacity: 0
@@ -446,5 +476,17 @@ const styles = StyleSheet.create({
     width: "100%",
     alignSelf: "center",
     height: 256
+  },
+  eventTimeRangeRow: {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 16
+  },
+  eventTimeRangeLabel: {
+    marginRight: 16
+  },
+  eventTimeRangeText: {
+    flex: 1
   }
 })

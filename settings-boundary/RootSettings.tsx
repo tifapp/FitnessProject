@@ -47,7 +47,7 @@ const MainScreenLinksSection = ({
   <TiFFormCardSectionView>
     <TiFFormNavigationLinkView
       iconName="settings"
-      iconBackgroundColor={AppStyles.black}
+      iconBackgroundColor={AppStyles.primary}
       title="General"
       onTapped={() => onSettingsScreenLinkTapped("generalSettings")}
     />
@@ -102,13 +102,13 @@ const SupportSectionView = ({
     <TiFFormCardSectionView title="Support">
       <TiFFormNavigationLinkView
         iconName="bulb-sharp"
-        iconBackgroundColor={AppStyles.black}
+        iconBackgroundColor={AppStyles.primary}
         title="Help and Feedback"
         onTapped={() => onSettingsScreenLinkTapped("helpAndSupport")}
       />
       <TiFFormNavigationLinkView
         iconName="lock-closed"
-        iconBackgroundColor={AppStyles.black}
+        iconBackgroundColor={AppStyles.primary}
         title="Privacy and Data"
         onTapped={() => onSettingsScreenLinkTapped("privacySettings")}
       />

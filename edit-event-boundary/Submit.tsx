@@ -68,7 +68,6 @@ export const EditEventFormSubmitButton = ({
 }: EditEventFormSubmitButtonProps) => (
   <View style={style}>
     <PrimaryButton
-      title={!state.eventId ? "Create Event" : "Update Event"}
       disabled={state.submission.status !== "submittable"}
       onPress={() => {
         if (state.submission.status === "submittable") {
@@ -76,7 +75,9 @@ export const EditEventFormSubmitButton = ({
         }
       }}
       style={styles.submitButton}
-    />
+    >
+      {!state.eventId ? "Create Event" : "Update Event"}
+    </PrimaryButton>
   </View>
 )
 

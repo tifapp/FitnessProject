@@ -118,7 +118,7 @@ const ContactInfoSectionView = ({
       <TiFFormNavigationLinkView
         title={`Change ${userContactInfo.formattedContactInfoType}`}
         iconName={userContactInfo.contactInfoTypeIconName}
-        iconBackgroundColor={AppStyles.black}
+        iconBackgroundColor={AppStyles.primary}
         isDisabled={isDisabled}
         onTapped={onChangeContactInfoTapped}
       />
@@ -141,14 +141,14 @@ const PasswordSectionView = ({
     <TiFFormNavigationLinkView
       title="Change Password"
       iconName="lock-closed"
-      iconBackgroundColor={AppStyles.black}
+      iconBackgroundColor={AppStyles.primary}
       isDisabled={isDisabled}
       onTapped={onChangePasswordTapped}
     />
     <TiFFormNavigationLinkView
       title="Forgot Password"
       iconName="bulb"
-      iconBackgroundColor={AppStyles.black}
+      iconBackgroundColor={AppStyles.primary}
       isDisabled={isDisabled}
       onTapped={onForgotPasswordTapped}
     />

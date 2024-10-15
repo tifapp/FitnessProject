@@ -57,7 +57,7 @@ export const TiFFormPreviewableOptionView = ({
           style={{
             borderRadius: 12,
             overflow: "hidden",
-            backgroundColor: isSelected ? AppStyles.darkColor : undefined
+            backgroundColor: isSelected ? AppStyles.primaryColor : undefined
           }}
         >
           <NameComponent
@@ -65,7 +65,7 @@ export const TiFFormPreviewableOptionView = ({
             style={[
               {
                 padding: 8,
-                color: isSelected ? "white" : AppStyles.darkColor
+                color: isSelected ? "white" : AppStyles.primaryColor
               }
             ]}
           >

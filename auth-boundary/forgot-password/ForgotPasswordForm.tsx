@@ -136,7 +136,7 @@ const styles = StyleSheet.create({
   },
   activeButton: {
     flex: 1,
-    backgroundColor: AppStyles.darkColor
+    backgroundColor: AppStyles.primaryColor
   },
   inactiveButton: {
     flex: 1,
