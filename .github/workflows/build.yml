@@ -34,11 +34,15 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: "18.16.0"
+          node-version: "20.0.0"
 
       - name: Install Dependencies
         run: |
           npm ci
+
+      - name: Rebuild
+        run: |
+          npm rebuild
 
       - name: Lint
         run: npm run staged-lint
@@ -85,11 +89,14 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: "18.16.0"
+          node-version: "20.0.0"
 
       - name: Install Dependencies
         run: |
           npm ci
+          find node_modules/TiFShared -name "*.ts" -type f -delete
+        env:
+          TIFSHARED_JS: true
 
       - name: Bundle project
         run: npx expo export
