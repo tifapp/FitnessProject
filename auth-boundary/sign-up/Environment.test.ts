@@ -1,15 +1,15 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import { TestCognitoError } from "@auth-boundary/CognitoHelpers"
 import { uuidString } from "@lib/utils/UUID"
-import { mswServer } from "@test-helpers/msw"
-import { HttpResponse, http } from "msw"
+import { EmailAddress, USPhoneNumber } from "@user/privacy"
+import { TiFAPI } from "TiFShared/api"
+import { UserHandle } from "TiFShared/domain-models/User"
+import {
+  mockTiFEndpoint,
+  mockTiFServer
+} from "TiFShared/test-helpers/mockAPIServer"
 import { Password } from ".."
 import { createSignUpEnvironment } from "./Environment"
-import { UserHandle } from "TiFShared/domain-models/User"
-import { TiFAPI } from "TiFShared/api"
-import { EmailAddress, USPhoneNumber } from "@user/privacy"
-
-const AUTOCOMPLETE_USERS_PATH = TiFAPI.testPath("/user/autocomplete")
 
 describe("SignUpEnvironment tests", () => {
   const cognito = {
@@ -89,30 +89,29 @@ describe("SignUpEnvironment tests", () => {
   describe("CheckIfHandleExists tests", () => {
     test("autocomplete returns user with matching handle, returns true", async () => {
       const handle = UserHandle.parse("abc").handle!
-      mswServer.use(
-        http.get(AUTOCOMPLETE_USERS_PATH, async ({ request }) => {
-          const searchParams = new URL(request.url).searchParams
-          if (searchParams.get("limit") !== "1") {
-            return new HttpResponse(null, {
-              status: 500
-            })
+
+      mockTiFServer({
+        autocompleteUsers: {
+          expectedRequest: {
+            query: {
+              limit: "1",
+              handle: handle.rawValue
+            }
+          },
+          mockResponse: {
+            status: 200,
+            data: {
+              users: [
+                {
+                  id: uuidString(),
+                  handle,
+                  name: "Bitchell Dickle"
+                }
+              ]
+            }
           }
-          if (searchParams.get("handle") !== handle.rawValue) {
-            return new HttpResponse(null, {
-              status: 500
-            })
-          }
-          return HttpResponse.json({
-            users: [
-              {
-                id: uuidString(),
-                handle: handle.rawValue,
-                name: "Bitchell Dickle"
-              }
-            ]
-          })
-        })
-      )
+        }
+      })
 
       const doesExist = await env.checkIfUserHandleTaken(handle)
       expect(doesExist).toEqual(true)
@@ -121,11 +120,8 @@ describe("SignUpEnvironment tests", () => {
 
   test("autocomplete returns no users, returns false", async () => {
     const handle = UserHandle.parse("abc").handle!
-    mswServer.use(
-      http.get(AUTOCOMPLETE_USERS_PATH, async () => {
-        return HttpResponse.json({ users: [] })
-      })
-    )
+
+    mockTiFEndpoint("autocompleteUsers", 200, { users: [] })
 
     const doesExist = await env.checkIfUserHandleTaken(handle)
     expect(doesExist).toEqual(false)
@@ -133,19 +129,16 @@ describe("SignUpEnvironment tests", () => {
 
   test("autocomplete returns no user with non-matching handle, returns false", async () => {
     const handle = UserHandle.parse("abc").handle!
-    mswServer.use(
-      http.get(AUTOCOMPLETE_USERS_PATH, async () => {
-        return HttpResponse.json({
-          users: [
-            {
-              id: uuidString(),
-              handle: "thing",
-              name: "Bitchell Dickle"
-            }
-          ]
-        })
-      })
-    )
+
+    mockTiFEndpoint("autocompleteUsers", 200, {
+      users: [
+        {
+          id: uuidString(),
+          handle: "thing",
+          name: "Bitchell Dickle"
+        }
+      ]
+    })
 
     const doesExist = await env.checkIfUserHandleTaken(handle)
     expect(doesExist).toEqual(false)
@@ -189,17 +182,12 @@ describe("SignUpEnvironment tests", () => {
     it("should return user handle from API when verification code is valid", async () => {
       const handle = UserHandle.parse("test").handle!
       cognito.confirmSignUpWithAutoSignIn.mockResolvedValueOnce("SUCCESS")
-      mswServer.use(
-        http.post(TiFAPI.testPath("/user"), async () => {
-          return HttpResponse.json(
-            {
-              id: uuidString(),
-              handle: handle.rawValue
-            },
-            { status: 201 }
-          )
-        })
-      )
+
+      mockTiFEndpoint("createCurrentUserProfile", 201, {
+        id: uuidString(),
+        handle
+      })
+
       const result = await env.finishRegisteringAccount(
         USPhoneNumber.parse("1234567890")!,
         "123456"

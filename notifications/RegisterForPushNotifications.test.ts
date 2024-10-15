@@ -1,28 +1,19 @@
 import { uuidString } from "@lib/utils/UUID"
-import { mswServer } from "@test-helpers/msw"
-import { DefaultBodyType, HttpResponse, StrictRequest, http } from "msw"
-import { registerForPushNotifications } from "./RegisterForPushNotifications"
 import { TiFAPI } from "TiFShared/api"
+import { mockTiFServer } from "TiFShared/test-helpers/mockAPIServer"
+import { registerForPushNotifications } from "./RegisterForPushNotifications"
 
 describe("RegisterForPushNotifications tests", () => {
-  const createTestBodyHandler = (expectedRequest: {
-    pushToken: string
-    platformName: "apple" | "android"
-  }) => {
-    return async ({ request }: { request: StrictRequest<DefaultBodyType> }) => {
-      expect(await request.json()).toEqual(expectedRequest)
-      return HttpResponse.json({ status: "inserted" }, { status: 201 })
-    }
-  }
-
   test("register with iOS token", async () => {
     const pushToken = uuidString()
-    mswServer.use(
-      http.post(
-        TiFAPI.testPath("/user/notifications/push/register"),
-        createTestBodyHandler({ pushToken, platformName: "apple" })
-      )
-    )
+
+    mockTiFServer({
+      registerForPushNotifications: {
+        expectedRequest: { body: { pushToken, platformName: "apple" } },
+        mockResponse: { status: 201, data: { status: "inserted" } }
+      }
+    })
+
     await registerForPushNotifications(
       { data: pushToken, type: "ios" },
       TiFAPI.testAuthenticatedInstance
@@ -31,12 +22,14 @@ describe("RegisterForPushNotifications tests", () => {
 
   test("register with android token", async () => {
     const pushToken = uuidString()
-    mswServer.use(
-      http.post(
-        TiFAPI.testPath("/user/notifications/push/register"),
-        createTestBodyHandler({ pushToken, platformName: "android" })
-      )
-    )
+
+    mockTiFServer({
+      registerForPushNotifications: {
+        expectedRequest: { body: { pushToken, platformName: "android" } },
+        mockResponse: { status: 201, data: { status: "inserted" } }
+      }
+    })
+
     await registerForPushNotifications(
       { data: pushToken, type: "android" },
       TiFAPI.testAuthenticatedInstance

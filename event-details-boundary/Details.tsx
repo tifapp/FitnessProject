@@ -1,25 +1,25 @@
-import { UseQueryResult } from "@tanstack/react-query"
+import { BodyText, Subtitle, Title } from "@components/Text"
 import {
   ClientSideEvent,
   clientSideEventFromResponse
 } from "@event/ClientSideEvent"
 import { useIsConnectedToInternet } from "@lib/InternetConnection"
+import { UseQueryResult } from "@tanstack/react-query"
 import React, { useRef, useState } from "react"
+import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 import { TiFAPI } from "TiFShared/api"
-import { StyleProp, View, ViewStyle, StyleSheet } from "react-native"
-import { BodyText, Subtitle, Title } from "@components/Text"
 
 import { PrimaryButton } from "@components/Buttons"
-import { useConst } from "@lib/utils/UseConst"
-import Animated, { ZoomIn, ZoomOut } from "react-native-reanimated"
-import { TiFDefaultLayoutTransition } from "@lib/Reanimated"
-import { AppStyles } from "@lib/AppColorStyle"
-import { useAutocorrectingInterval } from "@lib/AutocorrectingInterval"
 import {
   EventDetailsLoadingResult,
   useEventDetailsQuery
 } from "@event/DetailsQuery"
-import { EventWhenBlockedByHost, EventID } from "TiFShared/domain-models/Event"
+import { AppStyles } from "@lib/AppColorStyle"
+import { useAutocorrectingInterval } from "@lib/AutocorrectingInterval"
+import { TiFDefaultLayoutTransition } from "@lib/Reanimated"
+import { useConst } from "@lib/utils/UseConst"
+import Animated, { ZoomIn, ZoomOut } from "react-native-reanimated"
+import { EventID, EventWhenBlockedByHost } from "TiFShared/domain-models/Event"
 
 /**
  * Loads the event details from the server.
@@ -31,13 +31,11 @@ export const loadEventDetails = async (
   eventId: number,
   tifAPI: TiFAPI
 ): Promise<EventDetailsLoadingResult> => {
-  const resp = await tifAPI.eventDetails(eventId)
+  const resp = await tifAPI.eventDetails({ params: { eventId } })
   if (resp.status === 404) {
     return { status: "not-found" }
   } else if (resp.status === 403) {
     return { status: "blocked", event: resp.data }
-  } else if (resp.status === 204) {
-    return { status: "cancelled" }
   } else {
     return {
       status: "success",

@@ -1,9 +1,9 @@
-import { Auth } from "@aws-amplify/auth"
-import { Password } from ".."
-import { TiFAPI } from "TiFShared/api"
 import { isCognitoErrorWithCode } from "@auth-boundary/CognitoHelpers"
-import { UserHandle } from "TiFShared/domain-models/User"
+import { Auth } from "@aws-amplify/auth"
 import { EmailAddress, USPhoneNumber } from "@user/privacy"
+import { TiFAPI } from "TiFShared/api"
+import { UserHandle } from "TiFShared/domain-models/User"
+import { Password } from ".."
 
 export type CreateAccountResult =
   | "success"
@@ -75,7 +75,7 @@ export const createSignUpEnvironment = (
    */
   checkIfUserHandleTaken: async (handle: UserHandle, signal?: AbortSignal) => {
     return await tifAPI
-      .autocompleteUsers(handle.rawValue, 1, signal)
+      .autocompleteUsers({ query: { handle, limit: 1 }, signal })
       .then((resp) => resp.data.users[0]?.handle.isEqualTo(handle) ?? false)
   },
   /**
@@ -84,7 +84,7 @@ export const createSignUpEnvironment = (
    * @param handle the handle to change to.
    */
   changeUserHandle: async (handle: UserHandle) => {
-    await tifAPI.updateCurrentUserProfile({ handle })
+    await tifAPI.updateCurrentUserProfile({ body: { handle } })
   },
   /**
    * Finishes registering the user's account by first verifying the sign-up code,
