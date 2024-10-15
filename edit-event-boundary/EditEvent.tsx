@@ -61,6 +61,7 @@ import { TiFFormCardView } from "@components/form-components/Card"
 import { formatDateTimeFromBasis } from "@date-time"
 import { EditEventFormLocationView, useEditEventFormLocation } from "./Location"
 import { TiFFormScrollableLayoutView } from "@components/form-components/ScrollableFormLayout"
+import { TiFFooterView } from "@components/Footer"
 
 export type EditEventProps = {
   hostProfileImageURL?: string
@@ -401,21 +402,13 @@ type FooterProps = {
   onSuccess: (event: ClientSideEvent) => void
 }
 
-const FooterView = ({ eventId, onSuccess, submit }: FooterProps) => {
-  const bottomPadding = useScreenBottomPadding({
-    safeAreaScreens: 8,
-    nonSafeAreaScreens: 24
-  })
-  return (
+const FooterView = ({ eventId, onSuccess, submit }: FooterProps) => (
+  <TiFFooterView style={{ width: "100%" }}>
     <EditEventFormSubmitButton
       state={useEditEventFormSubmission({ eventId, submit, onSuccess })}
-      style={{
-        paddingTop: 8,
-        paddingBottom: useSafeAreaInsets().bottom + bottomPadding
-      }}
     />
-  )
-}
+  </TiFFooterView>
+)
 
 const styles = StyleSheet.create({
   container: {

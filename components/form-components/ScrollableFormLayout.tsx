@@ -79,8 +79,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     width: "100%",
     flex: 1,
-    backgroundColor: "white",
-    bottom: 0,
-    paddingHorizontal: 24
+    backgroundColor: "transparent",
+    bottom: 0
   }
 })
