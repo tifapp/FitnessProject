@@ -1,26 +1,24 @@
+import { verifyNeverOccurs } from "@test-helpers/ExpectNeverOccurs"
+import { createTestQueryClient } from "@test-helpers/ReactQuery"
 import { resetTestSQLiteBeforeEach, testSQLite } from "@test-helpers/SQLite"
-import {
-  SQLiteUserSettingsStorage,
-  UserSettingsSynchronizingStore,
-  userSettingsRefreshAction,
-  userSettingsStore
-} from "./UserSettings"
+import { fakeTimers } from "@test-helpers/Timers"
+import { waitFor } from "@testing-library/react-native"
+import { TiFAPI } from "TiFShared/api"
 import {
   DEFAULT_USER_SETTINGS,
   UserSettings
 } from "TiFShared/domain-models/Settings"
-import { fakeTimers } from "@test-helpers/Timers"
-import { verifyNeverOccurs } from "@test-helpers/ExpectNeverOccurs"
-import { mswServer } from "@test-helpers/msw"
-import { TiFAPI } from "TiFShared/api"
-import {
-  UserSettingsResponse,
-  UpdateUserSettingsRequest
-} from "TiFShared/api/models/User"
 import { mergeWithPartial } from "TiFShared/lib/Object"
-import { http, HttpResponse } from "msw"
-import { waitFor } from "@testing-library/react-native"
-import { createTestQueryClient } from "@test-helpers/ReactQuery"
+import {
+  mockTiFEndpoint,
+  mockTiFServer
+} from "TiFShared/test-helpers/mockAPIServer"
+import {
+  SQLiteUserSettingsStorage,
+  userSettingsRefreshAction,
+  userSettingsStore,
+  UserSettingsSynchronizingStore
+} from "./UserSettings"
 
 describe("UserSettings tests", () => {
   describe("SQLiteUserSettingsStorage tests", () => {
@@ -276,7 +274,7 @@ describe("UserSettings tests", () => {
         ...DEFAULT_USER_SETTINGS,
         isCrashReportingEnabled: false
       }
-      setGetSettingsResponse(expectedSettings)
+      mockTiFEndpoint("userSettings", 200, expectedSettings)
       const callback = jest.fn()
       store.subscribe(callback)
       await waitFor(() => {
@@ -291,7 +289,7 @@ describe("UserSettings tests", () => {
         canShareArrivalStatus: false,
         version: DEFAULT_USER_SETTINGS.version + 1
       }
-      setGetSettingsResponse(expectedSettings)
+      mockTiFEndpoint("userSettings", 200, expectedSettings)
       const callback = jest.fn()
       store.subscribe(callback)
       await store.refresh()
@@ -305,13 +303,13 @@ describe("UserSettings tests", () => {
         canShareArrivalStatus: false,
         version: DEFAULT_USER_SETTINGS.version + 1
       }
-      setGetSettingsResponse(expectedSettings)
+      mockTiFEndpoint("userSettings", 200, expectedSettings)
       await store.refresh()
       expect(await storage.load()).toEqual(expectedSettings)
     })
 
     it("should cancel the debounced update when refreshing", async () => {
-      setupGetSettingsErrorResponse()
+      mockTiFEndpoint("userSettings", 500)
       setupUpdateSettingsEndpoint()
       store.update({ isAnalyticsEnabled: false })
       await store.refresh()
@@ -321,7 +319,7 @@ describe("UserSettings tests", () => {
 
     it("should push the stored settings to the API if the version >= API version on refresh", async () => {
       await storage.save({ isAnalyticsEnabled: false, version: 5 })
-      setGetSettingsResponse({
+      mockTiFEndpoint("userSettings", 200, {
         ...DEFAULT_USER_SETTINGS,
         isCrashReportingEnabled: false,
         version: 5
@@ -340,7 +338,7 @@ describe("UserSettings tests", () => {
 
     it("should publish the stored settings when failing to fetch API settings on refresh", async () => {
       const updatedSettings = { isAnalyticsEnabled: false, version: 6 }
-      setupGetSettingsErrorResponse()
+      mockTiFEndpoint("userSettings", 500)
       const callback = jest.fn()
       store.subscribe(callback)
       await storage.save(updatedSettings)
@@ -353,12 +351,12 @@ describe("UserSettings tests", () => {
 
     it("should publish the stored settings when failing to push settings to API refresh", async () => {
       const updatedSettings = { isAnalyticsEnabled: false, version: 6 }
-      setGetSettingsResponse({
+      mockTiFEndpoint("userSettings", 200, {
         ...DEFAULT_USER_SETTINGS,
         isCrashReportingEnabled: false,
         version: 5
       })
-      setupUpdateSettingsFailingEndpoint()
+      mockTiFEndpoint("saveUserSettings", 500)
       const callback = jest.fn()
       store.subscribe(callback)
       await storage.save(updatedSettings)
@@ -371,40 +369,18 @@ describe("UserSettings tests", () => {
 
     let savedAPISettings = DEFAULT_USER_SETTINGS as UserSettings
 
-    const USER_SETTINGS_ENDPOINT_PATH = TiFAPI.testPath("/user/self/settings")
-
-    const setGetSettingsResponse = (settings: UserSettingsResponse) => {
-      mswServer.use(
-        http.get(USER_SETTINGS_ENDPOINT_PATH, async () => {
-          return HttpResponse.json(settings)
-        })
-      )
-    }
-
-    const setupGetSettingsErrorResponse = () => {
-      mswServer.use(
-        http.get(USER_SETTINGS_ENDPOINT_PATH, async () => {
-          return HttpResponse.error()
-        })
-      )
-    }
-
     const setupUpdateSettingsEndpoint = () => {
-      mswServer.use(
-        http.patch(USER_SETTINGS_ENDPOINT_PATH, async ({ request }) => {
-          const body = (await request.json()) as UpdateUserSettingsRequest
-          savedAPISettings = mergeWithPartial(savedAPISettings, body)
-          return HttpResponse.json(savedAPISettings, { status: 200 })
-        })
-      )
-    }
-
-    const setupUpdateSettingsFailingEndpoint = () => {
-      mswServer.use(
-        http.patch(USER_SETTINGS_ENDPOINT_PATH, async () => {
-          return HttpResponse.error()
-        })
-      )
+      mockTiFServer({
+        saveUserSettings: {
+          handler: ({ body }) => {
+            savedAPISettings = mergeWithPartial(savedAPISettings, body)
+          },
+          mockResponse: {
+            status: 200,
+            data: savedAPISettings
+          }
+        }
+      })
     }
 
     const resetSavedAPISettings = () => {
