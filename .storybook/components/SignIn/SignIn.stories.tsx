@@ -20,7 +20,7 @@ import { NavigationContainer } from "@react-navigation/native"
 import { createStackNavigator } from "@react-navigation/stack"
 import { ComponentStory } from "@storybook/react-native"
 import { SafeAreaProvider } from "react-native-safe-area-context"
-import { TiFAPI } from "TiFShared/api"
+import { TiFAPIClientCreator } from "TiFShared/api/APIClient"
 
 const SignInMeta: StoryMeta = {
   title: "Sign In"
@@ -32,7 +32,7 @@ type SignInStory = ComponentStory<typeof SettingsScreen>
 
 const Stack = createStackNavigator<SignInParamsList>()
 
-const tiFAPI = new TiFAPI(awsTiFAPITransport(new URL(API_URL)))
+const tiFAPI = TiFAPIClientCreator(awsTiFAPITransport(new URL(API_URL)))
 
 const authenticator = new CognitoSignInAuthenticator()
 const signInScreens = createSignInScreens(Stack, authenticator)

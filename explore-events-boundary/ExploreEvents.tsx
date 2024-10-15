@@ -1,38 +1,38 @@
-import React, { useState } from "react"
-import { Pressable, StyleProp, StyleSheet, View, ViewStyle } from "react-native"
-import { useSafeAreaInsets } from "react-native-safe-area-context"
-import {
-  useRequestForegroundLocationPermissions,
-  useUserCoordinatesQuery
-} from "@location/index"
+import { PrimaryButton } from "@components/Buttons"
+import { Ionicon } from "@components/common/Icons"
+import { BodyText, Title } from "@components/Text"
 import {
   ClientSideEvent,
   clientSideEventFromResponse
 } from "@event/ClientSideEvent"
+import { eventDetailsQueryKey } from "@event/DetailsQuery"
+import { QueryHookOptions } from "@lib/ReactQuery"
+import { useLastDefinedValue } from "@lib/utils/UseLastDefinedValue"
+import {
+  useRequestForegroundLocationPermissions,
+  useUserCoordinatesQuery
+} from "@location/index"
+import { UseQueryResult, useQuery, useQueryClient } from "@tanstack/react-query"
+import { LocationAccuracy, PermissionResponse } from "expo-location"
+import React, { useState } from "react"
+import { Pressable, StyleProp, StyleSheet, View, ViewStyle } from "react-native"
+import { useSafeAreaInsets } from "react-native-safe-area-context"
+import { TiFAPI } from "TiFShared/api"
+import { LocationCoordinate2D } from "TiFShared/domain-models/LocationCoordinate2D"
+import { ExploreEventsBottomSheet } from "./BottomSheet"
 import {
   ExploreEventsInitialCenter,
   initialCenterToRegion
 } from "./InitialCenter"
 import { ExploreEventsMap } from "./Map"
-import { useLastDefinedValue } from "@lib/utils/UseLastDefinedValue"
-import { ExploreEventsBottomSheet } from "./BottomSheet"
-import { BodyText, Title } from "@components/Text"
-import { SkeletonEventCard } from "./SkeletonEventCard"
-import { Ionicon } from "@components/common/Icons"
-import { PrimaryButton } from "@components/Buttons"
-import { ExploreEventsSearchBar } from "./SearchBar"
-import { QueryHookOptions } from "@lib/ReactQuery"
-import { UseQueryResult, useQueryClient, useQuery } from "@tanstack/react-query"
-import { PermissionResponse, LocationAccuracy } from "expo-location"
-import { TiFAPI } from "TiFShared/api"
-import { LocationCoordinate2D } from "TiFShared/domain-models/LocationCoordinate2D"
 import {
   ExploreEventsRegion,
   SAN_FRANCISCO_DEFAULT_REGION,
   createDefaultMapRegion,
   minRegionMeterRadius
 } from "./Region"
-import { eventDetailsQueryKey } from "@event/DetailsQuery"
+import { ExploreEventsSearchBar } from "./SearchBar"
+import { SkeletonEventCard } from "./SkeletonEventCard"
 
 export const eventsByRegion = async (
   api: TiFAPI,
@@ -41,9 +41,13 @@ export const eventsByRegion = async (
 ) => {
   return (
     await api.exploreEvents(
-      { latitude: region.latitude, longitude: region.longitude },
-      minRegionMeterRadius(region),
-      signal
+      {
+        body: {
+          userLocation: { latitude: region.latitude, longitude: region.longitude },
+          radius: minRegionMeterRadius(region)
+        },
+        signal
+      }
     )
   ).data.events.map(clientSideEventFromResponse)
 }
