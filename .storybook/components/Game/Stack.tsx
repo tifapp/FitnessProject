@@ -1,6 +1,7 @@
 import { StackScreenProps } from "@react-navigation/stack";
 import React from "react";
 import { StackNavigatorType } from "../../../components/Navigation";
+import { EnterGoalScene } from "../EnterGoal/Scene";
 import { EnterNameScene } from "../EnterName/Scene";
 import { VesselPickerScene } from "../VesselPicker/Scene";
 
@@ -56,7 +57,7 @@ export const Screens = <Params extends ParamsList>(
         })}
       >
         {(props: StackScreenProps<Params, 'Scene3'>) => (
-          <EnterNameScene 
+          <EnterGoalScene 
             onComplete={() => {
               props.navigation.navigate("Scene3");
             }}

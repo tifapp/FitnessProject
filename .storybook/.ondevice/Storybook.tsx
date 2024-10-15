@@ -16,6 +16,9 @@ import AttendeesListMeta, {
 import ButtonsMeta, {
   Basic as ButtonsBasic
 } from "../components/Buttons/Buttons.stories"
+import EnterGoalMeta, {
+  Basic as EnterGoalBasic
+} from "../components/EnterGoal/EnterGoal.stories"
 import EnterNameMeta, {
   Basic as EnterNameBasic
 } from "../components/EnterName/EnterName.stories"
@@ -88,6 +91,11 @@ const stories = [
     name: EnterNameMeta.title,
     component: EnterNameBasic,
     args: EnterNameMeta.args
+  },
+  {
+    name: EnterGoalMeta.title,
+    component: EnterGoalBasic,
+    args: EnterGoalMeta.args
   },
   {
     name: SettingsMeta.title,
