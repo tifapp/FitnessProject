@@ -1,17 +1,17 @@
+import { AppStyles } from "@lib/AppColorStyle"
 import React, { ReactNode, Ref, forwardRef, useState } from "react"
 import {
-  TextInputProps,
-  StyleSheet,
-  View,
   StyleProp,
-  ViewStyle,
-  TextStyle
+  StyleSheet,
+  TextInputProps,
+  TextStyle,
+  View,
+  ViewStyle
 } from "react-native"
 import { TextInput } from "react-native-gesture-handler"
-import { Caption } from "./Text"
-import { AppStyles } from "@lib/AppColorStyle"
-import { TouchableIonicon } from "./common/Icons"
 import Animated, { FadeInUp, FadeOutUp } from "react-native-reanimated"
+import { TouchableIonicon } from "./common/Icons"
+import { Caption } from "./Text"
 
 export type TextFieldRefValue = TextInput | null
 
@@ -24,6 +24,27 @@ export type TextFieldProps = {
   textStyle?: StyleProp<TextStyle>
   style?: StyleProp<ViewStyle>
 } & Omit<TextInputProps, "style" | "placeholderStyle">
+
+/**
+ * A generic Text Field component.
+ */
+export const NakedTextField = forwardRef(function TextField(
+  { error, style, ...props }: TextFieldProps,
+  ref: TextFieldRef
+) {
+  return (
+    <View style={style}>
+      <View style={[styles.card, { backgroundColor: "transparent", borderWidth: 0 }]}>
+        <InternalTextField
+          ref={ref}
+          placeholderTextColor={AppStyles.colorOpacity35}
+          {...props}
+        />
+      </View>
+      {error && <TextFieldErrorView error={error} />}
+    </View>
+  )
+})
 
 /**
  * A generic Text Field component.

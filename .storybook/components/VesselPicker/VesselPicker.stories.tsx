@@ -16,9 +16,8 @@ type VesselPickerStory = ComponentStory<typeof View>
 export const Basic: VesselPickerStory = () => (
   <SafeAreaProvider>
     <GestureHandlerRootView style={{ flex: 1 }}>
-    <View style={{ marginVertical: 50 }} />
     <View style={{width: "100%", height: "100%"}}> 
-      <Scene />
+      <Scene onComplete={() => {}}/>
     </View>
     </GestureHandlerRootView>
   </SafeAreaProvider>

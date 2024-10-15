@@ -1,8 +1,7 @@
 // VesselPicker.tsx
-import { Title } from "@components/Text";
 import React, { useEffect, useMemo, useRef } from "react";
 import {
-  Animated,
+  FlatList,
   StyleSheet,
   ViewStyle
 } from "react-native";
@@ -58,7 +57,7 @@ export const VesselPicker = ({
   onSelect,
   style,
 }: VesselPickerProps) => {
-  const flatListRef = useRef<Animated.FlatList>(null);
+  const flatListRef = useRef<FlatList>(null);
 
   useEffect(() => {
     if (flatListRef.current && data.length > 0) {
@@ -102,22 +101,7 @@ export const VesselPicker = ({
 
   return (
     <>
-    <Animated.View
-        style={{
-          opacity: style?.opacity, // Apply animated opacity if provided
-        }}
-      >
-      <Title
-        style={{
-          alignItems: "center",
-          textAlign: "center",
-          fontStyle: "italic",
-        }}
-      >
-        Please select an avatar.
-      </Title>
-      </Animated.View>
-      <Animated.FlatList
+      <FlatList
         decelerationRate={"fast"}
         ref={flatListRef}
         data={data}

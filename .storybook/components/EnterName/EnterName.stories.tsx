@@ -3,22 +3,21 @@ import React from "react"
 import { View } from "react-native"
 import { GestureHandlerRootView } from "react-native-gesture-handler"
 import { SafeAreaProvider } from "react-native-safe-area-context"
-import { Scene } from "./Scene"
+import { EnterNameScene } from "./Scene"
 
-const VesselPickerMeta: ComponentMeta<typeof View> = {
-  title: "VesselPicker"
+const EnterNameMeta: ComponentMeta<typeof View> = {
+  title: "EnterName"
 }
 
-export default VesselPickerMeta
+export default EnterNameMeta
 
-type VesselPickerStory = ComponentStory<typeof View>
+type EnterNameStory = ComponentStory<typeof View>
 
-export const Basic: VesselPickerStory = () => (
+export const Basic: EnterNameStory = () => (
   <SafeAreaProvider>
     <GestureHandlerRootView style={{ flex: 1 }}>
-    <View style={{ marginVertical: 50 }} />
     <View style={{width: "100%", height: "100%"}}> 
-      <Scene />
+      <EnterNameScene onComplete={() => {}} />
     </View>
     </GestureHandlerRootView>
   </SafeAreaProvider>

@@ -23,7 +23,7 @@ import { HeartProgress } from "./Meter";
 
 export const ITEM_SIZE = 125;
 const HEARTBEAT_INTERVAL = 2000;
-const PROGRESS_DURATION = 2000;
+const PROGRESS_DURATION = 10000;
 
 export type Item = {
   color: string;

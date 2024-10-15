@@ -16,6 +16,9 @@ import AttendeesListMeta, {
 import ButtonsMeta, {
   Basic as ButtonsBasic
 } from "../components/Buttons/Buttons.stories"
+import EnterNameMeta, {
+  Basic as EnterNameBasic
+} from "../components/EnterName/EnterName.stories"
 import EventDetailsMeta, {
   Basic as EventDetailsBasic
 } from "../components/EventDetails/EventDetails.stories"
@@ -80,6 +83,11 @@ const stories = [
     name: VesselPickerMeta.title,
     component: VesselPickerBasic,
     args: VesselPickerMeta.args
+  },
+  {
+    name: EnterNameMeta.title,
+    component: EnterNameBasic,
+    args: EnterNameMeta.args
   },
   {
     name: SettingsMeta.title,
