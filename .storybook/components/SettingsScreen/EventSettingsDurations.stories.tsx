@@ -75,11 +75,12 @@ const DurationScreenTest = () => {
   return (
     <SafeAreaView edges={["bottom"]}>
       <PrimaryButton
-        title="Add Test Buttons"
         onPress={() =>
           update({ eventPresetDurations: [600, 1200, 1800, 2400, 4800, 7200] })
         }
-      />
+      >
+        Add Test Buttons
+      </PrimaryButton>
       <EventDurationView />
     </SafeAreaView>
   )
