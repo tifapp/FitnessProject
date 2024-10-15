@@ -1,6 +1,6 @@
 // VesselPicker.tsx
 import { Title } from "@components/Text";
-import React, { useEffect, useMemo, useRef } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   Animated,
   StyleSheet,
@@ -25,7 +25,7 @@ type VesselPickerProps = {
   style?: ViewStyle;
 };
 
-const REPEAT_FACTOR = 100; // Number of shuffled blocks
+const REPEAT_FACTOR = 5 // Number of shuffled blocks
 
 // Helper function to shuffle an array (Fisher-Yates algorithm)
 const shuffleArray = <T,>(array: T[]): T[] => {
@@ -61,6 +61,7 @@ export const VesselPicker: React.FC<VesselPickerProps> = ({
   style,
 }) => {
   const flatListRef = useRef<Animated.FlatList>(null);
+  const [scrollEnabled, setScrollEnabled] = useState(true); // Manage scroll state
 
   useEffect(() => {
     if (flatListRef.current && data.length > 0) {
@@ -100,6 +101,8 @@ export const VesselPicker: React.FC<VesselPickerProps> = ({
           onLongPress={() => {}}
           onPressOut={() => { /* Optional: Handle press out if needed */ }}
           opacity={1} // Optionally pass opacity if needed
+          onGestureStart={() => setScrollEnabled(false)} // Disable scrolling on gesture start
+          onGestureEnd={() => setScrollEnabled(true)}   // Enable scrolling on gesture end
         />
       );
     };
@@ -107,20 +110,20 @@ export const VesselPicker: React.FC<VesselPickerProps> = ({
 
   return (
     <>
-    <Animated.View
+      <Animated.View
         style={{
           opacity: style?.opacity, // Apply animated opacity if provided
         }}
       >
-      <Title
-        style={{
-          alignItems: "center",
-          textAlign: "center",
-          fontStyle: "italic",
-        }}
-      >
-        Please select an avatar.
-      </Title>
+        <Title
+          style={{
+            alignItems: "center",
+            textAlign: "center",
+            fontStyle: "italic",
+          }}
+        >
+          Please select an avatar.
+        </Title>
       </Animated.View>
       <Animated.FlatList
         decelerationRate={"fast"}
@@ -140,6 +143,7 @@ export const VesselPicker: React.FC<VesselPickerProps> = ({
         windowSize={10}
         style={[style]}
         contentContainerStyle={styles.contentContainer}
+        scrollEnabled={scrollEnabled} // Control scrolling
         onScrollToIndexFailed={(info: any) => {
           const wait = new Promise((resolve) => setTimeout(resolve, 500));
           wait.then(() => {

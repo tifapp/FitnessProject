@@ -13,7 +13,6 @@ import Animated, {
   useAnimatedStyle,
   useDerivedValue,
   useSharedValue,
-  withRepeat,
   withSequence,
   withSpring,
   withTiming,
@@ -22,6 +21,7 @@ import { useHaptics } from '../../../modules/tif-haptics';
 import { createHeartbeatPattern } from './Haptics';
 
 export const ITEM_SIZE = 125;
+const INITIAL_DURATION = 2000;
 
 export type Item = {
   color: string;
@@ -91,19 +91,11 @@ export const PickerItem = ({
   // Gesture handling using LongPress
   const gesture = Gesture.LongPress()
     .minDuration(0) // Detect press immediately
+    .maxDistance(50)
+    .shouldCancelWhenOutside(false) // Prevent cancellation on movement outside
     .onStart(() => {
       isPressed.value = true;
       runOnJS(onPress)();
-      
-      // Start pulsing animation (black <-> color)
-      pulse.value = withRepeat(
-        withTiming(1, {
-          duration: 500,
-          easing: Easing.inOut(Easing.ease),
-        }),
-        -1, // Infinite repetitions
-        true // Reverse each cycle
-      );
 
       // Start progress meter animation
       progress.value = withTiming(
@@ -146,7 +138,6 @@ export const PickerItem = ({
       if (isPressed.value) {
         // If the press is released before completion
         isPressed.value = false;
-        pulse.value = withTiming(0, { duration: 300 });
         progress.value = withTiming(0, { duration: 300 });
         runOnJS(onPressOut)();
       }
@@ -173,11 +164,22 @@ export const PickerItem = ({
       const elapsedTime = Date.now() - startTime;
 
       // Decrease interval duration over time
-      const newInterval = Math.max(3000 - elapsedTime / 5, 200);
+      const newInterval = Math.max(INITIAL_DURATION - elapsedTime / 5, 200);
 
       // Play haptic feedback
-      const pattern = createHeartbeatPattern();
       triggerHapticBurst();
+
+      // Trigger pulse animation (synchronized with haptic)
+      pulse.value = withSequence(
+        withTiming(1, {
+          duration: 200,
+          easing: Easing.out(Easing.ease),
+        }),
+        withTiming(0, {
+          duration: 200,
+          easing: Easing.in(Easing.ease),
+        })
+      );
 
       // Schedule next heartbeat
       timeoutId = setTimeout(playHeartbeat, newInterval);
@@ -199,7 +201,13 @@ export const PickerItem = ({
     <GestureDetector gesture={gesture}>
       <Animated.View style={styles.optionContainer}>
         <AnimatedIcon name="accessibility" style={animatedIconStyle} size={90} />
-        <Animated.View style={[styles.progressBar, { backgroundColor: color }, animatedProgressStyle]} />
+        <Animated.View
+          style={[
+            styles.progressBar,
+            { backgroundColor: color },
+            animatedProgressStyle,
+          ]}
+        />
       </Animated.View>
     </GestureDetector>
   );
