@@ -13,27 +13,18 @@ function withTiFNativePod(config) {
         "Podfile"
       )
 
-      const podfileContent = fs.readFileSync(podfilePath, "utf8")
+      let podfileContent = fs.readFileSync(podfilePath, "utf8")
 
       if (!podfileContent.includes("pod 'TiFNative'")) {
-        const targetRegex = /target\s+'([^']+)'s*do/g
-        const match = targetRegex.exec(podfileContent)
-
-        if (match && match[1]) {
-          const targetName = match[1]
-          const podToInject =
-            "  pod 'TiFNative', '~> 1.0.0', :path => '../native-code/iOS/TiFNative'\n"
-
-          const updatedPodfileContent = podfileContent.replace(
-            `target '${targetName}' do`,
-            `target '${targetName}' do\n${podToInject}`
-          )
-
-          fs.writeFileSync(podfilePath, updatedPodfileContent, "utf8")
-          console.log(`Injected TiFNative pod into target '${targetName}' in Podfile.`)
-        } else {
-          console.warn("Could not find a valid target in Podfile to inject TiFNative pod.")
-        }
+        const targetString = "target 'FitnessApp' do"
+        const podToInject =
+          "  pod 'TiFNative', :path => '../native-code/iOS/TiFNative'\n"
+        podfileContent = podfileContent.replace(
+          targetString,
+          `${targetString}\n${podToInject}`
+        )
+        fs.writeFileSync(podfilePath, podfileContent, "utf8")
+        console.log("Injected TiFNative pod into Podfile.")
       } else {
         console.log("TiFNative pod is already in the Podfile.")
       }

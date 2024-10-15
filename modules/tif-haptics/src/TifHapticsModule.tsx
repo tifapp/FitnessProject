@@ -1,8 +1,8 @@
+import { LocalSettings } from "@settings-storage/LocalSettings"
+import { SettingsStore } from "@settings-storage/Settings"
 import { requireOptionalNativeModule } from "expo"
 import { ReactNode, createContext, useContext } from "react"
-import { LocalSettings } from "@settings-storage/LocalSettings"
 import { logger } from "TiFShared/logging"
-import { SettingsStore } from "@settings-storage/Settings"
 
 enum TiFNativeHapticEvent {
   Selection = "selection"
@@ -43,6 +43,11 @@ export interface Haptics {
   play(event: HapticEvent): Promise<void>
 
   /**
+   * Plays a custom haptic pattern defined by a JSON string.
+   */
+  playCustomPattern(jsonPattern: any): Promise<void>;
+
+  /**
    * Applies the settings to this underlying haptics engine.
    */
   apply(settings: HapticsSettings): Promise<void>
@@ -67,6 +72,15 @@ export const TiFHaptics = {
   play: async (event: HapticEvent) => {
     try {
       await TiFNativeHaptics.play(toNativeHapticEvent(event))
+    } catch (error) {
+      log.warn("An error occurred when playing haptics", {
+        error: error.message
+      })
+    }
+  },
+  playCustomPattern: async (pattern: any) => {
+    try {
+      await TiFNativeHaptics.playCustomPattern(JSON.stringify(pattern))
     } catch (error) {
       log.warn("An error occurred when playing haptics", {
         error: error.message
@@ -113,6 +127,7 @@ export const HapticsProvider = ({
   <HapticsContext.Provider
     value={{
       play: (event) => haptics.play(event),
+      playCustomPattern: (pattern) => haptics.playCustomPattern(pattern),
       apply: (settings) => haptics.apply(settings),
       isFeedbackSupportedOnDevice,
       isAudioSupportedOnDevice
