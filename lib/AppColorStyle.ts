@@ -1,6 +1,6 @@
 import { ColorString } from "TiFShared/domain-models/ColorString"
 
-const blackColor = ColorString.parse("#011224")!
+const blackColor = ColorString.parse("#01160A")!
 
 export namespace AppStyles {
   export const primaryColor = blackColor.toString()
@@ -9,7 +9,7 @@ export namespace AppStyles {
   export const colorOpacity35 = blackColor.withOpacity(0.35).toString()
   export const errorColor = "#EA4335"
   export const highlightedText = "#4285F4"
-  export const cardColor = "#f2f2f8"
+  export const cardColor = "#F1F5F3"
   export const eventCardBorder = "rgba(145, 145, 145, 0.2)"
   export const linkColor = "#4287f5"
   export const primary = blackColor

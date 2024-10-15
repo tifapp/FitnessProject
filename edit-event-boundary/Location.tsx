@@ -20,7 +20,8 @@ import MapView, { Marker } from "react-native-maps"
 import Animated, { FadeIn } from "react-native-reanimated"
 import { TiFFormCardView } from "@components/form-components/Card"
 import { placemarkToFormattedAddress } from "@lib/AddressFormatting"
-import { FontScaleFactors, useFontScale } from "@lib/Fonts"
+import { FontScaleFactors } from "@lib/Fonts"
+import { AvatarMapMarkerView } from "@components/AvatarMapMarker"
 
 export const useEditEventFormLocation = () => {
   const [location, setLocation] = useAtom(editEventFormValueAtoms.location)
@@ -49,12 +50,14 @@ export const useEditEventFormLocation = () => {
 }
 
 export type EditEventFormLocationProps = {
+  hostProfileImageURL?: string
   location?: EditEventFormLocation
   onSelectLocationTapped: () => void
   style?: StyleProp<ViewStyle>
 }
 
 export const EditEventFormLocationView = ({
+  hostProfileImageURL,
   location,
   onSelectLocationTapped,
   style
@@ -72,6 +75,7 @@ export const EditEventFormLocationView = ({
       />
     ) : (
       <LocationView
+        hostProfileImageURL={hostProfileImageURL}
         location={location}
         onSelectLocationTapped={onSelectLocationTapped}
       />
@@ -80,11 +84,16 @@ export const EditEventFormLocationView = ({
 )
 
 type LocationProps = {
+  hostProfileImageURL?: string
   location: EditEventFormLocation
   onSelectLocationTapped: () => void
 }
 
-const LocationView = ({ location, onSelectLocationTapped }: LocationProps) => {
+const LocationView = ({
+  hostProfileImageURL,
+  location,
+  onSelectLocationTapped
+}: LocationProps) => {
   const [overlayLayout, setOverlayLayout] = useState<
     LayoutRectangle | undefined
   >(undefined)
@@ -108,7 +117,7 @@ const LocationView = ({ location, onSelectLocationTapped }: LocationProps) => {
                 top: 0,
                 left: 0,
                 right: 0,
-                bottom: overlayLayout.height + 16
+                bottom: overlayLayout.height + 24
               }}
               customMapStyle={[
                 {
@@ -121,7 +130,9 @@ const LocationView = ({ location, onSelectLocationTapped }: LocationProps) => {
                 }
               ]}
             >
-              <Marker coordinate={location.coordinate} />
+              <Marker coordinate={location.coordinate}>
+                <AvatarMapMarkerView imageURL={hostProfileImageURL} />
+              </Marker>
             </MapView>
           ) : (
             <View
@@ -132,18 +143,18 @@ const LocationView = ({ location, onSelectLocationTapped }: LocationProps) => {
               ]}
             >
               <ActivityIndicator
-                style={{ marginTop: (mapHeight - overlayLayout.height) / 4 }}
+                style={{ marginTop: (mapHeight - overlayLayout.height) / 2 }}
               />
             </View>
           )}
         </Animated.View>
       )}
-      <View
-        style={styles.overlayContainer}
-        onLayout={(event) => setOverlayLayout(event.nativeEvent.layout)}
-      >
+      <View style={styles.overlayContainer}>
         <TiFFormCardView borderRadius={8} style={styles.overlay}>
-          <View style={styles.overlayRow}>
+          <View
+            style={styles.overlayRow}
+            onLayout={(event) => setOverlayLayout(event.nativeEvent.layout)}
+          >
             {!location.placemark ? (
               <TiFFormNavigationLinkView
                 iconName="location"
