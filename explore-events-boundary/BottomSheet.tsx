@@ -1,11 +1,7 @@
 import { EventCard } from "@event/EventCard"
-import {
-  BottomSheetModal,
-  BottomSheetFlatList,
-  BottomSheetModalProvider
-} from "@gorhom/bottom-sheet"
+import { BottomSheetFlatList } from "@gorhom/bottom-sheet"
 import { ClientSideEvent } from "@event/ClientSideEvent"
-import React, { ReactElement, useEffect, useRef } from "react"
+import React, { ReactElement } from "react"
 import {
   ListRenderItemInfo,
   Pressable,
@@ -14,6 +10,7 @@ import {
   View,
   ViewStyle
 } from "react-native"
+import { TiFBottomSheet, TiFBottomSheetProvider } from "@components/BottomSheet"
 
 export type ExploreEventsBottomSheetProps = {
   events: ClientSideEvent[]
@@ -35,42 +32,35 @@ export const ExploreEventsBottomSheet = ({
   HeaderComponent,
   EmptyEventsComponent,
   style
-}: ExploreEventsBottomSheetProps) => {
-  const sheetRef = useRef<BottomSheetModal>(null)
-
-  useEffect(() => {
-    sheetRef?.current?.present()
-  }, [])
-
-  return (
-    <BottomSheetModalProvider>
-      <View style={style}>
-        <BottomSheetModal
-          ref={sheetRef}
-          snapPoints={SNAP_POINTS}
-          index={1}
-          enablePanDownToClose={false}
-        >
-          <BottomSheetFlatList
-            data={events}
-            keyExtractor={(event) => event.id.toString()}
-            renderItem={({ item }: ListRenderItemInfo<ClientSideEvent>) => (
-              <Pressable
-                onPress={() => onEventSelected(item)}
-                style={styles.eventContainer}
-              >
-                <EventCard event={item} style={styles.event} />
-              </Pressable>
-            )}
-            ListEmptyComponent={EmptyEventsComponent}
-            ListHeaderComponent={HeaderComponent}
-            stickyHeaderIndices={STICKY_HEADER_INDICIES}
-          />
-        </BottomSheetModal>
-      </View>
-    </BottomSheetModalProvider>
-  )
-}
+}: ExploreEventsBottomSheetProps) => (
+  <TiFBottomSheetProvider>
+    <View style={style}>
+      <TiFBottomSheet
+        isPresented
+        sizing={{ snapPoints: SNAP_POINTS }}
+        initialSnapPointIndex={1}
+        canSwipeToDismiss={false}
+        shouldIncludeBackdrop={false}
+      >
+        <BottomSheetFlatList
+          data={events}
+          keyExtractor={(event) => event.id.toString()}
+          renderItem={({ item }: ListRenderItemInfo<ClientSideEvent>) => (
+            <Pressable
+              onPress={() => onEventSelected(item)}
+              style={styles.eventContainer}
+            >
+              <EventCard event={item} style={styles.event} />
+            </Pressable>
+          )}
+          ListEmptyComponent={EmptyEventsComponent}
+          ListHeaderComponent={HeaderComponent}
+          stickyHeaderIndices={STICKY_HEADER_INDICIES}
+        />
+      </TiFBottomSheet>
+    </View>
+  </TiFBottomSheetProvider>
+)
 
 const styles = StyleSheet.create({
   eventContainer: {
