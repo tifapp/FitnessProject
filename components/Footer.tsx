@@ -38,7 +38,7 @@ export const TiFFooterView = ({ children, style }: TiFFooterProps) => {
 const styles = StyleSheet.create({
   footer: {
     width: "100%",
-    paddingTop: 8,
+    paddingTop: 16,
     paddingHorizontal: 24,
     backgroundColor: AppStyles.cardColor,
     borderTopLeftRadius: 24,
