@@ -21,7 +21,7 @@ import EnterGoalMeta, {
 } from "../components/EnterGoal/EnterGoal.stories"
 import EnterNameMeta, {
     Basic as EnterNameBasic
-} from "../components/EnterMotivation/EnterName.stories"
+} from "../components/EnterMotivation/EnterMotivation.stories"
 import EventDetailsMeta, {
     Basic as EventDetailsBasic
 } from "../components/EventDetails/EventDetails.stories"

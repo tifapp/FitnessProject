@@ -7,7 +7,7 @@ import {
 import { Title } from "../../../components/Text";
 import { FadeOut } from "../FadeOut/FadeOut";
 import { Mountain } from "../Icons/Mountain";
-import { VesselPicker } from "../VesselPicker/VesselPickerDiscrete";
+import { Carousel } from "./Carousel";
 
 export const EnterGoalScene = ({ onComplete }: { onComplete: (name: string) => void }) => {
   const [held, setHeld] = useState(false)
@@ -24,7 +24,7 @@ export const EnterGoalScene = ({ onComplete }: { onComplete: (name: string) => v
 
       {/* <View style={styles.space} /> */}
 
-      <VesselPicker onSelect={setGoal} />
+      <Carousel onComplete={setGoal} onStart={() => setHeld(true)} />
       
       <FadeOut 
         trigger={goal != ""} 

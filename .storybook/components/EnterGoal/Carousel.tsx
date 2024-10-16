@@ -1,9 +1,7 @@
-import { Subtitle } from '@components/Text';
 import React from 'react';
 import {
   Dimensions,
   StyleSheet,
-  TouchableOpacity,
   ViewStyle
 } from 'react-native';
 import Animated, {
@@ -13,8 +11,7 @@ import Animated, {
   useAnimatedStyle,
   useSharedValue,
 } from 'react-native-reanimated';
-import { Cloud } from "../Icons/Cloud";
-import { Doll } from './AliveVessel';
+import { PickerItem } from "./PickerItem";
 
 // Define the Colors enum
 const options = [
@@ -25,8 +22,9 @@ const options = [
   { color: '#F4845F', persona: 'Climber/Hiker' }
 ];
 
-type VesselPickerProps = {
-  onSelect: (option: string) => void;
+type CarouselProps = {
+  onStart: (option: string) => void;
+  onComplete: (option: string) => void;
   style?: ViewStyle;
 };
 
@@ -38,7 +36,7 @@ const snapOffsets = options.map((_, index) => {
   return index * totalItemWidth;
 });
 
-export const VesselPicker = ({ onSelect, style }: VesselPickerProps) => {
+export const Carousel = ({ onComplete, onStart, style }: CarouselProps) => {
   const { width: windowWidth } = Dimensions.get('window');
 
   const sidePadding = (windowWidth - ITEM_WIDTH) / 2;
@@ -86,21 +84,17 @@ export const VesselPicker = ({ onSelect, style }: VesselPickerProps) => {
                   width: ITEM_WIDTH,
                   marginHorizontal: ITEM_MARGIN,
                   backgroundColor: "transparent",
+                  overflow: "visible"
                 },
                 animatedStyle,
               ]}
             >
-              <TouchableOpacity
-                style={{paddingTop: 150, alignItems: 'center', backgroundColor: "transparent"}}
-                activeOpacity={0.8}
-                onPress={() => onSelect(color)}
-              >
-                <Cloud />
-                <Doll color={color} rotation={0} />
-                <Subtitle style={{ textAlign: 'center', backgroundColor: "transparent" }}>
-                  {persona}
-                </Subtitle>
-              </TouchableOpacity>
+              <PickerItem 
+                color={color} 
+                persona={persona} 
+                onProgressStart={() => onStart(persona)}
+                onProgressComplete={() => onComplete(persona)}
+              />
             </Animated.View>
           );
         })}

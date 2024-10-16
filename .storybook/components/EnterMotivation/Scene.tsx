@@ -10,7 +10,7 @@ import { Title } from "../../../components/Text";
 import { FadeOut } from "../FadeOut/FadeOut";
 import { Avatar, AvatarRef } from "./Avatar";
 
-export const EnterNameScene = ({ goal, onComplete }: { goal: string, onComplete: (name: string) => void }) => {
+export const EnterMotivationScene = ({ goal, onComplete }: { goal: string, onComplete: (name: string) => void }) => {
   const [finished, setFinished] = useState(false);
   const [name, setName] = useState<string>("");
 
