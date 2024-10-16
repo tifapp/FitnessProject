@@ -1,7 +1,7 @@
 import React from 'react';
-import { StyleSheet, TouchableOpacity } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
-import { Easing, runOnJS, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
+import { Easing, runOnJS, useSharedValue, withTiming } from 'react-native-reanimated';
 import { Subtitle } from "../../../components/Text";
 import { Cloud } from "../Icons/Cloud";
 import { Doll } from './AliveVessel'; // Assuming the Doll component is in the same directory
@@ -58,25 +58,17 @@ export const PickerItem = ({
       progress.value = withTiming(0, { duration: 300 });
     });
 
-  // Animated style for progress bar
-  const animatedProgressStyle = useAnimatedStyle(() => {
-    return {
-      width: `${progress.value * 100}%`,
-    };
-  });
-
   return (
     <GestureDetector gesture={gesture}>
-      <TouchableOpacity 
+      <View 
         style={{paddingTop: 150, alignItems: 'center', backgroundColor: "transparent"}}
-        activeOpacity={0.8}
       >
         <Cloud style={{width: ITEM_SIZE + 120, height: ITEM_SIZE + 120}} />
         <Doll color={color} rotation={0} />
         <Subtitle style={{ marginTop: 20, textAlign: 'center', backgroundColor: "transparent" }}>
           {persona}
         </Subtitle>
-      </TouchableOpacity>
+      </View>
     </GestureDetector>
   );
 };

@@ -24,6 +24,7 @@ const options = [
 
 type CarouselProps = {
   onStart: (option: string) => void;
+  onEnd: (option: string) => void;
   onComplete: (option: string) => void;
   style?: ViewStyle;
 };
@@ -36,7 +37,7 @@ const snapOffsets = options.map((_, index) => {
   return index * totalItemWidth;
 });
 
-export const Carousel = ({ onComplete, onStart, style }: CarouselProps) => {
+export const Carousel = ({ onComplete, onStart, onEnd, style }: CarouselProps) => {
   const { width: windowWidth } = Dimensions.get('window');
 
   const sidePadding = (windowWidth - ITEM_WIDTH) / 2;
@@ -92,6 +93,7 @@ export const Carousel = ({ onComplete, onStart, style }: CarouselProps) => {
               <PickerItem 
                 color={color} 
                 persona={persona} 
+                onEnd={() => onEnd(persona)}
                 onProgressStart={() => onStart(persona)}
                 onProgressComplete={() => onComplete(persona)}
               />

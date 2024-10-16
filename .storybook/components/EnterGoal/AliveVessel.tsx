@@ -70,8 +70,8 @@ export const Doll = ({
     phaseOffset,
   } = useMemo(() => {
     const jumpHeight = -50 + Math.random() * -20; // Between -50 and -70
-    const jumpDurationUp = 500 + Math.random() * 200; // Between 500ms and 700ms
-    const jumpDurationDown = 500 + Math.random() * 200; // Between 500ms and 700ms
+    const jumpDurationUp = 550 + Math.random() * 200; // Between 550ms and 700ms
+    const jumpDurationDown = 550 + Math.random() * 200; // Between 550ms and 700ms
     const scaleUp = 1 + Math.random() * 0.2; // Between 1 and 1.2
     const rotateMax = 10 + Math.random() * 10; // Between 10deg and 20deg
     const phaseOffset = Math.random() * 1000; // Between 0ms and 1000ms
