@@ -4,59 +4,57 @@ import {
   StyleSheet,
   View
 } from "react-native";
-import { SettingsChecklistPickerView } from "settings-boundary/components/ChecklistPicker";
-import { Subtitle, Title } from "../../../components/Text";
+import { Title } from "../../../components/Text";
 import { FadeOut } from "../FadeOut/FadeOut";
-import { Avatar } from "./Avatar";
-
-const WEB_BROWSER_CHECKLIST_OPTIONS = [
-  { title: "Tries new activities", value: "in-app" },
-  { title: "Exercises consistently", value: "system-default" },
-  { title: "Other", value: "other" }
-] as const
+import { Mountain } from "../Icons/Mountain";
+import { VesselPicker } from "../VesselPicker/VesselPickerDiscrete";
 
 export const EnterGoalScene = ({ onComplete }: { onComplete: (name: string) => void }) => {
-  const [finished, setFinished] = useState(false)
+  const [held, setHeld] = useState(false)
   const [goal, setGoal] = useState<string>("");
 
   return (
     <SafeAreaView style={styles.container}>
-      <Title style={styles.title}>Who do you want to become?</Title>
+      <Title>Who do you want to be?</Title>
+      <Title style={{opacity: held ? 1 : 0}}>Hold still.</Title>
 
-      <View style={styles.avatarContainer}>
-        <Avatar color={"red"} rotation={0} />
-      </View>
+      <View style={styles.background}>
+        <Mountain width={900} height={900}/>
+      </View> 
 
-      <Subtitle style={styles.subtitle}>I'm going to be someone who</Subtitle>
-      <SettingsChecklistPickerView
-        options={WEB_BROWSER_CHECKLIST_OPTIONS}
-        onOptionSelected={(preferredBrowserName) => {
-          setGoal(preferredBrowserName)
-        }}
-        selectedOptions={[goal]}
-      />
+      {/* <View style={styles.space} /> */}
+
+      <VesselPicker onSelect={setGoal} />
       
       <FadeOut 
-        trigger={finished} 
-        onComplete={() => onComplete(name!)} 
+        trigger={goal != ""} 
+        onComplete={() => onComplete(goal!)} 
       />
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+  space: {
+    margin: 50,
+  },
   container: {
     flex: 1,
     marginVertical: 100,
-    backgroundColor: "#fff", // Optional: Set a background color
     justifyContent: "flex-start", // Center vertically
     alignItems: "center",
+  },
+  background: {
+    position: "absolute",
+    opacity: 0.5,
+    top: 300,
   },
   title: {
     width: "100%",
     textAlign: "center",
     fontSize: 24, // Optional: Adjust font size
     marginBottom: 150, // Spacing below the title
+    paddingHorizontal: 50,
   },
   avatarContainer: {
     justifyContent: "center",

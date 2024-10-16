@@ -11,58 +11,58 @@ import { addLogHandler, consoleLogHandler } from "TiFShared/logging"
 import Game from "../../Game/Game"
 import GameMeta from "../../Game/Game.stories"
 import AttendeesListMeta, {
-  Basic as AttendeesListBasic
+    Basic as AttendeesListBasic
 } from "../components/AttendeesList/AttendeesList.stories"
 import ButtonsMeta, {
-  Basic as ButtonsBasic
+    Basic as ButtonsBasic
 } from "../components/Buttons/Buttons.stories"
 import EnterGoalMeta, {
-  Basic as EnterGoalBasic
+    Basic as EnterGoalBasic
 } from "../components/EnterGoal/EnterGoal.stories"
 import EnterNameMeta, {
-  Basic as EnterNameBasic
-} from "../components/EnterName/EnterName.stories"
+    Basic as EnterNameBasic
+} from "../components/EnterMotivation/EnterName.stories"
 import EventDetailsMeta, {
-  Basic as EventDetailsBasic
+    Basic as EventDetailsBasic
 } from "../components/EventDetails/EventDetails.stories"
 import ExploreEventsMeta, {
-  Basic as ExploreEventsBasic
+    Basic as ExploreEventsBasic
 } from "../components/Explore/Explore.stories"
 import ForgotPasswordMeta, {
-  Basic as ForgotPasswordBasic
+    Basic as ForgotPasswordBasic
 } from "../components/ForgotPassword/ForgotPasswordForm.stories"
 import GameNavigationMeta, {
-  Basic as GameNavigationBasic
+    Basic as GameNavigationBasic
 } from "../components/Game/Navigation.stories"
 import LocationSearchMeta, {
-  Basic as LocationSearchBasic
+    Basic as LocationSearchBasic
 } from "../components/LocationSearch/LocationSearch.stories"
 import RegionMonitoringMeta, {
-  Basic as RegionMonitoringBasic
+    Basic as RegionMonitoringBasic
 } from "../components/RegionMonitoring/RegionMonitoring.stories"
 import SearchBarMeta, {
-  Default as SearchBarBasic
+    Default as SearchBarBasic
 } from "../components/SearchBar/SearchBar.stories"
 import EventSettingsDurationMeta, {
-  Basic as EventSettingsDurationBasic
+    Basic as EventSettingsDurationBasic
 } from "../components/SettingsScreen/EventSettingsDurations.stories"
 import EventSettingsMeta, {
-  Basic as EventSettingsBasic
+    Basic as EventSettingsBasic
 } from "../components/SettingsScreen/EventSettingsScreen.stories"
 import SettingsMeta, {
-  Basic as SettingsScreenBasic
+    Basic as SettingsScreenBasic
 } from "../components/SettingsScreen/SettingsScreen.stories"
 import SignInMeta, {
-  Basic as SignInBasic
+    Basic as SignInBasic
 } from "../components/SignIn/SignIn.stories"
 import SignUpMeta, {
-  Basic as SignUpBasic
+    Basic as SignUpBasic
 } from "../components/SignUp/SignUp.stories"
 import TextFieldMeta, {
-  Basic as TextFieldBasic
+    Basic as TextFieldBasic
 } from "../components/TextField/TextField.stories"
 import VesselPickerMeta, {
-  Basic as VesselPickerBasic
+    Basic as VesselPickerBasic
 } from "../components/VesselPicker/VesselPicker.stories"
 
 setupCognito(new InMemorySecureStore())

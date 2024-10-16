@@ -1,40 +1,50 @@
-import React, { useState } from "react";
+import { EventColors } from "@lib/events";
+import React, { useRef, useState } from "react";
 import {
   SafeAreaView,
   StyleSheet,
   TextInput,
   View
 } from "react-native";
-import { Subtitle, Title } from "../../../components/Text";
+import { Title } from "../../../components/Text";
 import { FadeOut } from "../FadeOut/FadeOut";
-import { Avatar } from "./Avatar";
+import { Avatar, AvatarRef } from "./Avatar";
 
-export const EnterNameScene = ({ onComplete }: { onComplete: (name: string) => void }) => {
-  const [finished, setFinished] = useState(false)
+export const EnterNameScene = ({ goal, onComplete }: { goal: string, onComplete: (name: string) => void }) => {
+  const [finished, setFinished] = useState(false);
   const [name, setName] = useState<string>("");
+
+  // Create a ref for the Avatar component
+  const avatarRef = useRef<AvatarRef>(null);
+
+  // Handler for text input changes
+  const handleChangeText = (text: string) => {
+    setName(text);
+    avatarRef.current?.wiggle(); // Trigger the wiggle animation
+  };
 
   return (
     <SafeAreaView style={styles.container}>
-      <Title style={styles.title}>Who are you?</Title>
+      <Title style={styles.title}>Why do you want to be {goal}?</Title>
 
       <View style={styles.avatarContainer}>
-        <Avatar color={"red"} rotation={0} />
+        <Avatar color={EventColors.Orange} rotation={75} ref={avatarRef} />
       </View>
 
-      <Subtitle style={styles.subtitle}>My name is</Subtitle>
       <TextInput
         textAlign="center"
-        style={[styles.textField]}
+        style={styles.textField}
         autoFocus={true}
         value={name}
-        onChangeText={setName}
+        multiline={true}
+        onChangeText={handleChangeText} // Use the handler
         returnKeyType="done"
         onSubmitEditing={() => setFinished(true)}
       />
       
       <FadeOut 
         trigger={finished} 
-        onComplete={() => onComplete(name!)} 
+        onComplete={() => onComplete(name)} 
       />
     </SafeAreaView>
   );

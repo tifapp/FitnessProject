@@ -1,4 +1,3 @@
-// PickerItem.tsx
 import { Ionicons } from '@expo/vector-icons';
 import React, { useEffect, useMemo, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
@@ -287,7 +286,7 @@ export const Doll = ({
     jumpingRotate.value = withRepeat(
       withSequence(
         withTiming(rotateMax, { // Randomized rotate to the right
-          duration: jumpDurationUp / 2,
+          duration: jumpDurationUp / 3,
           easing: Easing.out(Easing.quad),
         }),
         withTiming(-rotateMax, { // Rotate to the left
@@ -295,7 +294,7 @@ export const Doll = ({
           easing: Easing.inOut(Easing.quad),
         }),
         withTiming(0, { // Reset rotation
-          duration: jumpDurationUp / 2,
+          duration: jumpDurationUp / 3,
           easing: Easing.in(Easing.quad),
         })
       ),
@@ -344,19 +343,14 @@ export const Doll = ({
 };
 
 const styles = StyleSheet.create({
-  contentContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   optionContainer: {
+    backgroundColor: "transparent",
     width: ITEM_SIZE,
     height: ITEM_SIZE,
     alignItems: 'center',
     justifyContent: 'center',
     marginHorizontal: 5,
     position: 'relative',
-    backgroundColor: 'transparent',
   },
   progressBar: {
     position: 'absolute',

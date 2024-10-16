@@ -62,7 +62,7 @@ export const Navigation = () => {
           },
           headerShown: false,
         }}
-        initialRouteName="Scene1"
+        initialRouteName="Scene3"
       >
         {Screens(Stack)}
       </Stack.Navigator>

@@ -1,8 +1,9 @@
 import { Title } from "@components/Text";
 import React, { useState } from "react";
-import { SafeAreaView, StyleSheet } from "react-native";
+import { SafeAreaView, StyleSheet, View } from "react-native";
 import { FadeOut } from "../FadeOut/FadeOut";
-import { VesselPicker } from "./VesselPicker"; // Adjust the import path as needed
+import { Mountain } from "../Icons/Mountain";
+import { VesselPicker } from "./VesselPicker";
 
 export const VesselPickerScene = ({ onComplete }: { onComplete: (color: string) => void; }) => {
   const [color, setColor] = useState<string>()
@@ -14,10 +15,14 @@ export const VesselPickerScene = ({ onComplete }: { onComplete: (color: string) 
           alignItems: "center",
           textAlign: "center",
           fontStyle: "italic",
+          marginBottom: 600,
         }}
       >
         Please select an avatar.
       </Title>
+      <View style={styles.background}>
+        <Mountain width={900} height={900}/>
+      </View> 
       <VesselPicker onSelect={setColor} />
 
       <FadeOut 
@@ -32,6 +37,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     marginVertical: 100,
+    justifyContent: "flex-start", // Center vertically
+    alignItems: "center",
+  },
+  background: {
+    position: "absolute",
+    opacity: 0.5,
+    bottom: 0,
   },
   fadeOverlay: {
     ...StyleSheet.absoluteFillObject, // Make the overlay cover the entire screen

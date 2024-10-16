@@ -37,7 +37,7 @@ export type Item = {
   opacity?: number;
 };
 
-export const PickerItem = ({
+export const Doll = ({
   color,
   rotation,
   onSelect = () => {},
