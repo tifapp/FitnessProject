@@ -60,6 +60,8 @@ import { useConst } from "@lib/utils/UseConst"
 import { TiFFormCardView } from "@components/form-components/Card"
 import { formatDateTimeFromBasis } from "@date-time"
 import { EditEventFormLocationView, useEditEventFormLocation } from "./Location"
+import { TiFFormScrollableLayoutView } from "@components/form-components/ScrollableFormLayout"
+import { TiFFooterView } from "@components/Footer"
 
 export type EditEventProps = {
   hostProfileImageURL?: string
@@ -115,35 +117,24 @@ export const EditEventView = ({
   style
 }: EditEventProps) => {
   useHydrateEditEvent(initialValues)
-  const [footerLayout, setFooterLayout] = useState<
-    LayoutRectangle | undefined
-  >()
   return (
-    <View style={style}>
-      <View style={styles.container}>
-        <TiFFormScrollView>
-          <QuoteSectionView eventId={eventId} currentDate={currentDate} />
-          <TitleSectionView />
-          <LocationSectionView
-            hostProfileImageURL={hostProfileImageURL}
-            onSelectLocationTapped={onSelectLocationTapped}
-          />
-          <StartDateSectionView />
-          <DurationSectionView />
-          <DescriptionSectionView />
-          <AdvancedSectionView />
-          {footerLayout && (
-            <View style={{ marginBottom: footerLayout.height }} />
-          )}
-        </TiFFormScrollView>
-        <View
-          style={styles.footer}
-          onLayout={(e) => setFooterLayout(e.nativeEvent.layout)}
-        >
-          <FooterView eventId={eventId} submit={submit} onSuccess={onSuccess} />
-        </View>
-      </View>
-    </View>
+    <TiFFormScrollableLayoutView
+      footer={
+        <FooterView eventId={eventId} submit={submit} onSuccess={onSuccess} />
+      }
+      style={style}
+    >
+      <QuoteSectionView eventId={eventId} currentDate={currentDate} />
+      <TitleSectionView />
+      <LocationSectionView
+        hostProfileImageURL={hostProfileImageURL}
+        onSelectLocationTapped={onSelectLocationTapped}
+      />
+      <StartDateSectionView />
+      <DurationSectionView />
+      <DescriptionSectionView />
+      <AdvancedSectionView />
+    </TiFFormScrollableLayoutView>
   )
 }
 
@@ -411,21 +402,13 @@ type FooterProps = {
   onSuccess: (event: ClientSideEvent) => void
 }
 
-const FooterView = ({ eventId, onSuccess, submit }: FooterProps) => {
-  const bottomPadding = useScreenBottomPadding({
-    safeAreaScreens: 8,
-    nonSafeAreaScreens: 24
-  })
-  return (
+const FooterView = ({ eventId, onSuccess, submit }: FooterProps) => (
+  <TiFFooterView>
     <EditEventFormSubmitButton
       state={useEditEventFormSubmission({ eventId, submit, onSuccess })}
-      style={{
-        paddingTop: 8,
-        paddingBottom: useSafeAreaInsets().bottom + bottomPadding
-      }}
     />
-  )
-}
+  </TiFFooterView>
+)
 
 const styles = StyleSheet.create({
   container: {

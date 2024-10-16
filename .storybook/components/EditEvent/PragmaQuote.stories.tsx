@@ -123,7 +123,7 @@ const EditEventScreen = () => {
           initialValues={{
             ...DEFAULT_EDIT_EVENT_FORM_VALUES,
             title: "Blob",
-            location: { coordinate: undefined, placemark }
+            location: undefined
           }}
           submit={async (id, edit) => {
             await sleep(3000)
