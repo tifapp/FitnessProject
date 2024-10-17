@@ -3,21 +3,21 @@ import React from "react"
 import { View } from "react-native"
 import { GestureHandlerRootView } from "react-native-gesture-handler"
 import { SafeAreaProvider } from "react-native-safe-area-context"
-import { EnterMotivationScene } from "./Scene"
+import { NarrationScene } from "./Scene"
 
-const EnterMotivationMeta: ComponentMeta<typeof View> = {
-  title: "EnterMotivation"
+const NarrationMeta: ComponentMeta<typeof View> = {
+  title: "Narration"
 }
 
-export default EnterMotivationMeta
+export default NarrationMeta
 
-type EnterMotivationStory = ComponentStory<typeof View>
+type NarrationStory = ComponentStory<typeof View>
 
-export const Basic: EnterMotivationStory = () => (
+export const Basic: NarrationStory = () => (
   <SafeAreaProvider>
     <GestureHandlerRootView style={{ flex: 1 }}>
     <View style={{width: "100%", height: "100%"}}> 
-      <EnterMotivationScene goal="marathon runner" onComplete={() => {}} />
+      <NarrationScene goal="marathon runner" onComplete={() => {}} />
     </View>
     </GestureHandlerRootView>
   </SafeAreaProvider>

@@ -2,8 +2,8 @@ import { StackScreenProps } from "@react-navigation/stack";
 import React, { useRef } from "react";
 import { StackNavigatorType } from "../../../components/Navigation";
 import { EnterGoalScene } from "../EnterGoal/Scene";
-import { EnterNameScene } from "../EnterMotivation/Scene";
-import { VesselPickerScene } from "../VesselPicker/Scene";
+import { EnterMotivationScene } from "../EnterMotivation/Scene";
+import { NarrationScene } from "../Narration/Scene";
 
 // Define the type for navigation params
 export type ParamsList = {
@@ -42,7 +42,7 @@ export const Screens = <Params extends ParamsList>(
         })}
       >
         {(props: StackScreenProps<Params, 'Scene2'>) => (
-          <EnterNameScene 
+          <EnterMotivationScene 
             goal={goal.current}
             onComplete={() => {
               props.navigation.navigate("Scene1");
@@ -58,11 +58,9 @@ export const Screens = <Params extends ParamsList>(
         })}
       >
         {(props: StackScreenProps<Params, 'Scene1'>) => (
-          <VesselPickerScene
+          <NarrationScene
             goal={goal.current}
-            onComplete={() => {
-              props.navigation.navigate("Scene2");
-            }}
+            onComplete={() => {}}
             {...props}
           />
         )}

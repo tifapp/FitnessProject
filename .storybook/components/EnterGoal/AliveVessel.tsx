@@ -1,11 +1,7 @@
-
+// Doll.tsx
 import { Ionicons } from '@expo/vector-icons';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { forwardRef, useEffect, useImperativeHandle, useMemo, useState } from 'react';
 import { StyleSheet } from 'react-native';
-import {
-  Gesture,
-  GestureDetector,
-} from 'react-native-gesture-handler';
 import Animated, {
   Easing,
   interpolateColor,
@@ -18,35 +14,30 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import { useHaptics } from '../../../modules/tif-haptics';
-import { createHeartbeatPattern } from '../VesselPicker/Haptics';
+import { createHeartbeatPattern } from '../Haptics';
 
+// Define the size and durations
 export const ITEM_SIZE = 125;
 const HEARTBEAT_INTERVAL = 2000;
 const PROGRESS_DURATION = 10000;
 
-export type Item = {
+// Define the props for the Doll component
+export type DollProps = {
   color: string;
   rotation: number;
-  onSelect?: () => void;
-  onPress?: () => void;
-  onLongPress?: () => void;
-  onPressOut?: () => void;
-  onGestureStart?: () => void;
-  onGestureEnd?: () => void;
   opacity?: number;
 };
 
-export const Doll = ({
+export interface DollRef {
+  handleGestureStart: () => void;
+  handleGestureEnd: () => void;
+}
+
+export const Doll = forwardRef<DollRef, DollProps>(({
   color,
   rotation,
-  onSelect = () => {},
-  onPress = () => {},
-  onLongPress= () => {},
-  onPressOut= () => {},
   opacity,
-  onGestureStart= () => {},
-  onGestureEnd= () => {},  
-}: Item) => {
+}, ref) => {
   const haptics = useHaptics();
 
   // Shared values for animations
@@ -103,96 +94,6 @@ export const Doll = ({
       opacity: opacity ?? 1,
     };
   });
-
-  // Gesture handling using LongPress
-  const gesture = Gesture.LongPress()
-    .minDuration(100) // Slight delay before recognizing press
-    .maxDistance(20) // Allow slight finger movements
-    .shouldCancelWhenOutside(false) // Prevent cancellation on movement outside
-    .onStart(() => {
-      isPressed.value = true;
-      runOnJS(onPress)();
-
-      // Notify parent that gesture has started
-      if (onGestureStart) {
-        runOnJS(onGestureStart)();
-      }
-
-      // Stop the jumping animation
-      stopJumping();
-
-      // Start progress meter animation
-      progress.value = withTiming(
-        1,
-        {
-          duration: PROGRESS_DURATION,
-          easing: Easing.linear,
-        },
-        (isFinished) => {
-          if (isFinished && isPressed.value) {
-            runOnJS(triggerHapticBurst)();
-            runOnJS(onLongPress)();
-
-            // Perform a bouncy jump (scale and translateY)
-            pulse.value = withSequence(
-              withTiming(1, {
-                duration: 200,
-                easing: Easing.out(Easing.ease),
-              }),
-              withTiming(0, {
-                duration: 200,
-                easing: Easing.in(Easing.ease),
-              })
-            );
-
-            // Reset rotation to upright position
-            iconRotation.value = withTiming(0, {
-              duration: 300,
-              easing: Easing.out(Easing.ease),
-            });
-
-            if (progress.value === 1) {
-              runOnJS(onSelect)();
-            }
-
-            // Reset states
-            isPressed.value = false;
-            progress.value = 0;
-            pulse.value = 0;
-            runOnJS(onPressOut)();
-
-            // Notify parent that gesture has ended
-            if (onGestureEnd) {
-              runOnJS(onGestureEnd)();
-            }
-
-            // Resume the jumping animation
-            if (!isPressed.value) {
-              startJumping();
-            }
-          }
-        }
-      );
-    })
-    .onFinalize(() => {
-      if (isPressed.value) {
-        // If the press is released before completion
-        isPressed.value = false;
-        progress.value = withTiming(0, { duration: 300 });
-        runOnJS(onPressOut)();
-
-        // Reset pulse
-        pulse.value = withTiming(0, { duration: 300 });
-
-        // Notify parent that gesture has ended
-        if (onGestureEnd) {
-          runOnJS(onGestureEnd)();
-        }
-
-        // Resume the jumping animation
-        startJumping();
-      }
-    });
 
   // React state to track 'pressed' for haptic heartbeat
   const [pressed, setPressed] = useState(false);
@@ -327,14 +228,77 @@ export const Doll = ({
     };
   }, [phaseOffset]);
 
+  // Expose methods to parent component
+  useImperativeHandle(ref, () => ({
+    handleGestureStart: () => {
+      isPressed.value = true;
+
+      // Stop the jumping animation
+      stopJumping();
+
+      // Start progress meter animation
+      progress.value = withTiming(
+        1,
+        {
+          duration: PROGRESS_DURATION,
+          easing: Easing.linear,
+        },
+        (isFinished) => {
+          if (isFinished && isPressed.value) {
+            runOnJS(triggerHapticBurst)();
+
+            // Perform a bouncy jump (scale and translateY)
+            pulse.value = withSequence(
+              withTiming(1, {
+                duration: 200,
+                easing: Easing.out(Easing.ease),
+              }),
+              withTiming(0, {
+                duration: 200,
+                easing: Easing.in(Easing.ease),
+              })
+            );
+
+            // Reset rotation to upright position
+            iconRotation.value = withTiming(0, {
+              duration: 300,
+              easing: Easing.out(Easing.ease),
+            });
+
+            // Reset states
+            isPressed.value = false;
+            progress.value = 0;
+            pulse.value = 0;
+
+            // Resume the jumping animation
+            if (!isPressed.value) {
+              startJumping();
+            }
+          }
+        }
+      );
+    },
+    handleGestureEnd: () => {
+      if (isPressed.value) {
+        // If the press is released before completion
+        isPressed.value = false;
+        progress.value = withTiming(0, { duration: 300 });
+
+        // Reset pulse
+        pulse.value = withTiming(0, { duration: 300 });
+
+        // Resume the jumping animation
+        startJumping();
+      }
+    },
+  }));
+
   return (
-    <GestureDetector gesture={gesture}>
-      <Animated.View style={styles.optionContainer}>
-        <AnimatedIcon name="accessibility" style={animatedIconStyle} size={90} />
-      </Animated.View>
-    </GestureDetector>
+    <Animated.View style={styles.optionContainer}>
+      <AnimatedIcon name="accessibility" style={animatedIconStyle} size={90} />
+    </Animated.View>
   );
-};
+});
 
 const styles = StyleSheet.create({
   optionContainer: {

@@ -18,7 +18,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import { useHaptics } from '../../../modules/tif-haptics';
-import { createHeartbeatPattern } from './Haptics';
+import { createHeartbeatPattern } from '../Haptics';
 import { HeartProgress } from "./Meter";
 
 export const ITEM_SIZE = 125;

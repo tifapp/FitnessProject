@@ -93,7 +93,7 @@ export const Carousel = ({ onComplete, onStart, onEnd, style }: CarouselProps) =
               <PickerItem 
                 color={color} 
                 persona={persona} 
-                onEnd={() => onEnd(persona)}
+                //onEnd={() => onEnd(persona)}
                 onProgressStart={() => onStart(persona)}
                 onProgressComplete={() => onComplete(persona)}
               />

@@ -69,10 +69,18 @@ public final class TiFHapticsEngine: @unchecked Sendable {
                     print("Invalid parameter in event: \(paramDict)")
                 }
             }
-            
-            // Create CHHapticEvent
-            let hapticEvent = CHHapticEvent(eventType: eventType, parameters: eventParameters, relativeTime: relativeTime)
-            hapticEvents.append(hapticEvent)
+
+            if eventType == .hapticContinuous {
+                guard let duration = eventDict["duration"] as? TimeInterval else {
+                    print("Missing or invalid duration in event: \(eventDict)")
+                    continue
+                }
+                let hapticEvent = CHHapticEvent(eventType: eventType, parameters: eventParameters, relativeTime: relativeTime, duration: duration)
+                hapticEvents.append(hapticEvent)
+            } else {
+                let hapticEvent = CHHapticEvent(eventType: eventType, parameters: eventParameters, relativeTime: relativeTime)
+                hapticEvents.append(hapticEvent)
+            }
         }
         
         // Create the haptic pattern with parsed events

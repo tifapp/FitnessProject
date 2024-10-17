@@ -9,9 +9,10 @@ import Animated, {
   withSequence,
   withTiming,
 } from 'react-native-reanimated';
+import { useHaptics } from '../../../modules/tif-haptics';
 
 export type AvatarRef = {
-  pulse: () => void;
+  wiggle: () => void;
   standUp: () => void;
 };
 
@@ -34,11 +35,16 @@ export const Avatar = forwardRef<AvatarRef, Item>(({
   rotation,
   opacity,
 }: Item, ref) => {
+  const haptics = useHaptics();
+
   // Shared values for animations
   const iconRotation = useSharedValue(rotation);
+  const wiggleRotation = useSharedValue(0);
   const pulse = useSharedValue(0);
   const standUpRotation = useSharedValue(0);
-  const translateY = useSharedValue(0);
+
+  // Constants for translation
+  const HALF_HEIGHT = ITEM_SIZE / 2;
 
   // Animated styles for the icon
   const AnimatedIcon = Animated.createAnimatedComponent(Ionicons);
@@ -52,17 +58,25 @@ export const Avatar = forwardRef<AvatarRef, Item>(({
 
     return {
       transform: [
-        { rotate: `${iconRotation.value + standUpRotation.value}deg` }, // Apply rotation
-        { translateY: translateY.value }, // Apply vertical translation (jump)
+        { translateY: HALF_HEIGHT * 2 }, // Move up to set pivot
+        { rotate: `${iconRotation.value + wiggleRotation.value + standUpRotation.value}deg` }, // Apply rotation
+        { translateY: -HALF_HEIGHT * 2 }, // Move back down to original position
       ],
       color: animatedColor,
       opacity: opacity ?? 1,
     };
   });
 
-  // Expose the pulse and standUp methods to parent components
+  // Expose the wiggle and standUp methods to parent components
   useImperativeHandle(ref, () => ({
-    pulse: () => {
+    wiggle: () => {
+      // Wiggle Rotation Animation
+      // wiggleRotation.value = withSequence(
+      //   withTiming(-5, { duration: 100, easing: Easing.out(Easing.ease) }), // Reduced angle
+      //   withTiming(5, { duration: 200, easing: Easing.out(Easing.ease) }),  // Reduced angle
+      //   withTiming(0, { duration: 100, easing: Easing.out(Easing.ease) })
+      // );
+
       // Pulse Color Animation (CPR-like compression and release)
       pulse.value = withSequence(
         withTiming(1, { duration: 200, easing: Easing.out(Easing.ease) }), // Slower pulse to 'color'
@@ -73,21 +87,7 @@ export const Avatar = forwardRef<AvatarRef, Item>(({
       // Stand-Up Rotation Animation
       standUpRotation.value = withSequence(
         withTiming(15, { duration: 300, easing: Easing.out(Easing.ease) }), // Tilt forward to 15 degrees
-        withTiming(0, { duration: 300, easing: Easing.out(Easing.ease) }),   // Return to original position
-        withTiming(-rotation, { duration: 600, easing: Easing.out(Easing.cubic) })   // Translate upwards to simulate the "jump"
-      );
-    
-      translateY.value = withSequence(
-        withTiming(0, { duration: 600, easing: Easing.out(Easing.ease) }), // Move up (jump)
-        withTiming(-80, { duration: 600, easing: Easing.out(Easing.quad) }), // Move up (jump)
-        withTiming(-20, { duration: 200, easing: Easing.out(Easing.quad) })    // Fall back down
-      );
-
-      // Apply color transition at the same time as standing up
-      pulse.value = withSequence(
-        withTiming(1, { duration: 300, easing: Easing.out(Easing.ease) }), // Tilt forward to 15 degrees
-        withTiming(0, { duration: 300, easing: Easing.out(Easing.ease) }), // Tilt forward to 15 degrees
-        withTiming(1, { duration: 300, easing: Easing.out(Easing.ease) })
+        withTiming(0, { duration: 300, easing: Easing.out(Easing.ease) })   // Return to original position
       );
     }
   }));
