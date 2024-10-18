@@ -5,11 +5,11 @@ import { TabNavigation } from "./navigation"
 
 const Stack = createStackNavigator()
 
-export type AppProps = {
+export type TiFProps = {
   isFontsLoaded: boolean
 }
 
-export const AppView = ({ isFontsLoaded }: AppProps) => {
+export const TiFView = ({ isFontsLoaded }: TiFProps) => {
   if (!isFontsLoaded) return null
   return (
     <NavigationContainer>

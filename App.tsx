@@ -20,7 +20,7 @@ import {
   setupInternetReconnectionRefreshes
 } from "@lib/ReactQuery"
 import { enableSentry } from "@lib/Sentry"
-import { AppView } from "@core-root/AppView"
+import { TiFView } from "@core-root"
 import * as Sentry from "@sentry/react-native"
 import "expo-dev-client"
 import { addPushTokenListener } from "expo-notifications"
@@ -65,7 +65,7 @@ const App = () => {
       <SafeAreaProvider>
         <TiFMenuProvider>
           <RootSiblingParent>
-            <AppView isFontsLoaded={isFontsLoaded} />
+            <TiFView isFontsLoaded={isFontsLoaded} />
           </RootSiblingParent>
         </TiFMenuProvider>
       </SafeAreaProvider>
