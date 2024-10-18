@@ -1,13 +1,12 @@
 // Doll.tsx
 import { Ionicons } from '@expo/vector-icons';
-import React, { forwardRef, useEffect, useImperativeHandle, useMemo, useState } from 'react';
-import { StyleSheet } from 'react-native';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Dimensions, StyleSheet } from 'react-native';
 import Animated, {
   Easing,
   interpolateColor,
   runOnJS,
   useAnimatedStyle,
-  useDerivedValue,
   useSharedValue,
   withRepeat,
   withSequence,
@@ -15,17 +14,19 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useHaptics } from '../../../modules/tif-haptics';
 import { createHeartbeatPattern } from '../Haptics';
+import { PROGRESS_DURATION } from './PickerItem';
 
 // Define the size and durations
 export const ITEM_SIZE = 125;
 const HEARTBEAT_INTERVAL = 2000;
-const PROGRESS_DURATION = 10000;
 
 // Define the props for the Doll component
 export type DollProps = {
   color: string;
   rotation: number;
   opacity?: number;
+  isPressed?: boolean;
+  triggerFall?: boolean; // New prop to trigger the fall animation
 };
 
 export interface DollRef {
@@ -33,23 +34,31 @@ export interface DollRef {
   handleGestureEnd: () => void;
 }
 
-export const Doll = forwardRef<DollRef, DollProps>(({
+export const Doll = ({
   color,
   rotation,
   opacity,
-}, ref) => {
+  isPressed,
+  triggerFall = false, // Default to false
+}: DollProps) => {
+  const [dummy, setDummy] = useState(false);
   const haptics = useHaptics();
 
   // Shared values for animations
   const pulse = useSharedValue(0);
   const progress = useSharedValue(0);
   const iconRotation = useSharedValue(rotation);
-  const isPressed = useSharedValue(false);
 
   // Shared values for lively jumping animation
   const jumpingTranslateY = useSharedValue(0);
   const jumpingScale = useSharedValue(1);
   const jumpingRotate = useSharedValue(0);
+
+  // Shared values for fall animation
+  const fallTranslateX = useSharedValue(0);
+  const fallTranslateY = useSharedValue(0);
+  const fallRotation = useSharedValue(0);
+  const fallColor = useSharedValue(0); // 0: original color, 1: black
 
   // Randomized animation parameters using useMemo to ensure they are set once
   const {
@@ -61,8 +70,8 @@ export const Doll = forwardRef<DollRef, DollProps>(({
     phaseOffset,
   } = useMemo(() => {
     const jumpHeight = -50 + Math.random() * -20; // Between -50 and -70
-    const jumpDurationUp = 550 + Math.random() * 200; // Between 550ms and 700ms
-    const jumpDurationDown = 550 + Math.random() * 200; // Between 550ms and 700ms
+    const jumpDurationUp = 550 + Math.random() * 200; // Between 550ms and 750ms
+    const jumpDurationDown = 550 + Math.random() * 200; // Between 550ms and 750ms
     const scaleUp = 1 + Math.random() * 0.2; // Between 1 and 1.2
     const rotateMax = 10 + Math.random() * 10; // Between 10deg and 20deg
     const phaseOffset = Math.random() * 1000; // Between 0ms and 1000ms
@@ -78,29 +87,35 @@ export const Doll = forwardRef<DollRef, DollProps>(({
   const AnimatedIcon = Animated.createAnimatedComponent(Ionicons);
 
   const animatedIconStyle = useAnimatedStyle(() => {
-    const animatedColor = interpolateColor(
-      pulse.value,
+
+    return {
+      transform: [
+        { rotate: `${jumpingRotate.value}deg` }, // Combine jumping and fall rotation
+        { scale: jumpingScale.value },
+        { translateY: jumpingTranslateY.value + fallTranslateY.value }, // Combine jumping and fall translateY
+        { translateX: fallTranslateX.value }, // Fall translateX
+      ],
+      opacity: opacity ?? 1,
+    };
+  });
+  
+  const fallAnimatedIconStyle = useAnimatedStyle(() => {
+    // Interpolate pulse for color change (heartbeat effect)
+    const pulseColor = interpolateColor(pulse.value, [0, 1], [color, 'black']);
+
+    // Interpolate fallColor to transition to black
+    const finalColor = interpolateColor(
+      fallColor.value,
       [0, 1],
-      [color, 'black']
+      [pulseColor, 'black']
     );
 
     return {
       transform: [
-        { rotate: `${jumpingRotate.value}deg` },
-        { scale: jumpingScale.value },
-        { translateY: jumpingTranslateY.value },
+        { rotate: `${fallRotation.value}deg` }, // Combine jumping and fall rotation
       ],
-      color: animatedColor,
-      opacity: opacity ?? 1,
+      color: finalColor,
     };
-  });
-
-  // React state to track 'pressed' for haptic heartbeat
-  const [pressed, setPressed] = useState(false);
-
-  // Sync shared value 'isPressed' with React state 'pressed'
-  useDerivedValue(() => {
-    runOnJS(setPressed)(isPressed.value);
   });
 
   useEffect(() => {
@@ -110,7 +125,7 @@ export const Doll = forwardRef<DollRef, DollProps>(({
     const startTime = Date.now();
 
     const playHeartbeat = () => {
-      if (!isMounted || !pressed) return;
+      if (!isMounted || !isPressed) return;
 
       // Calculate elapsed time
       const elapsedTime = Date.now() - startTime;
@@ -137,8 +152,57 @@ export const Doll = forwardRef<DollRef, DollProps>(({
       timeoutId = setTimeout(playHeartbeat, newInterval);
     };
 
-    if (pressed) {
+    if (isPressed && dummy && !triggerFall) {
       playHeartbeat();
+
+      // Stop the jumping animation
+      stopJumping();
+
+      // Start progress meter animation
+      progress.value = withTiming(
+        1,
+        {
+          duration: PROGRESS_DURATION,
+          easing: Easing.linear,
+        },
+        (isFinished) => {
+          if (isFinished && isPressed) {
+            runOnJS(triggerHapticBurst)();
+
+            // Perform a bouncy jump (scale and translateY)
+            pulse.value = withSequence(
+              withTiming(1, {
+                duration: 200,
+                easing: Easing.out(Easing.ease),
+              }),
+              withTiming(0, {
+                duration: 200,
+                easing: Easing.in(Easing.ease),
+              })
+            );
+
+            // Reset rotation to upright position
+            iconRotation.value = withTiming(0, {
+              duration: 300,
+              easing: Easing.out(Easing.ease),
+            });
+
+            progress.value = 0;
+            pulse.value = 0;
+          }
+        }
+      );
+      console.log('Heartbeat and Progress Started');
+    } else {
+      progress.value = withTiming(0, { duration: 300 });
+
+      // Reset pulse
+      pulse.value = withTiming(0, { duration: 300 });
+
+      // Resume the jumping animation
+      startJumping();
+
+      console.log('Jumping Animation Resumed');
     }
 
     return () => {
@@ -147,10 +211,19 @@ export const Doll = forwardRef<DollRef, DollProps>(({
         clearTimeout(timeoutId);
       }
     };
-  }, [pressed, haptics]);
+  }, [isPressed, dummy, haptics, triggerFall]);
+
+  useEffect(() => {
+    setTimeout(() => setDummy(true), 100);
+  }, []);
 
   // Function to start the jumping animation with random parameters
   const startJumping = () => {
+    // Reset to initial values before starting the animation
+    jumpingTranslateY.value = 0;
+    jumpingScale.value = 1;
+    jumpingRotate.value = 0;
+
     // Jumping TranslateY: Jump high up and come down with randomized parameters
     jumpingTranslateY.value = withRepeat(
       withSequence(
@@ -211,115 +284,70 @@ export const Doll = forwardRef<DollRef, DollProps>(({
     jumpingRotate.value = withTiming(0, { duration: 300, easing: Easing.out(Easing.ease) });
   };
 
-  // Start the jumping animation when component mounts with a phase offset for randomness
+  // useEffect to handle fall animation when triggerFall becomes true
   useEffect(() => {
-    const timer = setTimeout(() => {
-      if (!isPressed.value) {
-        startJumping();
-      }
-    }, phaseOffset); // Apply phase offset
-
-    return () => {
-      clearTimeout(timer);
-      // Clean up animations when component unmounts
-      jumpingTranslateY.value = 0;
-      jumpingScale.value = 1;
-      jumpingRotate.value = 0;
-    };
-  }, [phaseOffset]);
-
-  // Expose methods to parent component
-  useImperativeHandle(ref, () => ({
-    handleGestureStart: () => {
-      isPressed.value = true;
-
-      // Stop the jumping animation
+    if (triggerFall) {
+      // Stop existing animations
       stopJumping();
+      pulse.value = withTiming(0, { duration: 300 });
+      progress.value = withTiming(0, { duration: 300 });
 
-      // Start progress meter animation
-      progress.value = withTiming(
-        1,
-        {
-          duration: PROGRESS_DURATION,
-          easing: Easing.linear,
-        },
-        (isFinished) => {
-          if (isFinished && isPressed.value) {
-            runOnJS(triggerHapticBurst)();
+      // Get window dimensions
+      const { width: windowWidth, height: windowHeight } = Dimensions.get('window');
 
-            // Perform a bouncy jump (scale and translateY)
-            pulse.value = withSequence(
-              withTiming(1, {
-                duration: 200,
-                easing: Easing.out(Easing.ease),
-              }),
-              withTiming(0, {
-                duration: 200,
-                easing: Easing.in(Easing.ease),
-              })
-            );
+      // Define horizontal velocity, randomly to left or right
+      const horizontalVelocity = -100;
 
-            // Reset rotation to upright position
-            iconRotation.value = withTiming(0, {
-              duration: 300,
-              easing: Easing.out(Easing.ease),
-            });
+      // Animate translateX to horizontalVelocity over duration
+      fallTranslateX.value = withTiming(horizontalVelocity, {
+        duration: 1000,
+        easing: Easing.out(Easing.cubic),
+      });
 
-            // Reset states
-            isPressed.value = false;
-            progress.value = 0;
-            pulse.value = 0;
+      // Animate translateY to windowHeight + ITEM_SIZE over duration
+      fallTranslateY.value = withTiming(windowHeight + ITEM_SIZE, {
+        duration: 1200,
+        easing: Easing.quad,
+      });
 
-            // Resume the jumping animation
-            if (!isPressed.value) {
-              startJumping();
-            }
-          }
-        }
-      );
-    },
-    handleGestureEnd: () => {
-      if (isPressed.value) {
-        // If the press is released before completion
-        isPressed.value = false;
-        progress.value = withTiming(0, { duration: 300 });
+      // Animate rotation for spin (e.g., 720 degrees)
+      fallRotation.value = withTiming(-80, {
+        duration: 1000,
+        easing: Easing.linear,
+      });
 
-        // Reset pulse
-        pulse.value = withTiming(0, { duration: 300 });
+      // Animate color to black
+      fallColor.value = withTiming(1, {
+        duration: 300,
+        easing: Easing.linear,
+      });
 
-        // Resume the jumping animation
-        startJumping();
-      }
-    },
-  }));
+      // Optionally, you can add a callback after animation completes
+      // For example, to notify parent or to perform cleanup
+      // Here, we'll log to console
+      runOnJS(() => {
+        console.log('Fall Animation Triggered');
+      })();
+    }
+  }, [triggerFall]);
 
   return (
     <Animated.View style={styles.optionContainer}>
-      <AnimatedIcon name="accessibility" style={animatedIconStyle} size={90} />
+      <Animated.View style={animatedIconStyle}>
+        <AnimatedIcon name="accessibility" style={fallAnimatedIconStyle} size={90} />
+        </Animated.View>
     </Animated.View>
   );
-});
+};
 
 const styles = StyleSheet.create({
   optionContainer: {
-    backgroundColor: "transparent",
+    backgroundColor: 'transparent',
     width: ITEM_SIZE,
     height: ITEM_SIZE,
     alignItems: 'center',
     justifyContent: 'center',
     marginHorizontal: 5,
     position: 'relative',
-  },
-  progressBar: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    height: 5,
-  },
-  heartContainer: {
-    position: 'absolute',
-    top: -ITEM_SIZE / 2, // Position the heart above the icon
-    alignItems: 'center',
-    justifyContent: 'center',
   },
 });

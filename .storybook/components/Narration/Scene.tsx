@@ -11,10 +11,10 @@ export const NarrationScene = ({ goal, onComplete }: {goal: string, onComplete: 
   const haptics = useHaptics();
   
   const items = [
-    { type: 'text', content: `I have walked the path before you.`, key: 'line2', duration: 1000, pauseAfter: 500 },
-    { type: 'text', content: `I am what you aspire to be.`, key: 'line2', duration: 1000, pauseAfter: 500 },
-    { type: 'text', content: 'Meet me at the top.', key: 'line3', duration: 1000, pauseAfter: 500 },
-    { type: 'image', component: <Mountain width={1000} height={1000} />, key: 'mountain', duration: 1000, pauseAfter: 1000 },
+    { type: 'text', content: `I have walked the path before you.`, key: 'line1', duration: 2000, pauseAfter: 500 },
+    { type: 'text', content: `I am what you aspire to be.`, key: 'line2', duration: 2000, pauseAfter: 500 },
+    { type: 'text', content: 'Meet me at the top.', key: 'line3', duration: 2000, pauseAfter: 500 },
+    { type: 'image', component: <Mountain width={800} height={800} />, key: 'mountain', duration: 1000, pauseAfter: 1000 },
   ];
 
   // Create an array of Animated.Values for opacity

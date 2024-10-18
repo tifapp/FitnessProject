@@ -17,7 +17,7 @@ export const Basic: EnterMotivationStory = () => (
   <SafeAreaProvider>
     <GestureHandlerRootView style={{ flex: 1 }}>
     <View style={{width: "100%", height: "100%"}}> 
-      <EnterMotivationScene goal="marathon runner" onComplete={() => {}} />
+      <EnterMotivationScene color="#ffffff" goal="marathon runner" onComplete={() => {}} />
     </View>
     </GestureHandlerRootView>
   </SafeAreaProvider>

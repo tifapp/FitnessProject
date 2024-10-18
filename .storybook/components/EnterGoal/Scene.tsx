@@ -1,20 +1,48 @@
-import React, { useState } from "react";
+import { Audio } from 'expo-av';
+import React, { useEffect, useState } from "react";
 import {
-  SafeAreaView,
   StyleSheet,
   View
 } from "react-native";
 import { Title } from "../../../components/Text";
+import { useHaptics } from '../../../modules/tif-haptics';
 import { FadeOut } from "../FadeOut/FadeOut";
+import { createThudPattern } from '../Haptics';
 import { Mountain } from "../Icons/Mountain";
 import { Carousel } from "./Carousel";
 
-export const EnterGoalScene = ({ onComplete }: { onComplete: (name: string) => void }) => {
+async function playSound() {
+  const { sound } = await Audio.Sound.createAsync(
+    require('../../assets/fall.mp3') // Path to your audio file
+  );
+  await sound.playAsync();
+  return sound;
+}
+
+export const EnterGoalScene = ({ onComplete }: { onComplete: (_: [color: string, name: string]) => void }) => {
+  const haptics = useHaptics();
   const [held, setHeld] = useState(false)
-  const [goal, setGoal] = useState<string>("");
+  const [goal, setGoal] = useState<[string, string]>();
+  
+  const [sound, setSound] = useState<any>();
+
+  useEffect(() => {
+    if (goal) {
+      playSound()
+      setTimeout(() => {haptics.playCustomPattern(createThudPattern())}, 2500)
+    }
+  }, [goal])
+
+  useEffect(() => {
+    return sound
+      ? () => {
+          sound.unloadAsync(); // Unload the sound when the component unmounts
+        }
+      : undefined;
+  }, [sound]);
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <Title>Who do you want to be?</Title>
       <Title style={{opacity: held ? 1 : 0}}>Hold still.</Title>
 
@@ -22,15 +50,14 @@ export const EnterGoalScene = ({ onComplete }: { onComplete: (name: string) => v
         <Mountain width={900} height={900}/>
       </View> 
 
-      {/* <View style={styles.space} /> */}
-
-      <Carousel onComplete={setGoal} onStart={() => setHeld(true)} />
+      <Carousel style={{backgroundColor: "transparent"}} onEnd={() => setHeld(false)} onComplete={setGoal} onStart={() => setHeld(true)} />
       
       <FadeOut 
-        trigger={goal != ""} 
+        trigger={!!goal} 
         onComplete={() => onComplete(goal!)} 
+        delay={2000}
       />
-    </SafeAreaView>
+    </View>
   );
 };
 
@@ -40,9 +67,10 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    marginVertical: 100,
+    marginTop: 100,
     justifyContent: "flex-start", // Center vertically
     alignItems: "center",
+    overflow: "visible"
   },
   background: {
     position: "absolute",

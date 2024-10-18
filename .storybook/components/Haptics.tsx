@@ -107,3 +107,27 @@ export const createRoarPattern = () => {
     ],
   };
 };
+
+export const createThudPattern = () => {
+  return {
+    events: [
+      {
+        eventType: 'hapticTransient', // Simulate the initial heavy impact
+        relativeTime: 0.0,
+        parameters: [
+          { parameterID: 'hapticIntensity', value: 1.0 }, // Very high intensity to represent a strong impact
+          { parameterID: 'hapticSharpness', value: 0.8 }, // Sharpness to make it feel like a solid, hard hit
+        ],
+      },
+      {
+        eventType: 'hapticContinuous', // Short fade-out after the impact
+        relativeTime: 0.05, // Very brief delay after the initial thud
+        duration: 0.2, // Quick fading
+        parameters: [
+          { parameterID: 'hapticIntensity', value: 0.3 }, // Rapid drop in intensity for the fade-out
+          { parameterID: 'hapticSharpness', value: 0.2 }, // Softer finish to simulate a bounce or settling
+        ],
+      },
+    ],
+  };
+};

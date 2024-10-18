@@ -1,5 +1,4 @@
 import React, { useState } from "react"
-import { FlatList, Text, TouchableOpacity, View } from "react-native"
 import { useAppFonts } from "../../lib/Fonts"
 
 // Import your stories
@@ -180,7 +179,7 @@ const stories = [
 
 const CustomStorybookUI = () => {
   const [isFontsLoaded, error] = useAppFonts()
-  const [selectedStory, setSelectedStory] = useState(-1)
+  const [selectedStory, setSelectedStory] = useState(1)
 
   //console.error(error)
   // if (!isFontsLoaded)
@@ -197,38 +196,10 @@ const CustomStorybookUI = () => {
     return (
       <>
         <StoryComponent {...args} />
-        <Text
-          onPress={() => setSelectedStory(-1)}
-          style={{ position: "absolute", bottom: 30, left: 10 }}
-        >
-          Close
-        </Text>
       </>
     )
   }
   
-  // Render the story list
-  return (
-    <View style={{ flex: 1, margin: 20 }}>
-      <FlatList
-        data={stories}
-        renderItem={({ item, index }) => (
-          <TouchableOpacity
-            style={{
-              padding: 10,
-              width: "100%",
-              borderWidth: 1,
-              borderColor: "gray"
-            }}
-            key={index}
-            onPress={() => setSelectedStory(index)}
-          >
-            <Text>{item.name}</Text>
-          </TouchableOpacity>
-        )}
-      />
-    </View>
-  )
 }
 
 export default CustomStorybookUI

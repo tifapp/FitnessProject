@@ -74,12 +74,12 @@ export const Avatar = forwardRef<AvatarRef, Item>(({
       standUpRotation.value = withSequence(
         withTiming(15, { duration: 300, easing: Easing.out(Easing.ease) }), // Tilt forward to 15 degrees
         withTiming(0, { duration: 300, easing: Easing.out(Easing.ease) }),   // Return to original position
-        withTiming(-rotation, { duration: 600, easing: Easing.out(Easing.cubic) })   // Translate upwards to simulate the "jump"
+        withTiming(-rotation, { duration: 600, easing: Easing.out(Easing.cubic) }),   // Translate upwards to simulate the "jump"
       );
     
       translateY.value = withSequence(
         withTiming(0, { duration: 600, easing: Easing.out(Easing.ease) }), // Move up (jump)
-        withTiming(-80, { duration: 600, easing: Easing.out(Easing.quad) }), // Move up (jump)
+        withTiming(-80, { duration: 800, easing: Easing.out(Easing.quad) }), // Move up (jump)
         withTiming(-20, { duration: 200, easing: Easing.out(Easing.quad) })    // Fall back down
       );
 

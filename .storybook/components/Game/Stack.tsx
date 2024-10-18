@@ -16,6 +16,7 @@ export const Screens = <Params extends ParamsList>(
   stack: StackNavigatorType<Params>
 ) => {
   const goal = useRef<string>()
+  const color = useRef<string>()
 
   return (
     <>
@@ -27,8 +28,12 @@ export const Screens = <Params extends ParamsList>(
       >
         {(props: StackScreenProps<Params, 'Scene3'>) => (
           <EnterGoalScene 
-            onComplete={(value) => {
-              goal.current = value;
+            onComplete={([value, c]) => {
+              console.log("values are")
+              console.log(value)
+              console.log(c)
+              color.current = value;
+              goal.current = c;
               props.navigation.navigate("Scene2");
             }}
             {...props}
@@ -43,6 +48,7 @@ export const Screens = <Params extends ParamsList>(
       >
         {(props: StackScreenProps<Params, 'Scene2'>) => (
           <EnterMotivationScene 
+            color={color.current}
             goal={goal.current}
             onComplete={() => {
               props.navigation.navigate("Scene1");
