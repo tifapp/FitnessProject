@@ -7,10 +7,15 @@ import { useKeyboardState } from "@lib/Keyboard"
 
 export type TiFFooterProps = {
   children: ReactNode
+  backgroundColor?: string
   style?: StyleProp<ViewStyle>
 }
 
-export const TiFFooterView = ({ children, style }: TiFFooterProps) => {
+export const TiFFooterView = ({
+  children,
+  backgroundColor = AppStyles.cardColor,
+  style
+}: TiFFooterProps) => {
   const bottomPadding = useScreenBottomPadding({
     safeAreaScreens: 8,
     nonSafeAreaScreens: 24
@@ -23,6 +28,7 @@ export const TiFFooterView = ({ children, style }: TiFFooterProps) => {
         style={[
           styles.footer,
           {
+            backgroundColor,
             paddingBottom: isKeyboardPresented
               ? 24
               : safeArea.bottom + bottomPadding
@@ -40,7 +46,6 @@ const styles = StyleSheet.create({
     width: "100%",
     paddingTop: 16,
     paddingHorizontal: 24,
-    backgroundColor: AppStyles.cardColor,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24
   }
