@@ -1,20 +1,20 @@
 
 import { AnimatedTitle } from '@components/Text';
 import React, { useEffect, useRef, useState } from 'react';
-import { Animated, SafeAreaView, StyleSheet } from 'react-native';
+import { Animated, SafeAreaView, StyleSheet, View } from 'react-native';
 import { useHaptics } from '../../../modules/tif-haptics';
 import { FadeOut } from "../FadeOut/FadeOut";
 import { createFadeOutPattern, createHeartbeatPattern } from '../Haptics';
 import { Mountain } from "../Icons/Mountain";
 
-export const NarrationScene = ({ goal, onComplete }: {goal: string, onComplete: () => void}) => {
+export const NarrationScene = ({ goal, color = "black", onComplete }: {goal: string, color: string, onComplete: () => void}) => {
   const haptics = useHaptics();
   
   const items = [
-    { type: 'text', content: `I have walked the path before you.`, key: 'line1', duration: 2000, pauseAfter: 500 },
-    { type: 'text', content: `I am what you aspire to be.`, key: 'line2', duration: 2000, pauseAfter: 500 },
-    { type: 'text', content: 'Meet me at the top.', key: 'line3', duration: 2000, pauseAfter: 500 },
-    { type: 'image', component: <Mountain width={800} height={800} />, key: 'mountain', duration: 1000, pauseAfter: 1000 },
+    { type: 'text', content: `I am what you aspire to be.`, key: 'line2', duration: 2000, pauseAfter: 1000 },
+    { type: 'text', content: `I have walked the path before you.`, key: 'line1', duration: 2000, pauseAfter: 1000 },
+    { type: 'text', content: `It will not be easy.`, key: 'line0', duration: 2000, pauseAfter: 1000 },
+    { type: 'text', content: 'Meet me at the top.', key: 'line3', color, duration: 1000, pauseAfter: 3000 },
   ];
 
   // Create an array of Animated.Values for opacity
@@ -61,11 +61,14 @@ export const NarrationScene = ({ goal, onComplete }: {goal: string, onComplete: 
 
   return (
     <SafeAreaView style={styles.container}>
+      <View style={styles.background}>
+        <Mountain width={800} height={800} />
+      </View>
       {items.map((item, index) => {
         const opacity = opacityValues[index];
         if (item.type === 'text') {
           return (
-            <AnimatedTitle key={item.key} style={[styles.title, { opacity }]}>
+            <AnimatedTitle key={item.key} style={[styles.title, { opacity, color: item.color ?? "black" }]}>
               {item.content}
             </AnimatedTitle>
           );
@@ -97,14 +100,14 @@ const styles = StyleSheet.create({
   },
   background: {
     position: "absolute",
-    opacity: 0.5,
+    opacity: 0.3,
     top: 300,
   },
   title: {
     width: "100%",
     textAlign: "center",
     fontSize: 24,
-    marginBottom: 100,
+    marginBottom: 50,
     paddingHorizontal: 20,
   },
 });

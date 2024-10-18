@@ -66,6 +66,7 @@ export const Screens = <Params extends ParamsList>(
         {(props: StackScreenProps<Params, 'Scene1'>) => (
           <NarrationScene
             goal={goal.current}
+            color={color.current}
             onComplete={() => {}}
             {...props}
           />

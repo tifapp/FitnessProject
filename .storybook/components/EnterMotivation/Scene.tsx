@@ -4,16 +4,100 @@ import { Audio } from 'expo-av';
 import React, { useEffect, useRef, useState } from "react";
 import {
   Keyboard,
-  SafeAreaView,
   StyleSheet,
   Text,
   TextInput,
-  View,
+  View
 } from "react-native";
 import { Title } from "../../../components/Text";
 import { FadeOut } from "../FadeOut/FadeOut";
 import { createRoarPattern } from "../Haptics";
+import { Mountain } from "../Icons/Mountain";
 import { Avatar, AvatarRef } from "./Avatar";
+
+const AvatarRow = ({ avatarCount, color, avatarRef }: { avatarCount: number, color: string, avatarRef: any }) => {
+  // Split the number of avatars into two parts: before and after the middle avatar
+  const middleIndex = Math.floor(avatarCount / 2);
+  const backRowCount = avatarCount + 1; // Back row has +1 more avatar than the front row
+
+  const renderAvatars = () => {
+    let avatars = [];
+
+    // Render avatars before the middle one
+    for (let i = 0; i < middleIndex; i++) {
+      avatars.push(
+        <Avatar
+          key={`before-${i}`}
+          color={color ?? EventColors.Orange}
+          rotation={Math.random() * -5 + (Math.random() > 0.5 ? -75 : 75)}
+        />
+      );
+    }
+
+    // Add the middle avatar with the ref passed from the parent
+    avatars.push(
+      <Avatar
+        key="middle"
+        color={color ?? EventColors.Orange}
+        rotation={-75}
+        ref={avatarRef}
+      />
+    );
+
+    // Render avatars after the middle one
+    for (let i = middleIndex + 1; i < avatarCount; i++) {
+      avatars.push(
+        <Avatar
+          key={`after-${i}`}
+          color={color ?? EventColors.Orange}
+          rotation={Math.random() * -5 + (Math.random() > 0.5 ? -75 : 75)}
+        />
+      );
+    }
+
+    return avatars;
+  };
+
+  const renderBackRowAvatars = () => {
+    let backAvatars = [];
+
+    for (let i = 0; i < backRowCount; i++) {
+      backAvatars.push(
+        <Avatar
+          key={`back-${i}`}
+          color={color ?? EventColors.Orange}
+          rotation={Math.random() * -5 + (Math.random() > 0.5 ? -75 : 75)}
+        />
+      );
+    }
+
+    return backAvatars;
+  };
+
+  return (
+    <View style={[styles.avatarContainer, {paddingLeft: 690}]}>
+      {/* Back row with opacity for depth */}
+      <View
+        style={[
+          styles.avatarContainer,
+          {
+            position: "absolute",
+            opacity: 0.1,
+            gap: 75,
+            left: -110,
+          },
+        ]}
+      >
+        {renderBackRowAvatars()}
+      </View>
+
+      {/* Main row of avatars */}
+      {renderAvatars()}
+    </View>
+  );
+};
+
+
 
 async function playSound() {
   const { sound } = await Audio.Sound.createAsync(
@@ -24,83 +108,102 @@ async function playSound() {
   return sound;
 }
 
+const MIN_ZOOM = 0.4
+const MAX_ZOOM = 1
+
 export const EnterMotivationScene = ({ color, goal, onComplete }: { color: string, goal: string, onComplete: (text: string) => void }) => {
-  const [sound, setSound] = useState<any>();
-
-  useEffect(() => {
-    playSound().then(sound => 
-      setSound(sound)
-    )
-  }, [])
-  
-  useEffect(() => {
-    return sound
-      ? () => {
-          sound.unloadAsync(); // Unload the sound when the component unmounts
-        }
-      : undefined;
-  }, [sound]);
-
+  const [sound, setSound] = useState(null);
   const haptics = useHaptics();
   const [finished, setFinished] = useState(false);
   const [text, setText] = useState("");
   const placeholderText = `I will be a ${goal}.`;
-  
   const avatarRef = useRef<AvatarRef>(null);
+  const [zoomLevel, setZoomLevel] = useState(MIN_ZOOM);
+  const [showWarning, setShowWarning] = useState(false);
+
+  useEffect(() => {
+    playSound().then(setSound);
+    return () => {
+      sound?.unloadAsync();
+    };
+  }, [sound]);
 
   const handleChangeText = (newText: string) => {
+    newText = newText.replace(/\n/g, '');
+    setShowWarning(false);
     setText(newText);
-    if (newText.length > text.length && placeholderText.startsWith(newText)) {
-      avatarRef.current?.pulse();
-    }
-  };
-
-  const handleKeyPress = (e: any) => {
-    if (e.nativeEvent.key === 'Enter') {
-      // Simulate the submit when Enter key is pressed
-      if (text.trim() === placeholderText.trim()) {
-        avatarRef.current?.standUp();
-        haptics.playCustomPattern(createRoarPattern());
-        setFinished(true);
-        Keyboard.dismiss(); // Dismiss the keyboard after submission
+    const spacesTyped = (newText.match(/ /g) || []).length;
+    const maxSpaces = 4; // Number of spaces in "I will be a "
+    if (placeholderText.startsWith(newText)) {
+      const newZoomLevel = MIN_ZOOM + ((spacesTyped / maxSpaces) * (MAX_ZOOM - MIN_ZOOM));
+      setZoomLevel(newZoomLevel);
+      if (newText.length > text.length) {
+        avatarRef.current?.pulse();
       }
     }
   };
 
-  return (
-    <SafeAreaView style={styles.container}>
-      <Title style={styles.title}>Are you sure you'll become a {goal}?</Title>
+  const handleKeyPress = (e) => {
+    if (e.nativeEvent.key === 'Enter') {
+      if (text.trim() === placeholderText.trim()) {
+        avatarRef.current?.standUp();
+        haptics.playCustomPattern(createRoarPattern());
+        setFinished(true);
+        Keyboard.dismiss();
+      }
+    }
+  };
 
-      <View style={styles.avatarContainer}>
-        <View style={[styles.avatarContainer, {position: "absolute", opacity: 0.1, gap: 100, paddingLeft: -50, paddingBottom: 0}]}>
-          <Avatar color={color ?? EventColors.Orange} rotation={70} />
-          <Avatar color={color ?? EventColors.Orange} rotation={-80} />
+  const rowHeight = 40;
+
+  return (
+    <View style={styles.container}>
+      <Title style={styles.title}>Are you sure you will become a {goal}?</Title>
+
+      <View
+        style={{
+          transform: [
+            { translateY: rowHeight * (1 - zoomLevel) },
+            { scale: zoomLevel },
+          ],
+          alignItems: "center",
+        }}
+      >
+        <View style={{position: "absolute", bottom: 200, opacity: 0.3}}>
+        <Mountain height={900} width={900} />
         </View>
-        <Avatar color={color ?? EventColors.Orange} rotation={-73} />
-        <Avatar color={color ?? EventColors.Orange} rotation={-75} ref={avatarRef} />
-        <Avatar color={color ?? EventColors.Orange} rotation={72} />
+        <AvatarRow avatarRef={avatarRef} color={color} avatarCount={7} />
       </View>
-      <View style={{borderBottomWidth: 2, width: "100%", marginBottom: 20, marginTop: -20}}/>
+      <View style={styles.separator} />
 
       <View style={styles.inputWrapper}>
         <Text style={styles.placeholderText}>{placeholderText}</Text>
         <TextInput
-          style={styles.textField}
-          autoFocus={true}
-          multiline={true} // Allow text to wrap
+          autoCorrect={false}
+          autoComplete="off"
+          textContentType="none"
+          style={[
+            styles.textField,
+            showWarning && styles.warningBorder,
+          ]}
+          autoFocus
+          multiline={true}
           value={text}
           onChangeText={handleChangeText}
-          returnKeyType="done"
-          onKeyPress={handleKeyPress} // Handle the key press
+          returnKeyType="go"
+          onKeyPress={handleKeyPress}
         />
       </View>
 
-      <FadeOut 
-        trigger={finished} 
-        onComplete={() => {sound.stopAsync(); onComplete(text)}} 
+      <FadeOut
+        trigger={finished}
+        onComplete={() => {
+          sound.stopAsync();
+          onComplete(text);
+        }}
         delay={2000}
       />
-    </SafeAreaView>
+    </View>
   );
 };
 
@@ -121,7 +224,6 @@ const styles = StyleSheet.create({
   },
   avatarContainer: {
     gap: 70,
-    paddingLeft: 180,
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
@@ -144,5 +246,15 @@ const styles = StyleSheet.create({
     width: '100%',
     backgroundColor: 'transparent',
     color: 'black'
+  },
+  separator: {
+    borderBottomWidth: 2,
+    width: "100%",
+    marginBottom: 20,
+    marginTop: -20,
+  },
+  warningBorder: {
+    borderColor: 'red',
+    borderWidth: 1,
   },
 });

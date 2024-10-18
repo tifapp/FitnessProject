@@ -41,7 +41,7 @@ export const FadeOut: React.FC<FadeOutProps> = ({ trigger, onComplete, delay = 0
 const styles = StyleSheet.create({
   fadeOverlay: {
     position: 'absolute',
-    top: 0,
+    top: -500,
     left: 0,
     right: 0,
     bottom: 0,

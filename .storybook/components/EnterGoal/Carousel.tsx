@@ -18,7 +18,7 @@ import { PickerItem } from "./PickerItem";
 const options = [
   { color: '#CB9CF2', persona: 'Yogi' },
   { color: '#88BDEA', persona: 'Marathon Runner' },
-  { color: '#72B01D', persona: 'Strength Trainer' },
+  { color: '#72B01D', persona: 'Weightlifter' },
   { color: '#F7B2BD', persona: 'High-Intensity Athlete' },
   { color: '#F4845F', persona: 'Long-Distance Hiker' }
 ];

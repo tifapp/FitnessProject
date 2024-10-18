@@ -260,7 +260,7 @@ export const Doll = ({
     jumpingRotate.value = withRepeat(
       withSequence(
         withTiming(rotateMax, { // Randomized rotate to the right
-          duration: jumpDurationUp / 3,
+          duration: jumpDurationUp / 2,
           easing: Easing.out(Easing.quad),
         }),
         withTiming(-rotateMax, { // Rotate to the left
@@ -268,7 +268,7 @@ export const Doll = ({
           easing: Easing.inOut(Easing.quad),
         }),
         withTiming(0, { // Reset rotation
-          duration: jumpDurationUp / 3,
+          duration: jumpDurationUp / 2,
           easing: Easing.in(Easing.quad),
         })
       ),
