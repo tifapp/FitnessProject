@@ -1,3 +1,4 @@
+import { AppStyles } from "@lib/AppColorStyle"
 import DateTimePicker from "@react-native-community/datetimepicker"
 import { requireNativeViewManager } from "expo-modules-core"
 import React, { useCallback } from "react"
@@ -17,6 +18,8 @@ const IOSDurationPickerView = ({
 }: TimePickerProps) => (
   <DateTimePicker
     value={Date.fromSecondsSince1970(initialDurationSeconds)}
+    accentColor={AppStyles.primaryColor}
+    textColor={AppStyles.primaryColor}
     mode="countdown"
     display="spinner"
     onChange={useCallback(

@@ -31,11 +31,9 @@ export const ReportSuccessView = ({
       </BodyText>
     </View>
     <View style={styles.doneButtonContainer}>
-      <PrimaryButton
-        title="Done"
-        onPress={onDoneTapped}
-        style={styles.doneButton}
-      />
+      <PrimaryButton onPress={onDoneTapped} style={styles.doneButton}>
+        Done
+      </PrimaryButton>
     </View>
   </SafeAreaView>
 )

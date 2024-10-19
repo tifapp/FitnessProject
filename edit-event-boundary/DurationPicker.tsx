@@ -191,7 +191,7 @@ const SliderKnobView = ({
       const nextPosition =
         sliderPosition.value < 0
           ? 0
-          : layoutForDuration(stateEntries, duration)?.x ?? 0
+          : (layoutForDuration(stateEntries, duration)?.x ?? 0)
       sliderPosition.value = withTiFDefaultSpring(nextPosition)
       runOnJS(setDuration)(durationAtPosition(stateEntries, nextPosition))
       previousTranslation.value = 0
@@ -361,12 +361,12 @@ const styles = StyleSheet.create({
   },
   backgroundTrail: {
     position: "absolute",
-    backgroundColor: AppStyles.black.withOpacity(0.15).toString()
+    backgroundColor: AppStyles.primary.withOpacity(0.15).toString()
   },
   selectedCard: {
     position: "absolute",
     borderRadius: INNER_TRACK_GAP,
-    backgroundColor: AppStyles.black.toString()
+    backgroundColor: AppStyles.primary.toString()
   },
   selectedContainer: {
     flex: 1,
@@ -379,7 +379,7 @@ const styles = StyleSheet.create({
   },
   backgroundCard: {
     position: "absolute",
-    backgroundColor: AppStyles.eventCardColor,
+    backgroundColor: AppStyles.cardColor,
     borderRadius: INNER_TRACK_GAP * 2,
     width: "100%"
   },

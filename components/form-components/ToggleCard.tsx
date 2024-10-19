@@ -65,7 +65,7 @@ export const TiFFormToggleCardView = ({
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: AppStyles.eventCardColor,
+    backgroundColor: AppStyles.cardColor,
     borderRadius: 12
   },
   innerContainer: {

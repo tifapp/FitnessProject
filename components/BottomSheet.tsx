@@ -131,5 +131,5 @@ const styles = StyleSheet.create({
   hiddenHandle: {
     opacity: 0
   },
-  backdrop: { backgroundColor: AppStyles.black.withOpacity(0.75).toString() }
+  backdrop: { backgroundColor: AppStyles.primary.withOpacity(0.75).toString() }
 })
