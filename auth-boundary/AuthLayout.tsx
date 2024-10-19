@@ -15,6 +15,8 @@ import {
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
 import Animated from "react-native-reanimated"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
+import { TiFFooterView } from "@components/Footer"
+import { TiFFormScrollableLayoutView } from "@components/form-components/ScrollableFormLayout"
 
 export type AuthSectionProps = {
   title: string
@@ -69,30 +71,22 @@ export const AuthLayoutView = ({
         contentContainerStyle={{ paddingBottom: insets.bottom }}
         keyboardVerticalOffset={windowHeight - viewHeight}
       >
-        <View
-          style={[
-            styles.footerContainer,
-            {
-              paddingBottom: !useKeyboardState().isPresented
-                ? insets.bottom + 16
-                : 16
-            }
-          ]}
-          onLayout={(e) => setFooterHeight(e.nativeEvent.layout.height)}
-        >
-          {footer}
+        <View onLayout={(e) => setFooterHeight(e.nativeEvent.layout.height)}>
           <Animated.View layout={TiFDefaultLayoutTransition}>
-            <PrimaryButton
-              style={[
-                styles.callToActionButton,
-                { opacity: isCallToActionDisabled ? 0.5 : 1 }
-              ]}
-              disabled={isCallToActionDisabled}
-              onPress={onCallToActionTapped}
-              accessibilityLabel={callToActionTitle}
-            >
-              {callToActionTitle}
-            </PrimaryButton>
+            <TiFFooterView>
+              {footer}
+              <PrimaryButton
+                style={[
+                  styles.callToActionButton,
+                  { opacity: isCallToActionDisabled ? 0.5 : 1 }
+                ]}
+                disabled={isCallToActionDisabled}
+                onPress={onCallToActionTapped}
+                accessibilityLabel={callToActionTitle}
+              >
+                {callToActionTitle}
+              </PrimaryButton>
+            </TiFFooterView>
           </Animated.View>
         </View>
       </KeyboardAvoidingView>

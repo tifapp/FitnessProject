@@ -1,19 +1,23 @@
-import { ReactNode } from "react"
-import { StyleProp, ViewStyle, StyleSheet } from "react-native"
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
+import { StyleSheet } from "react-native"
+import {
+  KeyboardAwareScrollView,
+  KeyboardAwareScrollViewProps
+} from "react-native-keyboard-aware-scroll-view"
 
-export type TiFFormScrollViewProps = {
-  children: ReactNode
-  style?: StyleProp<ViewStyle>
-}
+export type TiFFormScrollViewProps = Omit<
+  KeyboardAwareScrollViewProps,
+  "contentContainerStyle"
+>
 
 export const TiFFormScrollView = ({
   children,
-  style
+  style,
+  ...props
 }: TiFFormScrollViewProps) => (
   <KeyboardAwareScrollView
     style={[style, styles.scroll]}
     contentContainerStyle={styles.contentContainer}
+    {...props}
   >
     {children}
   </KeyboardAwareScrollView>
