@@ -13,7 +13,6 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import { useHaptics } from '../../../modules/tif-haptics';
-import { createHeartbeatPattern } from '../Haptics';
 import { PROGRESS_DURATION } from './PickerItem';
 
 // Define the size and durations
@@ -80,7 +79,7 @@ export const Doll = ({
 
   // Handle haptic feedback
   const triggerHapticBurst = () => {
-    haptics.playCustomPattern(createHeartbeatPattern());
+    haptics.playHeartbeat();
   };
 
   // Animated styles for the icon

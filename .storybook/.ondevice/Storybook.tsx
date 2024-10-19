@@ -181,7 +181,8 @@ const CustomStorybookUI = () => {
   const [isFontsLoaded, error] = useAppFonts()
   const [selectedStory, setSelectedStory] = useState(1)
 
-  //console.error(error)
+  console.error(error)
+  //REMEMBER TO UNCOMMENT FOR PREVIEW
   // if (!isFontsLoaded)
   //   return (
   //     <Text style={{ marginTop: 128 }}>

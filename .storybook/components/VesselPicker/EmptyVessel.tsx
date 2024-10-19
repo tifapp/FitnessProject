@@ -18,7 +18,6 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import { useHaptics } from '../../../modules/tif-haptics';
-import { createHeartbeatPattern } from '../Haptics';
 import { HeartProgress } from "./Meter";
 
 export const ITEM_SIZE = 125;
@@ -62,7 +61,7 @@ export const Doll = ({
 
   // Handle haptic feedback
   const triggerHapticBurst = () => {
-    haptics.playCustomPattern(createHeartbeatPattern());
+    haptics.playHeartbeat();
   };
 
   // Animated styles for the icon

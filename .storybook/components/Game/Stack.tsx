@@ -2,6 +2,7 @@ import { StackScreenProps } from "@react-navigation/stack";
 import { Audio } from 'expo-av';
 import React, { useEffect, useRef, useState } from "react";
 import { StackNavigatorType } from "../../../components/Navigation";
+import { useAudioFade } from "../Audio";
 import { EnterGoalScene } from "../EnterGoal/Scene";
 import { EnterMotivationScene } from "../EnterMotivation/Scene";
 import { NarrationScene } from "../Narration/Scene";
@@ -26,9 +27,8 @@ export const Screens = <Params extends ParamsList>(
   stack: StackNavigatorType<Params>
 ) => {
   const [sound, setSound] = useState<Audio.Sound | null>(null);
-  const fadeInIntervalRef = useRef<number | null>(null); // Use ref to track fadeIn interval
-  const fadeOutIntervalRef = useRef<number | null>(null); // Use ref to track fadeOut interval
-
+  const {clearFadeIn, clearFadeOut, fadeIn, fadeOut} = useAudioFade(sound)
+  
   useEffect(() => {
     playSound().then((newSound) => {
       setSound(newSound);
@@ -37,69 +37,10 @@ export const Screens = <Params extends ParamsList>(
     return () => {
       sound?.unloadAsync();
     };
-  }, []); // Dependency on sound
-
-  const clearFadeIn = () => {
-    if (fadeInIntervalRef.current !== null) {
-      clearInterval(fadeInIntervalRef.current);
-      fadeInIntervalRef.current = null; // Reset after clearing
-    }
-  };
-
-  const clearFadeOut = () => {
-    if (fadeOutIntervalRef.current !== null) {
-      clearInterval(fadeOutIntervalRef.current);
-      fadeOutIntervalRef.current = null; // Reset after clearing
-    }
-  };
-
-  // Function to adjust volume
-  const setVolume = async (volume: number) => {
-    if (sound) {
-      await sound.setVolumeAsync(volume);
-    }
-  };
-
-  // Fade-in function
-  const fadeIn = async (duration: number = 1000) => {
-    if (!sound) return;
-
-    let volume = 0;
-    const interval = 100; // adjust volume every 100ms
-    const step = interval / duration; // the amount to increase each interval
-
-    clearFadeOut(); // Stop fading out and clear the interval
-    fadeInIntervalRef.current = setInterval(() => {
-      if (volume < 1) {
-        volume += step;
-        setVolume(Math.min(volume, 1)); // Ensure volume doesn't go over 1
-      } else {
-        clearFadeIn(); // Stop fading in and clear the interval
-      }
-    }, interval) as unknown as number; // Typescript fix for setInterval return type
-  };
-
-  // Fade-out function
-  const fadeOut = async (duration: number = 1000) => {
-    if (!sound) return;
-
-    let volume = 1;
-    const interval = 100; // adjust volume every 100ms
-    const step = interval / duration; // the amount to decrease each interval
-
-    clearFadeIn(); // Stop fading out and clear the interval
-    fadeOutIntervalRef.current = setInterval(() => {
-      if (volume > 0) {
-        volume -= step;
-        setVolume(Math.max(volume, 0)); // Ensure volume doesn't go below 0
-      } else {
-        clearFadeOut(); // Stop fading out and clear the interval
-      }
-    }, interval) as unknown as number; // Typescript fix for setInterval return type
-  };
+  }, []);
   
-  const goal = useRef<string>()
-  const color = useRef<string>()
+  const goal = useRef<string>("")
+  const color = useRef<string>("")
 
   return (
     <>
@@ -116,7 +57,7 @@ export const Screens = <Params extends ParamsList>(
               clearFadeOut();
               color.current = value;
               goal.current = value2;
-              props.navigation.navigate("Scene2");
+              props.navigation.navigate("Scene2" as any);
             }}
             onStart={() => {clearFadeIn(); fadeOut(8000);}}
             onEnd={() => {clearFadeOut(); fadeIn();}}
@@ -138,7 +79,7 @@ export const Screens = <Params extends ParamsList>(
               fadeIn();
             }}
             onComplete={() => {
-              props.navigation.navigate("Scene1");
+              props.navigation.navigate("Scene1" as any);
             }}
             {...props}
           />

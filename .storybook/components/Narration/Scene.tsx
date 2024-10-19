@@ -4,7 +4,6 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Animated, SafeAreaView, StyleSheet, View } from 'react-native';
 import { useHaptics } from '../../../modules/tif-haptics';
 import { FadeOut } from "../FadeOut/FadeOut";
-import { createFadeOutPattern, createHeartbeatPattern } from '../Haptics';
 import { Mountain } from "../Icons/Mountain";
 
 export const NarrationScene = ({ goal, color = "black", onComplete }: {goal: string, color: string, onComplete: () => void}) => {
@@ -35,7 +34,7 @@ export const NarrationScene = ({ goal, color = "black", onComplete }: {goal: str
             duration: items[i].duration || 1000,
             useNativeDriver: true,
           }).start(() => {
-            haptics.playCustomPattern(createHeartbeatPattern());
+            haptics.playHeartbeat();
             resolve(null);
           });
         });
@@ -47,7 +46,7 @@ export const NarrationScene = ({ goal, color = "black", onComplete }: {goal: str
       }
 
       if (!isCancelled) {
-        haptics.playCustomPattern(createFadeOutPattern())
+        haptics.playFadeOut()
         setFinished(true);
       }
     }

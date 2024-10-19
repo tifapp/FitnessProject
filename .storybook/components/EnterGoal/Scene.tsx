@@ -7,7 +7,6 @@ import {
 import { Title } from "../../../components/Text";
 import { useHaptics } from '../../../modules/tif-haptics';
 import { FadeOut } from "../FadeOut/FadeOut";
-import { createThudPattern } from '../Haptics';
 import { Mountain } from "../Icons/Mountain";
 import { Carousel } from "./Carousel";
 
@@ -29,7 +28,7 @@ export const EnterGoalScene = ({ onComplete, onStart, onEnd }: { onStart?: () =>
   useEffect(() => {
     if (goal) {
       playSound()
-      setTimeout(() => {haptics.playCustomPattern(createThudPattern())}, 3000)
+      setTimeout(() => {haptics.playThud()}, 3000)
     }
   }, [goal])
 

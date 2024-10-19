@@ -10,8 +10,8 @@ import {
   View
 } from "react-native";
 import { Title } from "../../../components/Text";
+import { useAudioFade } from "../Audio";
 import { FadeOut } from "../FadeOut/FadeOut";
-import { createRoarPattern } from "../Haptics";
 import { Mountain } from "../Icons/Mountain";
 import { Avatar, AvatarRef } from "./Avatar";
 
@@ -111,7 +111,7 @@ const MIN_ZOOM = 0.4
 const MAX_ZOOM = 1
 
 export const EnterMotivationScene = ({ color, goal, onComplete, onStand }: { color: string, goal: string, onComplete: (text: string) => void, onStand: () => void }) => {
-  const [sound, setSound] = useState(null);
+  const [sound, setSound] = useState<Audio.Sound | null>(null);
   const haptics = useHaptics();
   const [finished, setFinished] = useState(false);
   const [text, setText] = useState("");
@@ -119,6 +119,8 @@ export const EnterMotivationScene = ({ color, goal, onComplete, onStand }: { col
   const avatarRef = useRef<AvatarRef>(null);
   const [zoomLevel, setZoomLevel] = useState(MIN_ZOOM);
   const [showWarning, setShowWarning] = useState(false);
+  
+  const {clearFadeIn, clearFadeOut, fadeIn, fadeOut} = useAudioFade(sound)
 
   useEffect(() => {
     playSound().then(setSound);
@@ -142,11 +144,12 @@ export const EnterMotivationScene = ({ color, goal, onComplete, onStand }: { col
     }
   };
 
-  const handleKeyPress = (e) => {
+  const handleKeyPress = (e: any) => {
     if (e.nativeEvent.key === 'Enter') {
       if (text.trim() === placeholderText.trim()) {
         avatarRef.current?.standUp();
-        haptics.playCustomPattern(createRoarPattern());
+        haptics.playRoar();
+        fadeOut();
         setFinished(true);
         onStand?.();
         Keyboard.dismiss();
@@ -169,7 +172,7 @@ export const EnterMotivationScene = ({ color, goal, onComplete, onStand }: { col
           alignItems: "center",
         }}
       >
-        <View style={{position: "absolute", bottom: 200, opacity: 0.3}}>
+        <View style={{position: "absolute", bottom: 200, opacity: 0.3, zIndex: -10}}>
         <Mountain height={900} width={900} />
         </View>
         <AvatarRow avatarRef={avatarRef} color={color} avatarCount={7} />
@@ -198,7 +201,7 @@ export const EnterMotivationScene = ({ color, goal, onComplete, onStand }: { col
       <FadeOut
         trigger={finished}
         onComplete={() => {
-          sound.stopAsync();
+          sound?.stopAsync();
           onComplete(text);
         }}
         delay={2000}
@@ -221,6 +224,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     marginBottom: 150,
     paddingHorizontal: 20,
+    zIndex: 10
   },
   avatarContainer: {
     gap: 70,

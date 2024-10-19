@@ -1,11 +1,20 @@
+// Import necessary modules
 import { LocalSettings } from "@settings-storage/LocalSettings"
 import { SettingsStore } from "@settings-storage/Settings"
 import { requireOptionalNativeModule } from "expo"
+import * as ExpoHaptics from "expo-haptics"
 import { ReactNode, createContext, useContext } from "react"
+import { Platform, Vibration } from "react-native"
 import { logger } from "TiFShared/logging"
+import {
+  createFadeOutPattern,
+  createHeartbeatPattern,
+  createRoarPattern,
+  createThudPattern
+} from "./HapticPatterns"
 
 enum TiFNativeHapticEvent {
-  Selection = "selection"
+  Selection = "selection",
 }
 
 const TiFNativeHaptics = requireOptionalNativeModule("TifHaptics") ?? {
@@ -18,7 +27,7 @@ const log = logger("tif.haptics")
 /**
  * A function type to indicate haptic feedback being played to the user.
  */
-export type HapticEvent = { name: "selection" }
+export type HapticEvent = { name: "selection" };
 
 /**
  * Configuration settings for the underlying haptics engine.
@@ -26,7 +35,7 @@ export type HapticEvent = { name: "selection" }
 export type HapticsSettings = Pick<
   LocalSettings,
   "isHapticFeedbackEnabled" | "isHapticAudioEnabled"
->
+>;
 
 const toNativeHapticEvent = (_: HapticEvent) => {
   // TODO: - Add more events
@@ -40,7 +49,7 @@ export interface Haptics {
   /**
    * Plays haptic feedback for the given {@link HapticEvent}.
    */
-  play(event: HapticEvent): Promise<void>
+  play(event: HapticEvent): Promise<void>;
 
   /**
    * Plays a custom haptic pattern defined by a JSON string.
@@ -50,18 +59,86 @@ export interface Haptics {
   /**
    * Applies the settings to this underlying haptics engine.
    */
-  apply(settings: HapticsSettings): Promise<void>
+  apply(settings: HapticsSettings): Promise<void>;
+
+  /**
+   * Plays the heartbeat haptic pattern.
+   */
+  playHeartbeat(): Promise<void>;
+
+  /**
+   * Plays the fade-out haptic pattern.
+   */
+  playFadeOut(): Promise<void>;
+
+  /**
+   * Plays the roar haptic pattern.
+   */
+  playRoar(): Promise<void>;
+
+  /**
+   * Plays the thud haptic pattern.
+   */
+  playThud(): Promise<void>;
 }
 
 /**
- * Subscribes to the given {@link LocalSettingsStore} and applies haptic
- * related settings changes to the given {@link Haptics} instance.
+ * Helper function to process and play haptic patterns on Android.
  */
-export const applyHapticDeviceSettingsChanges = (
-  haptics: Haptics,
-  localSettingsStore: SettingsStore<LocalSettings>
-) => {
-  localSettingsStore.subscribe((settings) => haptics.apply(settings))
+async function processPattern(pattern: any): Promise<void> {
+  if (Platform.OS === "ios") {
+    // For iOS, use the native function
+    try {
+      await TiFNativeHaptics.playCustomPattern(JSON.stringify(pattern))
+    } catch (error: any) {
+      log.warn("An error occurred when playing haptics", {
+        error: error.message
+      })
+    }
+  } else if (Platform.OS === "android") {
+    // For Android, process the pattern manually
+    const events = pattern.events
+    events.sort((a: any, b: any) => a.relativeTime - b.relativeTime)
+
+    const startTime = Date.now()
+
+    for (const event of events) {
+      const currentTime = Date.now()
+      const eventStartTime = startTime + event.relativeTime * 1000
+      const delay = eventStartTime - currentTime
+
+      if (delay > 0) {
+        await new Promise((resolve) => setTimeout(resolve, delay))
+      }
+
+      if (event.eventType === "hapticTransient") {
+        // Use ExpoHaptics
+        const intensityParam = event.parameters.find(
+          (p: any) => p.parameterID === "hapticIntensity"
+        )
+        const intensity = intensityParam ? intensityParam.value : 1.0
+
+        // Map intensity to ExpoHaptics style
+        let hapticStyle = ExpoHaptics.ImpactFeedbackStyle.Medium
+        if (intensity >= 0.7) {
+          hapticStyle = ExpoHaptics.ImpactFeedbackStyle.Heavy
+        } else if (intensity <= 0.3) {
+          hapticStyle = ExpoHaptics.ImpactFeedbackStyle.Light
+        }
+
+        await ExpoHaptics.impactAsync(hapticStyle)
+      } else if (event.eventType === "hapticContinuous") {
+        // Use Vibration
+        const duration = event.duration * 1000 // milliseconds
+        Vibration.vibrate(duration)
+        // Wait for the duration to finish
+        await new Promise((resolve) => setTimeout(resolve, duration))
+      }
+    }
+  } else {
+    // Other platforms not supported
+    log.warn("Haptic feedback not supported on this platform")
+  }
 }
 
 /**
@@ -72,30 +149,40 @@ export const TiFHaptics = {
   play: async (event: HapticEvent) => {
     try {
       await TiFNativeHaptics.play(toNativeHapticEvent(event))
-    } catch (error) {
+    } catch (error: any) {
       log.warn("An error occurred when playing haptics", {
         error: error.message
       })
     }
   },
   playCustomPattern: async (pattern: any) => {
-    try {
-      await TiFNativeHaptics.playCustomPattern(JSON.stringify(pattern))
-    } catch (error) {
-      log.warn("An error occurred when playing haptics", {
-        error: error.message
-      })
-    }
+    await processPattern(pattern)
   },
   apply: async () => {
     throw new Error("TODO: - Implement this natively")
+  },
+  playHeartbeat: async () => {
+    const pattern = createHeartbeatPattern()
+    await processPattern(pattern)
+  },
+  playFadeOut: async () => {
+    const pattern = createFadeOutPattern()
+    await processPattern(pattern)
+  },
+  playRoar: async () => {
+    const pattern = createRoarPattern()
+    await processPattern(pattern)
+  },
+  playThud: async () => {
+    const pattern = createThudPattern()
+    await processPattern(pattern)
   }
 } as Haptics
 
 export type HapticsContextValues = Haptics & {
-  isFeedbackSupportedOnDevice: boolean
-  isAudioSupportedOnDevice: boolean
-}
+  isFeedbackSupportedOnDevice: boolean;
+  isAudioSupportedOnDevice: boolean;
+};
 
 const HapticsContext = createContext<HapticsContextValues>({
   ...TiFHaptics,
@@ -109,11 +196,11 @@ const HapticsContext = createContext<HapticsContextValues>({
 export const useHaptics = () => useContext(HapticsContext)
 
 export type HapticsProviderProps = {
-  haptics: Haptics
-  isFeedbackSupportedOnDevice: boolean
-  isAudioSupportedOnDevice: boolean
-  children: ReactNode
-}
+  haptics: Haptics;
+  isFeedbackSupportedOnDevice: boolean;
+  isAudioSupportedOnDevice: boolean;
+  children: ReactNode;
+};
 
 /**
  * Provider for {@link Haptics}.
@@ -126,9 +213,7 @@ export const HapticsProvider = ({
 }: HapticsProviderProps) => (
   <HapticsContext.Provider
     value={{
-      play: (event) => haptics.play(event),
-      playCustomPattern: (pattern) => haptics.playCustomPattern(pattern),
-      apply: (settings) => haptics.apply(settings),
+      ...haptics,
       isFeedbackSupportedOnDevice,
       isAudioSupportedOnDevice
     }}
@@ -136,3 +221,14 @@ export const HapticsProvider = ({
     {children}
   </HapticsContext.Provider>
 )
+
+/**
+ * Subscribes to the given {@link LocalSettingsStore} and applies haptic
+ * related settings changes to the given {@link Haptics} instance.
+ */
+export const applyHapticDeviceSettingsChanges = (
+  haptics: Haptics,
+  localSettingsStore: SettingsStore<LocalSettings>
+) => {
+  localSettingsStore.subscribe((settings) => haptics.apply(settings))
+}
