@@ -19,7 +19,7 @@ async function playSound() {
   return sound;
 }
 
-export const EnterGoalScene = ({ onComplete }: { onComplete: (_: [color: string, name: string]) => void }) => {
+export const EnterGoalScene = ({ onComplete, onStart, onEnd }: { onStart?: () => void, onEnd?: () => void, onComplete: (_: [color: string, name: string]) => void }) => {
   const haptics = useHaptics();
   const [held, setHeld] = useState(false)
   const [goal, setGoal] = useState<[string, string]>();
@@ -29,7 +29,7 @@ export const EnterGoalScene = ({ onComplete }: { onComplete: (_: [color: string,
   useEffect(() => {
     if (goal) {
       playSound()
-      setTimeout(() => {haptics.playCustomPattern(createThudPattern())}, 2500)
+      setTimeout(() => {haptics.playCustomPattern(createThudPattern())}, 3000)
     }
   }, [goal])
 
@@ -50,12 +50,12 @@ export const EnterGoalScene = ({ onComplete }: { onComplete: (_: [color: string,
         <Mountain width={900} height={900}/>
       </View> 
 
-      <Carousel style={{backgroundColor: "transparent"}} onEnd={() => setHeld(false)} onComplete={setGoal} onStart={() => setHeld(true)} />
+      <Carousel style={{backgroundColor: "transparent"}} onEnd={() => {onEnd?.(); setHeld(false)}} onComplete={setGoal} onStart={() => {onStart?.(); setHeld(true)}} />
       
       <FadeOut 
         trigger={!!goal} 
         onComplete={() => onComplete(goal!)} 
-        delay={2000}
+        delay={2500}
       />
     </View>
   );

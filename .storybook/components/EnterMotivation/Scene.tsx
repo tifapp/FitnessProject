@@ -97,13 +97,12 @@ const AvatarRow = ({ avatarCount, color, avatarRef }: { avatarCount: number, col
   );
 };
 
-
-
 async function playSound() {
   const { sound } = await Audio.Sound.createAsync(
     require('../../assets/wind.mp3'), // Path to your audio file
     { volume: 0.5 }
   );
+  await sound.setIsLoopingAsync(true); // Set the sound to loop
   await sound.playAsync();
   return sound;
 }
@@ -111,7 +110,7 @@ async function playSound() {
 const MIN_ZOOM = 0.4
 const MAX_ZOOM = 1
 
-export const EnterMotivationScene = ({ color, goal, onComplete }: { color: string, goal: string, onComplete: (text: string) => void }) => {
+export const EnterMotivationScene = ({ color, goal, onComplete, onStand }: { color: string, goal: string, onComplete: (text: string) => void, onStand: () => void }) => {
   const [sound, setSound] = useState(null);
   const haptics = useHaptics();
   const [finished, setFinished] = useState(false);
@@ -126,7 +125,7 @@ export const EnterMotivationScene = ({ color, goal, onComplete }: { color: strin
     return () => {
       sound?.unloadAsync();
     };
-  }, [sound]);
+  }, []);
 
   const handleChangeText = (newText: string) => {
     newText = newText.replace(/\n/g, '');
@@ -149,6 +148,7 @@ export const EnterMotivationScene = ({ color, goal, onComplete }: { color: strin
         avatarRef.current?.standUp();
         haptics.playCustomPattern(createRoarPattern());
         setFinished(true);
+        onStand?.();
         Keyboard.dismiss();
       }
     }

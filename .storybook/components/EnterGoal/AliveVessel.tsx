@@ -306,7 +306,7 @@ export const Doll = ({
 
       // Animate translateY to windowHeight + ITEM_SIZE over duration
       fallTranslateY.value = withTiming(windowHeight + ITEM_SIZE, {
-        duration: 1200,
+        duration: 1000,
         easing: Easing.quad,
       });
 
