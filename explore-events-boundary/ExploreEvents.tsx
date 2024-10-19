@@ -35,9 +35,9 @@ import { ExploreEventsSearchBar } from "./SearchBar"
 import { SkeletonEventCard } from "./SkeletonEventCard"
 
 export const eventsByRegion = async (
-  api: TiFAPI,
   region: ExploreEventsRegion,
-  signal?: AbortSignal
+  signal?: AbortSignal,
+  api: TiFAPI = TiFAPI.productionInstance
 ) => {
   return (
     await api.exploreEvents({

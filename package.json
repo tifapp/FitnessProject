@@ -139,7 +139,7 @@
     "react-native-select-dropdown": "^3.2.1",
     "react-native-svg": "15.2.0",
     "regenerator-runtime": "^0.13.11",
-    "TiFShared": "github:tifapp/TiFShared#index-js",
+    "TiFShared": "github:tifapp/TiFShared#color-opacity",
     "type-detect": "4.0.8",
     "use-sync-external-store": "^1.2.2",
     "uuid": "^9.0.0",

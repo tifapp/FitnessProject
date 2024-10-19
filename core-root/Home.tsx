@@ -12,6 +12,9 @@ import {
   useExploreEvents
 } from "@explore-events-boundary"
 import { ClientSideEvent } from "@event/ClientSideEvent"
+import { AnimatedPagerView } from "@components/Pager"
+import { useAnimatedStyle, useSharedValue } from "react-native-reanimated"
+import { colorWithOpacity } from "TiFShared/lib/Color"
 
 export type HomeProps = {
   onViewEventTapped: (event: ClientSideEvent) => void
@@ -20,14 +23,22 @@ export type HomeProps = {
 
 export const HomeView = ({ onViewEventTapped, style }: HomeProps) => {
   const [pageIndex, setPageIndex] = useState(0)
+  const footerBackgroundOpacity = useSharedValue(0)
   return (
     <View style={style}>
       <View style={styles.container}>
-        <PagerView
+        <AnimatedPagerView
           orientation="horizontal"
           layoutDirection="ltr"
           initialPage={pageIndex}
           onPageSelected={(e) => setPageIndex(e.nativeEvent.position)}
+          onPageScroll={(e) => {
+            if (e.nativeEvent.position > 0) {
+              footerBackgroundOpacity.value = 1
+            } else {
+              footerBackgroundOpacity.value = e.nativeEvent.offset
+            }
+          }}
           style={styles.pager}
         >
           <View key="1" style={styles.screen}>
@@ -36,9 +47,14 @@ export const HomeView = ({ onViewEventTapped, style }: HomeProps) => {
           <View key="2" style={styles.screen}>
             <ExploreView onViewEventTapped={onViewEventTapped} />
           </View>
-        </PagerView>
+        </AnimatedPagerView>
         <TiFFooterView
-          backgroundColor={pageIndex > 0 ? AppStyles.cardColor : "transparent"}
+          backgroundStyle={useAnimatedStyle(() => ({
+            backgroundColor: colorWithOpacity(
+              AppStyles.cardColor,
+              footerBackgroundOpacity.value
+            )
+          }))}
           style={styles.footer}
         >
           <Headline>TODO</Headline>
