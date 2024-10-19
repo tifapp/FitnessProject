@@ -76,6 +76,7 @@ export const Screens = <Params extends ParamsList>(
             color={color.current}
             goal={goal.current}
             onStand={() => {
+              sound?.setPositionAsync(254500)
               fadeIn();
             }}
             onComplete={() => {

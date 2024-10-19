@@ -6,6 +6,7 @@ import Animated, {
   interpolateColor,
   useAnimatedStyle,
   useSharedValue,
+  withDelay,
   withSequence,
   withTiming,
 } from 'react-native-reanimated';
@@ -87,7 +88,8 @@ export const Avatar = forwardRef<AvatarRef, Item>(({
       pulse.value = withSequence(
         withTiming(1, { duration: 300, easing: Easing.out(Easing.ease) }), // Tilt forward to 15 degrees
         withTiming(0, { duration: 300, easing: Easing.out(Easing.ease) }), // Tilt forward to 15 degrees
-        withTiming(1, { duration: 300, easing: Easing.out(Easing.ease) })
+        withTiming(1, { duration: 300, easing: Easing.out(Easing.ease) }),
+        withDelay(600, withTiming(0, { duration: 600, easing: Easing.out(Easing.ease) }))
       );
     }
   }));

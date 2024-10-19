@@ -75,7 +75,7 @@ const AvatarRow = ({ avatarCount, color, avatarRef }: { avatarCount: number, col
   };
 
   return (
-    <View style={[styles.avatarContainer, {paddingLeft: 690}]}>
+    <View style={[styles.avatarContainer, {paddingLeft: 690, zIndex: 5}]}>
       {/* Back row with opacity for depth */}
       <View
         style={[
@@ -100,7 +100,6 @@ const AvatarRow = ({ avatarCount, color, avatarRef }: { avatarCount: number, col
 async function playSound() {
   const { sound } = await Audio.Sound.createAsync(
     require('../../assets/wind.mp3'), // Path to your audio file
-    { volume: 0.5 }
   );
   await sound.setIsLoopingAsync(true); // Set the sound to loop
   await sound.playAsync();
@@ -134,10 +133,19 @@ export const EnterMotivationScene = ({ color, goal, onComplete, onStand }: { col
     setShowWarning(false);
     setText(newText);
     const spacesTyped = (newText.match(/ /g) || []).length;
-    const maxSpaces = 4; // Number of spaces in "I will be a "
+    const maxSpaces = 4;
     if (placeholderText.startsWith(newText)) {
       const newZoomLevel = MIN_ZOOM + ((spacesTyped / maxSpaces) * (MAX_ZOOM - MIN_ZOOM));
+      if (newZoomLevel > zoomLevel) {
+        haptics.playHeartbeat()
+      }
       setZoomLevel(newZoomLevel);
+
+      const minVolume = 0.5;
+      const maxVolume = 1;
+      const newVolume = maxVolume - ((newZoomLevel - MIN_ZOOM) / (MAX_ZOOM - MIN_ZOOM)) * (maxVolume - minVolume);
+      sound?.setVolumeAsync(newVolume);
+
       if (newText.length > text.length) {
         avatarRef.current?.pulse();
       }
