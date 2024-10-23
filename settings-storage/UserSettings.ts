@@ -2,7 +2,7 @@ import { SQLExecutable, TiFSQLite } from "@lib/SQLite"
 import { MutationObserver, QueryClient } from "@tanstack/react-query"
 import { TiFAPI } from "TiFShared/api"
 import { UpdateUserSettingsRequest } from "TiFShared/api/models/User"
-import { Placemark } from "TiFShared/domain-models/Placemark"
+import { EventEditLocation } from "TiFShared/domain-models/Event"
 import {
   DEFAULT_USER_SETTINGS,
   PushNotificationTriggerID,
@@ -27,7 +27,7 @@ type SQLiteUserSettings = {
   eventCalendarStartOfWeekDay: string
   eventCalendarDefaultLayout: string
   eventPresetDurations: string
-  eventPresetPlacemark: string
+  eventPresetLocation: string
   eventPresetShouldHideAfterStartDate: number
   version: number
 }
@@ -61,7 +61,7 @@ export class SQLiteUserSettingsStorage
         eventCalendarStartOfWeekDay,
         eventCalendarDefaultLayout,
         eventPresetDurations,
-        eventPresetPlacemark,
+        eventPresetLocation,
         eventPresetShouldHideAfterStartDate,
         version
       ) VALUES (
@@ -72,7 +72,7 @@ export class SQLiteUserSettingsStorage
         ${newSettings.eventCalendarStartOfWeekDay},
         ${newSettings.eventCalendarDefaultLayout},
         ${serializeDurations(newSettings.eventPresetDurations)},
-        ${serializePlacemark(newSettings.eventPresetPlacemark)},
+        ${serializeLocation(newSettings.eventPresetLocation)},
         ${newSettings.eventPresetShouldHideAfterStartDate},
         ${newSettings.version}
       )
@@ -99,8 +99,8 @@ export class SQLiteUserSettingsStorage
       eventPresetDurations: deserializeDurations(
         sqliteSettings.eventPresetDurations
       ),
-      eventPresetPlacemark: deserializePlacemark(
-        sqliteSettings.eventPresetPlacemark
+      eventPresetLocation: deserializeLocation(
+        sqliteSettings.eventPresetLocation
       )
     }
   }
@@ -124,12 +124,12 @@ const deserializeDurations = (serializedDurations: string) => {
   return serializedDurations.split(",").map((x) => +x)
 }
 
-const serializePlacemark = (placemark: Placemark | null) => {
-  return JSON.stringify(placemark)
+const serializeLocation = (location?: EventEditLocation) => {
+  return JSON.stringify(location)
 }
 
-const deserializePlacemark = (serializedPlacemark: string): Placemark => {
-  return JSON.parse(serializedPlacemark)
+const deserializeLocation = (serializedLocation: string): EventEditLocation => {
+  return JSON.parse(serializedLocation) ?? undefined
 }
 
 const log = logger("user.settings.synchronizing.store")
@@ -145,7 +145,7 @@ export const addAPIUserSettingsExponentialBackoff = (
 ) => {
   const saveMutation = new MutationObserver(queryClient, {
     mutationFn: async (request: UpdateUserSettingsRequest) => {
-      return (await api.saveUserSettings(request)).data
+      return (await api.saveUserSettings({ body: request })).data
     },
     retry: saveRetryCount
   })

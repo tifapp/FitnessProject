@@ -6,8 +6,8 @@ import { Extension, protoypeExtension } from "TiFShared/lib/Extend"
 const extensions = {
   formatted: (range: FixedDateRange) => {
     // TODO: - Should this support multiple locales?
-    const start = dayjs(range.startDate)
-    const end = dayjs(range.endDate)
+    const start = dayjs(range.startDateTime)
+    const end = dayjs(range.endDateTime)
 
     const startDateFormat = formatFromBasis(now(), start)
     if (start.isSame(end, "minute")) return startDateFormat
@@ -18,7 +18,7 @@ const extensions = {
     return `${startDateFormat} - ${endDateFormat}`
   },
   formattedStartTime: (range: FixedDateRange) => {
-    const start = dayjs(range.startDate)
+    const start = dayjs(range.startDateTime)
     return start.format("h:mm A")
   },
   formattedDate: (_: FixedDateRange, basis: Dayjs, date: Dayjs) => {

@@ -1,32 +1,33 @@
 import { EventMocks } from "@event-details-boundary/MockData"
+import { renderUseLoadEventDetails } from "@event-details-boundary/TestHelpers"
 import {
   mockExpoLocationObject,
   mockLocationCoordinate2D,
   mockRegion
 } from "@location/MockData"
 import { UserLocationFunctionsProvider } from "@location/UserLocation"
+import { verifyNeverOccurs } from "@test-helpers/ExpectNeverOccurs"
+import { TestInternetConnectionStatus } from "@test-helpers/InternetConnectionStatus"
+import { neverPromise } from "@test-helpers/Promise"
 import {
   TestQueryClientProvider,
   createTestQueryClient
 } from "@test-helpers/ReactQuery"
-import { timeTravel, fakeTimers } from "@test-helpers/Timers"
+import { fakeTimers, timeTravel } from "@test-helpers/Timers"
 import { act, renderHook, waitFor } from "@testing-library/react-native"
-import {
-  ExploreEventsRegion,
-  minRegionMeterRadius,
-  createDefaultMapRegion,
-  SAN_FRANCISCO_DEFAULT_REGION
-} from "./Region"
-import { eventsByRegion, useExploreEvents } from "./ExploreEvents"
-import { renderUseLoadEventDetails } from "@event-details-boundary/TestHelpers"
-import { TestInternetConnectionStatus } from "@test-helpers/InternetConnectionStatus"
-import { neverPromise } from "@test-helpers/Promise"
-import { verifyNeverOccurs } from "@test-helpers/ExpectNeverOccurs"
-import { mswServer } from "@test-helpers/msw"
-import { HttpResponse, http } from "msw"
 import { TiFAPI } from "TiFShared/api"
 import { EventID } from "TiFShared/domain-models/Event"
+import { dateRange } from "TiFShared/domain-models/FixedDateRange"
+import { UserHandle } from "TiFShared/domain-models/User"
+import { mockTiFServer } from "TiFShared/test-helpers/mockAPIServer"
+import { eventsByRegion, useExploreEvents } from "./ExploreEvents"
 import { ExploreEventsInitialCenter } from "./InitialCenter"
+import {
+  ExploreEventsRegion,
+  SAN_FRANCISCO_DEFAULT_REGION,
+  createDefaultMapRegion,
+  minRegionMeterRadius
+} from "./Region"
 
 const TEST_EVENTS = [EventMocks.Multiday, EventMocks.PickupBasketball]
 
@@ -41,23 +42,18 @@ describe("ExploreEvents tests", () => {
         {
           attendeeCount: 2,
           isChatExpired: false,
-          createdAt: "2024-03-25T03:31:24.000Z",
+          createdDateTime: new Date("2024-03-25T03:31:24.000Z"),
           description: "Dactylomys boliviensis",
-          color: "#FFFFFF",
-          endedAt: null,
+          endedDateTime: undefined,
           hasArrived: false,
           host: {
-            handle: "marygoodwin3187",
+            handle: UserHandle.optionalParse("marygoodwin3187")!,
             id: "269851f0-64ae-4fc6-a2e3-e1b957cc7769",
-            profileImageURL: null,
-            relations: {
-              themToYou: "not-friends",
-              youToThem: "not-friends"
-            },
-            username: "Mary Goodwin"
+            relationStatus: "friends" as const,
+            name: "Mary Goodwin"
           },
           id: 19160,
-          joinDate: "2024-03-25T03:31:26.000Z",
+          joinedDateTime: new Date("2024-03-25T03:31:26.000Z"),
           location: {
             arrivalRadiusMeters: 120,
             coordinate: {
@@ -76,12 +72,10 @@ describe("ExploreEvents tests", () => {
           },
           previewAttendees: [
             {
-              id: "269851f0-64ae-4fc6-a2e3-e1b957cc7769",
-              profileImageURL: null
+              id: "269851f0-64ae-4fc6-a2e3-e1b957cc7769"
             },
             {
-              id: "b144faae-8519-40ab-9af4-99a27bf7bccd",
-              profileImageURL: null
+              id: "b144faae-8519-40ab-9af4-99a27bf7bccd"
             }
           ],
           settings: {
@@ -89,37 +83,31 @@ describe("ExploreEvents tests", () => {
             shouldHideAfterStartDate: true
           },
           time: {
-            dateRange: {
-              endDateTime: "2025-03-25T03:31:22.000Z",
-              startDateTime: "2024-03-25T15:31:22.000Z"
-            },
+            dateRange: dateRange(
+              new Date("2024-03-25T15:31:22.000Z"), new Date("2025-03-25T03:31:22.000Z")
+            )!,
             secondsToStart: 43195.08,
-            todayOrTomorrow: "today"
+            todayOrTomorrow: "today" as const
           },
           title: "quince",
-          updatedAt: "2024-03-25T03:31:24.000Z",
-          userAttendeeStatus: "attending"
+          updatedDateTime: new Date("2024-03-25T03:31:24.000Z"),
+          userAttendeeStatus: "attending" as const
         },
         {
           attendeeCount: 2,
           isChatExpired: false,
-          createdAt: "2024-03-25T03:31:24.000Z",
+          createdDateTime: new Date("2024-03-25T03:31:24.000Z"),
           description: "Dactylomys boliviensis",
-          color: "#FFFFFF",
-          endedAt: null,
+          endedDateTime: undefined,
           hasArrived: false,
           host: {
-            handle: "marygoodwin3187",
+            handle: UserHandle.optionalParse("marygoodwin3187")!,
             id: "269851f0-64ae-4fc6-a2e3-e1b957cc7769",
-            profileImageURL: null,
-            relations: {
-              themToYou: "not-friends",
-              youToThem: "not-friends"
-            },
-            username: "Mary Goodwin"
+            relationStatus: "friends" as const,
+            name: "Mary Goodwin"
           },
           id: 19161,
-          joinDate: "2024-03-25T03:31:26.000Z",
+          joinedDateTime: new Date("2024-03-25T03:31:26.000Z"),
           location: {
             arrivalRadiusMeters: 120,
             coordinate: {
@@ -138,12 +126,10 @@ describe("ExploreEvents tests", () => {
           },
           previewAttendees: [
             {
-              id: "269851f0-64ae-4fc6-a2e3-e1b957cc7769",
-              profileImageURL: null
+              id: "269851f0-64ae-4fc6-a2e3-e1b957cc7769"
             },
             {
-              id: "b144faae-8519-40ab-9af4-99a27bf7bccd",
-              profileImageURL: null
+              id: "b144faae-8519-40ab-9af4-99a27bf7bccd"
             }
           ],
           settings: {
@@ -151,16 +137,14 @@ describe("ExploreEvents tests", () => {
             shouldHideAfterStartDate: true
           },
           time: {
-            dateRange: {
-              endDateTime: "2025-03-25T03:31:22.000Z",
-              startDateTime: "2024-03-24T15:31:22.000Z"
-            },
-            secondsToStart: -43204.922,
-            todayOrTomorrow: null
+            dateRange: dateRange(
+              new Date("2024-03-24T15:31:22.000Z"), new Date("2025-03-25T03:31:22.000Z")
+            )!,
+            secondsToStart: -43204.922
           },
           title: "quince",
-          updatedAt: "2024-03-25T03:31:24.000Z",
-          userAttendeeStatus: "attending"
+          updatedDateTime: new Date("2024-03-25T03:31:24.000Z"),
+          userAttendeeStatus: "attending" as const
         }
       ]
     }
@@ -191,17 +175,16 @@ describe("ExploreEvents tests", () => {
     })
 
     const setupExploreEndpointHandlerExpectingRegion = (
-      userLatitude: number,
-      userLongitude: number,
+      latitude: number,
+      longitude: number,
       radius: number
     ) => {
-      mswServer.use(
-        http.post(TiFAPI.testPath("/event/region"), async ({ request }) => {
-          const body = await request.json()
-          expect(body).toEqual({ userLatitude, userLongitude, radius })
-          return HttpResponse.json(TEST_EXPLORE_RESPONSE)
-        })
-      )
+      mockTiFServer({
+        exploreEvents: {
+          expectedRequest: { body: { userLocation: { latitude, longitude }, radius } },
+          mockResponse: { status: 200, data: TEST_EXPLORE_RESPONSE }
+        }
+      })
     }
   })
 

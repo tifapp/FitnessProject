@@ -9,7 +9,6 @@ import { SQLiteEventArrivalsStorage } from "../Storage"
 import { TestEventArrivalsGeofencer } from "../geofencing/TestGeofencer"
 import { EventArrivalsTrackerRegionMonitor } from "./EventArrivalsTrackerRegionMonitor"
 import { ForegroundEventRegionMonitor } from "./ForegroundRegionMonitor"
-import { advanceByForegroundMonitorBufferTime } from "./TestHelpers"
 import { resetTestSQLiteBeforeEach, testSQLite } from "@test-helpers/SQLite"
 import { LocationCoordinate2D } from "TiFShared/domain-models/LocationCoordinate2D"
 import { addTestArrivals, removeTestArrivals } from "../TestHelpers"
@@ -29,7 +28,6 @@ describe("EventArrivalsTrackerRegionMonitor tests", () => {
     return new ForegroundEventRegionMonitor(async (callback) => {
       sendForegroundLocationUpdate = (coordinate) => {
         callback(coordinate)
-        advanceByForegroundMonitorBufferTime()
       }
       return { remove: jest.fn() }
     })

@@ -8,16 +8,16 @@ import {
   TextStyle,
   Platform
 } from "react-native"
-import { SettingsScrollView } from "./components/ScrollView"
-import { SettingsSectionView } from "./components/Section"
-import { SettingsCardView } from "./components/Card"
+import { TiFFormScrollView } from "@components/form-components/ScrollView"
+import { TiFFormSectionView } from "@components/form-components/Section"
+import { TiFFormCardView } from "@components/form-components/Card"
 import { useLocalSettings } from "@settings-storage/Hooks"
 import { settingsSelector } from "@settings-storage/Settings"
 import { BodyText } from "@components/Text"
 import { AppStyles } from "@lib/AppColorStyle"
 import { FontScaleFactors, useFontScale } from "@lib/Fonts"
 import { useOpenWeblink } from "@modules/tif-weblinks"
-import { SettingsPreviewableOptionView } from "./components/PreviewableOption"
+import { TiFFormPreviewableOptionView } from "@components/form-components/PreviewableOption"
 import { isOSMajorVersionAvailable } from "@lib/Platform"
 
 export type AppearanceSettingsProps = {
@@ -25,10 +25,10 @@ export type AppearanceSettingsProps = {
 }
 
 export const AppearanceSettingsView = ({ style }: AppearanceSettingsProps) => (
-  <SettingsScrollView style={style}>
+  <TiFFormScrollView style={style}>
     <ThemeSectionView />
     <FontFamilySectionView />
-  </SettingsScrollView>
+  </TiFFormScrollView>
 )
 
 const ThemeSectionView = () => {
@@ -36,10 +36,10 @@ const ThemeSectionView = () => {
     settingsSelector("userInterfaceStyle")
   )
   return (
-    <SettingsSectionView title="Theme">
-      <SettingsCardView>
+    <TiFFormSectionView title="Theme">
+      <TiFFormCardView>
         <View style={styles.previewOptionRow}>
-          <SettingsPreviewableOptionView
+          <TiFFormPreviewableOptionView
             name="System"
             isSelected={settings.userInterfaceStyle === "system"}
             onSelected={() => update({ userInterfaceStyle: "system" })}
@@ -47,8 +47,8 @@ const ThemeSectionView = () => {
           >
             <View style={styles.systemUserInterfaceStylePreviewDark} />
             <View style={styles.systemUserInterfaceStylePreviewLight} />
-          </SettingsPreviewableOptionView>
-          <SettingsPreviewableOptionView
+          </TiFFormPreviewableOptionView>
+          <TiFFormPreviewableOptionView
             name="Dark"
             isSelected={settings.userInterfaceStyle === "dark"}
             onSelected={() => update({ userInterfaceStyle: "dark" })}
@@ -57,7 +57,7 @@ const ThemeSectionView = () => {
               styles.darkUserInterfaceStylePreview
             ]}
           />
-          <SettingsPreviewableOptionView
+          <TiFFormPreviewableOptionView
             name="Light"
             isSelected={settings.userInterfaceStyle === "light"}
             onSelected={() => update({ userInterfaceStyle: "light" })}
@@ -67,8 +67,8 @@ const ThemeSectionView = () => {
             ]}
           />
         </View>
-      </SettingsCardView>
-    </SettingsSectionView>
+      </TiFFormCardView>
+    </TiFFormSectionView>
   )
 }
 
@@ -83,7 +83,7 @@ const FontFamilySectionView = () => {
       maximumScaleFactor: FontScaleFactors.xxxLarge
     })
   return (
-    <SettingsSectionView
+    <TiFFormSectionView
       title="Font"
       subtitle={
         <BodyText>
@@ -102,9 +102,9 @@ const FontFamilySectionView = () => {
         </BodyText>
       }
     >
-      <SettingsCardView>
+      <TiFFormCardView>
         <View style={styles.previewOptionRow}>
-          <SettingsPreviewableOptionView
+          <TiFFormPreviewableOptionView
             name="Open Sans"
             NameComponent={(props: TextProps) => (
               <Text
@@ -117,8 +117,8 @@ const FontFamilySectionView = () => {
             previewStyle={styles.fontOptionPreviewContainer}
           >
             <FontOptionPreviewView textStyle={styles.openSansOptionPreview} />
-          </SettingsPreviewableOptionView>
-          <SettingsPreviewableOptionView
+          </TiFFormPreviewableOptionView>
+          <TiFFormPreviewableOptionView
             name="Open Dyslexic"
             NameComponent={(props: TextProps) => (
               <Text
@@ -148,10 +148,10 @@ const FontFamilySectionView = () => {
                 }
               ]}
             />
-          </SettingsPreviewableOptionView>
+          </TiFFormPreviewableOptionView>
         </View>
-      </SettingsCardView>
-    </SettingsSectionView>
+      </TiFFormCardView>
+    </TiFFormSectionView>
   )
 }
 

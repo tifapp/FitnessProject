@@ -1,3 +1,14 @@
+import { PrimaryButton } from "@components/Buttons"
+import { BoldFootnote, Headline } from "@components/Text"
+import { Ionicon } from "@components/common/Icons"
+import { TextToastView } from "@components/common/Toasts"
+import { TiFFormCardView } from "@components/form-components/Card"
+import { TiFFormSectionView } from "@components/form-components/Section"
+import ProfileImageAndName from "@components/profileImageComponents/ProfileImageAndName"
+import { AlertsObject, presentAlert } from "@lib/Alerts"
+import { AppStyles } from "@lib/AppColorStyle"
+import { TiFDefaultLayoutTransition } from "@lib/Reanimated"
+import { useLastDefinedValue } from "@lib/utils/UseLastDefinedValue"
 import {
   InfiniteData,
   QueryClient,
@@ -5,37 +16,26 @@ import {
   useMutation,
   useQueryClient
 } from "@tanstack/react-query"
-import { UserID } from "TiFShared/domain-models/User"
 import {
   BlockListPage,
   BlockListUser,
   removeUsersFromBlockListPages
 } from "TiFShared/domain-models/BlockList"
+import { UserID } from "TiFShared/domain-models/User"
 import { memo, useCallback, useMemo, useState } from "react"
 import {
-  StyleProp,
-  Pressable,
   ActivityIndicator,
-  RefreshControl,
-  ViewStyle,
-  StyleSheet,
-  Alert,
-  View,
   FlatList,
   Platform,
-  TouchableOpacity
+  Pressable,
+  RefreshControl,
+  StyleProp,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+  ViewStyle
 } from "react-native"
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated"
-import { BoldFootnote, Headline } from "@components/Text"
-import { SettingsSectionView } from "./components/Section"
-import { PrimaryButton } from "@components/Buttons"
-import { TiFDefaultLayoutTransition } from "@lib/Reanimated"
-import { SettingsCardView } from "./components/Card"
-import { TextToastView } from "@components/common/Toasts"
-import ProfileImageAndName from "@components/profileImageComponents/ProfileImageAndName"
-import { Ionicon } from "@components/common/Icons"
-import { AppStyles } from "@lib/AppColorStyle"
-import { useLastDefinedValue } from "@lib/utils/UseLastDefinedValue"
 
 export type UseBlockListSettingsEnvironment = {
   nextPage: (token: string | null) => Promise<BlockListPage>
@@ -43,16 +43,18 @@ export type UseBlockListSettingsEnvironment = {
 }
 
 export const BLOCK_LIST_SETTINGS_ALERTS = {
-  unblockUserConfirmation: {
-    title: (username: string) => `Unblock ${username}?`,
-    description: (
-      user: Pick<BlockListUser, "username" | "handle">
-    ) => `Are you sure you want to unblock ${user.username} (${user.handle})? You will need to wait 48 hours to block them again.
+  unblockUserConfirmation: (
+    user: Pick<BlockListUser, "name" | "handle">,
+    cancel?: () => void,
+    unblock?: () => void
+  ) => ({
+    title: `Unblock ${user.name}?`,
+    description: `Are you sure you want to unblock ${user.name} (${user.handle})? You will need to wait 48 hours to block them again.
 
     They will be able to view your profile and see your activity, including the events you attend.
 
     You can continue to report them for any inappropriate behavior.`,
-    buttons: (cancel: () => void, unblock: () => void) => [
+    buttons: [
       {
         text: "Cancel",
         style: "cancel" as const,
@@ -63,12 +65,13 @@ export const BLOCK_LIST_SETTINGS_ALERTS = {
         onPress: unblock
       }
     ]
-  },
-  unblockUserFailed: {
+  }),
+  unblockUserFailed: (ok?: () => void) => ({
     title: "Uh Oh!",
-    description: "Unable to unblock user. Please try again later."
-  }
-}
+    description: "Unable to unblock user. Please try again later.",
+    buttons: [{ text: "Ok", onPress: ok }]
+  })
+} satisfies AlertsObject
 
 const BLOCK_LIST_QUERY_KEY = ["block-list"]
 
@@ -140,10 +143,10 @@ const useBlocklistSettingsUnblocking = ({
       onError: () => {
         if (isShowingErrorAlert) return
         setIsShowingErrorAlert(true)
-        Alert.alert(
-          BLOCK_LIST_SETTINGS_ALERTS.unblockUserFailed.title,
-          BLOCK_LIST_SETTINGS_ALERTS.unblockUserFailed.description,
-          [{ text: "Ok", onPress: () => setIsShowingErrorAlert(false) }]
+        presentAlert(
+          BLOCK_LIST_SETTINGS_ALERTS.unblockUserFailed(() => {
+            setIsShowingErrorAlert(false)
+          })
         )
       },
       onSettled: (_, __, user) => {
@@ -160,12 +163,9 @@ const useBlocklistSettingsUnblocking = ({
       (user: BlockListUser) => {
         setMostRecentUnblockedUser(undefined)
         setActiveUnblockingIds((ids) => [...ids, user.id])
-        Alert.alert(
-          BLOCK_LIST_SETTINGS_ALERTS.unblockUserConfirmation.title(
-            user.username
-          ),
-          BLOCK_LIST_SETTINGS_ALERTS.unblockUserConfirmation.description(user),
-          BLOCK_LIST_SETTINGS_ALERTS.unblockUserConfirmation.buttons(
+        presentAlert(
+          BLOCK_LIST_SETTINGS_ALERTS.unblockUserConfirmation(
+            user,
             () => {
               setActiveUnblockingIds((ids) => {
                 return ids.filter((id) => id !== user.id)
@@ -213,7 +213,7 @@ export const BlockListSettingsView = ({
         />
       )}
       ListHeaderComponent={
-        <SettingsSectionView
+        <TiFFormSectionView
           title="Blocked Users"
           subtitle="Listed below are the users that you have blocked. You can choose to unblock them or view their profile."
           style={styles.section}
@@ -258,7 +258,7 @@ export const BlockListSettingsView = ({
     />
     <TextToastView
       isVisible={!!state.mostRecentUnblockedUser}
-      text={`Unblocked ${useLastDefinedValue(state.mostRecentUnblockedUser?.username)}!`}
+      text={`Unblocked ${useLastDefinedValue(state.mostRecentUnblockedUser?.name)}!`}
     />
   </>
 )
@@ -282,12 +282,12 @@ const BlockListUserView = memo(function BlockListUserView({
       exiting={Platform.OS === "ios" ? FadeOut : undefined}
       style={styles.container}
     >
-      <SettingsCardView>
+      <TiFFormCardView>
         <View style={styles.userContainer}>
           <View style={styles.profileAndName}>
             <Pressable onPress={() => onProfileTapped(user.id)}>
               <ProfileImageAndName
-                username={user.username}
+                name={user.name}
                 handle={user.handle}
                 imageURL={user.profileImageURL}
               />
@@ -310,7 +310,7 @@ const BlockListUserView = memo(function BlockListUserView({
             </View>
           </TouchableOpacity>
         </View>
-      </SettingsCardView>
+      </TiFFormCardView>
     </Animated.View>
   )
 })

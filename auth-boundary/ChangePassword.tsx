@@ -4,12 +4,26 @@ import { AppStyles } from "@lib/AppColorStyle"
 import { TiFDefaultLayoutTransition } from "@lib/Reanimated"
 import { useFormSubmission } from "@lib/utils/Form"
 import React, { useRef, useState } from "react"
-import { Alert, Platform, StyleProp, StyleSheet, ViewStyle } from "react-native"
+import { Platform, StyleProp, StyleSheet, ViewStyle } from "react-native"
 import { TouchableOpacity } from "react-native-gesture-handler"
 import Animated from "react-native-reanimated"
 import { AuthFormView } from "./AuthLayout"
 import { AuthShadedPasswordTextField } from "./AuthTextFields"
 import { Password } from "./Password"
+import { AlertsObject, presentAlert } from "@lib/Alerts"
+
+export const CHANGE_PASSWORD_ALERTS = {
+  "incorrect-password": {
+    title: "Incorrect Password",
+    description:
+      "You entered your current password incorrectly, please try again."
+  },
+  genericError: {
+    title: "Whoops",
+    description:
+      "Sorry, something went wrong when trying to change your password. Please try again."
+  }
+} satisfies AlertsObject
 
 export type ChangePasswordResult = "valid" | "incorrect-password"
 
@@ -85,20 +99,10 @@ export const useChangePasswordForm = ({
             attemptedCurrentPasswords.current.push(
               args.uncheckedCurrentPassword
             )
-            Alert.alert(
-              "Incorrect Password",
-              "You entered your current password incorrectly, please try again.",
-              [{ text: "Ok" }]
-            )
+            presentAlert(CHANGE_PASSWORD_ALERTS[result])
           }
         },
-        onError: () => {
-          Alert.alert(
-            "Whoops",
-            "Sorry, something went wrong when trying to change your password. Please try again.",
-            [{ text: "Ok" }]
-          )
-        }
+        onError: () => presentAlert(CHANGE_PASSWORD_ALERTS.genericError)
       }
     )
   }

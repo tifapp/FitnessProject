@@ -19,6 +19,7 @@ import {
 } from "@auth-boundary/forgot-password"
 import React from "react"
 import { EmailAddress, USPhoneNumber } from "@user/privacy"
+import { presentAlert } from "@lib/Alerts"
 
 export type ForgotPasswordParamsList = {
   forgotPassword: undefined
@@ -170,11 +171,10 @@ const ResetPasswordScreen = ({
     onSuccess: (result, newPass) => {
       if (result === "valid") navigation.pop(2)
       else {
-        Alert.alert(
-          "Invalid Verification Code",
-          "The verification code that you have entered is invalid.",
-          [{ text: "Ok" }]
-        )
+        presentAlert({
+          title: "Invalid Verification Code",
+          description: "The verification code that you have entered is invalid."
+        })
         navigation.navigate("verifyCode", {
           emailOrPhoneNumber: route.params.emailOrPhoneNumber,
           code: route.params.code,

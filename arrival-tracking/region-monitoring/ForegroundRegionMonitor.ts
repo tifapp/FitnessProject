@@ -29,12 +29,6 @@ import { EventRegion } from "TiFShared/domain-models/Event"
  * completely in the foreground. This still allows users to see arrival
  * information on the details screen even if the 2 conditions don't apply.
  *
- * When a user enters or exits a region, the update isn't published
- * immediately. There's a 20 seond buffer between the user crossing a region
- * boundary, and when an update is published. This ensures that the UI isn't
- * spammed with extraneous updates, and it evokes similar behavior as the
- * OS geofencing capabilities.
- *
  * Only 1 subscription is made to watch the current user's location, and it
  * can be controlled via the `startWatchingIfNeeded` and
  * `stopWatchingIfNeeded`. Adding a region to be monitored also starts up the
@@ -42,8 +36,6 @@ import { EventRegion } from "TiFShared/domain-models/Event"
  * while the app is open, then this class will behave accordingly.
  */
 export class ForegroundEventRegionMonitor implements EventRegionMonitor {
-  static readonly BUFFER_TIME = 20_000
-
   private regionStates = [] as ForegroundRegionState[]
 
   private userCoordinate?: LocationCoordinate2D
@@ -94,10 +86,7 @@ export class ForegroundEventRegionMonitor implements EventRegionMonitor {
         state.region,
         newCoordinate
       )
-      state.scheduleUpdateIfNeeded(
-        hasArrivedAtNewCoordinate,
-        ForegroundEventRegionMonitor.BUFFER_TIME
-      )
+      state.publishUpdateIfNeeded(hasArrivedAtNewCoordinate)
     })
   }
 
@@ -117,49 +106,14 @@ export class ForegroundEventRegionMonitor implements EventRegionMonitor {
 }
 
 class ForegroundRegionState extends RegionState {
-  private scheduledUpdate?: {
-    timeout: NodeJS.Timeout
-    hasArrived: boolean
-  }
-
   subscribeEmittingInitialStatus(callback: (hasArrived: boolean) => void) {
     callback(super.hasArrived)
-    const baseUnsub = super.subscribe(callback)
-    return () => {
-      baseUnsub()
-      if (!super.hasSubscribers) {
-        this.cancelScheduledUpdate()
-      }
-    }
+    return super.subscribe(callback)
   }
 
-  scheduleUpdateIfNeeded(hasArrived: boolean, timeout: number) {
-    const isScheduledUpdateInvalid =
-      this.scheduledUpdate?.hasArrived !== hasArrived
-    if (isScheduledUpdateInvalid) {
-      this.cancelScheduledUpdate()
-    }
-
+  publishUpdateIfNeeded(hasArrived: boolean) {
     const didCrossRegionBoundary = this.hasArrived !== hasArrived
-    if (!this.scheduledUpdate && didCrossRegionBoundary) {
-      this.scheduleUpdate(hasArrived, timeout)
-    }
-  }
-
-  private cancelScheduledUpdate() {
-    if (!this.scheduledUpdate) return
-    clearTimeout(this.scheduledUpdate.timeout)
-    this.scheduledUpdate = undefined
-  }
-
-  private scheduleUpdate(hasArrived: boolean, timeout: number) {
-    this.scheduledUpdate = {
-      timeout: setTimeout(() => {
-        super.publishUpdate(hasArrived)
-        this.scheduledUpdate = undefined
-      }, timeout),
-      hasArrived
-    }
+    if (didCrossRegionBoundary) super.publishUpdate(hasArrived)
   }
 }
 

@@ -15,6 +15,9 @@ import AttendeesListMeta, {
 import ButtonsMeta, {
   Basic as ButtonsBasic
 } from "../components/Buttons/Buttons.stories"
+import EditEventDurationsMeta, {
+  Basic as EditEventDurationsBasic
+} from "../components/EditEvent/DurationPicker.stories"
 import EnterGoalMeta, {
   Basic as EnterGoalBasic
 } from "../components/EnterGoal/EnterGoal.stories"
@@ -174,6 +177,11 @@ const stories = [
     component: AttendeesListBasic,
     args: AttendeesListMeta.args
   },
+  {
+    name: EditEventDurationsMeta.title,
+    component: EditEventDurationsBasic,
+    args: EditEventDurationsMeta.args
+  }
   // Add more stories here...
 ]
 

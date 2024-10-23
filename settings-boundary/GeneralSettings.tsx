@@ -1,16 +1,13 @@
 import { StyleProp, ViewStyle, Platform } from "react-native"
-import { SettingsScrollView } from "./components/ScrollView"
-import {
-  SettingsCardSectionView,
-  SettingsSectionView
-} from "./components/Section"
-import { SettingsNamedToggleView } from "./components/NamedToggle"
+import { TiFFormScrollView } from "@components/form-components/ScrollView"
+import { TiFFormCardSectionView } from "@components/form-components/Section"
+import { TiFFormNamedToggleView } from "@components/form-components/NamedToggle"
 import { useHaptics } from "@modules/tif-haptics"
 import { useLocalSettings } from "@settings-storage/Hooks"
 import { settingsSelector } from "@settings-storage/Settings"
-import { SettingsChecklistPickerView } from "./components/ChecklistPicker"
+import { TiFFormChecklistPickerView } from "@components/form-components/ChecklistPicker"
 import { PreferredBrowserName } from "@settings-storage/LocalSettings"
-import { SettingsButton } from "./components/Button"
+import { TiFFormRowButton } from "@components/form-components/Button"
 import { Headline } from "@components/Text"
 
 export type GeneralSettingsProps = {
@@ -28,7 +25,7 @@ export const GeneralSettingsView = ({
     isAudioSupportedOnDevice
   )
   return (
-    <SettingsScrollView style={style}>
+    <TiFFormScrollView style={style}>
       {hapticsTitle && (
         <HapticsSectionView
           title={hapticsTitle}
@@ -39,7 +36,7 @@ export const GeneralSettingsView = ({
       {/* TODO: - Check for Availability */}
       <WebBrowserSectionView />
       <AdvancedSectionView onClearCacheTapped={onClearCacheTapped} />
-    </SettingsScrollView>
+    </TiFFormScrollView>
   )
 }
 
@@ -75,9 +72,9 @@ const HapticsSectionView = ({
     settingsSelector("isHapticAudioEnabled", "isHapticFeedbackEnabled")
   )
   return (
-    <SettingsCardSectionView title={title}>
+    <TiFFormCardSectionView title={title}>
       {isFeedbackSupported && (
-        <SettingsNamedToggleView
+        <TiFFormNamedToggleView
           name="Haptic Feedback"
           description="Some app actions will cause slight device vibrations."
           isOn={settings.isHapticFeedbackEnabled}
@@ -87,7 +84,7 @@ const HapticsSectionView = ({
         />
       )}
       {isAudioSupported && (
-        <SettingsNamedToggleView
+        <TiFFormNamedToggleView
           name="Sound Effects"
           isOn={settings.isHapticAudioEnabled}
           onIsOnChange={(isHapticAudioEnabled) => {
@@ -95,7 +92,7 @@ const HapticsSectionView = ({
           }}
         />
       )}
-    </SettingsCardSectionView>
+    </TiFFormCardSectionView>
   )
 }
 
@@ -105,18 +102,18 @@ const WebBrowserSectionView = () => {
   )
   return (
     <>
-      <SettingsCardSectionView title="Open Websites In">
-        <SettingsChecklistPickerView<PreferredBrowserName>
+      <TiFFormCardSectionView title="Open Websites In">
+        <TiFFormChecklistPickerView<PreferredBrowserName>
           options={WEB_BROWSER_CHECKLIST_OPTIONS}
           onOptionSelected={(preferredBrowserName) => {
             update({ preferredBrowserName })
           }}
           selectedOptions={[settings.preferredBrowserName]}
         />
-      </SettingsCardSectionView>
+      </TiFFormCardSectionView>
       {Platform.OS === "ios" && settings.preferredBrowserName === "in-app" && (
-        <SettingsCardSectionView>
-          <SettingsNamedToggleView
+        <TiFFormCardSectionView>
+          <TiFFormNamedToggleView
             name="Safari Reader Mode"
             description="Makes websites easier to read by removing visual styling. This may not be supported on some websites."
             isOn={settings.isUsingSafariReaderMode}
@@ -124,7 +121,7 @@ const WebBrowserSectionView = () => {
               update({ isUsingSafariReaderMode })
             }}
           />
-        </SettingsCardSectionView>
+        </TiFFormCardSectionView>
       )}
     </>
   )
@@ -140,10 +137,10 @@ type AdvancedSectionProps = {
 }
 
 const AdvancedSectionView = ({ onClearCacheTapped }: AdvancedSectionProps) => (
-  <SettingsCardSectionView title="Advanced">
+  <TiFFormCardSectionView title="Advanced">
     {/* TODO: - Show Cache Size? */}
-    <SettingsButton onTapped={onClearCacheTapped}>
+    <TiFFormRowButton onTapped={onClearCacheTapped}>
       <Headline>Clear Cache</Headline>
-    </SettingsButton>
-  </SettingsCardSectionView>
+    </TiFFormRowButton>
+  </TiFFormCardSectionView>
 )

@@ -6,11 +6,24 @@ import { useFormSubmission } from "@lib/utils/Form"
 import { AppStyles } from "@lib/AppColorStyle"
 import { useMutation } from "@tanstack/react-query"
 import React, { useRef, useState } from "react"
-import { Alert, StyleProp, StyleSheet, View, ViewStyle } from "react-native"
+import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 import { TouchableOpacity } from "react-native-gesture-handler"
 import { PrivacyFormattable } from "@user/privacy"
+import { AlertsObject, presentAlert } from "@lib/Alerts"
 
 export type AuthResendVerificationCodeStatus = "success" | "error"
+
+export const VERIFY_CODE_ALERTS = {
+  genericError: {
+    title: "Whoops!",
+    description:
+      "Something went wrong trying to submit your code. Please try again."
+  },
+  invalidCode: (code: string) => ({
+    title: "Invalid Code",
+    description: `${code} is an invalid code, please try again.`
+  })
+} satisfies AlertsObject
 
 export type AuthVerifyCodeResult<Data> =
   | { isCorrect: false }
@@ -64,19 +77,11 @@ export const useAuthVerificationCodeForm = <Data,>({
           if (result.isCorrect) {
             onSuccess(result.data)
           } else {
-            Alert.alert(
-              "Invalid Code",
-              `${code} is an invalid code, please try again.`
-            )
+            presentAlert(VERIFY_CODE_ALERTS.invalidCode(code))
             attemptedCodesRef.current.push(code)
           }
         },
-        onError: () => {
-          Alert.alert(
-            "Whoops!",
-            "Something went wrong trying to submit your code. Please try again."
-          )
-        }
+        onError: () => presentAlert(VERIFY_CODE_ALERTS.genericError)
       }
     )
   }

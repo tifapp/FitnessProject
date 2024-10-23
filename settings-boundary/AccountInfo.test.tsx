@@ -42,10 +42,8 @@ describe("AccountInfoSettings tests", () => {
       act(() => result.current.signOutStarted?.())
       await confirmSignOut()
       await waitFor(() => {
-        expect(alertPresentationSpy).toHaveBeenCalledWith(
-          ALERTS.signOutError.title,
-          ALERTS.signOutError.description,
-          undefined
+        expect(alertPresentationSpy).toHaveBeenPresentedWith(
+          ALERTS.signOutError
         )
       })
     })
@@ -64,9 +62,7 @@ describe("AccountInfoSettings tests", () => {
     const { alertPresentationSpy, tapAlertButton } = captureAlerts()
 
     const confirmSignOut = async () => {
-      await tapAlertButton(
-        ALERTS.signOutConfirmation.buttons(jest.fn())[1].text
-      )
+      await tapAlertButton(ALERTS.signOutConfirmation().buttons[1].text)
     }
   })
 })

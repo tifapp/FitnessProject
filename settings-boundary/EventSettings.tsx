@@ -1,5 +1,9 @@
 import { Headline } from "@components/Text"
-import { CircularIonicon, Ionicon } from "@components/common/Icons"
+import {
+  CircularIonicon,
+  Ionicon,
+  TouchableIonicon
+} from "@components/common/Icons"
 import { AppStyles } from "@lib/AppColorStyle"
 import { FontScaleFactors, useFontScale } from "@lib/Fonts"
 import { TiFDefaultLayoutTransition } from "@lib/Reanimated"
@@ -8,28 +12,55 @@ import { settingsSelector } from "@settings-storage/Settings"
 import { Placemark } from "TiFShared/domain-models/Placemark"
 import { formatEventDurationPreset } from "TiFShared/domain-models/Settings"
 import { repeatElements } from "TiFShared/lib/Array"
-import React from "react"
+import { useAtom } from "jotai"
+import { atomWithStorage } from "jotai/utils"
+import React, { useState } from "react"
 import {
   StyleProp,
   StyleSheet,
-  TouchableHighlight,
   TouchableOpacity,
   View,
   ViewStyle
 } from "react-native"
-import Animated, { FadeInLeft, FadeOutLeft } from "react-native-reanimated"
-import { SettingsNamedToggleView } from "./components/NamedToggle"
-import { SettingsNavigationLinkView } from "./components/NavigationLink"
-import { SettingsScrollView } from "./components/ScrollView"
+import Animated, {
+  FadeInLeft,
+  FadeOutLeft,
+  ZoomIn,
+  ZoomOut
+} from "react-native-reanimated"
+
+import { DurationPickerButton } from "./EventSettingsDurationPicker"
+import { TiFFormNamedToggleView } from "@components/form-components/NamedToggle"
+import { TiFFormNavigationLinkView } from "@components/form-components/NavigationLink"
+import { TiFFormScrollView } from "@components/form-components/ScrollView"
 import {
-  SettingsCardSectionView,
-  SettingsSectionView
-} from "./components/Section"
+  TiFFormCardSectionView,
+  TiFFormSectionView
+} from "@components/form-components/Section"
+
+export const eventSettingsEditMode = atomWithStorage("OFF", false)
 
 export type SettingDurationCardProps = {
   style?: StyleProp<ViewStyle>
   durationInSeconds: number
   onClosePress: () => void
+}
+
+export type DurationSettingsEditModeButtonProps = {
+  style?: StyleProp<ViewStyle>
+}
+
+export const DurationSettingsEditModeButton = ({
+  style
+}: DurationSettingsEditModeButtonProps) => {
+  const [editModeOn, setEditModeOn] = useAtom(eventSettingsEditMode)
+  return (
+    <TouchableIonicon
+      icon={editModeOn ? { name: "close" } : { name: "create" }}
+      style={style}
+      onPress={() => setEditModeOn((editModeOn) => !editModeOn)}
+    />
+  )
 }
 
 export const SettingsDurationCard = ({
@@ -38,6 +69,7 @@ export const SettingsDurationCard = ({
   onClosePress
 }: SettingDurationCardProps) => {
   const fontScale = useFontScale()
+  const [editMode] = useAtom(eventSettingsEditMode)
   return (
     <Animated.View
       style={[styles.container, { height: 64 * fontScale }]}
@@ -46,24 +78,34 @@ export const SettingsDurationCard = ({
       layout={TiFDefaultLayoutTransition}
     >
       <Headline>{formatEventDurationPreset(durationInSeconds)}</Headline>
-      <TouchableOpacity
-        hitSlop={{ left: 16, right: 16, top: 16, bottom: 16 }}
-        style={styles.closeButton}
-        activeOpacity={0.8}
-        onPress={onClosePress}
-      >
-        <CircularIonicon
-          size={16}
-          backgroundColor={AppStyles.darkColor}
-          name={"close"}
-        />
-      </TouchableOpacity>
+      {editMode ? (
+        <Animated.View
+          hitSlop={{ left: 16, right: 16, top: 16, bottom: 16 }}
+          style={styles.closeButton}
+          entering={ZoomIn}
+          exiting={ZoomOut}
+          layout={TiFDefaultLayoutTransition}
+        >
+          <TouchableOpacity activeOpacity={0.8} onPress={onClosePress}>
+            <CircularIonicon
+              size={16}
+              backgroundColor={AppStyles.darkColor}
+              name={"close"}
+            />
+          </TouchableOpacity>
+        </Animated.View>
+      ) : undefined}
     </Animated.View>
   )
 }
 
 export const AddDurationCard = () => {
+  const { settings, update } = useUserSettings(
+    settingsSelector("eventPresetDurations")
+  )
+  const [timeInSeconds, setTimeInSeconds] = useState(0)
   const fontScale = useFontScale()
+
   return (
     <Animated.View
       style={{ flex: 1 }}
@@ -71,12 +113,24 @@ export const AddDurationCard = () => {
       exiting={FadeOutLeft}
       layout={TiFDefaultLayoutTransition}
     >
-      <TouchableHighlight
+      <DurationPickerButton
         style={[styles.addButtonContainer, { height: 64 * fontScale }]}
+        durationSeconds={timeInSeconds}
         underlayColor={AppStyles.colorOpacity35}
+        onAddPresetTapped={() => {
+          if (!settings.eventPresetDurations.includes(timeInSeconds)) {
+            update({
+              eventPresetDurations: [
+                ...settings.eventPresetDurations,
+                timeInSeconds
+              ]
+            })
+          }
+        }}
+        onDurationChange={setTimeInSeconds}
       >
         <Ionicon size={36} color={AppStyles.darkColor} name={"add"} />
-      </TouchableHighlight>
+      </DurationPickerButton>
     </Animated.View>
   )
 }
@@ -131,7 +185,7 @@ export const DurationSectionView = () => {
   const fontScale = useFontScale()
   const sortedDurations = settings.eventPresetDurations.sort((a, b) => a - b)
   return (
-    <SettingsSectionView title="Duration Presets">
+    <TiFFormSectionView>
       <View style={styles.presetRowsGridContainer}>
         {fontScale < FontScaleFactors.accessibility1 ? (
           <>
@@ -166,7 +220,7 @@ export const DurationSectionView = () => {
           </>
         )}
       </View>
-    </SettingsSectionView>
+    </TiFFormSectionView>
   )
 }
 
@@ -182,12 +236,12 @@ export const EventSettingsView = ({
   onDurationTapped
 }: EventSettingsProps) => {
   return (
-    <SettingsScrollView style={style}>
+    <TiFFormScrollView style={style}>
       <PresetSectionView
         onLocationPresetTapped={onLocationPresetTapped}
         onDurationTapped={onDurationTapped}
       />
-    </SettingsScrollView>
+    </TiFFormScrollView>
   )
 }
 
@@ -197,9 +251,9 @@ export type EventDurationsProps = {
 
 export const EventDurationView = ({ style }: EventDurationsProps) => {
   return (
-    <SettingsScrollView style={style}>
+    <TiFFormScrollView style={style}>
       <DurationSectionView />
-    </SettingsScrollView>
+    </TiFFormScrollView>
   )
 }
 
@@ -214,16 +268,16 @@ const PresetSectionView = ({
 }: PresetSectionProps) => {
   const { settings, update } = useUserSettings(
     settingsSelector(
-      "eventPresetPlacemark",
+      "eventPresetLocation",
       "eventPresetShouldHideAfterStartDate"
     )
   )
   return (
-    <SettingsCardSectionView
+    <TiFFormCardSectionView
       title="Presets"
       subtitle="These presets will be populated when you create an event."
     >
-      <SettingsNamedToggleView
+      <TiFFormNamedToggleView
         name={"Hide After Start Date"}
         description={
           "The event will no longer be publicly visible to other users once it starts."
@@ -233,17 +287,17 @@ const PresetSectionView = ({
           update({ eventPresetShouldHideAfterStartDate })
         }
       />
-      <SettingsNavigationLinkView
+      <TiFFormNavigationLinkView
         title={"Location"}
-        description={settings.eventPresetPlacemark?.name ?? "No Location"}
-        onTapped={() => onLocationPresetTapped(settings.eventPresetPlacemark!)}
+        description={settings.eventPresetLocation?.name ?? "No Location"}
+        onTapped={() => onLocationPresetTapped(settings.eventPresetLocation!)}
       />
-      <SettingsNavigationLinkView
+      <TiFFormNavigationLinkView
         title={"Durations"}
         description={"Set Durations"}
         onTapped={() => onDurationTapped()}
       />
-    </SettingsCardSectionView>
+    </TiFFormCardSectionView>
   )
 }
 
@@ -266,8 +320,9 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     borderStyle: "dashed",
-
+    paddingHorizontal: 32,
     borderColor: AppStyles.darkColor,
+    backgroundColor: AppStyles.eventCardColor,
     borderWidth: 2
   },
   presetRowsGridContainer: {

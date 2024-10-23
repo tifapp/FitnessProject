@@ -24,6 +24,7 @@ export const useAppFonts = () => {
  */
 export namespace FontScaleFactors {
   export const xxxLarge = 1.5
+  export const large = 1.0
   export const accessibility1 = 1.75
   export const accessibility2 = 2.2
 }

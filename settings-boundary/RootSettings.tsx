@@ -1,14 +1,14 @@
 import { IfAuthenticated, UserSession } from "@user/Session"
 import { StyleProp, ViewStyle, StyleSheet, View } from "react-native"
-import { SettingsScrollView } from "./components/ScrollView"
-import { SettingsCardSectionView } from "./components/Section"
+import { TiFFormScrollView } from "@components/form-components/ScrollView"
+import { TiFFormCardSectionView } from "@components/form-components/Section"
 import { useState } from "react"
 import { useConst } from "@lib/utils/UseConst"
-import { SettingsNavigationLinkView } from "./components/NavigationLink"
+import { TiFFormNavigationLinkView } from "@components/form-components/NavigationLink"
 import { AppStyles } from "@lib/AppColorStyle"
 import { BodyText } from "@components/Text"
 import { nativeBuildVersion } from "expo-application"
-import { SettingsCardView } from "./components/Card"
+import { TiFFormCardView } from "@components/form-components/Card"
 import Animated, { FadeIn } from "react-native-reanimated"
 
 export type RootSettingsScreenLinkID =
@@ -29,12 +29,12 @@ export type RootSettingsProps = {
 }
 
 export const RootSettingsView = ({ style, ...props }: RootSettingsProps) => (
-  <SettingsScrollView style={style}>
+  <TiFFormScrollView style={style}>
     <MainScreenLinksSection {...props} />
     <SupportSectionView
       onSettingsScreenLinkTapped={props.onSettingsScreenLinkTapped}
     />
-  </SettingsScrollView>
+  </TiFFormScrollView>
 )
 
 type MainScreenLinksSectionProps = Omit<RootSettingsProps, "style">
@@ -44,8 +44,8 @@ const MainScreenLinksSection = ({
   onAccountInfoLinkTapped,
   areNotificationsEnabled
 }: MainScreenLinksSectionProps) => (
-  <SettingsCardSectionView>
-    <SettingsNavigationLinkView
+  <TiFFormCardSectionView>
+    <TiFFormNavigationLinkView
       iconName="settings"
       iconBackgroundColor={AppStyles.black}
       title="General"
@@ -53,7 +53,7 @@ const MainScreenLinksSection = ({
     />
     <IfAuthenticated
       thenRender={(session: UserSession) => (
-        <SettingsNavigationLinkView
+        <TiFFormNavigationLinkView
           iconName="person"
           iconBackgroundColor={AppStyles.blue}
           title="Account Info"
@@ -61,19 +61,19 @@ const MainScreenLinksSection = ({
         />
       )}
     />
-    <SettingsNavigationLinkView
+    <TiFFormNavigationLinkView
       iconName="color-palette"
       iconBackgroundColor={AppStyles.red}
       title="Appearance"
       onTapped={() => onSettingsScreenLinkTapped("appearanceSettings")}
     />
-    <SettingsNavigationLinkView
+    <TiFFormNavigationLinkView
       iconName="golf"
       iconBackgroundColor={AppStyles.green}
       title="Events"
       onTapped={() => onSettingsScreenLinkTapped("eventSettings")}
     />
-    <SettingsNavigationLinkView
+    <TiFFormNavigationLinkView
       iconName="notifications"
       iconBackgroundColor={AppStyles.yellow}
       title="Notifications"
@@ -84,13 +84,13 @@ const MainScreenLinksSection = ({
       }
       onTapped={() => onSettingsScreenLinkTapped("notificationsSettings")}
     />
-    <SettingsNavigationLinkView
+    <TiFFormNavigationLinkView
       iconName="calendar"
       iconBackgroundColor={AppStyles.purple}
       title="Calendar"
       onTapped={() => onSettingsScreenLinkTapped("calendarSettings")}
     />
-  </SettingsCardSectionView>
+  </TiFFormCardSectionView>
 )
 
 type SupportSectionProps = Pick<RootSettingsProps, "onSettingsScreenLinkTapped">
@@ -99,20 +99,20 @@ const SupportSectionView = ({
   onSettingsScreenLinkTapped
 }: SupportSectionProps) => (
   <View style={styles.supportSectionContainer}>
-    <SettingsCardSectionView title="Support">
-      <SettingsNavigationLinkView
+    <TiFFormCardSectionView title="Support">
+      <TiFFormNavigationLinkView
         iconName="bulb-sharp"
         iconBackgroundColor={AppStyles.black}
         title="Help and Feedback"
         onTapped={() => onSettingsScreenLinkTapped("helpAndSupport")}
       />
-      <SettingsNavigationLinkView
+      <TiFFormNavigationLinkView
         iconName="lock-closed"
         iconBackgroundColor={AppStyles.black}
         title="Privacy and Data"
         onTapped={() => onSettingsScreenLinkTapped("privacySettings")}
       />
-    </SettingsCardSectionView>
+    </TiFFormCardSectionView>
     <VersionNumberView />
   </View>
 )
@@ -141,11 +141,11 @@ const VersionNumberView = () => {
       </BodyText>
       {quote && (
         <Animated.View entering={FadeIn}>
-          <SettingsCardView style={styles.quoteCard}>
+          <TiFFormCardView style={styles.quoteCard}>
             <BodyText suppressHighlighting style={styles.quoteText}>
               {quote}
             </BodyText>
-          </SettingsCardView>
+          </TiFFormCardView>
         </Animated.View>
       )}
     </>

@@ -6,7 +6,11 @@ import {
   createTestQueryClient
 } from "@test-helpers/ReactQuery"
 import { act, renderHook, waitFor } from "@testing-library/react-native"
-import { LeaveEventResult, useLeaveEvent } from "./LeaveEvent"
+import {
+  LEAVE_EVENT_ALERTS,
+  LeaveEventResult,
+  useLeaveEvent
+} from "./LeaveEvent"
 import { EventMocks } from "./MockData"
 import { renderSuccessfulUseLoadEventDetails } from "./TestHelpers"
 
@@ -161,27 +165,24 @@ describe("LeaveEvent tests", () => {
       testEnv.leaveEvent.mockResolvedValueOnce("event-has-ended")
       act(() => (leaveEventResult.current as any).confirmButtonTapped())
       await waitFor(() => {
-        expect(alertPresentationSpy).toHaveBeenCalledWith(
-          "Event has ended",
-          "This event has ended. You will be moved to the previous screen."
+        expect(alertPresentationSpy).toHaveBeenPresentedWith(
+          LEAVE_EVENT_ALERTS["event-has-ended"]
         )
       })
 
       testEnv.leaveEvent.mockResolvedValueOnce("event-was-cancelled")
       act(() => (leaveEventResult.current as any).confirmButtonTapped())
       await waitFor(() => {
-        expect(alertPresentationSpy).toHaveBeenCalledWith(
-          "Event was cancelled",
-          "This event was cancelled. You will be moved to the previous screen."
+        expect(alertPresentationSpy).toHaveBeenPresentedWith(
+          LEAVE_EVENT_ALERTS["event-was-cancelled"]
         )
       })
 
       testEnv.leaveEvent.mockResolvedValueOnce("co-host-not-found")
       act(() => (leaveEventResult.current as any).confirmButtonTapped())
       await waitFor(() => {
-        expect(alertPresentationSpy).toHaveBeenCalledWith(
-          "Event has no co-host",
-          "This event has no co-host. To leave, you will need to select a new host."
+        expect(alertPresentationSpy).toHaveBeenPresentedWith(
+          LEAVE_EVENT_ALERTS["co-host-not-found"]
         )
       })
     })

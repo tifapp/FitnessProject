@@ -1,22 +1,21 @@
-import { TiFAPI } from "TiFShared/api"
-import { ColorString } from "TiFShared/domain-models/ColorString"
 import { uuidString } from "@lib/utils/UUID"
 import { TestInternetConnectionStatus } from "@test-helpers/InternetConnectionStatus"
 import { fakeTimers } from "@test-helpers/Timers"
-import { noContentResponse, mswServer } from "@test-helpers/msw"
 import { act, renderHook, waitFor } from "@testing-library/react-native"
+import { TiFAPI } from "TiFShared/api"
+import { EventResponse } from "TiFShared/api/models/Event"
+import { ColorString } from "TiFShared/domain-models/ColorString"
+import { EventID, EventWhenBlockedByHost } from "TiFShared/domain-models/Event"
+import { dateRange } from "TiFShared/domain-models/FixedDateRange"
+import { UserHandle } from "TiFShared/domain-models/User"
+import { mockTiFEndpoint } from "TiFShared/test-helpers/mockAPIServer"
 import dayjs from "dayjs"
-import { HttpResponse, http } from "msw"
 import {
   loadEventDetails,
   useDisplayedEventDetailsLoadingBalls
 } from "./Details"
 import { EventMocks, mockEventLocation } from "./MockData"
 import { renderUseLoadEventDetails } from "./TestHelpers"
-import { dateRange } from "TiFShared/domain-models/FixedDateRange"
-import { UserHandle } from "TiFShared/domain-models/User"
-import { EventID } from "TiFShared/domain-models/Event"
-import { addLogHandler, consoleLogHandler } from "TiFShared/logging"
 
 describe("EventDetailsLoading tests", () => {
   beforeEach(() => {
@@ -193,36 +192,27 @@ describe("EventDetailsLoading tests", () => {
   describe("LoadEventDetails tests", () => {
     fakeTimers()
 
-    it("should return canceled when a 204 occurs", async () => {
-      setEventResponse(204)
-      const result = await loadEventDetails(1, TiFAPI.testAuthenticatedInstance)
-      expect(result).toEqual({ status: "cancelled" })
-    })
-
     it("should return not-found when a 404 occurs", async () => {
-      setEventResponse(404, { error: "event-not-found" })
+      mockTiFEndpoint("eventDetails", 404, { error: "event-not-found" })
       const result = await loadEventDetails(1, TiFAPI.testAuthenticatedInstance)
       expect(result).toEqual({ status: "not-found" })
     })
 
     it("should return blocked when a 403 occurs", async () => {
-      const blockedEventResponse = {
+      const blockedEventResponse: EventWhenBlockedByHost = {
+        error: "blocked-you",
         id: 1,
         title: "Some Event",
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        createdDateTime: new Date(),
+        updatedDateTime: new Date(),
         host: {
           id: uuidString(),
-          username: "Blob",
-          handle: "blob",
-          profileImageURL: null,
-          relations: {
-            themToYou: "blocked",
-            youToThem: "blocked"
-          }
+          name: "Blob",
+          handle: UserHandle.optionalParse("blob")!,
+          relationStatus: "blocked-you"
         }
       }
-      setEventResponse(403, blockedEventResponse)
+      mockTiFEndpoint("eventDetails", 403, blockedEventResponse)
       const result = await loadEventDetails(1, TiFAPI.testAuthenticatedInstance)
       expect(result).toEqual({
         status: "blocked",
@@ -239,26 +229,22 @@ describe("EventDetailsLoading tests", () => {
     it("should indicate the time of response on the event time when a 200 occurs", async () => {
       const clientReceivedTime = new Date(4500)
       jest.setSystemTime(clientReceivedTime)
-      const eventResponse = {
+      const eventResponse: EventResponse = {
         id: 1,
         title: "Some Event",
-        color: "#FFFFFF",
+        color: ColorString.parse("#FFFFFF")!,
         description: "This is an event.",
         hasArrived: false,
-        createdAt: new Date(2000),
-        updatedAt: new Date(3000),
+        createdDateTime: new Date(2000),
+        updatedDateTime: new Date(3000),
         attendeeCount: 10,
         userAttendeeStatus: "attending",
         isChatExpired: false,
         host: {
           id: uuidString(),
-          username: "Blob",
-          handle: "blob",
-          profileImageURL: null,
-          relations: {
-            themToYou: "not-friends",
-            youToThem: "not-friends"
-          }
+          name: "Blob",
+          handle: UserHandle.optionalParse("blob")!,
+          relationStatus: "not-friends"
         },
         settings: {
           shouldHideAfterStartDate: false,
@@ -267,17 +253,14 @@ describe("EventDetailsLoading tests", () => {
         time: {
           secondsToStart: dayjs.duration(3, "hours").asSeconds(),
           todayOrTomorrow: "today",
-          dateRange: {
-            startDateTime: new Date(4000),
-            endDateTime: new Date(5000)
-          }
+          dateRange: dateRange(new Date(4000), new Date(5000))!
         },
-        joinDate: null,
+        joinedDateTime: undefined,
         location: mockEventLocation(),
-        previewAttendees: [{ id: uuidString(), profileImageURL: null }],
-        endedAt: null
+        previewAttendees: [{ id: uuidString() }],
+        endedDateTime: undefined
       }
-      setEventResponse(200, eventResponse)
+      mockTiFEndpoint("eventDetails", 200, eventResponse)
       const resp = await loadEventDetails(1, TiFAPI.testAuthenticatedInstance)
       expect(resp).toEqual({
         status: "success",
@@ -296,17 +279,6 @@ describe("EventDetailsLoading tests", () => {
         }
       })
     })
-
-    const setEventResponse = (status: 200 | 204 | 404 | 403, body?: object) => {
-      mswServer.use(
-        http.get(TiFAPI.testPath("/event/details/:id"), async () => {
-          if (status === 204) {
-            return noContentResponse()
-          }
-          return HttpResponse.json(body, { status })
-        })
-      )
-    }
   })
 
   describe("UseDisplayedEventDetailsLoadingBalls tests", () => {

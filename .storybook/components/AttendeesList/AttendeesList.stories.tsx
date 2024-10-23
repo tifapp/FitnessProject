@@ -39,7 +39,7 @@ const AttendeesListTestScreen = () => {
   const renderAttendee = (attendee: EventAttendee) => {
     return (
       <View>
-        <Subtitle> {attendee.username} </Subtitle>
+        <Subtitle> {attendee.name} </Subtitle>
         <BodyText> {attendee.handle.toString()} </BodyText>
       </View>
     )

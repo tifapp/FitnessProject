@@ -4,13 +4,29 @@ import { TextFieldRefValue } from "@components/TextFields"
 import { useFormSubmission } from "@lib/utils/Form"
 import { AppStyles } from "@lib/AppColorStyle"
 import React, { useRef, useState } from "react"
-import { Alert, StyleProp, StyleSheet, ViewStyle } from "react-native"
+import { StyleProp, StyleSheet, ViewStyle } from "react-native"
 import {
   EmailPhoneTextToggleFooterView,
   useEmailPhoneTextState
 } from "../EmailPhoneText"
 import { ForgotPasswordResult } from "./Environment"
 import { EmailAddress, USPhoneNumber } from "@user/privacy"
+import { AlertsObject, presentAlert } from "@lib/Alerts"
+
+export const FORGOT_PASSWORD_ALERTS = {
+  "invalid-email": {
+    title: "Invalid Email",
+    description: "No account exists with the email that you entered."
+  },
+  "invalid-phone-number": {
+    title: "Invalid Phone Number",
+    description: "No account exists with the phone number that you entered."
+  },
+  genericError: {
+    title: "Whoops",
+    description: "Sorry, something went wrong. Please try again."
+  }
+} satisfies AlertsObject
 
 /**
  * A type to help show what props need to be given in order to utilize {@link useForgotPasswordForm}.
@@ -51,23 +67,10 @@ export const useForgotPasswordForm = ({
           if (result === "success") {
             onSuccess(args.emailOrPhoneNumber)
           } else {
-            Alert.alert(
-              result === "invalid-email"
-                ? "Invalid Email"
-                : "Invalid Phone Number",
-              result === "invalid-email"
-                ? "No account exists with the email that you entered."
-                : "No account exists with the phone number that you entered."
-            )
+            presentAlert(FORGOT_PASSWORD_ALERTS[result])
           }
         },
-        onError: () => {
-          Alert.alert(
-            "Whoops",
-            "Sorry, something went wrong. Please try again.",
-            [{ text: "Ok" }]
-          )
-        }
+        onError: () => presentAlert(FORGOT_PASSWORD_ALERTS.genericError)
       }
     )
   }

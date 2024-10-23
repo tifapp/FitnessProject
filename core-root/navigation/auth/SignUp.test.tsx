@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/naming-convention */
+import { createSignUpEnvironment } from "@auth-boundary/sign-up"
 import { uuidString } from "@lib/utils/UUID"
 import {
   NavigationContainer,
@@ -9,7 +10,6 @@ import { StackScreenProps, createStackNavigator } from "@react-navigation/stack"
 import { captureAlerts } from "@test-helpers/Alerts"
 import "@test-helpers/Matchers"
 import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
-import { mswServer } from "@test-helpers/msw"
 import {
   act,
   fireEvent,
@@ -17,13 +17,12 @@ import {
   screen,
   waitFor
 } from "@testing-library/react-native"
-import { HttpResponse, http } from "msw"
+import { TiFAPI } from "TiFShared/api"
+import { UserHandle } from "TiFShared/domain-models/User"
+import { mockTiFEndpoint, mockTiFServer } from "TiFShared/test-helpers/mockAPIServer"
 import { useCallback, useState } from "react"
 import { Button, View } from "react-native"
-import { createSignUpEnvironment } from "@auth-boundary/sign-up"
 import { SignUpParamsList, createSignUpScreens } from "./SignUp"
-import { UserHandle } from "TiFShared/domain-models/User"
-import { TiFAPI } from "TiFShared/api"
 
 type TestSignUpParamsList = {
   test: undefined
@@ -42,20 +41,20 @@ describe("SignUpNavigation tests", () => {
 
   beforeEach(() => {
     jest.resetAllMocks()
-    mswServer.use(
-      http.post(TiFAPI.testPath("/user"), async () => {
-        return HttpResponse.json(
-          {
+    mockTiFServer({
+      createCurrentUserProfile: {
+        mockResponse: {
+          status: 201,
+          data: {
             id: uuidString(),
-            handle: TEST_GENERATED_USER_HANDLE.rawValue
-          },
-          { status: 201 }
-        )
-      }),
-      http.get(TiFAPI.testPath("/user/autocomplete"), async () =>
-        HttpResponse.json({ users: [] })
-      )
-    )
+            handle: TEST_GENERATED_USER_HANDLE
+          }
+        }
+      },
+      autocompleteUsers: {
+        mockResponse: { status: 200, data: { users: [] } }
+      }
+    })
   })
 
   test("a full valid sign-up flow", async () => {
@@ -89,19 +88,15 @@ describe("SignUpNavigation tests", () => {
     const newHandleText = "bitchelldickle"
 
     replaceUserHandleText(TEST_GENERATED_USER_HANDLE.rawValue, newHandleText)
-    mswServer.use(
-      http.patch(TiFAPI.testPath("/user/self"), async ({ request }) => {
-        const body: any = await request.json()
-        if (body?.handle !== newHandleText) {
-          return new HttpResponse(null, {
-            status: 500
-          })
-        }
-        return new HttpResponse(null, {
-          status: 204
-        })
-      })
-    )
+
+    mockTiFServer({
+      updateCurrentUserProfile: {
+        // @ts-expect-error Comparing handle rawValue
+        expectedRequest: { body: { handle: newHandleText } },
+        mockResponse: { status: 204 }
+      }
+    })
+
     submitNewUserHandle()
 
     await waitFor(() => expect(endingView()).toBeDisplayed())
@@ -110,14 +105,8 @@ describe("SignUpNavigation tests", () => {
     await waitFor(() => expect(isAtEnd()).toEqual(true))
   })
 
-  test("get to end of sign-up flow, go back to change username again, finish sign-up flow", async () => {
-    mswServer.use(
-      http.patch(TiFAPI.testPath("/user/self"), async () => {
-        return new HttpResponse(null, {
-          status: 204
-        })
-      })
-    )
+  test("get to end of sign-up flow, go back to change name again, finish sign-up flow", async () => {
+    mockTiFEndpoint("updateCurrentUserProfile", 204)
 
     renderSignUpFlow()
 
@@ -227,7 +216,7 @@ describe("SignUpNavigation tests", () => {
     fireEvent.press(screen.getByLabelText("Verify me!"))
   }
 
-  const changeUserHandleForm = () => screen.queryByText("Choose your Username")
+  const changeUserHandleForm = () => screen.queryByText("Choose your name")
 
   const replaceUserHandleText = (
     originalHandleText: string,

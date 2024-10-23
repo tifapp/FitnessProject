@@ -1,4 +1,20 @@
+import { EventArrivals } from "@arrival-tracking"
+import { mockEventRegion } from "@arrival-tracking/MockData"
+import { TrueRegionMonitor } from "@arrival-tracking/region-monitoring/MockRegionMonitors"
+import { mockLocationCoordinate2D, mockTiFLocation } from "@location/MockData"
+import { SQLiteRecentLocationsStorage } from "@location/Recents"
 import { captureAlerts } from "@test-helpers/Alerts"
+import { verifyNeverOccurs } from "@test-helpers/ExpectNeverOccurs"
+import "@test-helpers/Matchers"
+import {
+  TestQueryClientProvider,
+  createTestQueryClient
+} from "@test-helpers/ReactQuery"
+import { resetTestSQLiteBeforeEach, testSQLite } from "@test-helpers/SQLite"
+import { renderHook, waitFor } from "@testing-library/react-native"
+import { act } from "react-test-renderer"
+import { TiFAPI, TiFEndpointResponse } from "TiFShared/api"
+import { mockTiFServer } from "TiFShared/test-helpers/mockAPIServer"
 import {
   JOIN_EVENT_ERROR_ALERTS,
   JoinEventRequest,
@@ -7,29 +23,11 @@ import {
   saveRecentLocationJoinEventHandler,
   useJoinEventStages
 } from "./JoinEvent"
-import { renderHook, waitFor } from "@testing-library/react-native"
-import { act } from "react-test-renderer"
-import {
-  TestQueryClientProvider,
-  createTestQueryClient
-} from "@test-helpers/ReactQuery"
-import { mockLocationCoordinate2D, mockTiFLocation } from "@location/MockData"
-import "@test-helpers/Matchers"
-import { TrueRegionMonitor } from "@arrival-tracking/region-monitoring/MockRegionMonitors"
-import { resetTestSQLiteBeforeEach, testSQLite } from "@test-helpers/SQLite"
-import { SQLiteRecentLocationsStorage } from "@location/Recents"
-import { mswServer } from "@test-helpers/msw"
-import { http, HttpResponse } from "msw"
-import { TiFAPI } from "TiFShared/api"
-import { mockEventRegion } from "@arrival-tracking/MockData"
 import {
   EventMocks,
-  mockEventChatTokenRequest,
   mockEventLocation
 } from "./MockData"
 import { renderSuccessfulUseLoadEventDetails } from "./TestHelpers"
-import { verifyNeverOccurs } from "@test-helpers/ExpectNeverOccurs"
-import { EventArrivals } from "@arrival-tracking"
 
 describe("JoinEvent tests", () => {
   describe("UseJoinEvent tests", () => {
@@ -222,10 +220,9 @@ describe("JoinEvent tests", () => {
     ) => {
       act(() => (result.current as any).joinButtonTapped())
       await waitFor(() => {
-        expect(alertPresentationSpy).toHaveBeenNthCalledWith(
+        expect(alertPresentationSpy).toHaveBeenNthPresentedWith(
           callIndex,
-          JOIN_EVENT_ERROR_ALERTS[key].title,
-          JOIN_EVENT_ERROR_ALERTS[key].description
+          JOIN_EVENT_ERROR_ALERTS[key]
         )
       })
       expect(result.current).toEqual({
@@ -255,7 +252,7 @@ describe("JoinEvent tests", () => {
       hasArrived: true,
       location: {
         ...mockEventRegion(),
-        placemark: null,
+        placemark: undefined,
         isInArrivalTrackingPeriod: true
       }
     }
@@ -263,25 +260,25 @@ describe("JoinEvent tests", () => {
     beforeEach(() => onJoinSuccessHandler.mockReset())
 
     it("should return success when API responds with 201", async () => {
-      setTestRequestHandler(mockSuccessResponse(), 201)
+      setTestRequestHandler(201, mockSuccessResponse())
       const result = await performTestJoinEvent(TEST_REQUEST)
       expect(result).toEqual("success")
     })
 
     it("should return success when API responds with 200", async () => {
-      setTestRequestHandler(mockSuccessResponse(), 200)
+      setTestRequestHandler(200, mockSuccessResponse())
       const result = await performTestJoinEvent(TEST_REQUEST)
       expect(result).toEqual("success")
     })
 
     it("should forward the 403 error", async () => {
-      setTestRequestHandler({ error: "user-is-blocked" }, 403)
+      setTestRequestHandler(403, { error: "blocked-you" })
       const result = await performTestJoinEvent(TEST_REQUEST)
-      expect(result).toEqual("user-is-blocked")
+      expect(result).toEqual("blocked-you")
     })
 
     it("should omit the request body when hasArrived is false", async () => {
-      setTestRequestHandler(mockSuccessResponse(), 200, "no-request-body")
+      setTestRequestHandler(200, mockSuccessResponse(), "no-request-body")
       const result = await performTestJoinEvent({
         ...TEST_REQUEST,
         hasArrived: false
@@ -290,7 +287,7 @@ describe("JoinEvent tests", () => {
     })
 
     it("should omit the request body when isInArrivalTrackingPeriod is false", async () => {
-      setTestRequestHandler(mockSuccessResponse(), 200, "no-request-body")
+      setTestRequestHandler(200, mockSuccessResponse(), "no-request-body")
       const result = await performTestJoinEvent({
         ...TEST_REQUEST,
         hasArrived: true,
@@ -304,10 +301,9 @@ describe("JoinEvent tests", () => {
 
     it("should run the on join success handler when successful", async () => {
       const response = mockSuccessResponse()
-      setTestRequestHandler(response, 201)
+      setTestRequestHandler(201, response)
       await performTestJoinEvent(TEST_REQUEST)
       expect(onJoinSuccessHandler).toHaveBeenCalledWith({
-        chatToken: response.chatToken,
         arrivals: EventArrivals.fromRegions(response.trackableRegions),
         locationIdentifier: TEST_REQUEST.location
       })
@@ -315,7 +311,7 @@ describe("JoinEvent tests", () => {
     })
 
     it("should not run the on join success handler when unsuccessful", async () => {
-      setTestRequestHandler({ error: "event-was-cancelled" }, 403)
+      setTestRequestHandler(403, { error: "event-was-cancelled" })
       await performTestJoinEvent(TEST_REQUEST)
       expect(onJoinSuccessHandler).not.toHaveBeenCalled()
     })
@@ -328,36 +324,27 @@ describe("JoinEvent tests", () => {
       ])
     }
 
-    const setTestRequestHandler = (
-      response: object,
-      status: 200 | 201 | 403,
+    const setTestRequestHandler = <Status extends 200 | 201 | 403 | 404, Data extends TiFEndpointResponse<"joinEvent", Status>>(
+      status: Status,
+      data: Data,
       bodyExpectation: "no-request-body" | "request-body" = "request-body"
     ) => {
-      mswServer.use(
-        http.post(
-          TiFAPI.testPath("/event/join/:eventId"),
-          async ({ params, request }) => {
-            expect(params.eventId).toEqual("1")
-            try {
-              const body = await request.json()
-              if (bodyExpectation === "no-request-body") {
-                return HttpResponse.error()
-              }
-              expect(body).toEqual({
-                region: {
-                  coordinate: TEST_REQUEST.location.coordinate,
-                  arrivalRadiusMeters: TEST_REQUEST.location.arrivalRadiusMeters
-                }
-              })
-            } catch {
-              if (bodyExpectation === "request-body") {
-                return HttpResponse.error()
+      mockTiFServer({
+        joinEvent: {
+          expectedRequest: {
+            params: {
+              eventId: "1"
+            },
+            body: bodyExpectation === "no-request-body" ? undefined : {
+              region: {
+                coordinate: TEST_REQUEST.location.coordinate,
+                arrivalRadiusMeters: TEST_REQUEST.location.arrivalRadiusMeters
               }
             }
-            return HttpResponse.json(response, { status })
-          }
-        )
-      )
+          },
+          mockResponse: { status, data } as any // NB: Typescript not inferring response properly
+        }
+      })
     }
   })
 
@@ -368,7 +355,7 @@ describe("JoinEvent tests", () => {
     it("should not save anything when the location has no placemark", async () => {
       const coordinate = mockLocationCoordinate2D()
       await saveRecentLocationJoinEventHandler(
-        { locationIdentifier: { coordinate, placemark: null } },
+        { locationIdentifier: { coordinate, placemark: undefined } },
         recentsStorage
       )
       const recents = await recentsStorage.locationsForCoordinates([coordinate])
@@ -391,7 +378,6 @@ describe("JoinEvent tests", () => {
   const mockSuccessResponse = () => ({
     id: 1,
     trackableRegions: [],
-    hasArrived: false,
-    chatToken: mockEventChatTokenRequest()
+    hasArrived: false
   })
 })

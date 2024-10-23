@@ -1,13 +1,16 @@
 import { Auth } from "@aws-amplify/auth"
 import { API_URL } from "@env"
-import {
-  TiFAPI,
-  TiFAPITransport,
-  jwtMiddleware,
-  tifAPITransport
-} from "TiFShared/api"
-import { LaunchArguments, launchArguments } from "./LaunchArguments"
 import { CognitoUserSession } from "amazon-cognito-identity-js"
+import {
+  APIMiddleware,
+  TiFAPI,
+  TiFAPIClientCreator,
+  jwtMiddleware,
+  tifAPITransport,
+  validateAPIClientCall
+} from "TiFShared/api"
+import { chainMiddleware } from "TiFShared/lib/Middleware"
+import { LaunchArguments, launchArguments } from "./LaunchArguments"
 
 const userSession = () => Auth.currentSession()
 
@@ -36,8 +39,12 @@ export const cognitoBearerToken = async (
  *
  * @param url the base url of the API.
  */
-export const awsTiFAPITransport = (url: URL): TiFAPITransport => {
-  return tifAPITransport(url, jwtMiddleware(cognitoBearerToken))
+export const awsTiFAPITransport = (url: URL): APIMiddleware => {
+  return chainMiddleware(
+    validateAPIClientCall,
+    jwtMiddleware(cognitoBearerToken),
+    tifAPITransport(url)
+  )
 }
 
 declare module "TiFShared/api" {
@@ -49,6 +56,6 @@ declare module "TiFShared/api" {
   }
 }
 
-TiFAPI.productionInstance = new TiFAPI(
+TiFAPI.productionInstance = TiFAPIClientCreator(
   awsTiFAPITransport(launchArguments.apiURL ?? new URL(API_URL))
 )
