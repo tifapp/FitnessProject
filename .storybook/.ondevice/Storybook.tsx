@@ -1,70 +1,73 @@
 import React, { useState } from "react"
-import { FlatList, Text, TouchableOpacity, View } from "react-native"
 import { useAppFonts } from "../../lib/Fonts"
 
 // Import your stories
 import { setupCognito } from "@auth-boundary/CognitoHelpers"
 import { InMemorySecureStore } from "@auth-boundary/CognitoSecureStorage"
+import { sqliteLogHandler, sqliteLogs } from "@lib/Logging"
+import { FlatList, Text, TouchableOpacity, View } from "react-native"
+import { dayjs } from "TiFShared/lib/Dayjs"
+import { addLogHandler, consoleLogHandler } from "TiFShared/logging"
 import AttendeesListMeta, {
-  Basic as AttendeesListBasic
+    Basic as AttendeesListBasic
 } from "../components/AttendeesList/AttendeesList.stories"
 import ButtonsMeta, {
-  Basic as ButtonsBasic
+    Basic as ButtonsBasic
 } from "../components/Buttons/Buttons.stories"
-import ChangePasswordMeta, {
-  Basic as ChangePasswordBasic
-} from "../components/ChangePassword/ChangePassword.stories"
-import ContentReportingMeta, {
-  Default as DefaultReportingFlow
-} from "../components/ContentReporting/ContentReporting.stories"
-import ContentTextMeta, {
-  Basic as ContentTextBasic
-} from "../components/ContentText/ContextText.stories"
+import EditEventDurationsMeta, {
+    Basic as EditEventDurationsBasic
+} from "../components/EditEvent/DurationPicker.stories"
+import EnterMotivationMeta, {
+    Basic as EnterMotivationBasic
+} from "../components/EnterMotivation/EnterMotivation.stories"
 import EventDetailsMeta, {
-  Basic as EventDetailsBasic
+    Basic as EventDetailsBasic
 } from "../components/EventDetails/EventDetails.stories"
 import ExploreEventsMeta, {
-  Basic as ExploreEventsBasic
+    Basic as ExploreEventsBasic
 } from "../components/Explore/Explore.stories"
 import ForgotPasswordMeta, {
-  Basic as ForgotPasswordBasic
+    Basic as ForgotPasswordBasic
 } from "../components/ForgotPassword/ForgotPasswordForm.stories"
 import LocationSearchMeta, {
-  Basic as LocationSearchBasic
+    Basic as LocationSearchBasic
 } from "../components/LocationSearch/LocationSearch.stories"
+import NarrationMeta, {
+    Basic as NarrationBasic
+} from "../components/Narration/Narration.stories"
+import EnterGoalMeta, {
+    Basic as EnterGoalBasic
+} from "../components/Prototypes/EnterGoal/EnterGoal.stories"
+import GameNavigationMeta, {
+    Basic as GameNavigationBasic
+} from "../components/Prototypes/InteractiveNarrative/Navigation.stories"
 import RegionMonitoringMeta, {
-  Basic as RegionMonitoringBasic
+    Basic as RegionMonitoringBasic
 } from "../components/RegionMonitoring/RegionMonitoring.stories"
 import SearchBarMeta, {
-  Default as SearchBarBasic
+    Default as SearchBarBasic
 } from "../components/SearchBar/SearchBar.stories"
 import EventSettingsDurationMeta, {
-  Basic as EventSettingsDurationBasic
+    Basic as EventSettingsDurationBasic
 } from "../components/SettingsScreen/EventSettingsDurations.stories"
 import EventSettingsMeta, {
-  Basic as EventSettingsBasic
+    Basic as EventSettingsBasic
 } from "../components/SettingsScreen/EventSettingsScreen.stories"
 import SettingsMeta, {
-  Basic as SettingsScreenBasic
+    Basic as SettingsScreenBasic
 } from "../components/SettingsScreen/SettingsScreen.stories"
 import SignInMeta, {
-  Basic as SignInBasic
+    Basic as SignInBasic
 } from "../components/SignIn/SignIn.stories"
 import SignUpMeta, {
-  Basic as SignUpBasic
+    Basic as SignUpBasic
 } from "../components/SignUp/SignUp.stories"
 import TextFieldMeta, {
-  Basic as TextFieldBasic
+    Basic as TextFieldBasic
 } from "../components/TextField/TextField.stories"
-import VerifcationCodeMeta, {
-  Basic as VerifcationCodeBasic
-} from "../components/VerificationCode/VerifyCode.stories"
-import EditEventDurationsMeta, {
-  Basic as EditEventDurationsBasic
-} from "../components/EditEvent/DurationPicker.stories"
-import { addLogHandler, consoleLogHandler } from "TiFShared/logging"
-import { sqliteLogHandler, sqliteLogs } from "@lib/Logging"
-import { dayjs } from "TiFShared/lib/Dayjs"
+import VesselPickerMeta, {
+    Basic as VesselPickerBasic
+} from "../components/VesselPicker/VesselPicker.stories"
 
 setupCognito(new InMemorySecureStore())
 addLogHandler(consoleLogHandler())
@@ -72,22 +75,36 @@ addLogHandler(
   sqliteLogHandler(sqliteLogs, dayjs.duration(2, "weeks").asSeconds())
 )
 
-// Create an array of stories
 const stories = [
   {
-    name: ContentReportingMeta.title,
-    component: DefaultReportingFlow,
-    args: ContentReportingMeta.args
+    name: GameNavigationMeta.title,
+    component: GameNavigationBasic,
+    args: GameNavigationMeta.args
   },
   {
-    name: ContentTextMeta.title,
-    component: ContentTextBasic,
-    args: ContentTextMeta.args
+    name: EnterGoalMeta.title,
+    component: EnterGoalBasic,
+    args: EnterGoalMeta.args
+  },
+  {
+    name: EnterMotivationMeta.title,
+    component: EnterMotivationBasic,
+    args: EnterMotivationMeta.args
+  },
+  {
+    name: NarrationMeta.title,
+    component: NarrationBasic,
+    args: NarrationMeta.args
+  },
+  {
+    name: VesselPickerMeta.title,
+    component: VesselPickerBasic,
+    args: VesselPickerMeta.args
   },
   {
     name: SettingsMeta.title,
     component: SettingsScreenBasic,
-    args: ContentTextMeta.args
+    args: SettingsMeta.args
   },
   {
     name: ExploreEventsMeta.title,
@@ -135,16 +152,6 @@ const stories = [
     args: SignInMeta.args
   },
   {
-    name: VerifcationCodeMeta.title,
-    component: VerifcationCodeBasic,
-    args: VerifcationCodeMeta.args
-  },
-  {
-    name: ChangePasswordMeta.title,
-    component: ChangePasswordBasic,
-    args: ChangePasswordMeta.args
-  },
-  {
     name: ButtonsMeta.title,
     component: ButtonsBasic,
     args: ButtonsMeta.args
@@ -171,6 +178,7 @@ const stories = [
   }
   // Add more stories here...
 ]
+
 
 const CustomStorybookUI = () => {
   const [isFontsLoaded, error] = useAppFonts()
@@ -203,7 +211,7 @@ const CustomStorybookUI = () => {
 
   // Render the story list
   return (
-    <View style={{ flex: 1, margin: 20 }}>
+    <View style={{ flex: 1, marginHorizontal: 20, marginVertical: 50 }}>
       <FlatList
         data={stories}
         renderItem={({ item, index }) => (

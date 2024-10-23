@@ -22,10 +22,14 @@ public class TifHapticsModule: Module {
     AsyncFunction("play") { (event: HapticEvent) async throws -> Void in
       try await self.hapticsEngine().play(event: event)
     }
+
+    AsyncFunction("playCustomPattern") { (jsonPattern: String) async throws -> Void in
+      try await self.hapticsEngine().playCustomPattern(jsonPattern: jsonPattern)
+    }
   }
 
   private func hapticsEngine() throws -> TiFHapticsEngine {
-    if let engine {
+    if let engine = engine {
       return engine
     }
     let engine = try TiFHapticsEngine()
@@ -36,4 +40,4 @@ public class TifHapticsModule: Module {
 
 // MARK: - Helpers
 
-extension HapticEvent: EnumArgument {}
+extension HapticEvent: Enumerable {}

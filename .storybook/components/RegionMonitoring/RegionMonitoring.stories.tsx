@@ -1,5 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react"
-import { SafeAreaProvider } from "react-native-safe-area-context"
+import { StoryMeta } from ".storybook/HelperTypes"
 import {
   EventArrivals,
   EventArrivalsTracker,
@@ -10,32 +9,38 @@ import {
   SQLiteEventArrivalsStorage,
   useHasArrivedAtRegion
 } from "@arrival-tracking"
-import { Button, Modal, ScrollView, View } from "react-native"
+import {
+  BodyText,
+  Caption,
+  CaptionTitle,
+  Headline,
+  Title
+} from "@components/Text"
+import { EventArrivalBannerView } from "@event-details-boundary/ArrivalBanner"
+import { TiFQueryClientProvider } from "@lib/ReactQuery"
+import { Migrations, TiFSQLite } from "@lib/SQLite"
+import Slider from "@react-native-community/slider"
+import { useQuery } from "@tanstack/react-query"
 import {
   LocationAccuracy,
   requestBackgroundPermissionsAsync,
   requestForegroundPermissionsAsync,
   watchPositionAsync
 } from "expo-location"
-import { BodyText, Headline, Title } from "@components/Text"
-import { TiFQueryClientProvider } from "@lib/ReactQuery"
-import Slider from "@react-native-community/slider"
-import MapView, { MapMarker } from "react-native-maps"
-import { EventArrivalBannerView } from "@event-details-boundary/ArrivalBanner"
-import { StoryMeta } from ".storybook/HelperTypes"
-import {
-  LocationCoordinate2D,
-  coordinateDistance
-} from "TiFShared/domain-models/LocationCoordinate2D"
-import { EventRegion } from "TiFShared/domain-models/Event"
-import { Migrations, TiFSQLite } from "@lib/SQLite"
-import { useQuery } from "@tanstack/react-query"
 import {
   requestPermissionsAsync as requestNotificationPermissionsAsync,
   scheduleNotificationAsync,
   setNotificationHandler
 } from "expo-notifications"
-import { Switch } from "react-native"
+import React, { useEffect, useMemo, useRef, useState } from "react"
+import { Button, Modal, ScrollView, Switch, View } from "react-native"
+import MapView, { MapMarker } from "react-native-maps"
+import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context"
+import { EventRegion } from "TiFShared/domain-models/Event"
+import {
+  coordinateDistance,
+  LocationCoordinate2D
+} from "TiFShared/domain-models/LocationCoordinate2D"
 
 const MT_FUJI_REGION = {
   coordinate: {
@@ -114,16 +119,17 @@ export const Basic = () => (
       }}
     >
       <TiFQueryClientProvider>
-        <ScrollView
-          style={{ width: "100%" }}
-          contentContainerStyle={{ marginTop: 128 }}
-        >
-          <StoryView />
-        </ScrollView>
+        <SafeAreaView>
+          <ScrollView style={{ width: "100%" }}>
+            <StoryView />
+          </ScrollView>
+        </SafeAreaView>
       </TiFQueryClientProvider>
     </View>
   </SafeAreaProvider>
 )
+
+const DEFAULT_LOCATION = { latitude: 0, longitude: 0 }
 
 const StoryView = () => {
   const { data: arePermissionsGranted } = useQuery(
@@ -137,7 +143,9 @@ const StoryView = () => {
         notificationsGranted
       )
     },
-    { initialData: false }
+    {
+      initialData: false
+    }
   )
   if (!arePermissionsGranted) {
     return (
@@ -170,7 +178,7 @@ const MainView = () => {
   const [coordinate, setCoordinate] = useState<
     LocationCoordinate2D | undefined
   >()
-  const timeoutRef = useRef<NodeJS.Timeout>(undefined)
+  const timeoutRef = useRef<NodeJS.Timeout>()
   const region = useMemo(() => {
     if (!coordinate) return undefined
     return { arrivalRadiusMeters, coordinate }
@@ -200,9 +208,35 @@ const MainView = () => {
     coordinate &&
     coordinateDistance(lastKnownCoordinate, coordinate, "meters")
   return (
-    <View style={{ width: "100%", paddingHorizontal: 24 }}>
+    <View
+      style={{
+        width: "100%",
+        height: "100%",
+        paddingHorizontal: 24
+      }}
+    >
+      <Title>Event Arrival Demo</Title>
+      <Spacer />
+      <View
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "space-between"
+        }}
+      >
+        <Headline>Use Foreground Monitor</Headline>
+        <Switch
+          value={monitor === foregroundMonitor}
+          onValueChange={(newValue) =>
+            setMonitor(newValue ? foregroundMonitor : backgroundMonitor)
+          }
+        />
+      </View>
       <Headline>
-        Radius: <BodyText>{arrivalRadiusMeters} meters</BodyText>
+        Arrival Radius:{" "}
+        <BodyText style={{ color: "brown" }}>
+          {arrivalRadiusMeters} meters
+        </BodyText>
       </Headline>
       <Spacer />
       <Slider
@@ -232,37 +266,25 @@ const MainView = () => {
       />
       <Spacer />
       <Button
-        title="Select Coordinate"
+        title="Change Event Location"
         onPress={() => setIsShowingCoordinatePicker(true)}
       />
+      <Spacer />
       {estimatedDistance && (
         <BodyText>
-          <Headline>Estimated Distance:</Headline>{" "}
-          {Math.trunc(estimatedDistance)} meters
+          <Headline style={{ color: "brown" }}>
+            {Math.trunc(estimatedDistance)}
+            {" meters "}
+          </Headline>
+          from the Event Center
         </BodyText>
       )}
-      <Spacer />
-      <View
-        style={{
-          display: "flex",
-          flexDirection: "row",
-          justifyContent: "space-between"
-        }}
-      >
-        <Headline>Use Foreground Monitor</Headline>
-        <Switch
-          value={monitor === foregroundMonitor}
-          onValueChange={(newValue) =>
-            setMonitor(newValue ? foregroundMonitor : backgroundMonitor)
-          }
-        />
-      </View>
       {region && (
         <>
           <Spacer />
           <RegionMonitoringView
             monitor={monitor}
-            lastKnownCoordinate={lastKnownCoordinate}
+            lastKnownCoordinate={lastKnownCoordinate ?? DEFAULT_LOCATION}
             region={region}
           />
         </>
@@ -271,6 +293,7 @@ const MainView = () => {
       <View style={{ marginBottom: 150 }} />
       <Modal visible={isShowingCoordinatePicker}>
         <CoordinatePickerView
+          lastKnownCoordinate={lastKnownCoordinate ?? DEFAULT_LOCATION}
           onSelected={(coordinate) => {
             tracker.replaceArrivals(
               EventArrivals.fromRegions([
@@ -295,12 +318,21 @@ const MainView = () => {
 const Spacer = () => <View style={{ paddingVertical: 16 }} />
 
 type CoordinatePickerProps = {
+  lastKnownCoordinate: LocationCoordinate2D
   onSelected: (coordinate: LocationCoordinate2D) => void
 }
 
-const CoordinatePickerView = ({ onSelected }: CoordinatePickerProps) => (
+const CoordinatePickerView = ({
+  lastKnownCoordinate,
+  onSelected
+}: CoordinatePickerProps) => (
   <View style={{ position: "relative" }}>
     <MapView
+      initialRegion={{
+        ...lastKnownCoordinate,
+        longitudeDelta: 0.25,
+        latitudeDelta: 0.25
+      }}
       onLongPress={(event) => {
         onSelected(event.nativeEvent.coordinate)
       }}
@@ -326,7 +358,7 @@ const CoordinatePickerView = ({ onSelected }: CoordinatePickerProps) => (
       }}
     >
       <View style={{ padding: 24 }}>
-        <Title>Tap and hold to select a location.</Title>
+        <Title>Tap and hold to select a location to arrive at.</Title>
       </View>
     </View>
   </View>
@@ -334,25 +366,30 @@ const CoordinatePickerView = ({ onSelected }: CoordinatePickerProps) => (
 
 type RegionMonitoringProps = {
   monitor: EventRegionMonitor
-  lastKnownCoordinate?: LocationCoordinate2D
+  lastKnownCoordinate: LocationCoordinate2D
   region: EventRegion
 }
 
 const RegionMonitoringView = ({
   monitor,
-  lastKnownCoordinate,
+  lastKnownCoordinate = DEFAULT_LOCATION,
   region
 }: RegionMonitoringProps) => {
   const hasArrived = useHasArrivedAtRegion(region, monitor)
   return (
     <View>
-      <Headline>Monitoring Coordinate</Headline>
-      <CoordinateLabel coordinate={region.coordinate} />
-      <Spacer />
-      <Headline>Current Location</Headline>
-      {lastKnownCoordinate && (
-        <CoordinateLabel coordinate={lastKnownCoordinate} />
-      )}
+      <View style={{ flexDirection: "row" }}>
+        <View style={{ flex: 1 }}>
+          <CaptionTitle>Current Coords</CaptionTitle>
+          {lastKnownCoordinate && (
+            <CoordinateLabel coordinate={lastKnownCoordinate} />
+          )}
+        </View>
+        <View style={{ flex: 1 }}>
+          <CaptionTitle>Event Center</CaptionTitle>
+          <CoordinateLabel coordinate={region.coordinate} />
+        </View>
+      </View>
       <Spacer />
       {hasArrived ? (
         <EventArrivalBannerView
@@ -370,6 +407,11 @@ const RegionMonitoringView = ({
       )}
       <Spacer />
       <MapView
+        initialRegion={{
+          ...region.coordinate,
+          longitudeDelta: 0.1,
+          latitudeDelta: 0.1
+        }}
         customMapStyle={[
           {
             featureType: "poi",
@@ -395,11 +437,11 @@ type CoordinateLabelProps = {
 
 const CoordinateLabel = ({ coordinate }: CoordinateLabelProps) => (
   <View>
-    <BodyText>
-      <Headline>Lat:</Headline> {coordinate.latitude}
-    </BodyText>
-    <BodyText>
-      <Headline>Lng:</Headline> {coordinate.longitude}
-    </BodyText>
+    <Caption>
+      <CaptionTitle>Lat:</CaptionTitle> {coordinate.latitude.toFixed(7)}
+    </Caption>
+    <Caption>
+      <CaptionTitle>Lng:</CaptionTitle> {coordinate.longitude.toFixed(7)}
+    </Caption>
   </View>
 )
