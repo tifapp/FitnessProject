@@ -2,7 +2,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator, StackCardStyleInterpolator } from '@react-navigation/stack';
 import React from 'react';
 import { Easing } from 'react-native';
-import { Screens } from "../../components/Game/Stack";
+import { Screens } from "../../components/InteractiveNarrative/Stack";
 
 const Stack = createStackNavigator<any>();
 

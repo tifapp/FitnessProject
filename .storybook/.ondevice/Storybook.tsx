@@ -7,8 +7,6 @@ import { InMemorySecureStore } from "@auth-boundary/CognitoSecureStorage"
 import { sqliteLogHandler, sqliteLogs } from "@lib/Logging"
 import { dayjs } from "TiFShared/lib/Dayjs"
 import { addLogHandler, consoleLogHandler } from "TiFShared/logging"
-import Game from "../../Game/Game"
-import GameMeta from "../../Game/Game.stories"
 import AttendeesListMeta, {
   Basic as AttendeesListBasic
 } from "../components/AttendeesList/AttendeesList.stories"
@@ -35,7 +33,7 @@ import ForgotPasswordMeta, {
 } from "../components/ForgotPassword/ForgotPasswordForm.stories"
 import GameNavigationMeta, {
   Basic as GameNavigationBasic
-} from "../components/Game/Navigation.stories"
+} from "../components/InteractiveNarrative/Navigation.stories"
 import LocationSearchMeta, {
   Basic as LocationSearchBasic
 } from "../components/LocationSearch/LocationSearch.stories"
@@ -77,11 +75,6 @@ addLogHandler(
 )
 
 const stories = [
-  {
-    name: GameMeta.title,
-    component: Game,
-    args: GameMeta.args
-  },
   {
     name: GameNavigationMeta.title,
     component: GameNavigationBasic,

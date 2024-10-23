@@ -1,9 +1,7 @@
-// Carousel.tsx
 import React, { useState } from 'react';
 import {
   Dimensions,
-  StyleSheet,
-  ViewStyle,
+  ViewStyle
 } from 'react-native';
 import Animated, {
   Extrapolate,
@@ -14,7 +12,6 @@ import Animated, {
 } from 'react-native-reanimated';
 import { PickerItem } from "./PickerItem";
 
-// Define the Colors and Personas
 const options = [
   { color: '#CB9CF2', persona: 'Yogi' },
   { color: '#88BDEA', persona: 'Marathon Runner' },
@@ -34,7 +31,6 @@ const ITEM_WIDTH = 200;
 const ITEM_MARGIN = 10;
 const totalItemWidth = ITEM_WIDTH + ITEM_MARGIN * 2;
 
-// Calculate snap offsets for each item
 const snapOffsets = options.map((_, index) => {
   return index * totalItemWidth;
 });
@@ -48,25 +44,21 @@ export const Carousel = ({ onComplete, onStart, onEnd, style }: CarouselProps) =
     scrollX.value = event.contentOffset.x;
   });
 
-  // State to track if carousel is disabled
   const [isDisabled, setIsDisabled] = useState(false);
 
-  // Handler when any PickerItem completes
   const handleComplete = (color: string, persona: string) => {
     if (!isDisabled) {
-      setIsDisabled(true); // Disable further interactions
-      onComplete([color, persona]); // Call the passed onComplete handler
+      setIsDisabled(true);
+      onComplete([color, persona]);
     }
   };
 
-  // Handler when PickerItem starts progress
   const handleStart = (persona: string) => {
     if (!isDisabled) {
       onStart(persona);
     }
   };
 
-  // Handler when PickerItem ends (gesture canceled or completed)
   const handleEnd = (persona: string) => {
     if (!isDisabled) {
       onEnd(persona);
@@ -77,17 +69,15 @@ export const Carousel = ({ onComplete, onStart, onEnd, style }: CarouselProps) =
     <Animated.ScrollView
       horizontal
       showsHorizontalScrollIndicator={false}
-      style={[styles.scrollView, style]}
-      contentContainerStyle={{
-        paddingHorizontal: sidePadding,
-      }}
+      style={style}
+      contentContainerStyle={{ paddingHorizontal: sidePadding, }}
       snapToOffsets={snapOffsets}
       snapToAlignment="center"
       decelerationRate="fast"
       pagingEnabled={false}
       onScroll={scrollHandler}
       scrollEventThrottle={16}
-      scrollEnabled={!isDisabled} // Disable scrolling when isDisabled is true
+      scrollEnabled={!isDisabled}
     >
       {options.map(({ color, persona }, index) => {
         const animatedStyle = useAnimatedStyle(() => {
@@ -122,7 +112,7 @@ export const Carousel = ({ onComplete, onStart, onEnd, style }: CarouselProps) =
               onEnd={() => handleEnd(persona)}
               onProgressStart={() => handleStart(persona)}
               onProgressComplete={() => handleComplete(color, persona)}
-              disabled={isDisabled} // Pass the disabled state if you modify PickerItem
+              disabled={isDisabled}
             />
           </Animated.View>
         );
@@ -130,9 +120,3 @@ export const Carousel = ({ onComplete, onStart, onEnd, style }: CarouselProps) =
     </Animated.ScrollView>
   );
 };
-
-const styles = StyleSheet.create({
-  scrollView: {
-    // Customize your ScrollView style if needed
-  },
-});

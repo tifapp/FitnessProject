@@ -1,15 +1,14 @@
-// PickerItem.tsx
 import React, { useEffect, useRef, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { runOnJS, useSharedValue, withTiming } from 'react-native-reanimated';
 import { Subtitle } from "../../../components/Text";
 import { Cloud } from "../Icons/Cloud";
-import { Doll } from './AliveVessel'; // Ensure correct import path
+import { Doll } from './AliveVessel';
 import { HeartProgress } from "./Meter";
 
 export const ITEM_SIZE = 125;
-export const PROGRESS_DURATION = 10000; // 10 seconds
+export const PROGRESS_DURATION = 10000;
 
 type PickerItemProps = {
   color: string;
@@ -31,36 +30,30 @@ export const PickerItem = ({
   const [isFall, setIsFall] = useState(false);
   const [isPressed, setIsPressed] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
-  const progress = useSharedValue(0); // Shared value for progress
+  const progress = useSharedValue(0);
 
-  // Handler to start progress
   const handleGestureStart = disabled ? () => {} : () => {
     setIsPressed(true);
     onProgressStart();
-    // Animate the progress to 1 over PROGRESS_DURATION
     progress.value = withTiming(1, { duration: PROGRESS_DURATION }, (isFinished) => {
       if (isFinished) {
         runOnJS(onProgressComplete)();
-        runOnJS(setIsPressed)(false); // Correctly wrapped
-        runOnJS(setIsFall)(true); // Correctly wrapped
+        runOnJS(setIsPressed)(false);
+        runOnJS(setIsFall)(true);
       }
     });
   };
 
-  // Handler to cancel progress
   const handleGestureEnd =disabled ? () => {} : () => {
     onEnd();
     setIsPressed(false);
-    // Clear the timer if gesture ends before PROGRESS_DURATION
     if (timerRef.current) {
       clearTimeout(timerRef.current);
       timerRef.current = null;
     }
-    // Reset the progress to 0
     progress.value = withTiming(0, { duration: 100 });
   };
 
-  // Clean up the timer on unmount
   useEffect(() => {
     return () => {
       if (timerRef.current) {
@@ -69,16 +62,13 @@ export const PickerItem = ({
     };
   }, []);
 
-  // Define the gesture
   const gesture = Gesture.LongPress()
-    .minDuration(100) // Minimum press duration to recognize the gesture
-    .maxDistance(100) // Maximum movement allowed during the gesture
+    .minDuration(100)
+    .maxDistance(100)
     .onStart(() => {
-      // Update state on gesture start
       runOnJS(handleGestureStart)();
     })
     .onEnd(() => {
-      // Update state on gesture end
       runOnJS(handleGestureEnd)();
     });
 
@@ -88,7 +78,7 @@ export const PickerItem = ({
         <Cloud style={{ width: ITEM_SIZE + 120, height: ITEM_SIZE + 120 }} />
         <HeartProgress progress={progress} size={80} color={color} />
         <Doll
-          isPressed={isPressed} // Pass the gesture state as prop
+          isPressed={isPressed}
           color={color}
           rotation={0}
           opacity={1}
@@ -102,7 +92,6 @@ export const PickerItem = ({
   );
 };
 
-// Styles for PickerItem
 const styles = StyleSheet.create({
   container: {
     paddingTop: 150,

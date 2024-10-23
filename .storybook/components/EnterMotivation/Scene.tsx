@@ -1,21 +1,20 @@
-import { EventColors } from "@lib/events";
+import { useSound } from "@lib/Audio";
 import { useHaptics } from "@modules/tif-haptics";
-import { Audio } from 'expo-av';
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import {
   Keyboard,
-  StyleSheet,
   Text,
   TextInput,
   View
 } from "react-native";
+import { ColorString } from "TiFShared/domain-models/ColorString";
 import { Title } from "../../../components/Text";
-import { useAudioFade } from "../Audio";
 import { FadeOut } from "../FadeOut/FadeOut";
 import { Mountain } from "../Icons/Mountain";
+import { useFade } from "../Interpolate";
 import { Avatar, AvatarRef } from "./Avatar";
 
-const AvatarRow = ({ avatarCount, color, avatarRef }: { avatarCount: number, color: string, avatarRef: any }) => {
+const AvatarRow = ({ avatarCount, color, avatarRef }: { avatarCount: number, color: ColorString, avatarRef: any }) => {
   // Split the number of avatars into two parts: before and after the middle avatar
   const middleIndex = Math.floor(avatarCount / 2);
   const backRowCount = avatarCount + 1; // Back row has +1 more avatar than the front row
@@ -28,7 +27,7 @@ const AvatarRow = ({ avatarCount, color, avatarRef }: { avatarCount: number, col
       avatars.push(
         <Avatar
           key={`before-${i}`}
-          color={color ?? EventColors.Orange}
+          color={color}
           rotation={Math.random() * -5 + (Math.random() > 0.5 ? -75 : 75)}
         />
       );
@@ -38,7 +37,7 @@ const AvatarRow = ({ avatarCount, color, avatarRef }: { avatarCount: number, col
     avatars.push(
       <Avatar
         key="middle"
-        color={color ?? EventColors.Orange}
+        color={color}
         rotation={-75}
         ref={avatarRef}
       />
@@ -49,7 +48,7 @@ const AvatarRow = ({ avatarCount, color, avatarRef }: { avatarCount: number, col
       avatars.push(
         <Avatar
           key={`after-${i}`}
-          color={color ?? EventColors.Orange}
+          color={color}
           rotation={Math.random() * -5 + (Math.random() > 0.5 ? -75 : 75)}
         />
       );
@@ -65,7 +64,7 @@ const AvatarRow = ({ avatarCount, color, avatarRef }: { avatarCount: number, col
       backAvatars.push(
         <Avatar
           key={`back-${i}`}
-          color={color ?? EventColors.Orange}
+          color={color}
           rotation={Math.random() * -5 + (Math.random() > 0.5 ? -75 : 75)}
         />
       );
@@ -97,36 +96,21 @@ const AvatarRow = ({ avatarCount, color, avatarRef }: { avatarCount: number, col
   );
 };
 
-async function playSound() {
-  const { sound } = await Audio.Sound.createAsync(
-    require('../../assets/wind.mp3'), // Path to your audio file
-  );
-  await sound.setIsLoopingAsync(true); // Set the sound to loop
-  await sound.playAsync();
-  return sound;
-}
-
 const MIN_ZOOM = 0.4
 const MAX_ZOOM = 1
 
-export const EnterMotivationScene = ({ color, goal, onComplete, onStand }: { color: string, goal: string, onComplete: (text: string) => void, onStand: () => void }) => {
-  const [sound, setSound] = useState<Audio.Sound | null>(null);
+export const EnterMotivationScene = ({ color, goal, onComplete, onStand }: { color: ColorString, goal: string, onComplete: (text: string) => void, onStand: () => void }) => {
+  const placeholderText = `I will be a ${goal}.`;
+  
+  const {sound} = useSound(require('../../assets/wind.mp3'));
   const haptics = useHaptics();
   const [finished, setFinished] = useState(false);
   const [text, setText] = useState("");
-  const placeholderText = `I will be a ${goal}.`;
   const avatarRef = useRef<AvatarRef>(null);
   const [zoomLevel, setZoomLevel] = useState(MIN_ZOOM);
   const [showWarning, setShowWarning] = useState(false);
   
-  const {clearFadeIn, clearFadeOut, fadeIn, fadeOut} = useAudioFade(sound)
-
-  useEffect(() => {
-    playSound().then(setSound);
-    return () => {
-      sound?.unloadAsync();
-    };
-  }, []);
+  const {fadeIn, fadeOut} = useFade(1, sound?.setVolumeAsync ?? (() => {}))
 
   const handleChangeText = (newText: string) => {
     newText = newText.replace(/\n/g, '');
@@ -218,55 +202,4 @@ export const EnterMotivationScene = ({ color, goal, onComplete, onStand }: { col
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    marginVertical: 100,
-    backgroundColor: "#fff",
-    justifyContent: "flex-start",
-    alignItems: "center",
-  },
-  title: {
-    width: "100%",
-    textAlign: "center",
-    fontSize: 24,
-    marginBottom: 150,
-    paddingHorizontal: 20,
-    zIndex: 10
-  },
-  avatarContainer: {
-    gap: 70,
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "transparent",
-  },
-  inputWrapper: {
-    position: 'relative',
-    backgroundColor: "transparent",
-    marginHorizontal: 30,
-  },
-  placeholderText: {
-    paddingTop: 5,
-    fontSize: 24,
-    color: 'gray',
-    backgroundColor:"transparent"
-  },
-  textField: {
-    position: 'absolute',
-    fontSize: 24,
-    width: '100%',
-    backgroundColor: 'transparent',
-    color: 'black'
-  },
-  separator: {
-    borderBottomWidth: 2,
-    width: "100%",
-    marginBottom: 20,
-    marginTop: -20,
-  },
-  warningBorder: {
-    borderColor: 'red',
-    borderWidth: 1,
-  },
-});
+

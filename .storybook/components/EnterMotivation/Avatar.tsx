@@ -10,6 +10,7 @@ import Animated, {
   withSequence,
   withTiming,
 } from 'react-native-reanimated';
+import { ColorString } from 'TiFShared/domain-models/ColorString';
 
 export type AvatarRef = {
   pulse: () => void;
@@ -19,7 +20,7 @@ export type AvatarRef = {
 export const ITEM_SIZE = 125;
 
 export type Item = {
-  color: string;
+  color: ColorString;
   rotation: number;
   onSelect?: () => void;
   onPress?: () => void;
@@ -35,59 +36,53 @@ export const Avatar = forwardRef<AvatarRef, Item>(({
   rotation,
   opacity,
 }: Item, ref) => {
-  // Shared values for animations
   const iconRotation = useSharedValue(rotation);
   const pulse = useSharedValue(0);
   const standUpRotation = useSharedValue(0);
   const translateY = useSharedValue(0);
 
-  // Animated styles for the icon
   const AnimatedIcon = Animated.createAnimatedComponent(Ionicons);
 
   const animatedIconStyle = useAnimatedStyle(() => {
     const animatedColor = interpolateColor(
       pulse.value,
       [0, 1],
-      ['black', color] // Adjust 'black' to your desired base color if needed
+      ['black', color.toString()]
     );
 
     return {
       transform: [
-        { rotate: `${iconRotation.value + standUpRotation.value}deg` }, // Apply rotation
-        { translateY: translateY.value }, // Apply vertical translation (jump)
+        { rotate: `${iconRotation.value + standUpRotation.value}deg` },
+        { translateY: translateY.value },
       ],
       color: animatedColor,
       opacity: opacity ?? 1,
     };
   });
 
-  // Expose the pulse and standUp methods to parent components
   useImperativeHandle(ref, () => ({
     pulse: () => {
-      // Pulse Color Animation (CPR-like compression and release)
       pulse.value = withSequence(
-        withTiming(1, { duration: 200, easing: Easing.out(Easing.ease) }), // Slower pulse to 'color'
-        withTiming(0, { duration: 200, easing: Easing.out(Easing.ease) })  // Return to 'black' gently
+        withTiming(1, { duration: 200, easing: Easing.out(Easing.ease) }),
+        withTiming(0, { duration: 200, easing: Easing.out(Easing.ease) })
       );
     },
     standUp: () => {
-      // Stand-Up Rotation Animation
       standUpRotation.value = withSequence(
-        withTiming(15, { duration: 300, easing: Easing.out(Easing.ease) }), // Tilt forward to 15 degrees
-        withTiming(0, { duration: 300, easing: Easing.out(Easing.ease) }),   // Return to original position
-        withTiming(-rotation, { duration: 600, easing: Easing.out(Easing.cubic) }),   // Translate upwards to simulate the "jump"
+        withTiming(15, { duration: 300, easing: Easing.out(Easing.ease) }),
+        withTiming(0, { duration: 300, easing: Easing.out(Easing.ease) }),
+        withTiming(-rotation, { duration: 600, easing: Easing.out(Easing.cubic) }),
       );
     
       translateY.value = withSequence(
-        withTiming(0, { duration: 600, easing: Easing.out(Easing.ease) }), // Move up (jump)
-        withTiming(-80, { duration: 800, easing: Easing.out(Easing.quad) }), // Move up (jump)
-        withTiming(-20, { duration: 200, easing: Easing.out(Easing.quad) })    // Fall back down
+        withTiming(0, { duration: 600, easing: Easing.out(Easing.ease) }),
+        withTiming(-80, { duration: 800, easing: Easing.out(Easing.quad) }),
+        withTiming(-20, { duration: 200, easing: Easing.out(Easing.quad) })  
       );
 
-      // Apply color transition at the same time as standing up
       pulse.value = withSequence(
-        withTiming(1, { duration: 300, easing: Easing.out(Easing.ease) }), // Tilt forward to 15 degrees
-        withTiming(0, { duration: 300, easing: Easing.out(Easing.ease) }), // Tilt forward to 15 degrees
+        withTiming(1, { duration: 300, easing: Easing.out(Easing.ease) }), 
+        withTiming(0, { duration: 300, easing: Easing.out(Easing.ease) }), 
         withTiming(1, { duration: 300, easing: Easing.out(Easing.ease) }),
         withDelay(600, withTiming(0, { duration: 600, easing: Easing.out(Easing.ease) }))
       );
@@ -96,13 +91,10 @@ export const Avatar = forwardRef<AvatarRef, Item>(({
 
   return (
     <Animated.View style={styles.optionContainer}>
-      {/* Person Icon */}
       <AnimatedIcon name="accessibility" style={animatedIconStyle} size={120} />
     </Animated.View>
   );
 });
-
-Avatar.displayName = 'Avatar'; // Optional: Helps with debugging
 
 const styles = StyleSheet.create({
   optionContainer: {

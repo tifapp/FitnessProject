@@ -1,4 +1,3 @@
-// Doll.tsx
 import { Ionicons } from '@expo/vector-icons';
 import React, { useEffect, useMemo, useState } from 'react';
 import { Dimensions, StyleSheet } from 'react-native';
@@ -15,17 +14,15 @@ import Animated, {
 import { useHaptics } from '../../../modules/tif-haptics';
 import { PROGRESS_DURATION } from './PickerItem';
 
-// Define the size and durations
 export const ITEM_SIZE = 125;
 const HEARTBEAT_INTERVAL = 2000;
 
-// Define the props for the Doll component
 export type DollProps = {
   color: string;
   rotation: number;
   opacity?: number;
   isPressed?: boolean;
-  triggerFall?: boolean; // New prop to trigger the fall animation
+  triggerFall?: boolean;
 };
 
 export interface DollRef {
@@ -38,71 +35,58 @@ export const Doll = ({
   rotation,
   opacity,
   isPressed,
-  triggerFall = false, // Default to false
+  triggerFall = false,
 }: DollProps) => {
   const [dummy, setDummy] = useState(false);
   const haptics = useHaptics();
 
-  // Shared values for animations
   const pulse = useSharedValue(0);
   const progress = useSharedValue(0);
   const iconRotation = useSharedValue(rotation);
 
-  // Shared values for lively jumping animation
   const jumpingTranslateY = useSharedValue(0);
   const jumpingScale = useSharedValue(1);
   const jumpingRotate = useSharedValue(0);
 
-  // Shared values for fall animation
   const fallTranslateX = useSharedValue(0);
   const fallTranslateY = useSharedValue(0);
   const fallRotation = useSharedValue(0);
-  const fallColor = useSharedValue(0); // 0: original color, 1: black
+  const fallColor = useSharedValue(0);
 
-  // Randomized animation parameters using useMemo to ensure they are set once
   const {
     jumpHeight,
     jumpDurationUp,
     jumpDurationDown,
     scaleUp,
     rotateMax,
-    phaseOffset,
   } = useMemo(() => {
-    const jumpHeight = -50 + Math.random() * -20; // Between -50 and -70
-    const jumpDurationUp = 550 + Math.random() * 200; // Between 550ms and 750ms
-    const jumpDurationDown = 550 + Math.random() * 200; // Between 550ms and 750ms
-    const scaleUp = 1 + Math.random() * 0.2; // Between 1 and 1.2
-    const rotateMax = 10 + Math.random() * 10; // Between 10deg and 20deg
-    const phaseOffset = Math.random() * 1000; // Between 0ms and 1000ms
+    const jumpHeight = -50 + Math.random() * -20;
+    const jumpDurationUp = 550 + Math.random() * 200;
+    const jumpDurationDown = 550 + Math.random() * 200;
+    const scaleUp = 1 + Math.random() * 0.2;
+    const rotateMax = 10 + Math.random() * 10;
+    const phaseOffset = Math.random() * 1000;
     return { jumpHeight, jumpDurationUp, jumpDurationDown, scaleUp, rotateMax, phaseOffset };
   }, []);
 
-  // Handle haptic feedback
-  const triggerHapticBurst = () => {
-    haptics.playHeartbeat();
-  };
-
-  // Animated styles for the icon
   const AnimatedIcon = Animated.createAnimatedComponent(Ionicons);
 
   const animatedIconStyle = useAnimatedStyle(() => {
 
     return {
       transform: [
-        { rotate: `${jumpingRotate.value}deg` }, // Combine jumping and fall rotation
+        { rotate: `${jumpingRotate.value}deg` },
         { scale: jumpingScale.value },
-        { translateY: jumpingTranslateY.value + fallTranslateY.value }, // Combine jumping and fall translateY
-        { translateX: fallTranslateX.value }, // Fall translateX
+        { translateY: jumpingTranslateY.value + fallTranslateY.value },
+        { translateX: fallTranslateX.value },
       ],
       opacity: opacity ?? 1,
     };
   });
   
   const fallAnimatedIconStyle = useAnimatedStyle(() => {
-    // Interpolate pulse for color change (heartbeat effect)
     const pulseColor = interpolateColor(pulse.value, [0, 1], [color, 'black']);
 
-    // Interpolate fallColor to transition to black
     const finalColor = interpolateColor(
       fallColor.value,
       [0, 1],
@@ -111,7 +95,7 @@ export const Doll = ({
 
     return {
       transform: [
-        { rotate: `${fallRotation.value}deg` }, // Combine jumping and fall rotation
+        { rotate: `${fallRotation.value}deg` },
       ],
       color: finalColor,
     };
@@ -133,7 +117,7 @@ export const Doll = ({
       const newInterval = Math.max(HEARTBEAT_INTERVAL - elapsedTime / 5, 200);
 
       // Play haptic feedback
-      triggerHapticBurst();
+      haptics.playHeartbeat();
 
       // Trigger pulse animation (synchronized with haptic)
       pulse.value = withSequence(
@@ -154,10 +138,8 @@ export const Doll = ({
     if (isPressed && dummy && !triggerFall) {
       playHeartbeat();
 
-      // Stop the jumping animation
       stopJumping();
 
-      // Start progress meter animation
       progress.value = withTiming(
         1,
         {
@@ -166,9 +148,8 @@ export const Doll = ({
         },
         (isFinished) => {
           if (isFinished && isPressed) {
-            runOnJS(triggerHapticBurst)();
+            runOnJS(haptics.playHeartbeat)();
 
-            // Perform a bouncy jump (scale and translateY)
             pulse.value = withSequence(
               withTiming(1, {
                 duration: 200,
@@ -180,7 +161,6 @@ export const Doll = ({
               })
             );
 
-            // Reset rotation to upright position
             iconRotation.value = withTiming(0, {
               duration: 300,
               easing: Easing.out(Easing.ease),
@@ -191,17 +171,12 @@ export const Doll = ({
           }
         }
       );
-      console.log('Heartbeat and Progress Started');
     } else {
       progress.value = withTiming(0, { duration: 300 });
 
-      // Reset pulse
       pulse.value = withTiming(0, { duration: 300 });
 
-      // Resume the jumping animation
       startJumping();
-
-      console.log('Jumping Animation Resumed');
     }
 
     return () => {
@@ -216,37 +191,18 @@ export const Doll = ({
     setTimeout(() => setDummy(true), 100);
   }, []);
 
-  // Function to start the jumping animation with random parameters
   const startJumping = () => {
-    // Reset to initial values before starting the animation
     jumpingTranslateY.value = 0;
     jumpingScale.value = 1;
     jumpingRotate.value = 0;
 
-    // Jumping TranslateY: Jump high up and come down with randomized parameters
     jumpingTranslateY.value = withRepeat(
       withSequence(
-        withTiming(jumpHeight, { // Randomized jump height
+        withTiming(jumpHeight, {
           duration: jumpDurationUp,
           easing: Easing.out(Easing.quad),
         }),
-        withTiming(0, { // Come back down
-          duration: jumpDurationDown,
-          easing: Easing.in(Easing.quad),
-        })
-      ),
-      -1, // Infinite repetitions
-      true // yoyo effect to repeat the sequence
-    );
-
-    // Randomized Scale Animation
-    jumpingScale.value = withRepeat(
-      withSequence(
-        withTiming(scaleUp, { // Randomized scale up
-          duration: jumpDurationUp,
-          easing: Easing.out(Easing.quad),
-        }),
-        withTiming(1, { // Scale back to normal
+        withTiming(0, {
           duration: jumpDurationDown,
           easing: Easing.in(Easing.quad),
         })
@@ -255,78 +211,76 @@ export const Doll = ({
       true
     );
 
-    // Randomized Rotation Animation
+    jumpingScale.value = withRepeat(
+      withSequence(
+        withTiming(scaleUp, {
+          duration: jumpDurationUp,
+          easing: Easing.out(Easing.quad),
+        }),
+        withTiming(1, {
+          duration: jumpDurationDown,
+          easing: Easing.in(Easing.quad),
+        })
+      ),
+      -1,
+      true
+    );
+
     jumpingRotate.value = withRepeat(
       withSequence(
-        withTiming(rotateMax, { // Randomized rotate to the right
+        withTiming(rotateMax, {
           duration: jumpDurationUp / 2,
           easing: Easing.out(Easing.quad),
         }),
-        withTiming(-rotateMax, { // Rotate to the left
+        withTiming(-rotateMax, {
           duration: jumpDurationDown,
           easing: Easing.inOut(Easing.quad),
         }),
-        withTiming(0, { // Reset rotation
+        withTiming(0, {
           duration: jumpDurationUp / 2,
           easing: Easing.in(Easing.quad),
         })
       ),
       -1,
-      false // Do not loop rotation continuously
+      false
     );
   };
 
-  // Function to stop the jumping animation
   const stopJumping = () => {
     jumpingTranslateY.value = withTiming(0, { duration: 300, easing: Easing.out(Easing.ease) });
     jumpingScale.value = withTiming(1, { duration: 300, easing: Easing.out(Easing.ease) });
     jumpingRotate.value = withTiming(0, { duration: 300, easing: Easing.out(Easing.ease) });
   };
 
-  // useEffect to handle fall animation when triggerFall becomes true
   useEffect(() => {
     if (triggerFall) {
-      // Stop existing animations
       stopJumping();
       pulse.value = withTiming(0, { duration: 300 });
       progress.value = withTiming(0, { duration: 300 });
 
-      // Get window dimensions
-      const { width: windowWidth, height: windowHeight } = Dimensions.get('window');
+      const { height: windowHeight } = Dimensions.get('window');
 
-      // Define horizontal velocity, randomly to left or right
       const horizontalVelocity = -100;
 
-      // Animate translateX to horizontalVelocity over duration
       fallTranslateX.value = withTiming(horizontalVelocity, {
         duration: 1000,
         easing: Easing.out(Easing.cubic),
       });
 
-      // Animate translateY to windowHeight + ITEM_SIZE over duration
-      fallTranslateY.value = withTiming(windowHeight + ITEM_SIZE, {
+      fallTranslateY.value = withTiming(windowHeight, {
         duration: 1000,
         easing: Easing.quad,
       });
 
-      // Animate rotation for spin (e.g., 720 degrees)
       fallRotation.value = withTiming(-80, {
         duration: 1000,
         easing: Easing.linear,
       });
 
-      // Animate color to black
       fallColor.value = withTiming(1, {
         duration: 300,
         easing: Easing.linear,
       });
-
-      // Optionally, you can add a callback after animation completes
-      // For example, to notify parent or to perform cleanup
-      // Here, we'll log to console
-      runOnJS(() => {
-        console.log('Fall Animation Triggered');
-      })();
     }
   }, [triggerFall]);
 

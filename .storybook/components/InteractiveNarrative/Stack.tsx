@@ -1,43 +1,23 @@
 import { StackScreenProps } from "@react-navigation/stack";
-import { Audio } from 'expo-av';
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef } from "react";
 import { StackNavigatorType } from "../../../components/Navigation";
-import { useAudioFade } from "../Audio";
+import { useSound } from "../Audio";
 import { EnterGoalScene } from "../EnterGoal/Scene";
 import { EnterMotivationScene } from "../EnterMotivation/Scene";
+import { useFade } from "../Interpolate";
 import { NarrationScene } from "../Narration/Scene";
 
-// Define the type for navigation params
 export type ParamsList = {
-  Scene1: undefined;  // No params for Scene1
-  Scene2: undefined;  // No params for Scene2
-  Scene3: undefined;  // No params for Scene3
+  Scene1: undefined;
+  Scene2: undefined;
+  Scene3: undefined;
 };
-
-async function playSound() {
-  const { sound } = await Audio.Sound.createAsync(
-    require('../../assets/music.mp3') // Path to your audio file
-  );
-  await sound.setIsLoopingAsync(true); // Set the sound to loop
-  await sound.playAsync();
-  return sound;
-}
 
 export const Screens = <Params extends ParamsList>(
   stack: StackNavigatorType<Params>
 ) => {
-  const [sound, setSound] = useState<Audio.Sound | null>(null);
-  const {clearFadeIn, clearFadeOut, fadeIn, fadeOut} = useAudioFade(sound)
-  
-  useEffect(() => {
-    playSound().then((newSound) => {
-      setSound(newSound);
-    });
-
-    return () => {
-      sound?.unloadAsync();
-    };
-  }, []);
+  const {sound} = useSound(require('../../assets/music.mp3'));
+  const {fadeIn, fadeOut} = useFade(1, sound?.setVolumeAsync ?? (() => {}))
   
   const goal = useRef<string>("")
   const color = useRef<string>("")
@@ -53,14 +33,13 @@ export const Screens = <Params extends ParamsList>(
         {(props: StackScreenProps<Params, 'Scene3'>) => (
           <EnterGoalScene 
             onComplete={([value, value2]) => {
-              clearFadeIn();
-              clearFadeOut();
+              fadeOut();
               color.current = value;
               goal.current = value2;
               props.navigation.navigate("Scene2" as any);
             }}
-            onStart={() => {clearFadeIn(); fadeOut(8000);}}
-            onEnd={() => {clearFadeOut(); fadeIn();}}
+            onStart={() => {fadeOut(8000)}}
+            onEnd={() => {fadeIn()}}
             {...props}
           />
         )}

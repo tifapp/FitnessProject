@@ -1,25 +1,23 @@
 import React, { useEffect, useState } from 'react';
 import { Animated, StyleSheet } from 'react-native';
+import { useFade } from "../Interpolate";
 
 interface FadeOutProps {
-  trigger: boolean; // Boolean to trigger the 
-  onComplete: () => void; // Callback once the animation is completed
+  trigger: boolean;
+  onComplete: () => void;
+  fadeDuration?: number;
   delay?: number;
 }
 
-export const FadeOut: React.FC<FadeOutProps> = ({ trigger, onComplete, delay = 0 }) => {
-  const [fadeAnim] = useState(new Animated.Value(0)); // Initial opacity for the fade effect
+export const FadeOut: React.FC<FadeOutProps> = ({ trigger, onComplete, fadeDuration = 500, delay = 0 }) => {
+  const [fade, setFade] = useState(0);
+  const {fadeIn} = useFade(fade, setFade)
 
   useEffect(() => {
     if (trigger) {
       setTimeout(() => {
-        Animated.timing(fadeAnim, {
-          toValue: 1, // Fully opaque
-          duration: 500, // Duration of the fade (500ms)
-          useNativeDriver: true, // Use native driver for performance
-        }).start(() => {
-          setTimeout(onComplete, 500); // Delay before calling onComplete
-        });
+        fadeIn(fadeDuration)
+        setTimeout(onComplete, fadeDuration)
       }, delay)
     }
   }, [trigger]);
@@ -31,7 +29,7 @@ export const FadeOut: React.FC<FadeOutProps> = ({ trigger, onComplete, delay = 0
       style={[
         styles.fadeOverlay,
         {
-          opacity: fadeAnim,
+          opacity: fade,
         },
       ]}
     />
