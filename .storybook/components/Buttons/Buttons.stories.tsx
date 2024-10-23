@@ -31,17 +31,18 @@ export const Basic: ButtonsStory = () => (
           <View style={{ marginVertical: 16 }} />
           <PrimaryButton>Hello World</PrimaryButton>
           <View style={{ marginVertical: 16 }} />
-          <PrimaryButton title="Hello World with title prop" />
+          <PrimaryButton>Hello World with title prop</PrimaryButton>
           <View style={{ marginVertical: 16 }} />
-          <PrimaryButton title="Disabled" disabled />
+          <PrimaryButton disabled>Disabled</PrimaryButton>
           <View style={{ marginVertical: 16 }} />
           <PrimaryButton
-            title="Max Width"
             style={{
               width: "100%",
               backgroundColor: AppStyles.orange.toString()
             }}
-          />
+          >
+            Max Width
+          </PrimaryButton>
           <View style={{ marginVertical: 16 }} />
           <SecondaryOutlinedButton>Hello World</SecondaryOutlinedButton>
           <View style={{ marginVertical: 16 }} />
