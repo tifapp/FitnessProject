@@ -17,7 +17,7 @@ import Animated, {
   withSpring,
   withTiming,
 } from 'react-native-reanimated';
-import { useHaptics } from '../../../modules/tif-haptics';
+import { useHaptics } from '../../../../modules/tif-haptics';
 
 export const ITEM_SIZE = 125;
 const HEARTBEAT_INTERVAL = 2000;

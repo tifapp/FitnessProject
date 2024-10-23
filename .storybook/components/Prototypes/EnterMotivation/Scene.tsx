@@ -1,5 +1,3 @@
-import { useTrack } from "@lib/Audio";
-import { useHaptics } from "@modules/tif-haptics";
 import React, { useRef, useState } from "react";
 import {
   Keyboard,
@@ -9,10 +7,12 @@ import {
   View
 } from "react-native";
 import { ColorString } from "TiFShared/domain-models/ColorString";
-import { Title } from "../../../components/Text";
+import { Title } from "../../../../components/Text";
+import { useHaptics } from "../../../../modules/tif-haptics";
 import { FadeOut } from "../FadeOut/FadeOut";
 import { Mountain } from "../Icons/Mountain";
-import { useFade } from "../Interpolate";
+import { useTrack } from "../utils/Audio";
+import { useFade } from "../utils/Interpolate";
 import { Avatar, AvatarRef } from "./Avatar";
 
 const AvatarRow = ({ avatarCount, color, avatarRef }: { avatarCount: number, color: string, avatarRef: any }) => {
@@ -20,7 +20,7 @@ const AvatarRow = ({ avatarCount, color, avatarRef }: { avatarCount: number, col
   const backRowCount = avatarCount + 1;
 
   const renderAvatars = () => {
-    let avatars = [];
+    let avatars: React.ReactNode[] = [];
 
     for (let i = 0; i < middleIndex; i++) {
       avatars.push(
@@ -55,7 +55,7 @@ const AvatarRow = ({ avatarCount, color, avatarRef }: { avatarCount: number, col
   };
 
   const renderBackRowAvatars = () => {
-    let backAvatars = [];
+    let backAvatars: React.ReactNode[] = [];
 
     for (let i = 0; i < backRowCount; i++) {
       backAvatars.push(

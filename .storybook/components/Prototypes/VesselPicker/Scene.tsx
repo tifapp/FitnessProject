@@ -1,6 +1,6 @@
-import { Title } from "@components/Text";
 import React, { useState } from "react";
 import { SafeAreaView, StyleSheet, View } from "react-native";
+import { Title } from "../../../../components/Text";
 import { FadeOut } from "../FadeOut/FadeOut";
 import { Mountain } from "../Icons/Mountain";
 import { VesselPicker } from "./VesselPicker";

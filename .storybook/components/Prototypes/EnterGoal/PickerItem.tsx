@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { runOnJS, useSharedValue, withTiming } from 'react-native-reanimated';
-import { Subtitle } from "../../../components/Text";
+import { Subtitle } from "../../../../components/Text";
 import { Cloud } from "../Icons/Cloud";
 import { Doll } from './AliveVessel';
 import { HeartProgress } from "./Meter";

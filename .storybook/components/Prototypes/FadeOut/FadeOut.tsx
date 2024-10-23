@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Animated, StyleSheet } from 'react-native';
-import { useFade } from "../Interpolate";
+import { useFade } from "../utils/Interpolate";
 
 interface FadeOutProps {
   trigger: boolean;

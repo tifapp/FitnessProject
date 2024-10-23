@@ -2,16 +2,16 @@ import { Ionicons } from '@expo/vector-icons';
 import React, { useEffect, useMemo, useState } from 'react';
 import { Dimensions, StyleSheet } from 'react-native';
 import Animated, {
-  Easing,
-  interpolateColor,
-  runOnJS,
-  useAnimatedStyle,
-  useSharedValue,
-  withRepeat,
-  withSequence,
-  withTiming,
+    Easing,
+    interpolateColor,
+    runOnJS,
+    useAnimatedStyle,
+    useSharedValue,
+    withRepeat,
+    withSequence,
+    withTiming,
 } from 'react-native-reanimated';
-import { useHaptics } from '../../../modules/tif-haptics';
+import { useHaptics } from '../../../../modules/tif-haptics';
 import { PROGRESS_DURATION } from './PickerItem';
 
 export const ITEM_SIZE = 125;

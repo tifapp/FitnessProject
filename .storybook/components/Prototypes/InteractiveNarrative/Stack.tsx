@@ -1,12 +1,12 @@
-import { useTrack } from "@lib/Audio";
 import { StackScreenProps } from "@react-navigation/stack";
 import React, { useRef } from "react";
 import { ColorString } from "TiFShared/domain-models/ColorString";
-import { StackNavigatorType } from "../../../components/Navigation";
+import { StackNavigatorType } from "../../../../components/Navigation";
 import { EnterGoalScene } from "../EnterGoal/Scene";
 import { EnterMotivationScene } from "../EnterMotivation/Scene";
-import { useFade } from "../Interpolate";
 import { NarrationScene } from "../Narration/Scene";
+import { useTrack } from "../utils/Audio";
+import { useFade } from "../utils/Interpolate";
 
 export type ParamsList = {
   Scene1: undefined;

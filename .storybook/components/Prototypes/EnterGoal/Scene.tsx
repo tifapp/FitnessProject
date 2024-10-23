@@ -1,10 +1,10 @@
-import { useSFX } from "@lib/Audio";
 import React, { useEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
-import { Title } from "../../../components/Text";
-import { useHaptics } from '../../../modules/tif-haptics';
+import { Title } from "../../../../components/Text";
+import { useHaptics } from '../../../../modules/tif-haptics';
 import { FadeOut } from "../FadeOut/FadeOut";
 import { Mountain } from "../Icons/Mountain";
+import { useSFX } from "../utils/Audio";
 import { Carousel, Option } from "./Carousel";
 
 export const EnterGoalScene = ({ onComplete, onStart, onEnd }: { onStart?: () => void, onEnd?: () => void, onComplete: (_: Option) => void }) => {

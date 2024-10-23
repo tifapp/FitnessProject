@@ -9,64 +9,64 @@ import { FlatList, Text, TouchableOpacity, View } from "react-native"
 import { dayjs } from "TiFShared/lib/Dayjs"
 import { addLogHandler, consoleLogHandler } from "TiFShared/logging"
 import AttendeesListMeta, {
-  Basic as AttendeesListBasic
+    Basic as AttendeesListBasic
 } from "../components/AttendeesList/AttendeesList.stories"
 import ButtonsMeta, {
-  Basic as ButtonsBasic
+    Basic as ButtonsBasic
 } from "../components/Buttons/Buttons.stories"
 import EditEventDurationsMeta, {
-  Basic as EditEventDurationsBasic
+    Basic as EditEventDurationsBasic
 } from "../components/EditEvent/DurationPicker.stories"
-import EnterGoalMeta, {
-  Basic as EnterGoalBasic
-} from "../components/EnterGoal/EnterGoal.stories"
 import EnterMotivationMeta, {
-  Basic as EnterMotivationBasic
+    Basic as EnterMotivationBasic
 } from "../components/EnterMotivation/EnterMotivation.stories"
 import EventDetailsMeta, {
-  Basic as EventDetailsBasic
+    Basic as EventDetailsBasic
 } from "../components/EventDetails/EventDetails.stories"
 import ExploreEventsMeta, {
-  Basic as ExploreEventsBasic
+    Basic as ExploreEventsBasic
 } from "../components/Explore/Explore.stories"
 import ForgotPasswordMeta, {
-  Basic as ForgotPasswordBasic
+    Basic as ForgotPasswordBasic
 } from "../components/ForgotPassword/ForgotPasswordForm.stories"
-import GameNavigationMeta, {
-  Basic as GameNavigationBasic
-} from "../components/InteractiveNarrative/Navigation.stories"
 import LocationSearchMeta, {
-  Basic as LocationSearchBasic
+    Basic as LocationSearchBasic
 } from "../components/LocationSearch/LocationSearch.stories"
 import NarrationMeta, {
-  Basic as NarrationBasic
+    Basic as NarrationBasic
 } from "../components/Narration/Narration.stories"
+import EnterGoalMeta, {
+    Basic as EnterGoalBasic
+} from "../components/Prototypes/EnterGoal/EnterGoal.stories"
+import GameNavigationMeta, {
+    Basic as GameNavigationBasic
+} from "../components/Prototypes/InteractiveNarrative/Navigation.stories"
 import RegionMonitoringMeta, {
-  Basic as RegionMonitoringBasic
+    Basic as RegionMonitoringBasic
 } from "../components/RegionMonitoring/RegionMonitoring.stories"
 import SearchBarMeta, {
-  Default as SearchBarBasic
+    Default as SearchBarBasic
 } from "../components/SearchBar/SearchBar.stories"
 import EventSettingsDurationMeta, {
-  Basic as EventSettingsDurationBasic
+    Basic as EventSettingsDurationBasic
 } from "../components/SettingsScreen/EventSettingsDurations.stories"
 import EventSettingsMeta, {
-  Basic as EventSettingsBasic
+    Basic as EventSettingsBasic
 } from "../components/SettingsScreen/EventSettingsScreen.stories"
 import SettingsMeta, {
-  Basic as SettingsScreenBasic
+    Basic as SettingsScreenBasic
 } from "../components/SettingsScreen/SettingsScreen.stories"
 import SignInMeta, {
-  Basic as SignInBasic
+    Basic as SignInBasic
 } from "../components/SignIn/SignIn.stories"
 import SignUpMeta, {
-  Basic as SignUpBasic
+    Basic as SignUpBasic
 } from "../components/SignUp/SignUp.stories"
 import TextFieldMeta, {
-  Basic as TextFieldBasic
+    Basic as TextFieldBasic
 } from "../components/TextField/TextField.stories"
 import VesselPickerMeta, {
-  Basic as VesselPickerBasic
+    Basic as VesselPickerBasic
 } from "../components/VesselPicker/VesselPicker.stories"
 
 setupCognito(new InMemorySecureStore())

@@ -1,7 +1,7 @@
 import React, { forwardRef, useEffect, useRef, useState } from 'react';
 import { Animated, SafeAreaView, StyleSheet, Text, TextProps, View } from 'react-native';
 import { ColorString } from 'TiFShared/domain-models/ColorString';
-import { useHaptics } from '../../../modules/tif-haptics';
+import { useHaptics } from '../../../../modules/tif-haptics';
 import { FadeOut } from "../FadeOut/FadeOut";
 import { Mountain } from "../Icons/Mountain";
 
@@ -72,12 +72,6 @@ export const NarrationScene = ({ color = ColorString.parse("#000000")!, onComple
             <AnimatedTitle key={item.key} style={[styles.title, { opacity, color: item.color?.toString() }]}>
               {item.content}
             </AnimatedTitle>
-          );
-        } else if (item.type === 'image') {
-          return (
-            <Animated.View key={item.key} style={[styles.background, { opacity }]}>
-              {item.component}
-            </Animated.View>
           );
         }
         return null;
