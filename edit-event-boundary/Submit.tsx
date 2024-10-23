@@ -3,20 +3,21 @@ import { useAtomValue } from "jotai"
 import React, { useMemo } from "react"
 import { submitFormAtom } from "./FormValues"
 import { useFormSubmission } from "@lib/utils/Form"
-import { Alert, StyleProp, ViewStyle, StyleSheet, View } from "react-native"
+import { StyleProp, ViewStyle, StyleSheet, View } from "react-native"
 import { PrimaryButton } from "@components/Buttons"
 import { ClientSideEvent } from "@event/ClientSideEvent"
 import { useQueryClient } from "@tanstack/react-query"
 import { setEventDetailsQueryEvent } from "@event/DetailsQuery"
+import { AlertsObject, presentAlert } from "@lib/Alerts"
 
 export const ALERTS = {
   submissionError: (eventId?: EventID) => ({
     title: "Oh No!",
-    message: eventId
+    description: eventId
       ? "It seems that we weren't able to create the event. Please try again."
       : "It seems that we weren't able to update the event. Please try again."
   })
-}
+} satisfies AlertsObject
 
 export type UseEditEventFormSubmissionEnvironment = {
   eventId?: EventID
@@ -49,8 +50,7 @@ export const useEditEventFormSubmission = ({
           onSuccess(event)
         },
         onError: () => {
-          const alertContents = ALERTS.submissionError(eventId)
-          Alert.alert(alertContents.title, alertContents.message)
+          presentAlert(ALERTS.submissionError(eventId))
         }
       }
     )

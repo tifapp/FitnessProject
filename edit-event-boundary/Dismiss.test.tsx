@@ -4,7 +4,7 @@ import {
   EditEventFormValues,
   editEventFormValuesAtom
 } from "./FormValues"
-import { useDismissEditEventForm } from "./Dismiss"
+import { ALERTS, useDismissEditEventForm } from "./Dismiss"
 import { PersistentSettingsStores } from "@settings-storage/PersistentStores"
 import { SQLiteUserSettingsStorage } from "@settings-storage/UserSettings"
 import { resetTestSQLiteBeforeEach, testSQLite } from "@test-helpers/SQLite"
@@ -42,7 +42,9 @@ describe("DismissEditEventForm tests", () => {
       editValues({ ...TEST_VALUES, description: "I am a changed event!" })
       act(() => result.current.dismissed())
       expect(onDismiss).toHaveBeenCalledTimes(0)
-      expect(alertPresentationSpy).toHaveBeenCalledTimes(1)
+      expect(alertPresentationSpy).toHaveBeenPresentedWith(
+        ALERTS.confirmDismissal()
+      )
       await confirmDismissal()
       expect(onDismiss).toHaveBeenCalledTimes(1)
     })

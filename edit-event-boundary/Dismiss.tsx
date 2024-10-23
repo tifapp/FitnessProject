@@ -1,18 +1,20 @@
 import { useAtomValue } from "jotai"
 import { isEditEventFormDirtyAtom } from "./FormValues"
-import { Alert, StyleProp, ViewStyle, StyleSheet, View } from "react-native"
+import { StyleProp, ViewStyle, StyleSheet, View } from "react-native"
 import { TouchableIonicon } from "@components/common/Icons"
+import { AlertsObject, presentAlert } from "@lib/Alerts"
 
 export const ALERTS = {
-  confirmDismissal: {
+  confirmDismissal: (onDiscard?: () => void) => ({
     title: "Discard Draft?",
-    message: "You have unsaved changes, discarding will remove them forever.",
-    buttons: (onDiscard: () => void) => [
-      { text: "Discard", style: "destructive" as const, onPress: onDiscard },
+    description:
+      "You have unsaved changes, discarding will remove them forever.",
+    buttons: [
+      { text: "Discard", style: "destructive", onPress: onDiscard },
       { text: "Keep Editing" }
     ]
-  }
-}
+  })
+} satisfies AlertsObject
 
 export type UseDismissEditEventFormEnvironment = {
   onDismiss: () => void
@@ -27,11 +29,7 @@ export const useDismissEditEventForm = ({
       if (!isDirty) {
         onDismiss()
       } else {
-        Alert.alert(
-          ALERTS.confirmDismissal.title,
-          ALERTS.confirmDismissal.message,
-          ALERTS.confirmDismissal.buttons(onDismiss)
-        )
+        presentAlert(ALERTS.confirmDismissal(onDismiss))
       }
     }
   }
