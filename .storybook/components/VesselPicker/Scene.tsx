@@ -44,6 +44,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     opacity: 0.5,
     bottom: 0,
+    zIndex: -10
   },
   fadeOverlay: {
     ...StyleSheet.absoluteFillObject, // Make the overlay cover the entire screen

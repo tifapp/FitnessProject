@@ -26,7 +26,7 @@ export type TextFieldProps = {
 } & Omit<TextInputProps, "style" | "placeholderStyle">
 
 /**
- * A generic Text Field component.
+ * A Text Field component without a border.
  */
 export const NakedTextField = forwardRef(function TextField(
   { error, style, ...props }: TextFieldProps,

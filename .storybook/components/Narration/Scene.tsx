@@ -1,11 +1,13 @@
-
-import { AnimatedTitle } from '@components/Text';
-import React, { useEffect, useRef, useState } from 'react';
-import { Animated, SafeAreaView, StyleSheet, View } from 'react-native';
+import React, { forwardRef, useEffect, useRef, useState } from 'react';
+import { Animated, SafeAreaView, StyleSheet, Text, TextProps, View } from 'react-native';
 import { ColorString } from 'TiFShared/domain-models/ColorString';
 import { useHaptics } from '../../../modules/tif-haptics';
 import { FadeOut } from "../FadeOut/FadeOut";
 import { Mountain } from "../Icons/Mountain";
+
+const AnimatedTitle = Animated.createAnimatedComponent(forwardRef<Text, TextProps>(function Title(props, ref) {
+  return <Text ref={ref} {...props} style={[styles.title, props.style]} />
+}))
 
 export const NarrationScene = ({ color = ColorString.parse("#000000")!, onComplete }: {color: ColorString, onComplete: () => void}) => {
   const haptics = useHaptics();
@@ -108,5 +110,6 @@ const styles = StyleSheet.create({
     fontSize: 24,
     marginBottom: 50,
     paddingHorizontal: 20,
+    fontFamily: "OpenSansBold"
   },
 });

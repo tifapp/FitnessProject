@@ -70,6 +70,17 @@ export interface Haptics {
 }
 
 /**
+ * Subscribes to the given {@link LocalSettingsStore} and applies haptic
+ * related settings changes to the given {@link Haptics} instance.
+ */
+export const applyHapticDeviceSettingsChanges = (
+  haptics: Haptics,
+  localSettingsStore: SettingsStore<LocalSettings>
+) => {
+  localSettingsStore.subscribe((settings) => haptics.apply(settings))
+}
+
+/**
  * Helper function to process and play haptic patterns on Android.
  */
 async function processPattern(pattern: any): Promise<void> {
@@ -203,14 +214,3 @@ export const HapticsProvider = ({
     {children}
   </HapticsContext.Provider>
 )
-
-/**
- * Subscribes to the given {@link LocalSettingsStore} and applies haptic
- * related settings changes to the given {@link Haptics} instance.
- */
-export const applyHapticDeviceSettingsChanges = (
-  haptics: Haptics,
-  localSettingsStore: SettingsStore<LocalSettings>
-) => {
-  localSettingsStore.subscribe((settings) => haptics.apply(settings))
-}

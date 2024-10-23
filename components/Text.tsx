@@ -1,17 +1,14 @@
 import { AppStyles } from "@lib/AppColorStyle"
-import React, { forwardRef } from "react"
-import { Animated, StyleSheet, Text, TextProps } from "react-native"
+import React from "react"
+import { StyleSheet, Text, TextProps } from "react-native"
 
 /**
  * A text component that represents the standard title of
  * some UI element.
  */
-export const Title = forwardRef<Text, TextProps>(function Title(props, ref) {
-  return <Text ref={ref} {...props} style={[styles.title, props.style]} />
-})
-
-// Create an Animated version of the Title component
-export const AnimatedTitle = Animated.createAnimatedComponent(Title)
+export const Title = (props: TextProps) => (
+  <Text {...props} style={[props.style, styles.title]} />
+)
 
 /**
  * A text component for secondary titles on screens.

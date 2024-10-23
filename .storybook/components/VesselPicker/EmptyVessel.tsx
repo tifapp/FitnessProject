@@ -1,7 +1,7 @@
 // PickerItem.tsx
 import { Ionicons } from '@expo/vector-icons';
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet } from 'react-native';
 import {
   Gesture,
   GestureDetector,
@@ -18,7 +18,6 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import { useHaptics } from '../../../modules/tif-haptics';
-import { HeartProgress } from "./Meter";
 
 export const ITEM_SIZE = 125;
 const HEARTBEAT_INTERVAL = 2000;
@@ -49,22 +48,14 @@ export const Doll = ({
 }: Item) => {
   const haptics = useHaptics();
 
-  // Shared values for animations
   const pulse = useSharedValue(0);
   const progress = useSharedValue(0);
   const iconRotation = useSharedValue(rotation);
   const isPressed = useSharedValue(false);
 
-  // Additional shared values for bouncy jump animation
   const translateY = useSharedValue(0);
   const scale = useSharedValue(1);
 
-  // Handle haptic feedback
-  const triggerHapticBurst = () => {
-    haptics.playHeartbeat();
-  };
-
-  // Animated styles for the icon
   const AnimatedIcon = Animated.createAnimatedComponent(Ionicons);
 
   const animatedIconStyle = useAnimatedStyle(() => {
@@ -85,21 +76,18 @@ export const Doll = ({
     };
   });
 
-  // Gesture handling using LongPress
   const gesture = Gesture.LongPress()
-    .minDuration(100) // Slight delay before recognizing press
-    .maxDistance(20) // Allow slight finger movements
-    .shouldCancelWhenOutside(false) // Prevent cancellation on movement outside
+    .minDuration(100) 
+    .maxDistance(20)
+    .shouldCancelWhenOutside(false) 
     .onStart(() => {
       isPressed.value = true;
       runOnJS(onPress)();
 
-      // Notify parent that gesture has started
       if (onGestureStart) {
         runOnJS(onGestureStart)();
       }
 
-      // Start progress meter animation
       progress.value = withTiming(
         1,
         {
@@ -108,10 +96,9 @@ export const Doll = ({
         },
         (isFinished) => {
           if (isFinished && isPressed.value) {
-            runOnJS(triggerHapticBurst)();
+            runOnJS(haptics.playHeartbeat)();
             runOnJS(onLongPress)();
 
-            // Perform a bouncy jump (scale and translateY)
             scale.value = withSequence(
               withSpring(1.3, { damping: 5, stiffness: 100 }),
               withSpring(1, { damping: 5, stiffness: 100 })
@@ -147,25 +134,20 @@ export const Doll = ({
     })
     .onFinalize(() => {
       if (isPressed.value) {
-        // If the press is released before completion
         isPressed.value = false;
         progress.value = withTiming(0, { duration: 300 });
         runOnJS(onPressOut)();
 
-        // Reset pulse
         pulse.value = withTiming(0, { duration: 300 });
 
-        // Notify parent that gesture has ended
         if (onGestureEnd) {
           runOnJS(onGestureEnd)();
         }
       }
     });
 
-  // React state to track 'pressed' for haptic heartbeat
   const [pressed, setPressed] = useState(false);
 
-  // Sync shared value 'isPressed' with React state 'pressed'
   useDerivedValue(() => {
     runOnJS(setPressed)(isPressed.value);
   });
@@ -179,16 +161,11 @@ export const Doll = ({
     const playHeartbeat = () => {
       if (!isMounted || !pressed) return;
 
-      // Calculate elapsed time
       const elapsedTime = Date.now() - startTime;
-
-      // Decrease interval duration over time
       const newInterval = Math.max(HEARTBEAT_INTERVAL - elapsedTime / 5, 200);
 
-      // Play haptic feedback
-      triggerHapticBurst();
+      haptics.playHeartbeat();
 
-      // Trigger pulse animation (synchronized with haptic)
       pulse.value = withSequence(
         withTiming(1, {
           duration: 200,
@@ -219,12 +196,6 @@ export const Doll = ({
   return (
     <GestureDetector gesture={gesture}>
       <Animated.View style={styles.optionContainer}>
-        {/* Heart Progress Meter */}
-        <View style={styles.heartContainer}>
-          <HeartProgress progress={progress} size={80} color={color} />
-        </View>
-
-        {/* Person Icon */}
         <AnimatedIcon name="accessibility" style={animatedIconStyle} size={90} />
       </Animated.View>
     </GestureDetector>
@@ -254,7 +225,7 @@ const styles = StyleSheet.create({
   },
   heartContainer: {
     position: 'absolute',
-    top: -ITEM_SIZE/2, // Position the heart above the icon
+    top: -ITEM_SIZE/2,
     alignItems: 'center',
     justifyContent: 'center',
   },

@@ -16,29 +16,6 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  prebuildios:
-    runs-on: macos-latest
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-    - name: Set up Node.js
-      uses: actions/setup-node@v2
-      with:
-        node-version: '18'
-
-    - name: Install dependencies
-      run: npm install
-
-    - name: Expo prebuild
-      run: npx expo prebuild --platform ios
-      
-    - name: Upload iOS folder as artifact
-      uses: actions/upload-artifact@v2
-      with:
-        name: ios-folder
-        path: ios/
-
-
   setup_and_lint:
     if: github.actor != 'roswaaltifbot' && !startsWith(github.event.pull_request.title, 'IGNORE_BUILD')
     runs-on: ubuntu-latest

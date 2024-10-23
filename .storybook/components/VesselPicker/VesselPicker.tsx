@@ -100,38 +100,36 @@ export const VesselPicker = ({
   }, [onSelect]);  
 
   return (
-    <>
-      <FlatList
-        decelerationRate={"fast"}
-        ref={flatListRef}
-        data={data}
-        renderItem={renderItem}
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        keyExtractor={(item) => item.key}
-        onMomentumScrollEnd={handleScrollEnd}
-        getItemLayout={(_, index) => ({
-          length: ITEM_SIZE,
-          offset: ITEM_SIZE * index,
-          index,
-        })}
-        initialNumToRender={Object.values(Options).length * 2}
-        windowSize={10}
-        style={[style]}
-        contentContainerStyle={styles.contentContainer}
-        onScrollToIndexFailed={(info: any) => {
-          const wait = new Promise((resolve) => setTimeout(resolve, 500));
-          wait.then(() => {
-            if (flatListRef.current) {
-              flatListRef.current.scrollToIndex({
-                index: info.index,
-                animated: false,
-              });
-            }
-          });
-        }}
-      />
-    </>
+    <FlatList
+      decelerationRate={"fast"}
+      ref={flatListRef}
+      data={data}
+      renderItem={renderItem}
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      keyExtractor={(item) => item.key}
+      onMomentumScrollEnd={handleScrollEnd}
+      getItemLayout={(_, index) => ({
+        length: ITEM_SIZE,
+        offset: ITEM_SIZE * index,
+        index,
+      })}
+      initialNumToRender={Object.values(Options).length * 2}
+      windowSize={10}
+      style={style}
+      contentContainerStyle={styles.contentContainer}
+      onScrollToIndexFailed={(info: any) => {
+        const wait = new Promise((resolve) => setTimeout(resolve, 500));
+        wait.then(() => {
+          if (flatListRef.current) {
+            flatListRef.current.scrollToIndex({
+              index: info.index,
+              animated: false,
+            });
+          }
+        });
+      }}
+    />
   );
 };
 
@@ -140,12 +138,5 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-  },
-  optionContainer: {
-    width: ITEM_SIZE,
-    height: ITEM_SIZE,
-    alignItems: "center",
-    justifyContent: "center",
-    marginHorizontal: 5,
   },
 });

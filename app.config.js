@@ -51,17 +51,6 @@ const config = {
   },
   plugins: [
     [
-      "expo-build-properties",
-      {
-        ios: {
-          newArchEnabled: true
-        },
-        android: {
-          newArchEnabled: true
-        }
-      }
-    ],
-    [
       "@sentry/react-native/expo",
       {
         url: "https://sentry.io",

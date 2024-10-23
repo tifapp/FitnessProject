@@ -40,7 +40,7 @@ export const EnterGoalScene = ({ onComplete, onStart, onEnd }: { onStart?: () =>
       <FadeOut 
         trigger={!!goal} 
         onComplete={() => onComplete(goal!)} 
-        delay={2500}
+        delay={3000}
       />
     </View>
   );
