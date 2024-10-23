@@ -203,3 +203,51 @@ export const IoniconCloseButton = ({
     />
   </TouchableOpacity>
 )
+
+export type PlusIconProps = {
+  size?: number
+  maxmimumFontScaleFactor?: number
+  style?: StyleProp<ViewStyle>
+}
+
+export const PlusIconView = ({
+  size = 24,
+  maxmimumFontScaleFactor,
+  style
+}: PlusIconProps) => {
+  const fontScale = useFontScale({
+    maximumScaleFactor: maxmimumFontScaleFactor
+  })
+  return (
+    <View accessible={false} style={style}>
+      <View style={styles.plusContainer}>
+        <View
+          style={{
+            width: size * fontScale,
+            height: 2 * fontScale,
+            alignSelf: "center",
+            borderRadius: 12,
+            backgroundColor: "white"
+          }}
+        />
+        <View
+          style={{
+            position: "absolute",
+            top: (-size * fontScale) / 2 + fontScale,
+            alignSelf: "center",
+            width: 2 * fontScale,
+            height: size * fontScale,
+            borderRadius: 12,
+            backgroundColor: "white"
+          }}
+        />
+      </View>
+    </View>
+  )
+}
+
+const styles = StyleSheet.create({
+  plusContainer: {
+    position: "relative"
+  }
+})

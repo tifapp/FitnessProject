@@ -47,14 +47,16 @@ export const TiFView = ({ isFontsLoaded, style, ...props }: TiFProps) => {
   )
 }
 
-const HomeScreen = () => {
-  return (
-    <HomeView
-      onViewEventTapped={() => console.log("TODO: Navigate to Event Details")}
-      style={styles.home}
-    />
-  )
-}
+const HomeScreen = () => (
+  <HomeView
+    onProfileTapped={() => console.log("TODO: Navigate to Profile")}
+    onCreateEventTapped={() => {
+      console.log("TODO: Navigate to Edit Event Form")
+    }}
+    onViewEventTapped={() => console.log("TODO: Navigate to Event Details")}
+    style={styles.home}
+  />
+)
 
 const styles = StyleSheet.create({
   home: {
