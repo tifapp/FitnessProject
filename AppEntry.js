@@ -1,7 +1,7 @@
 import { BUILD_TYPE } from "@env"
 import { registerRootComponent } from "expo"
 import "TiFShared"
-console.log(BUILD_TYPE)
+
 if (BUILD_TYPE !== "storybook") {
   // @ts-ignore App entry
   const Module = require("./App")
