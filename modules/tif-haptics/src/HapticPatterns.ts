@@ -1,13 +1,11 @@
 export const createHeartbeatPattern = () => {
   return {
     events: [
-      // Changed from "Pattern" to "events"
       {
-        eventType: "hapticTransient", // Changed from "EventType" to "eventType"
-        relativeTime: 0, // Changed from "Time" to "relativeTime"
+        eventType: "hapticTransient",
+        relativeTime: 0,
         parameters: [
-          // Changed from "EventParameters" to "parameters"
-          { parameterID: "hapticIntensity", value: 1.0 }, // Changed from "ParameterID" and "Value" to "parameterID" and "value"
+          { parameterID: "hapticIntensity", value: 1.0 },
           { parameterID: "hapticSharpness", value: 0.5 }
         ]
       },
@@ -29,36 +27,36 @@ export const createFadeOutPattern = () => {
       {
         eventType: "hapticContinuous",
         relativeTime: 0.0,
-        duration: 0.3, // Quick burst at the start
+        duration: 0.3,
         parameters: [
-          { parameterID: "hapticIntensity", value: 0.5 }, // High intensity for a strong gust
-          { parameterID: "hapticSharpness", value: 0.3 } // Moderate sharpness for a brisk effect
+          { parameterID: "hapticIntensity", value: 0.5 },
+          { parameterID: "hapticSharpness", value: 0.3 }
         ]
       },
       {
         eventType: "hapticContinuous",
         relativeTime: 0.3,
-        duration: 0.3, // Quick burst at the start
+        duration: 0.3,
         parameters: [
-          { parameterID: "hapticIntensity", value: 1.0 }, // High intensity for a strong gust
-          { parameterID: "hapticSharpness", value: 0.6 } // Moderate sharpness for a brisk effect
+          { parameterID: "hapticIntensity", value: 1.0 },
+          { parameterID: "hapticSharpness", value: 0.6 }
         ]
       },
       {
         eventType: "hapticContinuous",
         relativeTime: 0.6,
-        duration: 0.2, // Quickly fades out
+        duration: 0.2,
         parameters: [
-          { parameterID: "hapticIntensity", value: 0.5 }, // Decreasing intensity
+          { parameterID: "hapticIntensity", value: 0.5 },
           { parameterID: "hapticSharpness", value: 0.4 }
         ]
       },
       {
         eventType: "hapticContinuous",
         relativeTime: 0.8,
-        duration: 0.2, // Final fade-off
+        duration: 0.2,
         parameters: [
-          { parameterID: "hapticIntensity", value: 0.2 }, // Very low intensity to finish the effect
+          { parameterID: "hapticIntensity", value: 0.2 },
           { parameterID: "hapticSharpness", value: 0.2 }
         ]
       }
@@ -69,41 +67,40 @@ export const createFadeOutPattern = () => {
 export const createRoarPattern = () => {
   return {
     events: [
-      // Delay for half a second before the roar starts
       {
         eventType: "hapticContinuous",
-        relativeTime: 0.5, // Start after 0.5 seconds
-        duration: 0.4, // Gradual build-up for the roar
+        relativeTime: 0.5,
+        duration: 0.4,
         parameters: [
-          { parameterID: "hapticIntensity", value: 0.2 }, // Start with low intensity
-          { parameterID: "hapticSharpness", value: 0.1 } // Start with very low sharpness
+          { parameterID: "hapticIntensity", value: 0.2 },
+          { parameterID: "hapticSharpness", value: 0.1 }
         ]
       },
       {
         eventType: "hapticContinuous",
-        relativeTime: 0.9, // Continue the roar
-        duration: 0.3, // More intensity for the peak of the roar
+        relativeTime: 0.9,
+        duration: 0.3,
         parameters: [
-          { parameterID: "hapticIntensity", value: 1.0 }, // Peak intensity
-          { parameterID: "hapticSharpness", value: 0.6 } // Moderate sharpness to convey force
+          { parameterID: "hapticIntensity", value: 1.0 },
+          { parameterID: "hapticSharpness", value: 0.6 }
         ]
       },
       {
         eventType: "hapticContinuous",
-        relativeTime: 1.2, // Fade out the roar
-        duration: 0.3, // Gradual fade out
+        relativeTime: 1.2,
+        duration: 0.3,
         parameters: [
-          { parameterID: "hapticIntensity", value: 0.5 }, // Decreasing intensity
-          { parameterID: "hapticSharpness", value: 0.4 } // Slight decrease in sharpness
+          { parameterID: "hapticIntensity", value: 0.5 },
+          { parameterID: "hapticSharpness", value: 0.4 }
         ]
       },
       {
         eventType: "hapticContinuous",
-        relativeTime: 1.5, // Final fade-off
-        duration: 0.2, // End of the roar
+        relativeTime: 1.5,
+        duration: 0.2,
         parameters: [
-          { parameterID: "hapticIntensity", value: 0.2 }, // Very low intensity to finish the roar
-          { parameterID: "hapticSharpness", value: 0.2 } // Soft finish
+          { parameterID: "hapticIntensity", value: 0.2 },
+          { parameterID: "hapticSharpness", value: 0.2 }
         ]
       }
     ]
@@ -114,20 +111,20 @@ export const createThudPattern = () => {
   return {
     events: [
       {
-        eventType: "hapticTransient", // Simulate the initial heavy impact
+        eventType: "hapticTransient",
         relativeTime: 0.0,
         parameters: [
-          { parameterID: "hapticIntensity", value: 1.0 }, // Very high intensity to represent a strong impact
-          { parameterID: "hapticSharpness", value: 0.8 } // Sharpness to make it feel like a solid, hard hit
+          { parameterID: "hapticIntensity", value: 1.0 },
+          { parameterID: "hapticSharpness", value: 0.8 }
         ]
       },
       {
-        eventType: "hapticContinuous", // Short fade-out after the impact
-        relativeTime: 0.05, // Very brief delay after the initial thud
-        duration: 0.2, // Quick fading
+        eventType: "hapticContinuous",
+        relativeTime: 0.05,
+        duration: 0.2,
         parameters: [
-          { parameterID: "hapticIntensity", value: 0.3 }, // Rapid drop in intensity for the fade-out
-          { parameterID: "hapticSharpness", value: 0.2 } // Softer finish to simulate a bounce or settling
+          { parameterID: "hapticIntensity", value: 0.3 },
+          { parameterID: "hapticSharpness", value: 0.2 }
         ]
       }
     ]

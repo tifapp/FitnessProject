@@ -6,7 +6,7 @@ import { SafeAreaProvider } from "react-native-safe-area-context"
 import { EnterGoalScene } from "./Scene"
 
 const EnterGoalMeta: ComponentMeta<typeof View> = {
-  title: "EnterGoal"
+  title: "EnterGoalPrototype"
 }
 
 export default EnterGoalMeta

@@ -5,6 +5,7 @@ import { useAppFonts } from "../../lib/Fonts"
 import { setupCognito } from "@auth-boundary/CognitoHelpers"
 import { InMemorySecureStore } from "@auth-boundary/CognitoSecureStorage"
 import { sqliteLogHandler, sqliteLogs } from "@lib/Logging"
+import { FlatList, Text, TouchableOpacity, View } from "react-native"
 import { dayjs } from "TiFShared/lib/Dayjs"
 import { addLogHandler, consoleLogHandler } from "TiFShared/logging"
 import AttendeesListMeta, {
@@ -19,8 +20,8 @@ import EditEventDurationsMeta, {
 import EnterGoalMeta, {
   Basic as EnterGoalBasic
 } from "../components/EnterGoal/EnterGoal.stories"
-import EnterNameMeta, {
-  Basic as EnterNameBasic
+import EnterMotivationMeta, {
+  Basic as EnterMotivationBasic
 } from "../components/EnterMotivation/EnterMotivation.stories"
 import EventDetailsMeta, {
   Basic as EventDetailsBasic
@@ -81,24 +82,24 @@ const stories = [
     args: GameNavigationMeta.args
   },
   {
-    name: VesselPickerMeta.title,
-    component: VesselPickerBasic,
-    args: VesselPickerMeta.args
-  },
-  {
-    name: EnterNameMeta.title,
-    component: EnterNameBasic,
-    args: EnterNameMeta.args
-  },
-  {
     name: EnterGoalMeta.title,
     component: EnterGoalBasic,
     args: EnterGoalMeta.args
   },
   {
+    name: EnterMotivationMeta.title,
+    component: EnterMotivationBasic,
+    args: EnterMotivationMeta.args
+  },
+  {
     name: NarrationMeta.title,
     component: NarrationBasic,
     args: NarrationMeta.args
+  },
+  {
+    name: VesselPickerMeta.title,
+    component: VesselPickerBasic,
+    args: VesselPickerMeta.args
   },
   {
     name: SettingsMeta.title,
@@ -178,19 +179,19 @@ const stories = [
   // Add more stories here...
 ]
 
+
 const CustomStorybookUI = () => {
   const [isFontsLoaded, error] = useAppFonts()
-  const [selectedStory, setSelectedStory] = useState(1)
+  const [selectedStory, setSelectedStory] = useState(-1)
 
-  console.error(error)
-  //REMEMBER TO UNCOMMENT FOR PREVIEW
-  // if (!isFontsLoaded)
-  //   return (
-  //     <Text style={{ marginTop: 128 }}>
-  //       The fonts did not load. You are trapped here forever!
-  //       {JSON.stringify(error)}
-  //     </Text>
-  //   )
+  console.log(error)
+  if (!isFontsLoaded)
+    return (
+      <Text style={{ marginTop: 128 }}>
+        The fonts did not load. You are trapped here forever!
+        {JSON.stringify(error)}
+      </Text>
+    )
 
   // Render the selected story
   if (selectedStory !== -1) {
@@ -198,10 +199,38 @@ const CustomStorybookUI = () => {
     return (
       <>
         <StoryComponent {...args} />
+        <Text
+          onPress={() => setSelectedStory(-1)}
+          style={{ position: "absolute", bottom: 30, left: 10 }}
+        >
+          Close
+        </Text>
       </>
     )
   }
-  
+
+  // Render the story list
+  return (
+    <View style={{ flex: 1, marginHorizontal: 20, marginVertical: 50 }}>
+      <FlatList
+        data={stories}
+        renderItem={({ item, index }) => (
+          <TouchableOpacity
+            style={{
+              padding: 10,
+              width: "100%",
+              borderWidth: 1,
+              borderColor: "gray"
+            }}
+            key={index}
+            onPress={() => setSelectedStory(index)}
+          >
+            <Text>{item.name}</Text>
+          </TouchableOpacity>
+        )}
+      />
+    </View>
+  )
 }
 
 export default CustomStorybookUI

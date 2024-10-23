@@ -10,7 +10,6 @@ import Animated, {
   withSequence,
   withTiming,
 } from 'react-native-reanimated';
-import { ColorString } from 'TiFShared/domain-models/ColorString';
 
 export type AvatarRef = {
   pulse: () => void;
@@ -20,7 +19,7 @@ export type AvatarRef = {
 export const ITEM_SIZE = 125;
 
 export type Item = {
-  color: ColorString;
+  color: string;
   rotation: number;
   onSelect?: () => void;
   onPress?: () => void;
@@ -47,7 +46,7 @@ export const Avatar = forwardRef<AvatarRef, Item>(({
     const animatedColor = interpolateColor(
       pulse.value,
       [0, 1],
-      ['black', color.toString()]
+      ['black', color]
     );
 
     return {

@@ -1,7 +1,8 @@
+import { useTrack } from "@lib/Audio";
 import { StackScreenProps } from "@react-navigation/stack";
 import React, { useRef } from "react";
+import { ColorString } from "TiFShared/domain-models/ColorString";
 import { StackNavigatorType } from "../../../components/Navigation";
-import { useSound } from "../Audio";
 import { EnterGoalScene } from "../EnterGoal/Scene";
 import { EnterMotivationScene } from "../EnterMotivation/Scene";
 import { useFade } from "../Interpolate";
@@ -12,15 +13,15 @@ export type ParamsList = {
   Scene2: undefined;
   Scene3: undefined;
 };
-
+  
 export const Screens = <Params extends ParamsList>(
   stack: StackNavigatorType<Params>
 ) => {
-  const {sound} = useSound(require('../../assets/music.mp3'));
-  const {fadeIn, fadeOut} = useFade(1, sound?.setVolumeAsync ?? (() => {}))
+  const {sound} = useTrack(require('../../assets/music.mp3'));
+  const {fadeIn, fadeOut} = useFade(1, (volume) => {sound?.setVolumeAsync(volume)})
   
-  const goal = useRef<string>("")
-  const color = useRef<string>("")
+  const goal = useRef<string>()
+  const color = useRef<ColorString>()
 
   return (
     <>
@@ -32,10 +33,10 @@ export const Screens = <Params extends ParamsList>(
       >
         {(props: StackScreenProps<Params, 'Scene3'>) => (
           <EnterGoalScene 
-            onComplete={([value, value2]) => {
+            onComplete={({color: selectedColor, persona: selectedGoal}) => {
               fadeOut();
-              color.current = value;
-              goal.current = value2;
+              color.current = ColorString.parse(selectedColor)!;
+              goal.current = selectedGoal;
               props.navigation.navigate("Scene2" as any);
             }}
             onStart={() => {fadeOut(8000)}}
@@ -52,15 +53,13 @@ export const Screens = <Params extends ParamsList>(
       >
         {(props: StackScreenProps<Params, 'Scene2'>) => (
           <EnterMotivationScene 
-            color={color.current}
-            goal={goal.current}
+            color={color.current!}
+            goal={goal.current!}
             onStand={() => {
               sound?.setPositionAsync(254500)
               fadeIn();
             }}
-            onComplete={() => {
-              props.navigation.navigate("Scene1" as any);
-            }}
+            onComplete={() => {props.navigation.navigate("Scene1" as any);}}
             {...props}
           />
         )}
@@ -73,8 +72,7 @@ export const Screens = <Params extends ParamsList>(
       >
         {(props: StackScreenProps<Params, 'Scene1'>) => (
           <NarrationScene
-            goal={goal.current}
-            color={color.current}
+            color={color.current!}
             onComplete={() => fadeOut(3000)}
             {...props}
           />

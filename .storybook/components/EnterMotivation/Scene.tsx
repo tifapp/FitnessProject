@@ -1,8 +1,9 @@
-import { useSound } from "@lib/Audio";
+import { useTrack } from "@lib/Audio";
 import { useHaptics } from "@modules/tif-haptics";
 import React, { useRef, useState } from "react";
 import {
   Keyboard,
+  StyleSheet,
   Text,
   TextInput,
   View
@@ -14,15 +15,13 @@ import { Mountain } from "../Icons/Mountain";
 import { useFade } from "../Interpolate";
 import { Avatar, AvatarRef } from "./Avatar";
 
-const AvatarRow = ({ avatarCount, color, avatarRef }: { avatarCount: number, color: ColorString, avatarRef: any }) => {
-  // Split the number of avatars into two parts: before and after the middle avatar
+const AvatarRow = ({ avatarCount, color, avatarRef }: { avatarCount: number, color: string, avatarRef: any }) => {
   const middleIndex = Math.floor(avatarCount / 2);
-  const backRowCount = avatarCount + 1; // Back row has +1 more avatar than the front row
+  const backRowCount = avatarCount + 1;
 
   const renderAvatars = () => {
     let avatars = [];
 
-    // Render avatars before the middle one
     for (let i = 0; i < middleIndex; i++) {
       avatars.push(
         <Avatar
@@ -33,7 +32,6 @@ const AvatarRow = ({ avatarCount, color, avatarRef }: { avatarCount: number, col
       );
     }
 
-    // Add the middle avatar with the ref passed from the parent
     avatars.push(
       <Avatar
         key="middle"
@@ -43,7 +41,6 @@ const AvatarRow = ({ avatarCount, color, avatarRef }: { avatarCount: number, col
       />
     );
 
-    // Render avatars after the middle one
     for (let i = middleIndex + 1; i < avatarCount; i++) {
       avatars.push(
         <Avatar
@@ -75,7 +72,6 @@ const AvatarRow = ({ avatarCount, color, avatarRef }: { avatarCount: number, col
 
   return (
     <View style={[styles.avatarContainer, {paddingLeft: 690, zIndex: 5}]}>
-      {/* Back row with opacity for depth */}
       <View
         style={[
           styles.avatarContainer,
@@ -90,7 +86,6 @@ const AvatarRow = ({ avatarCount, color, avatarRef }: { avatarCount: number, col
         {renderBackRowAvatars()}
       </View>
 
-      {/* Main row of avatars */}
       {renderAvatars()}
     </View>
   );
@@ -102,7 +97,7 @@ const MAX_ZOOM = 1
 export const EnterMotivationScene = ({ color, goal, onComplete, onStand }: { color: ColorString, goal: string, onComplete: (text: string) => void, onStand: () => void }) => {
   const placeholderText = `I will be a ${goal}.`;
   
-  const {sound} = useSound(require('../../assets/wind.mp3'));
+  const {sound} = useTrack(require('../../assets/wind.mp3'));
   const haptics = useHaptics();
   const [finished, setFinished] = useState(false);
   const [text, setText] = useState("");
@@ -110,9 +105,9 @@ export const EnterMotivationScene = ({ color, goal, onComplete, onStand }: { col
   const [zoomLevel, setZoomLevel] = useState(MIN_ZOOM);
   const [showWarning, setShowWarning] = useState(false);
   
-  const {fadeIn, fadeOut} = useFade(1, sound?.setVolumeAsync ?? (() => {}))
+  const {fadeOut} = useFade(1, (volume) => {sound?.setVolumeAsync(volume)})
 
-  const handleChangeText = (newText: string) => {
+  const handleNewText = (newText: string) => {
     newText = newText.replace(/\n/g, '');
     setShowWarning(false);
     setText(newText);
@@ -136,16 +131,14 @@ export const EnterMotivationScene = ({ color, goal, onComplete, onStand }: { col
     }
   };
 
-  const handleKeyPress = (e: any) => {
-    if (e.nativeEvent.key === 'Enter') {
-      if (text.trim() === placeholderText.trim()) {
-        avatarRef.current?.standUp();
-        haptics.playRoar();
-        fadeOut();
-        setFinished(true);
-        onStand?.();
-        Keyboard.dismiss();
-      }
+  const onSubmit = () => {
+    if (text.trim() === placeholderText.trim()) {
+      avatarRef.current?.standUp();
+      haptics.playRoar();
+      fadeOut();
+      setFinished(true);
+      onStand?.();
+      Keyboard.dismiss();
     }
   };
 
@@ -167,7 +160,7 @@ export const EnterMotivationScene = ({ color, goal, onComplete, onStand }: { col
         <View style={{position: "absolute", bottom: 200, opacity: 0.3, zIndex: -10}}>
         <Mountain height={900} width={900} />
         </View>
-        <AvatarRow avatarRef={avatarRef} color={color} avatarCount={7} />
+        <AvatarRow avatarRef={avatarRef} color={color.toString()} avatarCount={7} />
       </View>
       <View style={styles.separator} />
 
@@ -184,9 +177,13 @@ export const EnterMotivationScene = ({ color, goal, onComplete, onStand }: { col
           autoFocus
           multiline={true}
           value={text}
-          onChangeText={handleChangeText}
+          onChangeText={handleNewText}
           returnKeyType="go"
-          onKeyPress={handleKeyPress}
+          onKeyPress={(e) => {
+            if (e.nativeEvent.key === 'Enter') {
+              onSubmit()
+            }
+          }}
         />
       </View>
 
@@ -202,4 +199,55 @@ export const EnterMotivationScene = ({ color, goal, onComplete, onStand }: { col
   );
 };
 
-
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    marginVertical: 100,
+    backgroundColor: "#fff",
+    justifyContent: "flex-start",
+    alignItems: "center",
+  },
+  title: {
+    width: "100%",
+    textAlign: "center",
+    fontSize: 24,
+    marginBottom: 150,
+    paddingHorizontal: 20,
+    zIndex: 10
+  },
+  avatarContainer: {
+    gap: 70,
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "transparent",
+  },
+  inputWrapper: {
+    position: 'relative',
+    backgroundColor: "transparent",
+    marginHorizontal: 30,
+  },
+  placeholderText: {
+    paddingTop: 5,
+    fontSize: 24,
+    color: 'gray',
+    backgroundColor:"transparent"
+  },
+  textField: {
+    position: 'absolute',
+    fontSize: 24,
+    width: '100%',
+    backgroundColor: 'transparent',
+    color: 'black'
+  },
+  separator: {
+    borderBottomWidth: 2,
+    width: "100%",
+    marginBottom: 20,
+    marginTop: -20,
+  },
+  warningBorder: {
+    borderColor: 'red',
+    borderWidth: 1,
+  },
+});

@@ -6,7 +6,7 @@ import { SafeAreaProvider } from "react-native-safe-area-context"
 import { Navigation } from "./Navigation"
 
 const GameNavigationMeta: ComponentMeta<typeof View> = {
-  title: "GameNavigation"
+  title: "GameNavigationPrototype"
 }
 
 export default GameNavigationMeta

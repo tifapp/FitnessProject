@@ -110,13 +110,11 @@ export const Doll = ({
     const playHeartbeat = () => {
       if (!isMounted || !isPressed) return;
 
-      // Calculate elapsed time
       const elapsedTime = Date.now() - startTime;
 
       // Decrease interval duration over time
       const newInterval = Math.max(HEARTBEAT_INTERVAL - elapsedTime / 5, 200);
 
-      // Play haptic feedback
       haptics.playHeartbeat();
 
       // Trigger pulse animation (synchronized with haptic)
@@ -131,7 +129,6 @@ export const Doll = ({
         })
       );
 
-      // Schedule next heartbeat
       timeoutId = setTimeout(playHeartbeat, newInterval);
     };
 

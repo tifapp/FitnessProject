@@ -1,44 +1,25 @@
-import { Audio } from 'expo-av';
+import { useSFX } from "@lib/Audio";
 import React, { useEffect, useState } from "react";
-import {
-  StyleSheet,
-  View
-} from "react-native";
+import { StyleSheet, View } from "react-native";
 import { Title } from "../../../components/Text";
 import { useHaptics } from '../../../modules/tif-haptics';
 import { FadeOut } from "../FadeOut/FadeOut";
 import { Mountain } from "../Icons/Mountain";
-import { Carousel } from "./Carousel";
+import { Carousel, Option } from "./Carousel";
 
-async function playSound() {
-  const { sound } = await Audio.Sound.createAsync(
-    require('../../assets/fall.mp3') // Path to your audio file
-  );
-  await sound.playAsync();
-  return sound;
-}
-
-export const EnterGoalScene = ({ onComplete, onStart, onEnd }: { onStart?: () => void, onEnd?: () => void, onComplete: (_: [color: string, name: string]) => void }) => {
+export const EnterGoalScene = ({ onComplete, onStart, onEnd }: { onStart?: () => void, onEnd?: () => void, onComplete: (_: Option) => void }) => {
   const haptics = useHaptics();
   const [held, setHeld] = useState(false)
-  const [goal, setGoal] = useState<[string, string]>();
+  const [goal, setGoal] = useState<Option>();
   
-  const [sound, setSound] = useState<any>();
+  const {sound} = useSFX(require('../../assets/fall.mp3'));
 
   useEffect(() => {
     if (goal) {
-      playSound()
-      setTimeout(() => {haptics.playThud()}, 3000)
+      sound?.playAsync()
+      setTimeout(haptics.playThud, 3000)
     }
   }, [goal])
-
-  useEffect(() => {
-    return sound
-      ? () => {
-          sound.unloadAsync(); // Unload the sound when the component unmounts
-        }
-      : undefined;
-  }, [sound]);
 
   return (
     <View style={styles.container}>
@@ -49,7 +30,12 @@ export const EnterGoalScene = ({ onComplete, onStart, onEnd }: { onStart?: () =>
         <Mountain width={900} height={900}/>
       </View> 
 
-      <Carousel style={{backgroundColor: "transparent"}} onEnd={() => {onEnd?.(); setHeld(false)}} onComplete={setGoal} onStart={() => {onStart?.(); setHeld(true)}} />
+      <Carousel 
+        style={{backgroundColor: "transparent"}}
+        onStart={() => {onStart?.(); setHeld(true)}} 
+        onEnd={() => {onEnd?.(); setHeld(false)}} 
+        onComplete={setGoal} 
+      />
       
       <FadeOut 
         trigger={!!goal} 
@@ -67,7 +53,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     marginTop: 100,
-    justifyContent: "flex-start", // Center vertically
+    justifyContent: "flex-start",
     alignItems: "center",
     overflow: "visible"
   },
@@ -79,14 +65,14 @@ const styles = StyleSheet.create({
   title: {
     width: "100%",
     textAlign: "center",
-    fontSize: 24, // Optional: Adjust font size
-    marginBottom: 150, // Spacing below the title
+    fontSize: 24, 
+    marginBottom: 150, 
     paddingHorizontal: 50,
   },
   avatarContainer: {
     justifyContent: "center",
     alignItems: "center",
-    marginBottom: 20, // Spacing below the avatar
+    marginBottom: 20,
   },
   inputContainer: {
     flexDirection: "row",
@@ -94,7 +80,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   subtitle: {
-    fontSize: 18, // Optional: Adjust font size
+    fontSize: 18,
     marginBottom: 20,
   },
   textField: {

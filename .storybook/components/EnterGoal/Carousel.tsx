@@ -12,18 +12,20 @@ import Animated, {
 } from 'react-native-reanimated';
 import { PickerItem } from "./PickerItem";
 
+export type Option = {color: string, persona: string}
+
 const options = [
   { color: '#CB9CF2', persona: 'Yogi' },
   { color: '#88BDEA', persona: 'Marathon Runner' },
   { color: '#72B01D', persona: 'Weightlifter' },
   { color: '#F7B2BD', persona: 'High-Intensity Athlete' },
   { color: '#F4845F', persona: 'Long-Distance Hiker' }
-];
+] satisfies Option[];
 
 type CarouselProps = {
-  onStart: (option: string) => void;
-  onEnd: (option: string) => void;
-  onComplete: (_: [color: string, option: string]) => void;
+  onStart: () => void;
+  onEnd: () => void;
+  onComplete: (_: Option) => void;
   style?: ViewStyle;
 };
 
@@ -46,22 +48,22 @@ export const Carousel = ({ onComplete, onStart, onEnd, style }: CarouselProps) =
 
   const [isDisabled, setIsDisabled] = useState(false);
 
-  const handleComplete = (color: string, persona: string) => {
+  const handleComplete = (option: Option) => {
     if (!isDisabled) {
       setIsDisabled(true);
-      onComplete([color, persona]);
+      onComplete(option);
     }
   };
 
-  const handleStart = (persona: string) => {
+  const handleStart = () => {
     if (!isDisabled) {
-      onStart(persona);
+      onStart();
     }
   };
 
-  const handleEnd = (persona: string) => {
+  const handleEnd = () => {
     if (!isDisabled) {
-      onEnd(persona);
+      onEnd();
     }
   };
 
@@ -109,9 +111,9 @@ export const Carousel = ({ onComplete, onStart, onEnd, style }: CarouselProps) =
             <PickerItem 
               color={color} 
               persona={persona} 
-              onEnd={() => handleEnd(persona)}
-              onProgressStart={() => handleStart(persona)}
-              onProgressComplete={() => handleComplete(color, persona)}
+              onEnd={() => handleEnd()}
+              onProgressStart={() => handleStart()}
+              onProgressComplete={() => handleComplete({color, persona})}
               disabled={isDisabled}
             />
           </Animated.View>

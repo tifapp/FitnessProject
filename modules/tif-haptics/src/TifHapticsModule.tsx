@@ -1,4 +1,3 @@
-// Import necessary modules
 import { LocalSettings } from "@settings-storage/LocalSettings"
 import { SettingsStore } from "@settings-storage/Settings"
 import { requireOptionalNativeModule } from "expo"
@@ -61,24 +60,12 @@ export interface Haptics {
    */
   apply(settings: HapticsSettings): Promise<void>;
 
-  /**
-   * Plays the heartbeat haptic pattern.
-   */
   playHeartbeat(): Promise<void>;
 
-  /**
-   * Plays the fade-out haptic pattern.
-   */
   playFadeOut(): Promise<void>;
 
-  /**
-   * Plays the roar haptic pattern.
-   */
   playRoar(): Promise<void>;
 
-  /**
-   * Plays the thud haptic pattern.
-   */
   playThud(): Promise<void>;
 }
 
@@ -87,7 +74,6 @@ export interface Haptics {
  */
 async function processPattern(pattern: any): Promise<void> {
   if (Platform.OS === "ios") {
-    // For iOS, use the native function
     try {
       await TiFNativeHaptics.playCustomPattern(JSON.stringify(pattern))
     } catch (error: any) {
@@ -96,7 +82,8 @@ async function processPattern(pattern: any): Promise<void> {
       })
     }
   } else if (Platform.OS === "android") {
-    // For Android, process the pattern manually
+    // TODO: Native Android haptics module
+    // Uses Vibration API + Expo Haptics currently
     const events = pattern.events
     events.sort((a: any, b: any) => a.relativeTime - b.relativeTime)
 
@@ -112,13 +99,11 @@ async function processPattern(pattern: any): Promise<void> {
       }
 
       if (event.eventType === "hapticTransient") {
-        // Use ExpoHaptics
         const intensityParam = event.parameters.find(
           (p: any) => p.parameterID === "hapticIntensity"
         )
         const intensity = intensityParam ? intensityParam.value : 1.0
 
-        // Map intensity to ExpoHaptics style
         let hapticStyle = ExpoHaptics.ImpactFeedbackStyle.Medium
         if (intensity >= 0.7) {
           hapticStyle = ExpoHaptics.ImpactFeedbackStyle.Heavy
@@ -128,15 +113,12 @@ async function processPattern(pattern: any): Promise<void> {
 
         await ExpoHaptics.impactAsync(hapticStyle)
       } else if (event.eventType === "hapticContinuous") {
-        // Use Vibration
-        const duration = event.duration * 1000 // milliseconds
+        const duration = event.duration * 1000
         Vibration.vibrate(duration)
-        // Wait for the duration to finish
         await new Promise((resolve) => setTimeout(resolve, duration))
       }
     }
   } else {
-    // Other platforms not supported
     log.warn("Haptic feedback not supported on this platform")
   }
 }

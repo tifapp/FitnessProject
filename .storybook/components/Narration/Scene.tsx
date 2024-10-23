@@ -2,11 +2,12 @@
 import { AnimatedTitle } from '@components/Text';
 import React, { useEffect, useRef, useState } from 'react';
 import { Animated, SafeAreaView, StyleSheet, View } from 'react-native';
+import { ColorString } from 'TiFShared/domain-models/ColorString';
 import { useHaptics } from '../../../modules/tif-haptics';
 import { FadeOut } from "../FadeOut/FadeOut";
 import { Mountain } from "../Icons/Mountain";
 
-export const NarrationScene = ({ goal, color = "black", onComplete }: {goal: string, color: string, onComplete: () => void}) => {
+export const NarrationScene = ({ color = ColorString.parse("#000000")!, onComplete }: {color: ColorString, onComplete: () => void}) => {
   const haptics = useHaptics();
   
   const items = [
@@ -16,7 +17,6 @@ export const NarrationScene = ({ goal, color = "black", onComplete }: {goal: str
     { type: 'text', content: 'Meet me at the top.', key: 'line3', color, duration: 1000, pauseAfter: 3000 },
   ];
 
-  // Create an array of Animated.Values for opacity
   const opacityValues = useRef(items.map(() => new Animated.Value(0))).current;
 
   const [finished, setFinished] = useState(false);
@@ -39,7 +39,6 @@ export const NarrationScene = ({ goal, color = "black", onComplete }: {goal: str
           });
         });
 
-        // Pause after the current item, if pauseAfter is specified
         if (items[i].pauseAfter) {
           await new Promise((resolve) => setTimeout(resolve, items[i].pauseAfter));
         }
@@ -68,7 +67,7 @@ export const NarrationScene = ({ goal, color = "black", onComplete }: {goal: str
         const opacity = opacityValues[index];
         if (item.type === 'text') {
           return (
-            <AnimatedTitle key={item.key} style={[styles.title, { opacity, color: item.color ?? "black" }]}>
+            <AnimatedTitle key={item.key} style={[styles.title, { opacity, color: item.color?.toString() }]}>
               {item.content}
             </AnimatedTitle>
           );
