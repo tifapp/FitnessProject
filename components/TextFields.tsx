@@ -170,7 +170,7 @@ const InternalPasswordTextField = forwardRef(function TextField(
 
 const styles = StyleSheet.create({
   filledCard: {
-    backgroundColor: AppStyles.eventCardColor,
+    backgroundColor: AppStyles.cardColor,
     borderRadius: 12,
     width: "100%"
   },
@@ -211,7 +211,7 @@ const styles = StyleSheet.create({
     padding: 4
   },
   placeholderText: {
-    color: AppStyles.darkColor,
+    color: AppStyles.primaryColor,
     opacity: 0.5
   }
 })
