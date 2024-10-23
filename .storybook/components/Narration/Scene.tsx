@@ -48,6 +48,7 @@ export const NarrationScene = ({ goal, color = "black", onComplete }: {goal: str
       if (!isCancelled) {
         haptics.playFadeOut()
         setFinished(true);
+        onComplete();
       }
     }
 
@@ -83,7 +84,7 @@ export const NarrationScene = ({ goal, color = "black", onComplete }: {goal: str
 
       <FadeOut
         trigger={finished}
-        onComplete={() => onComplete()}
+        onComplete={() => {}}
       />
     </SafeAreaView>
   );

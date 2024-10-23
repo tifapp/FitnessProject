@@ -96,7 +96,7 @@ export const Screens = <Params extends ParamsList>(
           <NarrationScene
             goal={goal.current}
             color={color.current}
-            onComplete={() => {}}
+            onComplete={() => fadeOut(3000)}
             {...props}
           />
         )}
