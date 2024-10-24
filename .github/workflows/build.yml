@@ -27,9 +27,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
+          key: ${{ runner.os }}-node-${{ matrix.node-version }}-${{ hashFiles('**/package-lock.json') }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v3
@@ -39,10 +37,6 @@ jobs:
       - name: Install Dependencies
         run: |
           npm ci
-
-      - name: Rebuild
-        run: |
-          npm rebuild
 
       - name: Lint
         run: npm run staged-lint
@@ -60,9 +54,16 @@ jobs:
         uses: actions/cache@v2
         with:
           path: node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
+          key: ${{ runner.os }}-node-${{ matrix.node-version }}-${{ hashFiles('**/package-lock.json') }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "20.0.0"
+      
+      - name: Install Dependencies
+        run: |
+          npm ci
 
       - name: Add Env
         run: echo "API_URL=${{ secrets.API_ENDPOINT }}" >> .env
@@ -82,9 +83,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
+          key: ${{ runner.os }}-node-${{ matrix.node-version }}-${{ hashFiles('**/package-lock.json') }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v3

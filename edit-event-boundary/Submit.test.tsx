@@ -89,10 +89,8 @@ describe("EditEventSubmit tests", () => {
       editValues(newValues)
       act(() => (result.current.submission as any).submit())
       await waitFor(() => {
-        const alertContents = ALERTS.submissionError(undefined)
-        expect(alertPresentationSpy).toHaveBeenCalledWith(
-          alertContents.title,
-          alertContents.message
+        expect(alertPresentationSpy).toHaveBeenPresentedWith(
+          ALERTS.submissionError()
         )
       })
       expect(onSuccess).not.toHaveBeenCalled()
@@ -126,10 +124,8 @@ describe("EditEventSubmit tests", () => {
       editValues(newValues)
       act(() => (result.current.submission as any).submit())
       await waitFor(() => {
-        const alertContents = ALERTS.submissionError(10)
-        expect(alertPresentationSpy).toHaveBeenCalledWith(
-          alertContents.title,
-          alertContents.message
+        expect(alertPresentationSpy).toHaveBeenPresentedWith(
+          ALERTS.submissionError(10)
         )
       })
       expect(onSuccess).not.toHaveBeenCalled()

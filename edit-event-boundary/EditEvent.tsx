@@ -3,7 +3,6 @@ import {
   ViewStyle,
   View,
   StyleSheet,
-  LayoutRectangle,
   TouchableOpacity,
   Platform
 } from "react-native"
@@ -30,7 +29,7 @@ import { useFontScale } from "@lib/Fonts"
 import { AppStyles } from "@lib/AppColorStyle"
 import React, { useCallback, useEffect, useState } from "react"
 import { useScreenBottomPadding } from "@components/Padding"
-import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context"
+import { SafeAreaView } from "react-native-safe-area-context"
 import { useUserSettings } from "@settings-storage/Hooks"
 import { EditEventDurationPickerView } from "./DurationPicker"
 import {
@@ -40,7 +39,6 @@ import {
 } from "@components/common/Icons"
 import { dayjs } from "TiFShared/lib/Dayjs"
 import { BodyText, Headline } from "@components/Text"
-import { TiFFormScrollView } from "@components/form-components/ScrollView"
 import {
   TiFFormCardSectionView,
   TiFFormSectionView
