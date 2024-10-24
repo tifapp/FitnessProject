@@ -25,6 +25,22 @@ export const BodyText = (props: TextProps) => (
 )
 
 /**
+ * A text component for small, but relevant details at the bottom
+ * of a particular UI element.
+ */
+export const Footnote = (props: TextProps) => (
+  <Text {...props} style={[props.style, styles.footnote]} />
+)
+
+/**
+ * A text component for small, but relevant details at the bottom
+ * of a particular UI element.
+ */
+export const BoldFootnote = (props: TextProps) => (
+  <Text {...props} style={[props.style, styles.boldFootnote]} />
+)
+
+/**
  * A text component for smaller and more subtle details.
  */
 export const Caption = (props: TextProps) => (
@@ -63,6 +79,14 @@ const styles = StyleSheet.create({
   body: {
     fontFamily: "OpenSans",
     fontSize: 16
+  },
+  footnote: {
+    fontFamily: "OpenSans",
+    fontSize: 14
+  },
+  boldFootnote: {
+    fontFamily: "OpenSansBold",
+    fontSize: 14
   },
   caption: {
     fontFamily: "OpenSans",

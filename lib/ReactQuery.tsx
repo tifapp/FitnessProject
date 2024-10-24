@@ -2,9 +2,13 @@ import {
   QueryClient,
   QueryClientProvider,
   UseMutationOptions,
-  UseQueryOptions
+  UseQueryOptions,
+  focusManager,
+  onlineManager
 } from "@tanstack/react-query"
 import React, { ReactNode } from "react"
+import { InternetConnectionStatus } from "./InternetConnection"
+import { AppState } from "react-native"
 
 /**
  * A helper type for creating custom hooks that wrap `useQuery`.
@@ -38,3 +42,31 @@ export const TiFQueryClientProvider = ({
 }: TiFQueryClientProviderProps) => (
   <QueryClientProvider client={tiFQueryClient}>{children}</QueryClientProvider>
 )
+
+/**
+ * Synchronizes the state of the given {@link InternetConnectionStatus} to
+ * react-query's {@link onlineManager}.
+ *
+ * This effectively means that any `useQuery` will automatically refetch its
+ * data when the user's internet connection comes back online.
+ */
+export const setupInternetReconnectionRefreshes = (
+  internetConnectionStatus: InternetConnectionStatus
+) => {
+  internetConnectionStatus.subscribe((isConnected) => {
+    onlineManager.setOnline(isConnected)
+  })
+}
+
+/**
+ * Synchronizes the current {@link AppStateStatus} with react-query's
+ * {@link focusManager}.
+ *
+ * This effectively means that any `useQuery` will automatically refetch its
+ * data when the app is focused after being backgrounded.
+ */
+export const setupFocusRefreshes = () => {
+  AppState.addEventListener("change", (status) => {
+    focusManager.setFocused(status === "active")
+  })
+}

@@ -43,7 +43,7 @@ const iOSSetDateTimePickerDate = ({
 
 const nativeEvent = (date: Date) => ({
   type: "set" as DateTimePickerModule.EvtTypes,
-  nativeEvent: { timestamp: date.getTime() }
+  nativeEvent: { timestamp: date.getTime(), utcOffset: 0 }
 })
 
 // See: https://github.com/react-native-datetimepicker/datetimepicker/blob/master/test/userlandTestExamples.test.js

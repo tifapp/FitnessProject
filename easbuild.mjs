@@ -3,14 +3,15 @@ import dotenv from "dotenv"
 import fs from "fs"
 import https from "https"
 import jwt from "jsonwebtoken"
-import qrcode from "qrcode"
 import fetch from "node-fetch"
+import qrcode from "qrcode"
 
 dotenv.config({ path: ".env.infra" })
 
-const outputChannel = "C01B7FFKDCP"
+const outputChannel = "C01BRGR9SHM"
 
-const action = process.argv[2] ?? "create"
+const action = process.argv[2]
+const checkRunName = "EAS Build"
 
 const sendMessageToSlack = (
   /** @type {string} */ message,
@@ -204,11 +205,7 @@ const checkGithubActionRuns = async (
       console.error("Error managing check run:", err)
     })
 
-  console.log(resp)
-  console.log(
-    `Git SHA: ${process.env.GITHUB_SHA}`,
-    `Length: ${(process.env.GITHUB_SHA ?? "").length}`
-  )
+  console.log("Updated github check run")
 
   // @ts-ignore
   fs.writeFileSync("checkRunId.txt", resp.id.toString())
@@ -221,7 +218,7 @@ const manageCheckRun = async (/** @type {string} */ action) => {
     checkRunId = fs.readFileSync("checkRunId.txt", "utf8")
     checkRunParams = {
       checkRunId,
-      name: "EAS Build",
+      name: checkRunName,
       status: "completed",
       completed_at: new Date().toISOString(),
       conclusion: action
@@ -237,7 +234,7 @@ const manageCheckRun = async (/** @type {string} */ action) => {
     checkRunData = {
       ...checkRunParams,
       output: {
-        title: "Build Completed",
+        title: `${checkRunName} Completed`,
         summary: buildLink
       }
     }
@@ -246,7 +243,7 @@ const manageCheckRun = async (/** @type {string} */ action) => {
     checkRunData = {
       ...checkRunParams,
       output: {
-        title: "Build Failed",
+        title: `${checkRunName} Failed`,
         summary: "Build failed with an error.",
         text: buildLink
       }
@@ -256,19 +253,19 @@ const manageCheckRun = async (/** @type {string} */ action) => {
     checkRunData = {
       ...checkRunParams,
       output: {
-        title: "Build Cancelled",
+        title: `${checkRunName} Cancelled`,
         summary: "Build was cancelled."
       }
     }
     break
   default:
     checkRunData = {
-      name: "EAS Build",
+      name: checkRunName,
       status: "in_progress",
       started_at: new Date().toISOString(),
       head_sha: process.env.GITHUB_SHA,
       output: {
-        title: "Build Started",
+        title: `${checkRunName} Started`,
         summary: `Build will be finished at approximately ${getPredictedBuildTime()}`
       }
     }
@@ -278,16 +275,20 @@ const manageCheckRun = async (/** @type {string} */ action) => {
 
   if (action === "success") {
     const buildqr = await qrcode.toDataURL(buildLink)
-    await sendImageToSlack(buildqr, `Build is ready:\n${buildLink}`)
+    await sendImageToSlack(buildqr, `${checkRunName} is ready:\n${buildLink}`)
   }
   if (action === "failure") {
-    await sendMessageToSlack(`Build failed. See details at\n${buildLink}`)
+    await sendMessageToSlack(
+      `${checkRunName} failed. See details at\n${buildLink}`
+    )
   }
   if (action === "create") {
     await sendMessageToSlack(
-      `A new build has started. Build will be finished at approximately *${getPredictedBuildTime()}*. See details at\n${buildLink}`
+      `A new development build has started. ${checkRunName} will be finished at approximately *${getPredictedBuildTime()}*. See details at\n${buildLink}\nCommit: ${process.env.GITHUB_SHA}`
     )
   }
+
+  console.log("Sent build status to slack")
 }
 
 if (process.env.RUN_EAS_BUILD_HOOKS === "1") {

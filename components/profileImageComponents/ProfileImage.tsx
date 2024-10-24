@@ -1,22 +1,21 @@
 import React from "react"
-import { Image, ImageStyle, StyleProp, StyleSheet } from "react-native"
+import { ImageStyle, StyleProp, StyleSheet } from "react-native"
+import { Image } from "expo-image"
 
 interface ProfileImageProps {
-  imageURL?: string
+  imageURL?: string | null
   style?: StyleProp<ImageStyle>
 }
 
-const fallbackImage = require("../../assets/default_profile.png")
+// TODO: - Placeholder
 
-const ProfileImage = ({ imageURL, style }: ProfileImageProps) => {
-  return (
-    <Image
-      defaultSource={fallbackImage}
-      source={{ uri: imageURL }}
-      style={[style, styles.image]}
-    />
-  )
-}
+const ProfileImage = ({ imageURL, style }: ProfileImageProps) => (
+  <Image
+    source={imageURL}
+    cachePolicy="memory-disk"
+    style={[style, styles.image]}
+  />
+)
 
 const styles = StyleSheet.create({
   image: {

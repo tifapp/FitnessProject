@@ -22,7 +22,7 @@ declare global {
 }
 
 expect.extend({
-  toBeDisplayed (value: ReactTestInstance | null) {
+  toBeDisplayed(value: ReactTestInstance | null) {
     // TODO: - Better messages
     if (!value) {
       return componentNotFoundResult
@@ -32,7 +32,7 @@ expect.extend({
       message: () => "The component was found on the screen."
     }
   },
-  toBeEnabled (value: ReactTestInstance) {
+  toBeEnabled(value: ReactTestInstance) {
     if (value.props.disabled === undefined) {
       return {
         pass: true,

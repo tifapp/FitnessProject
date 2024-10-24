@@ -1,14 +1,15 @@
 import React, { ReactNode, createContext, useContext } from "react"
-import { LocationCoordinate2D, TiFLocation } from "."
+import { NamedLocation } from "./NamedLocation"
 import { useQuery } from "@tanstack/react-query"
 import { QueryHookOptions } from "@lib/ReactQuery"
+import { LocationCoordinate2D } from "TiFShared/domain-models/LocationCoordinate2D"
 
 /**
  * Reverse geocodes the most accurrate location for the given coordinates.
  */
 export const useReverseGeocodeQuery = (
   coordinates: LocationCoordinate2D,
-  options: QueryHookOptions<TiFLocation> = DEFAULT_REVERSE_GEOCODE_QUERY_OPTIONS
+  options: QueryHookOptions<NamedLocation> = DEFAULT_REVERSE_GEOCODE_QUERY_OPTIONS
 ) => {
   const { reverseGeocode } = useGeocodingFunctions()
   return useQuery(
@@ -31,7 +32,7 @@ export const DEFAULT_REVERSE_GEOCODE_QUERY_OPTIONS = {
  * A set of functions required for performing geocoding operations.
  */
 export type GeocodingFunctions = {
-  reverseGeocode: (coordinates: LocationCoordinate2D) => Promise<TiFLocation>
+  reverseGeocode: (coordinates: LocationCoordinate2D) => Promise<NamedLocation>
 }
 
 const GeocodingFunctionsContext = createContext<GeocodingFunctions | undefined>(

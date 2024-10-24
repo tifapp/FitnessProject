@@ -1,8 +1,10 @@
-import { EmailAddress, USPhoneNumber } from "@auth"
+import { StoryMeta } from ".storybook/HelperTypes"
 import {
+  EmailAddress,
+  USPhoneNumber,
   useAuthVerificationCodeForm,
   AuthVerificationCodeFormView
-} from "@auth/VerifyCode"
+} from "@auth-boundary"
 import {
   BASE_HEADER_SCREEN_OPTIONS,
   ChevronBackButton
@@ -16,14 +18,13 @@ import {
   useNavigation
 } from "@react-navigation/native"
 import { createStackNavigator } from "@react-navigation/stack"
-import { SettingsScreen } from "@screens/SettingsScreen/SettingsScreen"
 import { ComponentMeta, ComponentStory } from "@storybook/react-native"
 import React from "react"
 import { Button, View } from "react-native"
 import { RootSiblingParent } from "react-native-root-siblings"
 import { SafeAreaProvider } from "react-native-safe-area-context"
 
-const VerifyCodeMeta: ComponentMeta<typeof SettingsScreen> = {
+const VerifyCodeMeta: StoryMeta = {
   title: "Verifcation Code"
 }
 
