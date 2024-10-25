@@ -197,13 +197,13 @@ const styles = StyleSheet.create({
     flexDirection: "row"
   },
   darkUserInterfaceStylePreview: {
-    backgroundColor: AppStyles.darkColor
+    backgroundColor: AppStyles.primaryColor
   },
   lightUserInterfaceStylePreview: {
     backgroundColor: "white"
   },
   systemUserInterfaceStylePreviewDark: {
-    backgroundColor: AppStyles.darkColor,
+    backgroundColor: AppStyles.primaryColor,
     width: "50%",
     height: "100%",
     borderBottomLeftRadius: 10,

@@ -1,4 +1,4 @@
-import { BodyText, Subtitle } from "@components/Text"
+import { BodyText, Headline } from "@components/Text"
 import { TiFDefaultLayoutTransition } from "@lib/Reanimated"
 import { ReactNode, createContext, useContext } from "react"
 import { ViewStyle, View, StyleProp, StyleSheet } from "react-native"
@@ -45,7 +45,7 @@ export const TiFFormSectionView = ({
           <View style={styles.textContainer}>
             {title && (
               <View style={styles.titleRow}>
-                <Subtitle>{title}</Subtitle>
+                <Headline>{title}</Headline>
                 {rightAddon}
               </View>
             )}

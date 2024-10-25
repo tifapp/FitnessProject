@@ -85,7 +85,7 @@ export type CircularIoniconProps = {
   backgroundColor: string
   name: IoniconName
   style?: StyleProp<ViewStyle>
-  size: number
+  size?: number
 } & Omit<IconProps<IoniconName>, "size">
 
 /**
@@ -190,14 +190,16 @@ export type IoniconCloseButtonProps = Omit<IconProps<"close">, "name"> &
  */
 export const IoniconCloseButton = ({
   onPress,
+  size = 20,
   ...props
 }: IoniconCloseButtonProps) => (
   <TouchableOpacity {...props} onPress={onPress}>
     <RoundedIonicon
       {...props}
       name="close"
+      size={size}
       borderRadius={32}
-      backgroundColor={AppStyles.eventCardColor}
+      backgroundColor={AppStyles.cardColor}
     />
   </TouchableOpacity>
 )

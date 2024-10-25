@@ -74,7 +74,7 @@ const LearnMoreSectionView = ({
         title="Privacy Policy"
         onTapped={onPrivacyPolicyTapped}
         iconName="lock-closed"
-        iconBackgroundColor={AppStyles.black}
+        iconBackgroundColor={AppStyles.primary}
       />
     </TiFFormCardView>
   </TiFFormSectionView>

@@ -20,7 +20,7 @@ export const TiFFormSwitchView = ({
     <Switch
       value={isOn}
       onValueChange={onIsOnChange}
-      trackColor={{ true: AppStyles.darkColor }}
+      trackColor={{ true: AppStyles.primaryColor }}
       thumbColor={isOn ? "#ffffff" : "#f4f3f4"}
       disabled={isDisabled ?? isSectionDisabled}
       style={style}

@@ -1,3 +1,4 @@
+import { shallowEquals } from "TiFShared/lib/ShallowEquals"
 import { EventEditLocation } from "TiFShared/domain-models/Event"
 
 export type SettingsStoreUnsubscribe = () => void
@@ -40,16 +41,7 @@ export interface SettingsStore<Settings extends AnySettings> {
 export const areSettingsEqual = <Settings extends AnySettings>(
   s1: Settings,
   s2: Settings
-) => {
-  return Object.keys(s1).every((key) => isEqualSettingValue(s1[key], s2[key]))
-}
-
-const isEqualSettingValue = (v1: SettingValue, v2: SettingValue): boolean => {
-  if (v1 instanceof Date && v2 instanceof Date) {
-    return v1.getTime() === v2.getTime()
-  }
-  return v1 === v2
-}
+) => shallowEquals(s1, s2)
 
 /**
  * Returns a selector function that grabs the settings values for the

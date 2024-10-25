@@ -62,6 +62,9 @@ import VerifcationCodeMeta, {
 import EditEventDurationsMeta, {
   Basic as EditEventDurationsBasic
 } from "../components/EditEvent/DurationPicker.stories"
+import EditEventPragmaQuotesMeta, {
+  Basic as EditEventPragmaQuotesBasic
+} from "../components/EditEvent/PragmaQuote.stories"
 import { addLogHandler, consoleLogHandler } from "TiFShared/logging"
 import { sqliteLogHandler, sqliteLogs } from "@lib/Logging"
 import { dayjs } from "TiFShared/lib/Dayjs"
@@ -167,7 +170,12 @@ const stories = [
   {
     name: EditEventDurationsMeta.title,
     component: EditEventDurationsBasic,
-    args: EditEventDurationsMeta.args
+    args: {}
+  },
+  {
+    name: EditEventPragmaQuotesMeta.title,
+    component: EditEventPragmaQuotesBasic,
+    args: {}
   }
   // Add more stories here...
 ]

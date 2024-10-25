@@ -89,7 +89,7 @@ export const SettingsDurationCard = ({
           <TouchableOpacity activeOpacity={0.8} onPress={onClosePress}>
             <CircularIonicon
               size={16}
-              backgroundColor={AppStyles.darkColor}
+              backgroundColor={AppStyles.primaryColor}
               name={"close"}
             />
           </TouchableOpacity>
@@ -129,7 +129,7 @@ export const AddDurationCard = () => {
         }}
         onDurationChange={setTimeInSeconds}
       >
-        <Ionicon size={36} color={AppStyles.darkColor} name={"add"} />
+        <Ionicon size={36} color={AppStyles.primaryColor} name={"add"} />
       </DurationPickerButton>
     </Animated.View>
   )
@@ -309,7 +309,7 @@ const styles = StyleSheet.create({
     position: "relative",
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: AppStyles.eventCardColor,
+    backgroundColor: AppStyles.cardColor,
     borderColor: "black"
   },
   addButtonContainer: {
@@ -321,15 +321,15 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderStyle: "dashed",
     paddingHorizontal: 32,
-    borderColor: AppStyles.darkColor,
-    backgroundColor: AppStyles.eventCardColor,
+    borderColor: AppStyles.primaryColor,
+    backgroundColor: AppStyles.cardColor,
     borderWidth: 2
   },
   presetRowsGridContainer: {
     rowGap: 8
   },
   cardDuration: {
-    color: AppStyles.darkColor
+    color: AppStyles.primaryColor
   },
   durationPresetRow: {
     alignContent: "space-between",

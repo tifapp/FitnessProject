@@ -1,4 +1,72 @@
+import { Subtitle } from "@components/Text"
+import { AppStyles } from "@lib/AppColorStyle"
 import { dayjs } from "TiFShared/lib/Dayjs"
+import { Image } from "expo-image"
+import { useEffect, useState } from "react"
+import { ViewStyle, StyleProp, View, StyleSheet } from "react-native"
+
+export type PragmaQuoteProps = {
+  quote: () => string
+  animationInterval: number
+  style?: StyleProp<ViewStyle>
+}
+
+export const PragmaQuoteView = ({
+  quote,
+  animationInterval,
+  style
+}: PragmaQuoteProps) => {
+  const [text, setText] = useState("")
+  useEffect(() => {
+    const quoteText = quote()
+    let index = 0
+    const interval = setInterval(() => {
+      const nextText = quoteText.substring(0, index++)
+      setText(nextText)
+      if (index > quoteText.length) clearInterval(interval)
+    }, animationInterval)
+    return () => clearInterval(interval)
+  }, [quote, animationInterval])
+  return (
+    <View style={style}>
+      <View style={styles.row}>
+        <View style={styles.pragmaContainer}>
+          <Image
+            source={
+              "https://static.wikia.nocookie.net/xenoblade/images/c/cd/XC3FR_Alpha_portrait.png/revision/latest?cb=20230419030915"
+            }
+            style={styles.pragmaImage}
+          />
+        </View>
+        <Subtitle style={styles.quote}>{text}</Subtitle>
+      </View>
+    </View>
+  )
+}
+
+const styles = StyleSheet.create({
+  row: {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "flex-start",
+    columnGap: 16
+  },
+  pragmaContainer: {
+    borderRadius: 12,
+    backgroundColor: AppStyles.cardColor,
+    padding: 8
+  },
+  pragmaImage: {
+    width: 48,
+    height: 48
+  },
+  quote: {
+    flex: 1
+  },
+  invisibleText: {
+    opacity: 0
+  }
+})
 
 /**
  * Returns Pragma's Quote when the user is editing an existing event through the edit form.
@@ -28,7 +96,7 @@ export const createEventQuote = (date: Date = new Date()) => {
 
 const CREATE_EVENT_QUOTES = {
   weekday: [
-    "What event is on you mind this week?",
+    "What event is on your mind this week?",
     "What event will you create this week?",
     "How will you progress with this new event?"
   ],
