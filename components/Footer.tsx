@@ -4,13 +4,19 @@ import { useScreenBottomPadding } from "./Padding"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { AppStyles } from "@lib/AppColorStyle"
 import { useKeyboardState } from "@lib/Keyboard"
+import Animated, { AnimatedStyle } from "react-native-reanimated"
 
 export type TiFFooterProps = {
   children: ReactNode
+  backgroundStyle?: StyleProp<AnimatedStyle<ViewStyle>>
   style?: StyleProp<ViewStyle>
 }
 
-export const TiFFooterView = ({ children, style }: TiFFooterProps) => {
+export const TiFFooterView = ({
+  children,
+  backgroundStyle = styles.defaultBackground,
+  style
+}: TiFFooterProps) => {
   const bottomPadding = useScreenBottomPadding({
     safeAreaScreens: 8,
     nonSafeAreaScreens: 24
@@ -19,9 +25,10 @@ export const TiFFooterView = ({ children, style }: TiFFooterProps) => {
   const safeArea = useSafeAreaInsets()
   return (
     <View style={style}>
-      <View
+      <Animated.View
         style={[
           styles.footer,
+          backgroundStyle,
           {
             paddingBottom: isKeyboardPresented
               ? 24
@@ -30,7 +37,7 @@ export const TiFFooterView = ({ children, style }: TiFFooterProps) => {
         ]}
       >
         {children}
-      </View>
+      </Animated.View>
     </View>
   )
 }
@@ -40,8 +47,10 @@ const styles = StyleSheet.create({
     width: "100%",
     paddingTop: 16,
     paddingHorizontal: 24,
-    backgroundColor: AppStyles.cardColor,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24
+  },
+  defaultBackground: {
+    backgroundColor: AppStyles.cardColor
   }
 })

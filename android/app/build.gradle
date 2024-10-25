@@ -1,7 +1,11 @@
 apply plugin: "com.android.application"
 apply plugin: "org.jetbrains.kotlin.android"
 apply plugin: "com.facebook.react"
+apply plugin: "com.google.android.libraries.mapsplatform.secrets-gradle-plugin"
 
+secrets {
+  propertiesFileName = "secrets.properties"
+}
 def projectRoot = rootDir.getAbsoluteFile().getParentFile().getAbsolutePath()
 
 static def versionToNumber(major, minor, patch) {

@@ -84,7 +84,8 @@ describe("ExploreEvents tests", () => {
           },
           time: {
             dateRange: dateRange(
-              new Date("2024-03-25T15:31:22.000Z"), new Date("2025-03-25T03:31:22.000Z")
+              new Date("2024-03-25T15:31:22.000Z"),
+              new Date("2025-03-25T03:31:22.000Z")
             )!,
             secondsToStart: 43195.08,
             todayOrTomorrow: "today" as const
@@ -138,7 +139,8 @@ describe("ExploreEvents tests", () => {
           },
           time: {
             dateRange: dateRange(
-              new Date("2024-03-24T15:31:22.000Z"), new Date("2025-03-25T03:31:22.000Z")
+              new Date("2024-03-24T15:31:22.000Z"),
+              new Date("2025-03-25T03:31:22.000Z")
             )!,
             secondsToStart: -43204.922
           },
@@ -159,8 +161,9 @@ describe("ExploreEvents tests", () => {
         minRegionMeterRadius(region)
       )
       const events = await eventsByRegion(
-        TiFAPI.testAuthenticatedInstance,
-        region
+        region,
+        undefined,
+        TiFAPI.testAuthenticatedInstance
       )
       expect(events).toMatchObject([
         {
@@ -181,7 +184,9 @@ describe("ExploreEvents tests", () => {
     ) => {
       mockTiFServer({
         exploreEvents: {
-          expectedRequest: { body: { userLocation: { latitude, longitude }, radius } },
+          expectedRequest: {
+            body: { userLocation: { latitude, longitude }, radius }
+          },
           mockResponse: { status: 200, data: TEST_EXPLORE_RESPONSE }
         }
       })
