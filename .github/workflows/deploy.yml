@@ -2,6 +2,7 @@ name: Merge Development Into Main
 
 env:
   RUN_EAS_BUILD_HOOKS: 1
+  NODE_VERSION: "20.0.0"
 
 on:
   push:
@@ -45,7 +46,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: node_modules
-          key: ${{ runner.os }}-node-${{ matrix.node-version }}-${{ hashFiles('**/package-lock.json') }}
+          key: ${{ runner.os }}-node-${{ env.NODE_VERSION }}-${{ hashFiles('**/package-lock.json') }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v3
@@ -54,7 +55,12 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          npm ci
+          if [ ! -d "node_modules" ]; then
+            echo "Cache not found, running npm ci."
+            npm ci
+          else
+            echo "Cache restored, skipping npm ci."
+          fi
 
       - name: Setup Expo and EAS
         uses: expo/expo-github-action@v8
