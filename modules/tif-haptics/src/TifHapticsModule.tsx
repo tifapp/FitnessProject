@@ -306,7 +306,7 @@ export const TiFHaptics = {
       })
     }
   },
-  apply: TiFNativeHaptics.apply
+  apply: async (settings) => await TiFNativeHaptics.apply(settings)
 } as Haptics
 
 export type HapticsCompatibility = {
