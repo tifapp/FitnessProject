@@ -1,10 +1,10 @@
 import dotenv from "dotenv"
 import withTiFNativePod from "./injectTiFNativePod.js"
+import withGradleSecretsPlugin from "./injectGradleSecretsPlugin.js"
 
 dotenv.config({ path: ".env.infra" })
 
-const { MAPS_API_KEY, EXPO_PROJECT_ID, EXPO_PROJECT_OWNER, EAS_BUILD_TYPE } =
-  process.env
+const { EXPO_PROJECT_ID, EXPO_PROJECT_OWNER, EAS_BUILD_TYPE } = process.env
 
 const { bundleIdentifier, icon, splash, name } =
   EAS_BUILD_TYPE === "development"
@@ -109,7 +109,8 @@ const config = {
     package: bundleIdentifier,
     config: {
       googleMaps: {
-        apiKey: MAPS_API_KEY
+        // eslint-disable-next-line
+        apiKey: "${MAPS_API_KEY}"
       }
     },
     permissions: [
@@ -120,4 +121,4 @@ const config = {
   }
 }
 
-export default withTiFNativePod(config)
+export default withGradleSecretsPlugin(withTiFNativePod(config))
