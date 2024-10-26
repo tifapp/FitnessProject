@@ -1,3 +1,5 @@
+// MARK: - CancellableCompletionRequest
+
 /// A protocol for some type that exposes asynchronous functionallity through
 /// a completion handler, and also includes a method to cancel the asynchronous
 /// work.
@@ -12,7 +14,12 @@ public protocol CancellableCompletionRequest<CompletionValue> {
   func cancel()
 }
 
-extension CancellableCompletionRequest where Self: AnyObject & Sendable {
+// MARK: - Perform
+
+extension CancellableCompletionRequest where Self: AnyObject & Sendable, CompletionValue: Sendable {
+  /// Performs this request and returns the result of the request.
+  ///
+  /// - Returns: A `CompletionValue`.
   public func perform() async throws -> CompletionValue {
     // NB: An AsyncStream must be used over an Unsafe/CheckedContinuation
     // since the latter does not participate in cooperative cancellation.

@@ -1,39 +1,28 @@
 import ExpoModulesCore
 import CoreHaptics
+import TiFNative
 
 public class TifHapticsModule: Module {
-  private var engine: TiFHapticsEngine?
+  private let engine = TiFHapticsEngine()
 
   public func definition() -> ModuleDefinition {
     Name("TifHaptics")
-
-    Constants([
-      "IS_HAPTICS_SUPPORTED": CHHapticEngine.capabilitiesForHardware().supportsHaptics
-    ])
-
-    Function("mute") {
-      try? self.hapticsEngine().mute()
+    
+    Function("deviceSupport") {
+      let capabilities = CHHapticEngine.capabilitiesForHardware()
+      return [
+        "isFeedbackSupportedOnDevice": capabilities.supportsHaptics,
+        "isAudioSupportedOnDevice": capabilities.supportsAudio
+      ]
     }
 
-    Function("unmute") {
-      try? self.hapticsEngine().unmute()
+    AsyncFunction("apply") { (settings: ExpoObject) async throws -> Void in
+      let settings = try HapticsSettings(expoObject: settings)
+      try await self.engine.apply(settings: settings)
     }
 
-    AsyncFunction("play") { (event: HapticEvent) async throws -> Void in
-      try await self.hapticsEngine().play(event: event)
+    AsyncFunction("play") { (event: ExpoObject) async throws -> Void in
+      try await self.engine.play(expoPattern: event)
     }
-  }
-
-  private func hapticsEngine() throws -> TiFHapticsEngine {
-    if let engine {
-      return engine
-    }
-    let engine = try TiFHapticsEngine()
-    self.engine = engine
-    return engine
   }
 }
-
-// MARK: - Helpers
-
-extension HapticEvent: EnumArgument {}

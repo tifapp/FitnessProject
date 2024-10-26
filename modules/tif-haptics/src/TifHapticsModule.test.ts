@@ -35,6 +35,7 @@ describe("TiFHaptics tests", () => {
         )
       )
     )
+    console.log(JSON.stringify(pattern))
     expect(pattern).toEqual({
       Pattern: [
         {

@@ -2091,6 +2091,7 @@ PODS:
     - sqlite3/common
   - TifHaptics (1.0.0):
     - ExpoModulesCore
+    - TiFNative (~> 1.0.0)
   - TiFNative (1.0.0)
   - UMAppLoader (4.6.0)
   - Yoga (0.0.0)
@@ -2630,7 +2631,7 @@ SPEC CHECKSUMS:
   Sentry: f8374b5415bc38dfb5645941b3ae31230fbeae57
   SocketRocket: abac6f5de4d4d62d24e11868d7a2f427e0ef940d
   sqlite3: 02d1f07eaaa01f80a1c16b4b31dfcbb3345ee01a
-  TifHaptics: fa348c2a95a4dea18737c1b932aaec8d410559f4
+  TifHaptics: 0cd81b25508d81aa199c99a812c800bd9342ebbc
   TiFNative: 6131f406e028e8ba7a9a77749836857e6142b59f
   UMAppLoader: f17a5ee8e85b536ace0fc254b447a37ed198d57e
   Yoga: 055f92ad73f8c8600a93f0e25ac0b2344c3b07e6
