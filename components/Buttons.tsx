@@ -111,7 +111,7 @@ const styles = StyleSheet.create({
     color: "white"
   },
   defaultPrimaryBackground: {
-    backgroundColor: AppStyles.darkColor
+    backgroundColor: AppStyles.primaryColor
   },
   outlinedButton: {
     borderWidth: 1,

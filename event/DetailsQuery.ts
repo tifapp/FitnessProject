@@ -40,3 +40,13 @@ export const updateEventDetailsQueryEvent = (
     }
   )
 }
+
+export const setEventDetailsQueryEvent = (
+  queryClient: QueryClient,
+  event: ClientSideEvent
+) => {
+  queryClient.setQueryData(eventDetailsQueryKey(event.id), {
+    status: "success",
+    event
+  })
+}

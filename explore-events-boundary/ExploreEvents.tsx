@@ -5,7 +5,6 @@ import {
   ClientSideEvent,
   clientSideEventFromResponse
 } from "@event/ClientSideEvent"
-import { eventDetailsQueryKey } from "@event/DetailsQuery"
 import { QueryHookOptions } from "@lib/ReactQuery"
 import { useLastDefinedValue } from "@lib/utils/UseLastDefinedValue"
 import {
@@ -31,6 +30,7 @@ import {
   createDefaultMapRegion,
   minRegionMeterRadius
 } from "./Region"
+import { setEventDetailsQueryEvent } from "@event/DetailsQuery"
 import { ExploreEventsSearchBar } from "./SearchBar"
 import { SkeletonEventCard } from "./SkeletonEventCard"
 
@@ -40,15 +40,16 @@ export const eventsByRegion = async (
   signal?: AbortSignal
 ) => {
   return (
-    await api.exploreEvents(
-      {
-        body: {
-          userLocation: { latitude: region.latitude, longitude: region.longitude },
-          radius: minRegionMeterRadius(region)
+    await api.exploreEvents({
+      body: {
+        userLocation: {
+          latitude: region.latitude,
+          longitude: region.longitude
         },
-        signal
-      }
-    )
+        radius: minRegionMeterRadius(region)
+      },
+      signal
+    })
   ).data.events.map(clientSideEventFromResponse)
 }
 
@@ -161,14 +162,7 @@ const useExploreEventsQuery = (
       queryKey,
       async ({ signal }) => {
         const events = await fetchEvents(region, signal)
-
-        events.forEach((event) => {
-          queryClient.setQueryData(eventDetailsQueryKey(event.id), {
-            status: "success",
-            event
-          })
-        })
-
+        events.forEach((event) => setEventDetailsQueryEvent(queryClient, event))
         return events
       },
       options

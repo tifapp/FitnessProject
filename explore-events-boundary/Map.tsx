@@ -1,16 +1,16 @@
 import { ExploreEventsMarkerView } from "./MapMarker"
 import { ClientSideEvent } from "@event/ClientSideEvent"
-import { Region } from "@location/index"
 import React from "react"
 import { StyleProp, ViewStyle } from "react-native"
 import MapView, { Marker } from "react-native-maps"
 import { LocationCoordinate2D } from "TiFShared/domain-models/LocationCoordinate2D"
+import { ExploreEventsRegion } from "./Region"
 
 export type ExploreEventsMapProps = {
-  initialRegion: Region
+  initialRegion: ExploreEventsRegion
   events: ClientSideEvent[]
   onEventSelected: (event: ClientSideEvent) => void
-  onRegionChanged: (region: Region) => void
+  onRegionChanged: (region: ExploreEventsRegion) => void
   onLongPress: (coordinate: LocationCoordinate2D) => void
   style?: StyleProp<ViewStyle>
 }
@@ -26,12 +26,11 @@ export const ExploreEventsMap = ({
   <MapView
     style={style}
     initialRegion={initialRegion}
-    loadingEnabled={true}
+    loadingEnabled
     toolbarEnabled={false}
     onLongPress={(e) => onLongPress(e.nativeEvent.coordinate)}
-    followsUserLocation={true}
     moveOnMarkerPress={false}
-    showsUserLocation={true}
+    showsUserLocation
     onRegionChangeComplete={(region) => onRegionChanged(region)}
     showsMyLocationButton={false}
     customMapStyle={[

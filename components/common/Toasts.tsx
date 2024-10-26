@@ -17,7 +17,7 @@ export const showToast = (message: string) => {
     delay: 100,
     textStyle: { fontSize: 16, fontFamily: "OpenSans" },
     textColor: "white",
-    backgroundColor: AppStyles.darkColor,
+    backgroundColor: AppStyles.primaryColor,
     opacity: 1,
     containerStyle: { borderRadius: 12 }
   })
@@ -62,7 +62,7 @@ export const TextToastView = ({
 const styles = StyleSheet.create({
   toastStyle: {
     borderRadius: 12,
-    backgroundColor: AppStyles.darkColor
+    backgroundColor: AppStyles.primaryColor
   },
   text: {
     color: "white",

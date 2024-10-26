@@ -4,19 +4,28 @@ import { StyleProp, ViewStyle, StyleSheet, View } from "react-native"
 export type TiFFormLabelProps = {
   title: string
   description?: string
+  maximumFontScaleFactor?: number
   style?: StyleProp<ViewStyle>
 }
 
 export const TiFFormLabelView = ({
   title,
   description,
+  maximumFontScaleFactor: maximumFontSizeMultiplier,
   style
 }: TiFFormLabelProps) => (
   <View style={style}>
     <View style={styles.label}>
-      <Headline>{title}</Headline>
+      <Headline maxFontSizeMultiplier={maximumFontSizeMultiplier}>
+        {title}
+      </Headline>
       {description && (
-        <Footnote style={styles.description}>{description}</Footnote>
+        <Footnote
+          maxFontSizeMultiplier={maximumFontSizeMultiplier}
+          style={styles.description}
+        >
+          {description}
+        </Footnote>
       )}
     </View>
   </View>

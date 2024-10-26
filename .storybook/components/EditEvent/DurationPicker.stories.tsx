@@ -10,14 +10,9 @@ const EditEventDurationsMeta = {
 
 export default EditEventDurationsMeta
 
-const PRESETS = [
-  300 * 15,
-  601 * 15,
-  900 * 15,
-  1201 * 15,
-  3601 * 15,
-  5400 * 15
-].sort((a, b) => a - b)
+const PRESETS = [300 * 15, 601 * 15, 900 * 15, 1730 * 15, 3730 * 15].sort(
+  (a, b) => a - b
+)
 
 const presetsAtom = atom(1100)
 export const Basic = () => {

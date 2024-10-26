@@ -37,6 +37,10 @@ declare module "TiFShared/domain-models/FixedDateRange" {
 
 protoypeExtension(FixedDateRange, extensions)
 
+export const formatDateTimeFromBasis = (basis: Date, date: Date) => {
+  return formatFromBasis(dayjs(basis), dayjs(date))
+}
+
 const formatDate = (basis: Dayjs, date: Dayjs) => {
   const current = now()
   if (date.isToday()) return "Today"

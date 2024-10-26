@@ -1,5 +1,4 @@
 import { StackNavigatorType } from "@components/Navigation"
-import { Region, isSignificantlyDifferentRegions } from "@location/index"
 import { StackScreenProps } from "@react-navigation/stack"
 import { ClientSideEvent } from "@event/ClientSideEvent"
 import React from "react"
@@ -7,7 +6,9 @@ import { StyleSheet } from "react-native"
 import {
   useExploreEvents,
   ExploreEventsView,
-  createInitialCenter
+  ExploreEventsRegion,
+  createInitialCenter,
+  isSignificantlyDifferentRegions
 } from "@explore-events-boundary"
 import { LocationCoordinate2D } from "TiFShared/domain-models/LocationCoordinate2D"
 
@@ -30,7 +31,7 @@ export const createExploreEventsScreens = <
 >(
   stack: StackNavigatorType<ParamsList>,
   fetchEvents: (
-    region: Region,
+    region: ExploreEventsRegion,
     signal?: AbortSignal
   ) => Promise<ClientSideEvent[]>
 ) => (
@@ -50,7 +51,7 @@ export const createExploreEventsScreens = <
 
 type ExploreEventsScreenProps = {
   fetchEvents: (
-    region: Region,
+    region: ExploreEventsRegion,
     signal?: AbortSignal
   ) => Promise<ClientSideEvent[]>
 } & ExploreEventsProps
