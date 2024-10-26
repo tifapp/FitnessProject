@@ -57,10 +57,15 @@ dependencies {
   // and ui library
   implementation("androidx.compose.material3:material3")
   // and WheelPickerCompose
-  implementation('com.github.commandiron:WheelPickerCompose:1.1.11')
+  implementation('com.github.tifapp:TiFWheelPickerCompose:master-SNAPSHOT')
   // and ViewModel
   implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.0")
   // OPTIONAL - Android Studio Preview support
   implementation("androidx.compose.ui:ui-tooling-preview")
   debugImplementation("androidx.compose.ui:ui-tooling")
+  configurations.all {
+    // Don't cache changing modules at all.
+    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+  }
 }
+
