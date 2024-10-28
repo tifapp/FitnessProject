@@ -7,7 +7,8 @@ import {
   parameters,
   parameterCurve,
   keyFrame,
-  dynamicParameter
+  dynamicParameter,
+  continuousSoundEvent
 } from "./TifHapticsModule"
 
 describe("TiFHaptics tests", () => {
@@ -16,23 +17,25 @@ describe("TiFHaptics tests", () => {
       events(
         transientEvent(0, { HapticIntensity: 0.5, HapticSharpness: 0.5 }),
         continuousEvent(0, 2, { HapticIntensity: 0.5, HapticSharpness: 0.5 }),
-        soundEffectEvent("coins", 0.5, { AudioVolume: 0.3 })
+        soundEffectEvent(
+          "coins",
+          0.5,
+          { AudioVolume: 0.3 },
+          { EventDuration: 3.0 }
+        ),
+        continuousSoundEvent(0.75, 2, { AudioVolume: 0.5, AudioPan: 0.2 })
       ),
       parameters(
-        parameterCurve(
-          "HapticIntensityControl",
-          0,
+        parameterCurve("HapticIntensityControl", 0, [
           keyFrame(0, 0),
           keyFrame(1, 0.1),
           keyFrame(0.5, 2)
-        ),
-        parameterCurve(
-          "HapticSharpnessControl",
-          2,
+        ]),
+        parameterCurve("HapticSharpnessControl", 2, [
           keyFrame(0, 0),
           keyFrame(1, 0.1),
           keyFrame(0.5, 2)
-        )
+        ])
       )
     )
 
@@ -62,10 +65,22 @@ describe("TiFHaptics tests", () => {
         {
           Event: {
             EventType: "AudioCustom",
-            EventWaveFormPath: "coins",
+            EventWaveformPath: "coins",
+            EventDuration: 3.0,
             Time: 0.5,
             EventParameters: [
               { ParameterID: "AudioVolume", ParameterValue: 0.3 }
+            ]
+          }
+        },
+        {
+          Event: {
+            EventType: "AudioContinuous",
+            Time: 0.75,
+            EventDuration: 2.0,
+            EventParameters: [
+              { ParameterID: "AudioVolume", ParameterValue: 0.5 },
+              { ParameterID: "AudioPan", ParameterValue: 0.2 }
             ]
           }
         },
@@ -133,7 +148,7 @@ describe("TiFHaptics tests", () => {
         {
           Event: {
             EventType: "AudioCustom",
-            EventWaveFormPath: "coins",
+            EventWaveformPath: "coins",
             Time: 0.5,
             EventParameters: [
               { ParameterID: "AudioVolume", ParameterValue: 0.3 }
