@@ -27,7 +27,7 @@ describe("TiFHaptics tests", () => {
           keyFrame(0.5, 2)
         ),
         parameterCurve(
-          "HapticAttackTimeControl",
+          "HapticSharpnessControl",
           2,
           keyFrame(0, 0),
           keyFrame(1, 0.1),
@@ -35,6 +35,7 @@ describe("TiFHaptics tests", () => {
         )
       )
     )
+
     expect(pattern).toEqual({
       Pattern: [
         {
@@ -81,7 +82,7 @@ describe("TiFHaptics tests", () => {
         },
         {
           ParameterCurve: {
-            ParameterID: "HapticAttackTimeControl",
+            ParameterID: "HapticSharpnessControl",
             Time: 2,
             ParameterCurveControlPoints: [
               { ParameterValue: 0, Time: 0 },

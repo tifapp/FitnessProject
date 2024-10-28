@@ -4,26 +4,28 @@ import { LocalSettings } from "@settings-storage/LocalSettings"
 import { logger } from "TiFShared/logging"
 import { SettingsStore } from "@settings-storage/Settings"
 
-const TiFNativeHaptics = requireOptionalNativeModule("TifHaptics") ?? {
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  IS_HAPTICS_SUPPORTED: false
-}
+const TiFNativeHaptics = requireOptionalNativeModule("TifHaptics")
 
 const log = logger("tif.haptics")
 
 export type HapticFeedbackParameterID =
   | "HapticIntensity"
   | "HapticSharpness"
-  | "HapticAttackTime"
-  | "HapticDecayTime"
-  | "HapticReleaseTime"
-  | "HapticSustained"
+  | "AttackTime"
+  | "DecayTime"
+  | "ReleaseTime"
+  | "Sustained"
 
 export type HapticAudioParameterID =
   | "AudioVolume"
   | "AudioPan"
   | "AudioPitch"
   | "AudioBrightness"
+
+export type AudioEventWaveformProperties = {
+  EventWaveformLoopEnabled: boolean
+  EventWaveformUseVolumeEnvelope: boolean
+}
 
 /**
  * A type of haptic event to be played at a specified moment in time.
@@ -43,11 +45,11 @@ export type HapticEvent = (
       EventParameters: HapticEventParameter<HapticFeedbackParameterID>[]
       EventDuration: number
     }
-  | {
-      EventType: "AudioCustom"
-      EventWaveFormPath: string
+  | ({
+      EventType: "AudioCustom" | "AudioContinuous"
+      EventWaveformPath: string
       EventParameters: HapticEventParameter<HapticAudioParameterID>[]
-    }
+    } & AudioEventWaveformProperties)
 ) & { Time: number }
 
 export type HapticEventParameter<
@@ -113,30 +115,37 @@ export const continuousEvent = (
 export const soundEffectEvent = (
   path: string,
   relativeTime: number,
-  parameters: Partial<Record<HapticAudioParameterID, number>>
+  parameters: Partial<Record<HapticAudioParameterID, number>>,
+  waveformProperties: AudioEventWaveformProperties = {
+    EventWaveformLoopEnabled: false,
+    EventWaveformUseVolumeEnvelope: false
+  }
 ): HapticEvent => {
   return {
     EventType: "AudioCustom",
-    EventWaveFormPath: path,
+    EventWaveformPath: path,
     EventParameters: Object.entries(parameters).map(([key, value]) => ({
       ParameterID: key as HapticAudioParameterID,
       ParameterValue: value
     })),
-    Time: relativeTime
+    Time: relativeTime,
+    ...waveformProperties
   }
 }
 
-export type HapticDynamicParameterID =
+export type HapticCurvableParameterID =
   | "HapticIntensityControl"
   | "HapticSharpnessControl"
-  | "HapticAttackTimeControl"
-  | "HapticDecayTimeControl"
-  | "HapticReleaseTimeControl"
-  | "HapticSustainedControl"
   | "AudioVolumeControl"
   | "AudioPanControl"
   | "AudioPitchControl"
   | "AudioBrightnessControl"
+
+export type HapticDynamicParameterID =
+  | HapticCurvableParameterID
+  | "HapticAttackTimeControl"
+  | "HapticDecayTimeControl"
+  | "HapticReleaseTimeControl"
   | "AudioAttackTimeControl"
   | "AudioDecayTimeControl"
   | "AudioReleaseTimeControl"
@@ -175,7 +184,7 @@ export const dynamicParameter = (
  * For altering parameter values at a particular point see {@link HapticDynamicParameter}.
  */
 export type HapticParameterCurve = {
-  ParameterID: HapticDynamicParameterID
+  ParameterID: HapticCurvableParameterID
   Time: number
   ParameterCurveControlPoints: HapticParameterCurveKeyFrame[]
 }
@@ -190,7 +199,7 @@ export type HapticParameterCurve = {
  * @param keyFrames The key frames to interpolate parameter values between.
  */
 export const parameterCurve = (
-  key: HapticDynamicParameterID,
+  key: HapticCurvableParameterID,
   relativeTime: number,
   ...keyFrames: HapticParameterCurveKeyFrame[]
 ): HapticParameterCurve => {
@@ -240,7 +249,7 @@ export type HapticPattern = {
  */
 export const hapticPattern = (
   events: HapticEvent[],
-  parameters: HapticParameterCurve[] | HapticDynamicParameter[] = []
+  parameters: (HapticParameterCurve | HapticDynamicParameter)[] = []
 ): HapticPattern => {
   return {
     Pattern: [
@@ -256,7 +265,7 @@ export const hapticPattern = (
 
 export const events = (...events: HapticEvent[]) => events
 export const parameters = (
-  ...parameters: HapticParameterCurve[] | HapticDynamicParameter[]
+  ...parameters: (HapticParameterCurve | HapticDynamicParameter)[]
 ) => parameters
 
 /**
@@ -307,20 +316,22 @@ export const TiFHaptics = {
       })
     }
   },
-  apply: async () => {
-    throw new Error("TODO: - Implement this natively")
-  }
+  apply: async (settings) => await TiFNativeHaptics.apply(settings)
 } as Haptics
 
-export type HapticsContextValues = Haptics & {
+export type HapticsCompatibility = {
   isFeedbackSupportedOnDevice: boolean
   isAudioSupportedOnDevice: boolean
 }
 
+export type HapticsContextValues = Haptics & HapticsCompatibility
+
 const HapticsContext = createContext<HapticsContextValues>({
   ...TiFHaptics,
-  isFeedbackSupportedOnDevice: !!TiFNativeHaptics.IS_HAPTICS_SUPPORTED,
-  isAudioSupportedOnDevice: true // TODO: - Native Code
+  ...(TiFNativeHaptics?.deviceSupport() ?? {
+    isFeedbackSupportedOnDevice: false,
+    isAudioSupportedOnDevice: false
+  })
 })
 
 /**
@@ -330,10 +341,8 @@ export const useHaptics = () => useContext(HapticsContext)
 
 export type HapticsProviderProps = {
   haptics: Haptics
-  isFeedbackSupportedOnDevice: boolean
-  isAudioSupportedOnDevice: boolean
   children: ReactNode
-}
+} & HapticsCompatibility
 
 /**
  * Provider for {@link Haptics}.
