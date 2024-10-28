@@ -22,6 +22,11 @@ export type HapticAudioParameterID =
   | "AudioPitch"
   | "AudioBrightness"
 
+export type AudioEventWaveformProperties = {
+  EventWaveformLoopEnabled: boolean
+  EventWaveformUseVolumeEnvelope: boolean
+}
+
 /**
  * A type of haptic event to be played at a specified moment in time.
  *
@@ -40,11 +45,11 @@ export type HapticEvent = (
       EventParameters: HapticEventParameter<HapticFeedbackParameterID>[]
       EventDuration: number
     }
-  | {
-      EventType: "AudioCustom"
-      EventWaveFormPath: string
+  | ({
+      EventType: "AudioCustom" | "AudioContinuous"
+      EventWaveformPath: string
       EventParameters: HapticEventParameter<HapticAudioParameterID>[]
-    }
+    } & AudioEventWaveformProperties)
 ) & { Time: number }
 
 export type HapticEventParameter<
@@ -110,16 +115,21 @@ export const continuousEvent = (
 export const soundEffectEvent = (
   path: string,
   relativeTime: number,
-  parameters: Partial<Record<HapticAudioParameterID, number>>
+  parameters: Partial<Record<HapticAudioParameterID, number>>,
+  waveformProperties: AudioEventWaveformProperties = {
+    EventWaveformLoopEnabled: false,
+    EventWaveformUseVolumeEnvelope: false
+  }
 ): HapticEvent => {
   return {
     EventType: "AudioCustom",
-    EventWaveFormPath: path,
+    EventWaveformPath: path,
     EventParameters: Object.entries(parameters).map(([key, value]) => ({
       ParameterID: key as HapticAudioParameterID,
       ParameterValue: value
     })),
-    Time: relativeTime
+    Time: relativeTime,
+    ...waveformProperties
   }
 }
 
@@ -239,7 +249,7 @@ export type HapticPattern = {
  */
 export const hapticPattern = (
   events: HapticEvent[],
-  parameters: HapticParameterCurve[] | HapticDynamicParameter[] = []
+  parameters: (HapticParameterCurve | HapticDynamicParameter)[] = []
 ): HapticPattern => {
   return {
     Pattern: [
@@ -255,7 +265,7 @@ export const hapticPattern = (
 
 export const events = (...events: HapticEvent[]) => events
 export const parameters = (
-  ...parameters: HapticParameterCurve[] | HapticDynamicParameter[]
+  ...parameters: (HapticParameterCurve | HapticDynamicParameter)[]
 ) => parameters
 
 /**
