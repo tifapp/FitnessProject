@@ -65,6 +65,9 @@ import EditEventDurationsMeta, {
 import EditEventPragmaQuotesMeta, {
   Basic as EditEventPragmaQuotesBasic
 } from "../components/EditEvent/PragmaQuote.stories"
+import HapticsMeta, {
+  Basic as HapticsBasic
+} from "../components/Haptics/Haptics.stories"
 import { addLogHandler, consoleLogHandler } from "TiFShared/logging"
 import { sqliteLogHandler, sqliteLogs } from "@lib/Logging"
 import { dayjs } from "TiFShared/lib/Dayjs"
@@ -175,6 +178,11 @@ const stories = [
   {
     name: EditEventPragmaQuotesMeta.title,
     component: EditEventPragmaQuotesBasic,
+    args: {}
+  },
+  {
+    name: HapticsMeta.title,
+    component: HapticsBasic,
     args: {}
   }
   // Add more stories here...
