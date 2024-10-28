@@ -38,6 +38,7 @@ export type AudioEventWaveformProperties = {
 export type HapticEvent = (
   | {
       EventType: "HapticTransient"
+      EventDuration?: number
       EventParameters: HapticEventParameter<HapticFeedbackParameterID>[]
     }
   | {
@@ -45,11 +46,20 @@ export type HapticEvent = (
       EventParameters: HapticEventParameter<HapticFeedbackParameterID>[]
       EventDuration: number
     }
-  | ({
-      EventType: "AudioCustom" | "AudioContinuous"
+  | {
+      EventType: "AudioCustom"
       EventWaveformPath: string
+      EventDuration?: number
+      EventWaveformLoopEnabled?: boolean
+      EventWaveformUseVolumeEnvelope?: boolean
       EventParameters: HapticEventParameter<HapticAudioParameterID>[]
-    } & AudioEventWaveformProperties)
+    }
+  | {
+      EventType: "AudioContinuous"
+      EventDuration: number
+      EventWaveformUseVolumeEnvelope?: boolean
+      EventParameters: HapticEventParameter<HapticAudioParameterID>[]
+    }
 ) & { Time: number }
 
 export type HapticEventParameter<
@@ -69,7 +79,8 @@ export type HapticEventParameter<
  */
 export const transientEvent = (
   relativeTime: number,
-  parameters: Partial<Record<HapticFeedbackParameterID, number>>
+  parameters: Partial<Record<HapticFeedbackParameterID, number>>,
+  properties: { EventDuration?: number } = {}
 ): HapticEvent => {
   return {
     EventType: "HapticTransient",
@@ -77,7 +88,8 @@ export const transientEvent = (
       ParameterID: key as HapticFeedbackParameterID,
       ParameterValue: value
     })),
-    Time: relativeTime
+    Time: relativeTime,
+    ...properties
   }
 }
 
@@ -116,14 +128,42 @@ export const soundEffectEvent = (
   path: string,
   relativeTime: number,
   parameters: Partial<Record<HapticAudioParameterID, number>>,
-  waveformProperties: AudioEventWaveformProperties = {
-    EventWaveformLoopEnabled: false,
-    EventWaveformUseVolumeEnvelope: false
-  }
+  waveformProperties: {
+    EventDuration?: number
+    EventWaveformLoopEnabled?: boolean
+    EventWaveformUseVolumeEnvelope?: boolean
+  } = {}
 ): HapticEvent => {
   return {
     EventType: "AudioCustom",
     EventWaveformPath: path,
+    EventParameters: Object.entries(parameters).map(([key, value]) => ({
+      ParameterID: key as HapticAudioParameterID,
+      ParameterValue: value
+    })),
+    Time: relativeTime,
+    ...waveformProperties
+  }
+}
+
+/**
+ * Returns an {@link HapticEvent} that plays a sound for a specified duration.
+ *
+ * You can customize the sound by changing the audio parameters. If you want to play a custom
+ * sound effect, use {@link soundEffectEvent} instead.
+ *
+ * @param duration The amount of time to play the sound effect for.
+ * @param relativeTime The time that this event plays relative to the other events in an {@link HapticPattern}.
+ */
+export const continuousSoundEvent = (
+  relativeTime: number,
+  duration: number,
+  parameters: Partial<Record<HapticAudioParameterID, number>>,
+  waveformProperties: { EventWaveformUseVolumeEnvelope?: boolean } = {}
+): HapticEvent => {
+  return {
+    EventType: "AudioContinuous",
+    EventDuration: duration,
     EventParameters: Object.entries(parameters).map(([key, value]) => ({
       ParameterID: key as HapticAudioParameterID,
       ParameterValue: value
@@ -201,7 +241,7 @@ export type HapticParameterCurve = {
 export const parameterCurve = (
   key: HapticCurvableParameterID,
   relativeTime: number,
-  ...keyFrames: HapticParameterCurveKeyFrame[]
+  keyFrames: HapticParameterCurveKeyFrame[]
 ): HapticParameterCurve => {
   return {
     ParameterID: key,
