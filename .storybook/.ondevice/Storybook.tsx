@@ -4,7 +4,6 @@ import { useAppFonts } from "../../lib/Fonts"
 
 // Import your stories
 import { setupCognito } from "@auth-boundary/CognitoHelpers"
-import { InMemorySecureStore } from "@auth-boundary/CognitoSecureStorage"
 import AttendeesListMeta, {
   Basic as AttendeesListBasic
 } from "../components/AttendeesList/AttendeesList.stories"
@@ -68,9 +67,13 @@ import EditEventPragmaQuotesMeta, {
 import HapticsMeta, {
   Basic as HapticsBasic
 } from "../components/Haptics/Haptics.stories"
+import RudeusEditorMeta, {
+  Basic as RudeusEditorBasic
+} from "../components/RudeusEditor/RudeusEditor.stories"
 import { addLogHandler, consoleLogHandler } from "TiFShared/logging"
 import { sqliteLogHandler, sqliteLogs } from "@lib/Logging"
 import { dayjs } from "TiFShared/lib/Dayjs"
+import { InMemorySecureStore } from "@lib/SecureStore"
 
 setupCognito(new InMemorySecureStore())
 addLogHandler(consoleLogHandler())
@@ -183,6 +186,11 @@ const stories = [
   {
     name: HapticsMeta.title,
     component: HapticsBasic,
+    args: {}
+  },
+  {
+    name: RudeusEditorMeta.title,
+    component: RudeusEditorBasic,
     args: {}
   }
   // Add more stories here...

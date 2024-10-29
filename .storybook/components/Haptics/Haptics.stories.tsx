@@ -21,22 +21,18 @@ export default HapticsMeta
 
 const testPattern = hapticPattern(
   events(
-    transientEvent(0, { HapticIntensity: 0.5, HapticSharpness: 0.5 }),
-    transientEvent(0.5, { HapticIntensity: 0.5, HapticSharpness: 0.5 }),
-    continuousEvent(1, 3, {
-      HapticIntensity: 1,
-      HapticSharpness: 0.2,
-      ReleaseTime: 1
-    })
+    continuousEvent(0.0, 1.7, { HapticIntensity: 1.0, HapticSharpness: 0.5 })
   ),
   parameters(
-    parameterCurve(
-      "AudioBrightnessControl",
-      0,
-      keyFrame(1, 3),
-      keyFrame(0.5, 4.5),
-      keyFrame(0.1, 5.5)
-    )
+    parameterCurve("HapticIntensityControl", 0.0, [
+      keyFrame(0.0, 0.0),
+      keyFrame(0.5, 1.1),
+      keyFrame(0.0, 1.7)
+    ]),
+    parameterCurve("HapticSharpnessControl", 0.0, [
+      keyFrame(-0.8, 0.0),
+      keyFrame(0.8, 1.7)
+    ])
   )
 )
 
