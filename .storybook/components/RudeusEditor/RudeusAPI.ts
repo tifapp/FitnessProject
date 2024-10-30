@@ -24,18 +24,23 @@ import {
 
 const log = logger("rudeus.api")
 
-export const RudeusAPI = (tokenStorage: RudeusUserTokenStorage) => {
+export const RudeusAPI = (
+  tokenStorage: RudeusUserTokenStorage,
+  baseURL?: URL
+) => {
   const middleware = chainMiddleware(
     validateRudeusAPICall,
     jwtMiddleware(async () => await tokenStorage.token()),
-    tifAPITransport(new URL(RUDEUS_API_URL))
+    tifAPITransport(new URL(baseURL ?? RUDEUS_API_URL))
   )
   return APIClientCreator(RudeusAPISchema, middleware)
 }
 
+export const TEST_RUDEUS_URL = new URL("http://localhost:8080")
+
 export type RudeusAPI = ReturnType<typeof RudeusAPI>
 
-const RudeusAPISchema = {
+export const RudeusAPISchema = {
   register: endpointSchema({
     input: { body: z.object({ name: z.string() }) },
     outputs: {
