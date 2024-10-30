@@ -5,10 +5,9 @@ import { RudeusUserTokenStorage } from "./UserTokenStorage"
 import { AlertsObject, presentAlert } from "@lib/Alerts"
 import { useFormSubmission } from "@lib/utils/Form"
 import { StyleProp, ViewStyle, View, StyleSheet } from "react-native"
-import { BodyText, Headline, Subtitle } from "@components/Text"
+import { BodyText, Subtitle } from "@components/Text"
 import { ShadedTextField } from "@components/TextFields"
 import { PrimaryButton } from "@components/Buttons"
-import { KeyboardAvoidingView } from "react-native"
 import { TiFFormScrollView } from "@components/form-components/ScrollView"
 
 export const registerUser = async (
@@ -65,11 +64,13 @@ export type RudeusRegisterProps = {
 export const RudeusRegisterView = ({ state, style }: RudeusRegisterProps) => (
   <View style={style}>
     <TiFFormScrollView>
-      <Subtitle>Register</Subtitle>
-      <BodyText>
-        Your name will be used for sharing haptic patterns and other cutscene
-        content.
-      </BodyText>
+      <View style={styles.text}>
+        <Subtitle>Register</Subtitle>
+        <BodyText>
+          Your name will be used for sharing haptic patterns and other cutscene
+          content.
+        </BodyText>
+      </View>
       <ShadedTextField
         placeholder="Enter a Name"
         value={state.name}
@@ -91,12 +92,8 @@ export const RudeusRegisterView = ({ state, style }: RudeusRegisterProps) => (
 )
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingHorizontal: 24,
-    rowGap: 16,
-    alignItems: "center",
-    justifyContent: "center"
+  text: {
+    rowGap: 8
   },
   button: {
     width: "100%"
