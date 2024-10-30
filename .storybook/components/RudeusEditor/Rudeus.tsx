@@ -7,15 +7,10 @@ import { useQuery } from "@tanstack/react-query"
 import { ActivityIndicator } from "react-native"
 import {
   NavigationContainer,
-  NavigationProp,
   RouteProp,
   useRoute
 } from "@react-navigation/native"
-import {
-  StackNavigationProp,
-  StackScreenProps,
-  createStackNavigator
-} from "@react-navigation/stack"
+import { StackScreenProps, createStackNavigator } from "@react-navigation/stack"
 import {
   BASE_HEADER_SCREEN_OPTIONS,
   ChevronBackButton
@@ -23,13 +18,21 @@ import {
 import { Headline } from "@components/Text"
 import { RudeusPatternsHeaderView, RudeusPatternsView } from "./Patterns"
 import { RudeusRegisterView, registerUser, useRudeusRegister } from "./Register"
-import { RudeusAPI, SharedRudeusAPI } from "./RudeusAPI"
+import {
+  DEFAULT_PATTERN_EDITOR_PATTERN,
+  RudeusPatternEditorPattern,
+  RudeusPatternEditorView,
+  editorPattern,
+  sharePattern,
+  useRudeusPatternEditor
+} from "./PatternEditor"
+import { SharedRudeusAPI } from "./RudeusAPI"
 import { RudeusUserStorage } from "./UserStorage"
 
 type RudeusParamsList = {
   register: undefined
   patterns: RudeusUser
-  editor: RudeusPattern | undefined
+  editor: RudeusPatternEditorPattern
 }
 
 const Stack = createStackNavigator<RudeusParamsList>()
@@ -123,13 +126,24 @@ const PatternsScreen = ({
 }: StackScreenProps<RudeusParamsList, "patterns">) => (
   <RudeusPatternsView
     patterns={async () => (await SharedRudeusAPI.patterns()).data.patterns}
-    onCreatePatternTapped={() => navigation.navigate("editor")}
-    onPatternTapped={(p) => navigation.navigate("editor", p)}
+    onCreatePatternTapped={() => {
+      navigation.navigate("editor", DEFAULT_PATTERN_EDITOR_PATTERN)
+    }}
+    onPatternTapped={(p) => navigation.navigate("editor", editorPattern(p))}
     style={styles.screen}
   />
 )
 
-const EditorScreen = () => <Headline>TODO</Headline>
+const EditorScreen = ({
+  route
+}: StackScreenProps<RudeusParamsList, "editor">) => (
+  <RudeusPatternEditorView
+    state={useRudeusPatternEditor(route.params, {
+      share: async (pattern) => await sharePattern(pattern, SharedRudeusAPI)
+    })}
+    style={styles.screen}
+  />
+)
 
 const styles = StyleSheet.create({
   loadingContainer: {
