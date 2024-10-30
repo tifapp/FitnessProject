@@ -2,7 +2,7 @@ import { StyleProp, ViewStyle, View, StyleSheet } from "react-native"
 import { RudeusPattern, RudeusUser } from "./Models"
 import { SafeAreaProvider } from "react-native-safe-area-context"
 import { TiFQueryClientProvider } from "@lib/ReactQuery"
-import React from "react"
+import React, { createContext, useContext } from "react"
 import { useQuery } from "@tanstack/react-query"
 import { ActivityIndicator } from "react-native"
 import {
@@ -26,7 +26,7 @@ import {
   sharePattern,
   useRudeusPatternEditor
 } from "./PatternEditor"
-import { SharedRudeusAPI } from "./RudeusAPI"
+import { RudeusAPI } from "./RudeusAPI"
 import { RudeusUserStorage } from "./UserStorage"
 
 type RudeusParamsList = {
@@ -37,23 +37,36 @@ type RudeusParamsList = {
 
 const Stack = createStackNavigator<RudeusParamsList>()
 
-export type RudeusProps = {
-  user: () => Promise<RudeusUser | null>
-  style?: StyleProp<ViewStyle>
+type RudeusContextValues = {
+  api: RudeusAPI
+  userStorage: RudeusUserStorage
 }
 
-export const RudeusView = ({ user, style }: RudeusProps) => (
+const RudeusContext = createContext<RudeusContextValues | undefined>(undefined)
+
+const useRudeusContext = () => useContext(RudeusContext)!
+
+export type RudeusProps = {
+  style?: StyleProp<ViewStyle>
+} & RudeusContextValues
+
+export const RudeusView = ({ style, ...values }: RudeusProps) => (
   <TiFQueryClientProvider>
     <SafeAreaProvider>
-      <View style={style}>
-        <RudeusRouterView user={user} style={style} />
-      </View>
+      <RudeusContext.Provider value={values}>
+        <RudeusRouterView style={style} />
+      </RudeusContext.Provider>
     </SafeAreaProvider>
   </TiFQueryClientProvider>
 )
 
-const RudeusRouterView = ({ user, style }: RudeusProps) => {
-  const query = useQuery(["rudeus-user"], user)
+type RudeusRouterProps = {
+  style?: StyleProp<ViewStyle>
+}
+
+const RudeusRouterView = ({ style }: RudeusRouterProps) => {
+  const { userStorage } = useRudeusContext()
+  const query = useQuery(["rudeus-user"], async () => await userStorage.user())
   return (
     <View style={style}>
       {query.isLoading && (
@@ -112,9 +125,10 @@ const RudeusRouterView = ({ user, style }: RudeusProps) => {
 const RegisterSceen = ({
   navigation
 }: StackScreenProps<RudeusParamsList, "register">) => {
+  const { api, userStorage } = useRudeusContext()
   const state = useRudeusRegister({
     register: async (name) => {
-      return await registerUser(name, SharedRudeusAPI, RudeusUserStorage.shared)
+      return await registerUser(name, api, userStorage)
     },
     onSuccess: (user) => navigation.replace("patterns", user)
   })
@@ -123,27 +137,33 @@ const RegisterSceen = ({
 
 const PatternsScreen = ({
   navigation
-}: StackScreenProps<RudeusParamsList, "patterns">) => (
-  <RudeusPatternsView
-    patterns={async () => (await SharedRudeusAPI.patterns()).data.patterns}
-    onCreatePatternTapped={() => {
-      navigation.navigate("editor", DEFAULT_PATTERN_EDITOR_PATTERN)
-    }}
-    onPatternTapped={(p) => navigation.navigate("editor", editorPattern(p))}
-    style={styles.screen}
-  />
-)
+}: StackScreenProps<RudeusParamsList, "patterns">) => {
+  const { api } = useRudeusContext()
+  return (
+    <RudeusPatternsView
+      patterns={async () => (await api.patterns()).data.patterns}
+      onCreatePatternTapped={() => {
+        navigation.navigate("editor", DEFAULT_PATTERN_EDITOR_PATTERN)
+      }}
+      onPatternTapped={(p) => navigation.navigate("editor", editorPattern(p))}
+      style={styles.screen}
+    />
+  )
+}
 
 const EditorScreen = ({
   route
-}: StackScreenProps<RudeusParamsList, "editor">) => (
-  <RudeusPatternEditorView
-    state={useRudeusPatternEditor(route.params, {
-      share: async (pattern) => await sharePattern(pattern, SharedRudeusAPI)
-    })}
-    style={styles.screen}
-  />
-)
+}: StackScreenProps<RudeusParamsList, "editor">) => {
+  const { api } = useRudeusContext()
+  return (
+    <RudeusPatternEditorView
+      state={useRudeusPatternEditor(route.params, {
+        share: async (pattern) => await sharePattern(pattern, api)
+      })}
+      style={styles.screen}
+    />
+  )
+}
 
 const styles = StyleSheet.create({
   loadingContainer: {

@@ -56,10 +56,7 @@ export const RudeusAPISchema = {
   })
 } satisfies APISchema
 
-export const RudeusAPI = (
-  tokenStorage: RudeusUserStorage = RudeusUserStorage.shared,
-  baseURL?: URL
-) => {
+export const RudeusAPI = (tokenStorage: RudeusUserStorage, baseURL?: URL) => {
   const middleware = chainMiddleware(
     validateRudeusAPICall,
     jwtMiddleware(async () => await tokenStorage.token()),
@@ -93,5 +90,3 @@ const validateRudeusAPICall = validateAPICall<ClientExtensions>((result) => {
   }
   throw new APIValidationError(result.validationStatus)
 })
-
-export const SharedRudeusAPI = RudeusAPI(RudeusUserStorage.shared)

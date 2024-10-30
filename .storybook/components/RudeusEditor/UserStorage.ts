@@ -1,11 +1,9 @@
-import { InMemorySecureStore, SecureStore } from "@lib/SecureStore"
+import { SecureStore } from "@lib/SecureStore"
 import { RudeusUserSchema } from "./Models"
 
 const TOKEN_KEY = "rudeusUserToken"
 
 export class RudeusUserStorage {
-  static readonly shared = new RudeusUserStorage(new InMemorySecureStore())
-
   constructor(private readonly secureStore: SecureStore) {}
 
   async token() {
