@@ -16,6 +16,7 @@ import { SafeAreaView } from "react-native-safe-area-context"
 import { TiFFormCardView } from "@components/form-components/Card"
 import { TiFFormNavigationLinkView } from "@components/form-components/NavigationLink"
 import { Ionicon } from "@components/common/Icons"
+import { RefreshControl } from "react-native"
 
 export type RudeusPatternsHeaderProps = {
   username: string
@@ -61,6 +62,12 @@ export const RudeusPatternsView = ({
                 Create New Pattern
               </PrimaryButton>
             </TiFFooterView>
+          }
+          refreshControl={
+            <RefreshControl
+              refreshing={query.isRefetching}
+              onRefresh={query.refetch}
+            />
           }
           style={styles.layout}
         >
