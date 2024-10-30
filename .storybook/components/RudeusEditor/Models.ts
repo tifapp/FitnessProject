@@ -2,7 +2,9 @@ import { z } from "zod"
 import { HapticPattern } from "@modules/tif-haptics"
 
 // NB: It's probably not super necessary to make the entire AHAP format zod compatible for now.
-export const HapticPatternSchema = z.custom<HapticPattern>()
+export const HapticPatternSchema = z.custom<
+  HapticPattern & { Version: number }
+>()
 
 export const RudeusPlatformSchema = z.union([
   z.literal("ios"),

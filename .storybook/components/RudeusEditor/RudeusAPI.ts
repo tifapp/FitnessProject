@@ -3,15 +3,11 @@ import { RUDEUS_API_URL } from "@env"
 import {
   APIClientCreator,
   APISchema,
-  ClientExtensions,
   endpointSchema,
   jwtMiddleware,
-  tifAPITransport
+  apiTransport
 } from "TiFShared/api"
-import {
-  APIValidationError,
-  validateAPICall
-} from "TiFShared/api/APIValidation"
+import { validateAPIClientCall } from "TiFShared/api/APIValidation"
 import { chainMiddleware } from "TiFShared/lib/Middleware"
 import { logger } from "TiFShared/logging"
 import { z } from "zod"
@@ -37,6 +33,7 @@ export const RudeusAPISchema = {
       body: z.object({
         id: z.string().uuid().optional(),
         name: z.string(),
+        description: z.string(),
         ahapPattern: HapticPatternSchema,
         platform: RudeusPlatformSchema
       })
@@ -58,9 +55,9 @@ export const RudeusAPISchema = {
 
 export const RudeusAPI = (tokenStorage: RudeusUserStorage, baseURL?: URL) => {
   const middleware = chainMiddleware(
-    validateRudeusAPICall,
+    validateAPIClientCall("Rudeus", log),
     jwtMiddleware(async () => await tokenStorage.token()),
-    tifAPITransport(new URL(baseURL ?? RUDEUS_API_URL))
+    apiTransport(new URL(baseURL ?? RUDEUS_API_URL), log)
   )
   return APIClientCreator(RudeusAPISchema, middleware)
 }
@@ -68,25 +65,3 @@ export const RudeusAPI = (tokenStorage: RudeusUserStorage, baseURL?: URL) => {
 export const TEST_RUDEUS_URL = new URL("http://localhost:8080")
 
 export type RudeusAPI = ReturnType<typeof RudeusAPI>
-
-const validateRudeusAPICall = validateAPICall<ClientExtensions>((result) => {
-  if (result.validationStatus === "passed") {
-    return result.response
-  } else if (result.validationStatus === "invalid-request") {
-    log.error(
-      `Request to Rudeus API endpoint ${result.requestContext.endpointName} is not valid`,
-      result.requestContext
-    )
-  } else if (result.validationStatus === "unexpected-response") {
-    log.error(
-      `Rudeus API endpoint ${result.requestContext.endpointName} responded unexpectedly`,
-      result.response
-    )
-  } else if (result.validationStatus === "invalid-response") {
-    log.error(
-      `Response from Rudeus API endpoint ${result.requestContext.endpointName} does not match the expected schema`,
-      result.response
-    )
-  }
-  throw new APIValidationError(result.validationStatus)
-})

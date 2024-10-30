@@ -46,6 +46,7 @@ export const sharePattern = async (
     await api.savePattern({
       body: {
         ...pattern,
+        description: "",
         ahapPattern: { Version: 1, ...pattern.ahapPattern },
         platform: Platform.OS as RudeusPlatform
       }

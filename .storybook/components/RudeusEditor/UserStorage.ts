@@ -1,5 +1,6 @@
 import { SecureStore } from "@lib/SecureStore"
 import { RudeusUserSchema } from "./Models"
+import { jwtBody } from "TiFShared/lib/JWT"
 
 const TOKEN_KEY = "rudeusUserToken"
 
@@ -20,12 +21,4 @@ export class RudeusUserStorage {
     const result = await RudeusUserSchema.safeParseAsync(jwtBody(token))
     return result.data ?? null
   }
-}
-
-const jwtBody = (token: string) => {
-  const parts = token.split(".")
-  if (parts.length !== 3) return null
-  const bodyBase64 = parts[1]
-  const bodyJson = atob(bodyBase64.replace(/-/g, "+").replace(/_/g, "/"))
-  return JSON.parse(bodyJson)
 }
