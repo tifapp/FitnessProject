@@ -15,6 +15,24 @@ import { TiFFooterView } from "@components/Footer"
 import { SafeAreaView } from "react-native-safe-area-context"
 import { TiFFormCardView } from "@components/form-components/Card"
 import { TiFFormNavigationLinkView } from "@components/form-components/NavigationLink"
+import { Ionicon } from "@components/common/Icons"
+
+export type RudeusPatternsHeaderProps = {
+  username: string
+  style?: StyleProp<ViewStyle>
+}
+
+export const RudeusPatternsHeaderView = ({
+  username,
+  style
+}: RudeusPatternsHeaderProps) => (
+  <View style={style}>
+    <View style={styles.patternsHeaderRow}>
+      <Ionicon name="person" />
+      <Headline>{username}</Headline>
+    </View>
+  </View>
+)
 
 export type RudeusPatternsProps = {
   onPatternTapped: (pattern: RudeusPattern) => void
@@ -83,8 +101,8 @@ type PatternProps = {
 const PatternView = ({ pattern, onTapped }: PatternProps) => (
   <TiFFormCardView>
     <TiFFormNavigationLinkView
-      title={pattern.name}
-      description={`By ${pattern.user.name}`}
+      title={`${pattern.name} (${pattern.platform === "ios" ? "iOS" : "Android"})`}
+      description={`by ${pattern.user.name}`}
       onTapped={() => onTapped(pattern)}
     />
   </TiFFormCardView>
@@ -110,5 +128,10 @@ const styles = StyleSheet.create({
   },
   patternConatiner: {
     padding: 16
+  },
+  patternsHeaderRow: {
+    display: "flex",
+    flexDirection: "row",
+    columnGap: 8
   }
 })

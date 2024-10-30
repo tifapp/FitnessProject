@@ -1,9 +1,11 @@
-import { SecureStore } from "@lib/SecureStore"
+import { InMemorySecureStore, SecureStore } from "@lib/SecureStore"
 import { RudeusUserSchema } from "./Models"
 
 const TOKEN_KEY = "rudeusUserToken"
 
-export class RudeusUserTokenStorage {
+export class RudeusUserStorage {
+  static readonly shared = new RudeusUserStorage(new InMemorySecureStore())
+
   constructor(private readonly secureStore: SecureStore) {}
 
   async token() {
@@ -16,15 +18,15 @@ export class RudeusUserTokenStorage {
 
   async user() {
     const token = await this.token()
-    if (!token) return undefined
+    if (!token) return null
     const result = await RudeusUserSchema.safeParseAsync(jwtBody(token))
-    return result.data
+    return result.data ?? null
   }
 }
 
 const jwtBody = (token: string) => {
   const parts = token.split(".")
-  if (parts.length !== 3) return undefined
+  if (parts.length !== 3) return null
   const bodyBase64 = parts[1]
   const bodyJson = atob(bodyBase64.replace(/-/g, "+").replace(/_/g, "/"))
   return JSON.parse(bodyJson)

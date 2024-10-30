@@ -1,4 +1,4 @@
-import { RudeusUserTokenStorage } from "./UserTokenStorage"
+import { RudeusUserStorage } from "./UserStorage"
 import { RudeusAPI, TEST_RUDEUS_URL } from "./RudeusAPI"
 import { ALERTS, registerUser, useRudeusRegister } from "./Register"
 import { InMemorySecureStore } from "@lib/SecureStore"
@@ -10,7 +10,7 @@ import { MOCK_USER, MOCK_USER_TOKEN } from "./Models"
 
 describe("RudeusRegister tests", () => {
   describe("UseRudeusRegister tests", () => {
-    const tokenStorage = new RudeusUserTokenStorage(new InMemorySecureStore())
+    const tokenStorage = new RudeusUserStorage(new InMemorySecureStore())
     const api = RudeusAPI(tokenStorage, TEST_RUDEUS_URL)
     const onSuccess = jest.fn()
 

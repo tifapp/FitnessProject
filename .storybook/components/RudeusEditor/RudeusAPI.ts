@@ -1,4 +1,4 @@
-import { RudeusUserTokenStorage } from "./UserTokenStorage"
+import { RudeusUserStorage } from "./UserStorage"
 import { RUDEUS_API_URL } from "@env"
 import {
   APIClientCreator,
@@ -23,22 +23,6 @@ import {
 } from "./Models"
 
 const log = logger("rudeus.api")
-
-export const RudeusAPI = (
-  tokenStorage: RudeusUserTokenStorage,
-  baseURL?: URL
-) => {
-  const middleware = chainMiddleware(
-    validateRudeusAPICall,
-    jwtMiddleware(async () => await tokenStorage.token()),
-    tifAPITransport(new URL(baseURL ?? RUDEUS_API_URL))
-  )
-  return APIClientCreator(RudeusAPISchema, middleware)
-}
-
-export const TEST_RUDEUS_URL = new URL("http://localhost:8080")
-
-export type RudeusAPI = ReturnType<typeof RudeusAPI>
 
 export const RudeusAPISchema = {
   register: endpointSchema({
@@ -72,6 +56,22 @@ export const RudeusAPISchema = {
   })
 } satisfies APISchema
 
+export const RudeusAPI = (
+  tokenStorage: RudeusUserStorage = RudeusUserStorage.shared,
+  baseURL?: URL
+) => {
+  const middleware = chainMiddleware(
+    validateRudeusAPICall,
+    jwtMiddleware(async () => await tokenStorage.token()),
+    tifAPITransport(new URL(baseURL ?? RUDEUS_API_URL))
+  )
+  return APIClientCreator(RudeusAPISchema, middleware)
+}
+
+export const TEST_RUDEUS_URL = new URL("http://localhost:8080")
+
+export type RudeusAPI = ReturnType<typeof RudeusAPI>
+
 const validateRudeusAPICall = validateAPICall<ClientExtensions>((result) => {
   if (result.validationStatus === "passed") {
     return result.response
@@ -93,3 +93,5 @@ const validateRudeusAPICall = validateAPICall<ClientExtensions>((result) => {
   }
   throw new APIValidationError(result.validationStatus)
 })
+
+export const SharedRudeusAPI = RudeusAPI(RudeusUserStorage.shared)

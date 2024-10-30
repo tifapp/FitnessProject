@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { RudeusUser } from "./Models"
 import { RudeusAPI } from "./RudeusAPI"
-import { RudeusUserTokenStorage } from "./UserTokenStorage"
+import { RudeusUserStorage } from "./UserTokenStorage"
 import { AlertsObject, presentAlert } from "@lib/Alerts"
 import { useFormSubmission } from "@lib/utils/Form"
 import { StyleProp, ViewStyle, View, StyleSheet } from "react-native"
@@ -9,11 +9,14 @@ import { BodyText, Subtitle } from "@components/Text"
 import { ShadedTextField } from "@components/TextFields"
 import { PrimaryButton } from "@components/Buttons"
 import { TiFFormScrollView } from "@components/form-components/ScrollView"
+import { TiFFormScrollableLayoutView } from "@components/form-components/ScrollableFormLayout"
+import { TiFFooterView } from "@components/Footer"
+import { useFontScale } from "@lib/Fonts"
 
 export const registerUser = async (
   name: string,
   api: RudeusAPI,
-  tokenStorage: RudeusUserTokenStorage
+  tokenStorage: RudeusUserStorage
 ) => {
   const resp = await api.register({ body: { name } })
   await tokenStorage.saveToken(resp.data.token)
@@ -63,7 +66,24 @@ export type RudeusRegisterProps = {
 
 export const RudeusRegisterView = ({ state, style }: RudeusRegisterProps) => (
   <View style={style}>
-    <TiFFormScrollView>
+    <TiFFormScrollableLayoutView
+      footer={
+        <TiFFooterView>
+          <PrimaryButton
+            disabled={state.submission.status !== "submittable"}
+            onPress={() => {
+              if (state.submission.status === "submittable") {
+                state.submission.submit()
+              }
+            }}
+            style={styles.button}
+          >
+            Register
+          </PrimaryButton>
+        </TiFFooterView>
+      }
+      style={styles.layout}
+    >
       <View style={styles.text}>
         <Subtitle>Register</Subtitle>
         <BodyText>
@@ -75,19 +95,9 @@ export const RudeusRegisterView = ({ state, style }: RudeusRegisterProps) => (
         placeholder="Enter a Name"
         value={state.name}
         onChangeText={state.nameChanged}
+        textStyle={{ height: 32 * useFontScale() }}
       />
-      <PrimaryButton
-        disabled={state.submission.status !== "submittable"}
-        onPress={() => {
-          if (state.submission.status === "submittable") {
-            state.submission.submit()
-          }
-        }}
-        style={styles.button}
-      >
-        Register
-      </PrimaryButton>
-    </TiFFormScrollView>
+    </TiFFormScrollableLayoutView>
   </View>
 )
 
@@ -97,5 +107,8 @@ const styles = StyleSheet.create({
   },
   button: {
     width: "100%"
+  },
+  layout: {
+    flex: 1
   }
 })
