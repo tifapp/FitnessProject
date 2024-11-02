@@ -16,38 +16,20 @@ import {
 import { StyleProp, ViewStyle, StyleSheet, View } from "react-native"
 import { RudeusAPI } from "./RudeusAPI"
 import { Platform } from "react-native"
-import { RudeusPattern, RudeusPlatform } from "./Models"
+import { RudeusEditorPattern, RudeusPattern, RudeusPlatform } from "./Models"
 import { useState } from "react"
 import { TiFFormCardView } from "@components/form-components/Card"
 import { Headline } from "@components/Text"
 import Slider from "@react-native-community/slider"
 
-export type RudeusPatternEditorPattern = {
-  id?: string
-  name: string
-  ahapPattern: HapticPattern
-}
-
-export const editorPattern = (pattern: RudeusPattern) => ({
-  name: pattern.name,
-  ahapPattern: pattern.ahapPattern
-})
-
-export const DEFAULT_PATTERN_EDITOR_PATTERN = {
-  name: "",
-  ahapPattern: hapticPattern(events())
-} as Readonly<RudeusPatternEditorPattern>
-
 export const sharePattern = async (
-  pattern: RudeusPatternEditorPattern,
+  pattern: RudeusEditorPattern,
   api: RudeusAPI
 ) => {
   return (
     await api.savePattern({
       body: {
         ...pattern,
-        description: "",
-        ahapPattern: { Version: 1, ...pattern.ahapPattern },
         platform: Platform.OS as RudeusPlatform
       }
     })
@@ -55,11 +37,11 @@ export const sharePattern = async (
 }
 
 export type UseRudeusPatternEditorEnvironment = {
-  share: (pattern: RudeusPatternEditorPattern) => Promise<RudeusPattern>
+  share: (pattern: RudeusEditorPattern) => Promise<RudeusPattern>
 }
 
 export const useRudeusPatternEditor = (
-  initialPattern: RudeusPatternEditorPattern,
+  initialPattern: RudeusEditorPattern,
   { share }: UseRudeusPatternEditorEnvironment
 ) => {
   const [pattern, setPattern] = useState(initialPattern)

@@ -1,5 +1,5 @@
 import { StyleProp, ViewStyle, View, StyleSheet } from "react-native"
-import { RudeusPattern, RudeusUser } from "./Models"
+import { RudeusEditorPattern, RudeusPattern, RudeusUser } from "./Models"
 import { SafeAreaProvider } from "react-native-safe-area-context"
 import { TiFQueryClientProvider } from "@lib/ReactQuery"
 import React, { createContext, useContext } from "react"
@@ -17,29 +17,25 @@ import {
 } from "@components/Navigation"
 import { Headline } from "@components/Text"
 import { RudeusPatternsHeaderView, RudeusPatternsView } from "./Patterns"
-import { RudeusRegisterView, registerUser, useRudeusRegister } from "./Register"
+import { RudeusRegisterView, useRudeusRegister } from "./Register"
 import {
-  DEFAULT_PATTERN_EDITOR_PATTERN,
-  RudeusPatternEditorPattern,
+  EMPTY_PATTERN_EDITOR_PATTERN,
   RudeusPatternEditorView,
   editorPattern,
-  sharePattern,
   useRudeusPatternEditor
 } from "./PatternEditor"
-import { RudeusAPI } from "./RudeusAPI"
-import { RudeusUserStorage } from "./UserStorage"
 
 type RudeusParamsList = {
   register: undefined
   patterns: RudeusUser
-  editor: RudeusPatternEditorPattern
+  editor: RudeusEditorPattern
 }
 
 const Stack = createStackNavigator<RudeusParamsList>()
 
 type RudeusContextValues = {
   register: (name: string) => Promise<RudeusUser>
-  share: (pattern: RudeusPatternEditorPattern) => Promise<RudeusPattern>
+  share: (pattern: RudeusEditorPattern) => Promise<RudeusPattern>
   patterns: () => Promise<RudeusPattern[]>
   user: () => Promise<RudeusUser | null>
 }
@@ -136,6 +132,7 @@ const RegisterSceen = ({
 }
 
 const PatternsScreen = ({
+  route,
   navigation
 }: StackScreenProps<RudeusParamsList, "patterns">) => {
   const { patterns } = useRudeusContext()
@@ -143,9 +140,11 @@ const PatternsScreen = ({
     <RudeusPatternsView
       patterns={patterns}
       onCreatePatternTapped={() => {
-        navigation.navigate("editor", DEFAULT_PATTERN_EDITOR_PATTERN)
+        navigation.navigate("editor", EMPTY_PATTERN_EDITOR_PATTERN)
       }}
-      onPatternTapped={(p) => navigation.navigate("editor", editorPattern(p))}
+      onPatternTapped={(p) => {
+        navigation.navigate("editor", editorPattern(p, route.params.id))
+      }}
       style={styles.screen}
     />
   )
