@@ -3,6 +3,8 @@ import { RudeusView } from "./Rudeus"
 import { RudeusUserStorage } from "./UserStorage"
 import { RudeusAPI } from "./RudeusAPI"
 import { InMemorySecureStore } from "@lib/SecureStore"
+import { sharePattern } from "./PatternEditor"
+import { registerUser } from "./Register"
 
 const RudeusEditorMeta = {
   title: "Rudeus Editor"
@@ -15,8 +17,10 @@ const api = RudeusAPI(userStorage)
 
 export const Basic = () => (
   <RudeusView
-    userStorage={userStorage}
-    api={api}
+    user={async () => await userStorage.user()}
+    share={async (p) => await sharePattern(p, api)}
+    patterns={async () => (await api.patterns()).data.patterns}
+    register={async (name) => await registerUser(name, api, userStorage)}
     style={{ height: "100%", flex: 1 }}
   />
 )

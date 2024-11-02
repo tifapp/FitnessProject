@@ -38,8 +38,10 @@ type RudeusParamsList = {
 const Stack = createStackNavigator<RudeusParamsList>()
 
 type RudeusContextValues = {
-  api: RudeusAPI
-  userStorage: RudeusUserStorage
+  register: (name: string) => Promise<RudeusUser>
+  share: (pattern: RudeusPatternEditorPattern) => Promise<RudeusPattern>
+  patterns: () => Promise<RudeusPattern[]>
+  user: () => Promise<RudeusUser | null>
 }
 
 const RudeusContext = createContext<RudeusContextValues | undefined>(undefined)
@@ -65,8 +67,8 @@ type RudeusRouterProps = {
 }
 
 const RudeusRouterView = ({ style }: RudeusRouterProps) => {
-  const { userStorage } = useRudeusContext()
-  const query = useQuery(["rudeus-user"], async () => await userStorage.user())
+  const { user } = useRudeusContext()
+  const query = useQuery(["rudeus-user"], user)
   return (
     <View style={style}>
       {query.isLoading && (
@@ -125,11 +127,9 @@ const RudeusRouterView = ({ style }: RudeusRouterProps) => {
 const RegisterSceen = ({
   navigation
 }: StackScreenProps<RudeusParamsList, "register">) => {
-  const { api, userStorage } = useRudeusContext()
+  const { register } = useRudeusContext()
   const state = useRudeusRegister({
-    register: async (name) => {
-      return await registerUser(name, api, userStorage)
-    },
+    register,
     onSuccess: (user) => navigation.replace("patterns", user)
   })
   return <RudeusRegisterView state={state} style={styles.screen} />
@@ -138,10 +138,10 @@ const RegisterSceen = ({
 const PatternsScreen = ({
   navigation
 }: StackScreenProps<RudeusParamsList, "patterns">) => {
-  const { api } = useRudeusContext()
+  const { patterns } = useRudeusContext()
   return (
     <RudeusPatternsView
-      patterns={async () => (await api.patterns()).data.patterns}
+      patterns={patterns}
       onCreatePatternTapped={() => {
         navigation.navigate("editor", DEFAULT_PATTERN_EDITOR_PATTERN)
       }}
@@ -154,12 +154,10 @@ const PatternsScreen = ({
 const EditorScreen = ({
   route
 }: StackScreenProps<RudeusParamsList, "editor">) => {
-  const { api } = useRudeusContext()
+  const { share } = useRudeusContext()
   return (
     <RudeusPatternEditorView
-      state={useRudeusPatternEditor(route.params, {
-        share: async (pattern) => await sharePattern(pattern, api)
-      })}
+      state={useRudeusPatternEditor(route.params, { share })}
       style={styles.screen}
     />
   )

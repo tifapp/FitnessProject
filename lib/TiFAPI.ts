@@ -7,7 +7,7 @@ import {
   TiFAPIClientCreator,
   jwtMiddleware,
   tifAPITransport,
-  validateAPIClientCall
+  validateTiFAPIClientCall
 } from "TiFShared/api"
 import { chainMiddleware } from "TiFShared/lib/Middleware"
 import { LaunchArguments, launchArguments } from "./LaunchArguments"
@@ -41,7 +41,7 @@ export const cognitoBearerToken = async (
  */
 export const awsTiFAPITransport = (url: URL): APIMiddleware => {
   return chainMiddleware(
-    validateAPIClientCall,
+    validateTiFAPIClientCall,
     jwtMiddleware(cognitoBearerToken),
     tifAPITransport(url)
   )

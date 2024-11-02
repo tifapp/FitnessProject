@@ -57,7 +57,7 @@ export const RudeusAPI = (tokenStorage: RudeusUserStorage, baseURL?: URL) => {
   const middleware = chainMiddleware(
     validateAPIClientCall("Rudeus", log),
     jwtMiddleware(async () => await tokenStorage.token()),
-    apiTransport(new URL(baseURL ?? RUDEUS_API_URL), log)
+    apiTransport("Rudeus", new URL(baseURL ?? RUDEUS_API_URL), log)
   )
   return APIClientCreator(RudeusAPISchema, middleware)
 }
