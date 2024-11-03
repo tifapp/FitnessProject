@@ -66,27 +66,31 @@ describe("PatternEditor tests", () => {
 
     it("should not be able to share without a name", async () => {
       const { result } = renderUseRudeusPatternEditor()
-      act(() => store.set(result.current.name, ""))
+      act(() => store.set(result.current.pattern.name, ""))
       act(() => result.current.eventAdded())
       expect(result.current.submission.status).toEqual("invalid")
     })
 
     it("should not be able to share without events", async () => {
       const { result } = renderUseRudeusPatternEditor()
-      act(() => store.set(result.current.name, "Hello"))
+      act(() => store.set(result.current.pattern.name, "Hello"))
       expect(result.current.submission.status).toEqual("invalid")
     })
 
     it("should be able to share a new pattern", async () => {
       const { result } = renderUseRudeusPatternEditor()
-      act(() => store.set(result.current.name, "Test Pattern"))
+      act(() => store.set(result.current.pattern.name, "Test Pattern"))
       act(() => {
-        store.set(result.current.description, "This is a test pattern")
+        store.set(result.current.pattern.description, "This is a test pattern")
       })
       act(() => result.current.eventAdded())
-      act(() => store.set(result.current.events[0].atom, PATTERN_EVENT_1))
+      act(() =>
+        store.set(result.current.pattern.events[0].atom, PATTERN_EVENT_1)
+      )
       act(() => result.current.eventAdded())
-      act(() => store.set(result.current.events[1].atom, PATTERN_EVENT_2))
+      act(() =>
+        store.set(result.current.pattern.events[1].atom, PATTERN_EVENT_2)
+      )
 
       mockRudeusServer({
         sharePattern: {
@@ -111,16 +115,56 @@ describe("PatternEditor tests", () => {
       })
     })
 
-    it("should use the generated ID when sharing a pattern for the second time", async () => {
+    it("should keep hidden events when sharing", async () => {
       const { result } = renderUseRudeusPatternEditor()
-      act(() => store.set(result.current.name, "Test Pattern"))
+      act(() => store.set(result.current.pattern.name, "Test"))
+      act(() => result.current.eventAdded())
       act(() => {
-        store.set(result.current.description, "This is a test pattern")
+        store.set(result.current.pattern.events[0].atom, {
+          ...PATTERN_EVENT_1,
+          isHidden: true
+        })
       })
       act(() => result.current.eventAdded())
-      act(() => store.set(result.current.events[0].atom, PATTERN_EVENT_1))
+      act(() => {
+        store.set(result.current.pattern.events[1].atom, PATTERN_EVENT_2)
+      })
+
+      mockRudeusServer({
+        sharePattern: {
+          expectedRequest: { body: { ahapPattern: EXPECTED_PATTERN } },
+          mockResponse: {
+            status: 201,
+            data: {
+              ...EXPECTED_SHARE_REQUEST,
+              id: uuidString(),
+              user: MOCK_USER
+            }
+          }
+        }
+      })
+      act(() => (result.current.submission as any).submit())
+      await waitFor(() => {
+        expect(alertPresentationSpy).toHaveBeenPresentedWith(
+          ALERTS.sharedSuccessfully
+        )
+      })
+    })
+
+    it("should use the generated ID when sharing a pattern for the second time", async () => {
+      const { result } = renderUseRudeusPatternEditor()
+      act(() => store.set(result.current.pattern.name, "Test Pattern"))
+      act(() => {
+        store.set(result.current.pattern.description, "This is a test pattern")
+      })
       act(() => result.current.eventAdded())
-      act(() => store.set(result.current.events[1].atom, PATTERN_EVENT_2))
+      act(() =>
+        store.set(result.current.pattern.events[0].atom, PATTERN_EVENT_1)
+      )
+      act(() => result.current.eventAdded())
+      act(() =>
+        store.set(result.current.pattern.events[1].atom, PATTERN_EVENT_2)
+      )
 
       const expectedId = uuidString()
 
@@ -162,14 +206,18 @@ describe("PatternEditor tests", () => {
 
     it("should present an error alert when failing to share pattern", async () => {
       const { result } = renderUseRudeusPatternEditor()
-      act(() => store.set(result.current.name, "Test Pattern"))
+      act(() => store.set(result.current.pattern.name, "Test Pattern"))
       act(() => {
-        store.set(result.current.description, "This is a test pattern")
+        store.set(result.current.pattern.description, "This is a test pattern")
       })
       act(() => result.current.eventAdded())
-      act(() => store.set(result.current.events[0].atom, PATTERN_EVENT_1))
+      act(() =>
+        store.set(result.current.pattern.events[0].atom, PATTERN_EVENT_1)
+      )
       act(() => result.current.eventAdded())
-      act(() => store.set(result.current.events[1].atom, PATTERN_EVENT_2))
+      act(() =>
+        store.set(result.current.pattern.events[1].atom, PATTERN_EVENT_2)
+      )
 
       mockRudeusServer({
         sharePattern: { mockResponse: { status: 500 } as any }
@@ -186,10 +234,10 @@ describe("PatternEditor tests", () => {
       const { result } = renderUseRudeusPatternEditor()
       act(() => result.current.eventAdded())
       act(() => result.current.eventAdded())
-      const beforeIds = result.current.events.map((e) => e.id)
-      act(() => result.current.eventAdded(result.current.events[0].id))
+      const beforeIds = result.current.pattern.events.map((e) => e.id)
+      act(() => result.current.eventAdded(result.current.pattern.events[0].id))
 
-      expect(result.current.events.map((e) => e.id)).toEqual([
+      expect(result.current.pattern.events.map((e) => e.id)).toEqual([
         beforeIds[0],
         expect.any(String),
         beforeIds[1]
@@ -199,9 +247,13 @@ describe("PatternEditor tests", () => {
     it("should be able to play the edited pattern", () => {
       const { result } = renderUseRudeusPatternEditor()
       act(() => result.current.eventAdded())
-      act(() => store.set(result.current.events[0].atom, PATTERN_EVENT_1))
+      act(() =>
+        store.set(result.current.pattern.events[0].atom, PATTERN_EVENT_1)
+      )
       act(() => result.current.eventAdded())
-      act(() => store.set(result.current.events[1].atom, PATTERN_EVENT_2))
+      act(() =>
+        store.set(result.current.pattern.events[1].atom, PATTERN_EVENT_2)
+      )
 
       expect(testHaptics.playedEvents).toEqual([])
       act(() => result.current.played())
@@ -212,13 +264,15 @@ describe("PatternEditor tests", () => {
       const { result } = renderUseRudeusPatternEditor()
       act(() => result.current.eventAdded())
       act(() => {
-        store.set(result.current.events[0].atom, {
+        store.set(result.current.pattern.events[0].atom, {
           ...PATTERN_EVENT_1,
           isHidden: true
         })
       })
       act(() => result.current.eventAdded())
-      act(() => store.set(result.current.events[1].atom, PATTERN_EVENT_2))
+      act(() =>
+        store.set(result.current.pattern.events[1].atom, PATTERN_EVENT_2)
+      )
 
       expect(testHaptics.playedEvents).toEqual([])
       act(() => result.current.played())
@@ -231,11 +285,15 @@ describe("PatternEditor tests", () => {
       const { result } = renderUseRudeusPatternEditor()
       act(() => result.current.eventAdded())
       act(() => {
-        store.set(result.current.events[0].atom, PATTERN_EVENT_1)
+        store.set(result.current.pattern.events[0].atom, PATTERN_EVENT_1)
       })
       act(() => result.current.eventAdded())
-      act(() => store.set(result.current.events[1].atom, PATTERN_EVENT_2))
-      act(() => result.current.eventRemoved(result.current.events[1].id))
+      act(() =>
+        store.set(result.current.pattern.events[1].atom, PATTERN_EVENT_2)
+      )
+      act(() =>
+        result.current.eventRemoved(result.current.pattern.events[1].id)
+      )
 
       expect(testHaptics.playedEvents).toEqual([])
       act(() => result.current.played())

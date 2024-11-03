@@ -76,7 +76,7 @@ export const useRudeusPatternEditor = (
   const name = useAtomValue(pattern.name)
   const store = useStore()
   return {
-    ...pattern,
+    pattern,
     eventAdded: (afterId?: RudeusEditablePatternEventID) => {
       const id = uuidString()
       const newEvent = {
@@ -105,7 +105,7 @@ export const useRudeusPatternEditor = (
       setPattern((p) => ({ ...p, events: p.events.filter((e) => e.id !== id) }))
     },
     played: () => {
-      play(playablePattern(store, pattern))
+      play(playablePattern(store, pattern, (isHidden) => !isHidden))
     },
     submission: useFormSubmission(
       async (p: typeof pattern) => {
@@ -144,11 +144,12 @@ type RudeusPatternEditorEvent = {
 
 const playablePattern = (
   store: Store,
-  pattern: { events: RudeusPatternEditorEvent[]; version: number }
+  pattern: { events: RudeusPatternEditorEvent[]; version: number },
+  predicate?: (isHidden: boolean, element: HapticPatternElement) => boolean
 ) => {
   const elements = pattern.events.ext.compactMap((e) => {
     const { isHidden, element } = store.get(e.atom)
-    if (isHidden) return undefined
+    if (predicate && !predicate(isHidden, element)) return undefined
     return element
   })
   return { Pattern: elements, Version: pattern.version }
@@ -167,7 +168,7 @@ export const RudeusPatternEditorView = ({
     <TiFFormScrollableLayoutView
       footer={
         <TiFFooterView>
-          <Caption>Pattern Version: {state.version}</Caption>
+          <Caption>Pattern Version: {state.pattern.version}</Caption>
           <View style={styles.footerRow}>
             <PrimaryButton onPress={state.played} style={styles.playButton}>
               Play
@@ -190,19 +191,19 @@ export const RudeusPatternEditorView = ({
     >
       <AtomTextFieldSectionView
         title="Name"
-        atom={state.name}
+        atom={state.pattern.name}
         placeholder="Enter a Name"
         textStyle={{ height: 32 * useFontScale() }}
       />
       <AtomTextFieldSectionView
         title="Description"
-        atom={state.description}
+        atom={state.pattern.description}
         multiline
         textAlignVertical="top"
         placeholder="Enter a Description"
         textStyle={{ minHeight: 128 * useFontScale() }}
       />
-      {state.events.length === 0 ? (
+      {state.pattern.events.length === 0 ? (
         <TiFFormSectionView>
           <PrimaryButton onPress={() => state.eventAdded()}>
             Add Event
@@ -210,7 +211,7 @@ export const RudeusPatternEditorView = ({
         </TiFFormSectionView>
       ) : (
         <TiFFormSectionView title="Events">
-          {state.events.map((event) => (
+          {state.pattern.events.map((event) => (
             <Animated.View
               key={event.id}
               layout={TiFDefaultLayoutTransition}
