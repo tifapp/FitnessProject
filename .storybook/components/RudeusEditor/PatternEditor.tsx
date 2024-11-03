@@ -6,35 +6,53 @@ import { TiFFormSectionView } from "@components/form-components/Section"
 import { AppStyles } from "@lib/AppColorStyle"
 import { useFontScale } from "@lib/Fonts"
 import {
-  HapticEvent,
-  HapticPattern,
-  events,
+  HapticPatternElement,
   hapticPattern,
   transientEvent,
   useHaptics
 } from "@modules/tif-haptics"
-import { StyleProp, ViewStyle, StyleSheet, View } from "react-native"
+import { StyleProp, ViewStyle, StyleSheet, View, TextStyle } from "react-native"
 import { RudeusAPI } from "./RudeusAPI"
 import { Platform } from "react-native"
-import { RudeusEditorPattern, RudeusPattern, RudeusPlatform } from "./Models"
+import {
+  RudeusEditablePatternEvent,
+  RudeusEditablePatternEventID,
+  RudeusEditorPattern,
+  RudeusPattern,
+  RudeusPlatform
+} from "./Models"
 import { useState } from "react"
-import { TiFFormCardView } from "@components/form-components/Card"
-import { Headline } from "@components/Text"
-import Slider from "@react-native-community/slider"
+import { Caption, Headline } from "@components/Text"
+import { PrimitiveAtom, atom, useAtom, useAtomValue, useStore } from "jotai"
+import { AlertsObject, presentAlert } from "@lib/Alerts"
+import { useFormSubmission } from "@lib/utils/Form"
+import { Store } from "@lib/Jotai"
+import { uuidString } from "@lib/utils/UUID"
+import { TouchableIonicon } from "@components/common/Icons"
+import Animated, { FadeIn, FadeOut } from "react-native-reanimated"
+import { TiFDefaultLayoutTransition } from "@lib/Reanimated"
 
 export const sharePattern = async (
   pattern: RudeusEditorPattern,
   api: RudeusAPI
 ) => {
   return (
-    await api.savePattern({
-      body: {
-        ...pattern,
-        platform: Platform.OS as RudeusPlatform
-      }
+    await api.sharePattern({
+      body: { ...pattern, platform: Platform.OS as RudeusPlatform }
     })
   ).data
 }
+
+export const ALERTS = {
+  sharedSuccessfully: {
+    title: "Shared Successfully",
+    description: "Your pattern was shared successfully!"
+  },
+  sharedUnsuccessfully: {
+    title: "Failed to Share Pattern",
+    description: "The pattern could not be shared. Please reach out on slack."
+  }
+} satisfies AlertsObject
 
 export type UseRudeusPatternEditorEnvironment = {
   share: (pattern: RudeusEditorPattern) => Promise<RudeusPattern>
@@ -44,14 +62,96 @@ export const useRudeusPatternEditor = (
   initialPattern: RudeusEditorPattern,
   { share }: UseRudeusPatternEditorEnvironment
 ) => {
-  const [pattern, setPattern] = useState(initialPattern)
+  const [pattern, setPattern] = useState({
+    id: initialPattern.id,
+    name: atom(initialPattern.name),
+    description: atom(initialPattern.description),
+    events: initialPattern.ahapPattern.Pattern.map((element) => ({
+      id: uuidString(),
+      atom: atom({ isHidden: false, element })
+    })),
+    version: initialPattern.ahapPattern.Version
+  })
+  const { play } = useHaptics()
+  const name = useAtomValue(pattern.name)
+  const store = useStore()
   return {
-    pattern,
-    setPattern,
-    shared: () => {
-      share(pattern)
-    }
+    ...pattern,
+    eventAdded: (afterId?: RudeusEditablePatternEventID) => {
+      const id = uuidString()
+      const newEvent = {
+        element: { Event: transientEvent(0, {}) },
+        isHidden: false
+      }
+      setPattern((p) => {
+        const index = p.events.findIndex((e) => e.id === afterId)
+        if (index === -1) {
+          return {
+            ...p,
+            events: [...p.events, { id, atom: atom(newEvent) }]
+          }
+        }
+        return {
+          ...p,
+          events: [
+            ...p.events.slice(0, index + 1),
+            { id, atom: atom(newEvent) },
+            ...p.events.slice(index + 1)
+          ]
+        }
+      })
+    },
+    eventRemoved: (id: RudeusEditablePatternEventID) => {
+      setPattern((p) => ({ ...p, events: p.events.filter((e) => e.id !== id) }))
+    },
+    played: () => {
+      play(playablePattern(store, pattern))
+    },
+    submission: useFormSubmission(
+      async (p: typeof pattern) => {
+        return await share({
+          id: p.id,
+          name: store.get(p.name),
+          description: store.get(p.description),
+          ahapPattern: playablePattern(store, p)
+        })
+      },
+      () => {
+        if (name.length === 0 || pattern.events.length === 0) {
+          return { status: "invalid" }
+        }
+        return { status: "submittable", submissionValues: pattern }
+      },
+      {
+        onSuccess: (pattern) => {
+          setPattern((p) => ({
+            ...p,
+            id: pattern.id,
+            version: pattern.ahapPattern.Version
+          }))
+          presentAlert(ALERTS.sharedSuccessfully)
+        },
+        onError: () => presentAlert(ALERTS.sharedUnsuccessfully)
+      }
+    )
   }
+}
+
+type RudeusPatternEditorEvent = {
+  id: RudeusEditablePatternEventID
+  atom: PrimitiveAtom<RudeusEditablePatternEvent>
+}
+
+const playablePattern = (
+  store: Store,
+  pattern: { events: RudeusPatternEditorEvent[]; version: number }
+) => {
+  const elements = pattern.events.ext.compactMap((e) => {
+    const { isHidden, element } = store.get(e.atom)
+    if (isHidden) return undefined
+    return element
+  })
+  return { Pattern: elements, Version: pattern.version }
 }
 
 export type RudeusPatternEditorProps = {
@@ -62,180 +162,104 @@ export type RudeusPatternEditorProps = {
 export const RudeusPatternEditorView = ({
   state,
   style
-}: RudeusPatternEditorProps) => {
-  const haptics = useHaptics()
-  return (
-    <View style={style}>
-      <TiFFormScrollableLayoutView
-        footer={
-          <TiFFooterView>
-            <View style={styles.footerRow}>
-              <PrimaryButton
-                onPress={() => haptics.play(state.pattern.ahapPattern)}
-                style={styles.playButton}
-              >
-                Play
-              </PrimaryButton>
-              <SecondaryOutlinedButton
-                onPress={() => state.shared()}
-                style={styles.playButton}
-              >
-                Share
-              </SecondaryOutlinedButton>
-            </View>
-          </TiFFooterView>
-        }
-        style={styles.layout}
-      >
-        <TiFFormSectionView title="Pattern Name">
-          <ShadedTextField
-            value={state.pattern.name}
-            onChangeText={(text) =>
-              state.setPattern((p) => ({ ...p, name: text }))
-            }
-            placeholder="Enter a Name"
-            textStyle={{ height: 32 * useFontScale() }}
-          />
-        </TiFFormSectionView>
-        <TiFFormSectionView title="Events">
-          {state.pattern.ahapPattern.Pattern.map((e, i) => {
-            const event = "Event" in e ? e.Event : ({} as HapticEvent)
-            const intensity = event.EventParameters.find(
-              (p) => p.ParameterID === "HapticIntensity"
-            )
-            const intensityIndex = event.EventParameters.findIndex(
-              (p) => p.ParameterID === "HapticIntensity"
-            )
-            const sharpness = event.EventParameters.find(
-              (p) => p.ParameterID === "HapticSharpness"
-            )
-            const sharpnessIndex = event.EventParameters.findIndex(
-              (p) => p.ParameterID === "HapticSharpness"
-            )
-            return (
-              <TiFFormCardView key={i}>
-                <View style={styles.card}>
-                  <Headline>Time: {event.Time}</Headline>
-                  <Slider
-                    value={event.Time}
-                    minimumValue={0}
-                    maximumValue={10}
-                    onValueChange={(Time) =>
-                      state.setPattern((p) => {
-                        return {
-                          ...p,
-                          ahapPattern: {
-                            Pattern: p.ahapPattern.Pattern.with(i, {
-                              Event: { ...event, Time }
-                            })
-                          }
-                        }
-                      })
-                    }
-                  />
-                  <Headline>
-                    Intensity: {intensity?.ParameterValue ?? 0}
-                  </Headline>
-                  <Slider
-                    value={intensity?.ParameterValue ?? 0}
-                    minimumValue={0}
-                    maximumValue={1}
-                    onValueChange={(newIntensity) => {
-                      haptics.play(
-                        hapticPattern(
-                          events(
-                            transientEvent(0, {
-                              HapticIntensity: newIntensity
-                            })
-                          )
-                        )
-                      )
-                      state.setPattern((p) => {
-                        return {
-                          ...p,
-                          ahapPattern: {
-                            Pattern: p.ahapPattern.Pattern.with(i, {
-                              Event: {
-                                ...event,
-                                EventParameters: intensity?.ParameterValue
-                                  ? event.EventParameters.with(intensityIndex, {
-                                      ParameterID: "HapticIntensity",
-                                      ParameterValue: newIntensity
-                                    })
-                                  : event.EventParameters.concat({
-                                      ParameterID: "HapticIntensity",
-                                      ParameterValue: newIntensity
-                                    })
-                              }
-                            })
-                          }
-                        }
-                      })
-                    }}
-                  />
-                  <Headline>
-                    Sharpness: {sharpness?.ParameterValue ?? 0}
-                  </Headline>
-                  <Slider
-                    value={sharpness?.ParameterValue ?? 0}
-                    minimumValue={0}
-                    maximumValue={1}
-                    onValueChange={(newSharpness) => {
-                      haptics.play(
-                        hapticPattern(
-                          events(
-                            transientEvent(0, {
-                              HapticSharpness: newSharpness
-                            })
-                          )
-                        )
-                      )
-                      state.setPattern((p) => {
-                        return {
-                          ...p,
-                          ahapPattern: {
-                            Pattern: p.ahapPattern.Pattern.with(i, {
-                              Event: {
-                                ...event,
-                                EventParameters: intensity?.ParameterValue
-                                  ? event.EventParameters.with(sharpnessIndex, {
-                                      ParameterID: "HapticSharpness",
-                                      ParameterValue: newSharpness
-                                    })
-                                  : event.EventParameters.concat({
-                                      ParameterID: "HapticSharpness",
-                                      ParameterValue: newSharpness
-                                    })
-                              }
-                            })
-                          }
-                        }
-                      })
-                    }}
-                  />
-                </View>
-              </TiFFormCardView>
-            )
-          })}
-        </TiFFormSectionView>
-        <TiFFormSectionView>
-          <PrimaryButton
-            onPress={() =>
-              state.setPattern((p) => ({
-                ...p,
-                ahapPattern: {
-                  Pattern: p.ahapPattern.Pattern.concat({
-                    Event: transientEvent(0, {})
-                  })
+}: RudeusPatternEditorProps) => (
+  <View style={style}>
+    <TiFFormScrollableLayoutView
+      footer={
+        <TiFFooterView>
+          <Caption>Pattern Version: {state.version}</Caption>
+          <View style={styles.footerRow}>
+            <PrimaryButton onPress={state.played} style={styles.playButton}>
+              Play
+            </PrimaryButton>
+            <SecondaryOutlinedButton
+              disabled={state.submission.status !== "submittable"}
+              onPress={() => {
+                if (state.submission.status === "submittable") {
+                  state.submission.submit()
                 }
-              }))
-            }
-          >
-            Add Section
+              }}
+              style={styles.playButton}
+            >
+              Share
+            </SecondaryOutlinedButton>
+          </View>
+        </TiFFooterView>
+      }
+      style={styles.layout}
+    >
+      <AtomTextFieldSectionView
+        title="Name"
+        atom={state.name}
+        placeholder="Enter a Name"
+        textStyle={{ height: 32 * useFontScale() }}
+      />
+      <AtomTextFieldSectionView
+        title="Description"
+        atom={state.description}
+        multiline
+        textAlignVertical="top"
+        placeholder="Enter a Description"
+        textStyle={{ minHeight: 128 * useFontScale() }}
+      />
+      {state.events.length === 0 ? (
+        <TiFFormSectionView>
+          <PrimaryButton onPress={() => state.eventAdded()}>
+            Add Event
           </PrimaryButton>
         </TiFFormSectionView>
-      </TiFFormScrollableLayoutView>
-    </View>
+      ) : (
+        <TiFFormSectionView title="Events">
+          {state.events.map((event) => (
+            <Animated.View
+              key={event.id}
+              layout={TiFDefaultLayoutTransition}
+              entering={FadeIn}
+              exiting={FadeOut}
+              style={styles.eventColumn}
+            >
+              <Headline>{event.id}</Headline>
+              <TouchableIonicon
+                icon={{ name: "add-circle" }}
+                onPress={() => state.eventAdded(event.id)}
+              />
+            </Animated.View>
+          ))}
+        </TiFFormSectionView>
+      )}
+    </TiFFormScrollableLayoutView>
+  </View>
+)
+
+type AtomTextFieldSectionProps = {
+  atom: PrimitiveAtom<string>
+  title: string
+  multiline?: boolean
+  textAlignVertical?: "top"
+  placeholder: string
+  textStyle: StyleProp<TextStyle>
+}
+
+const AtomTextFieldSectionView = ({
+  atom,
+  multiline = false,
+  title,
+  textAlignVertical,
+  placeholder,
+  textStyle
+}: AtomTextFieldSectionProps) => {
+  const [text, setText] = useAtom(atom)
+  return (
+    <TiFFormSectionView title={title}>
+      <ShadedTextField
+        value={text}
+        multiline={multiline}
+        onChangeText={setText}
+        textAlignVertical={textAlignVertical}
+        placeholder={placeholder}
+        textStyle={textStyle}
+      />
+    </TiFFormSectionView>
   )
 }
 
@@ -243,7 +267,8 @@ const styles = StyleSheet.create({
   footerRow: {
     display: "flex",
     flexDirection: "row",
-    columnGap: 16
+    columnGap: 16,
+    marginTop: 16
   },
   playButton: {
     flex: 1
@@ -257,6 +282,9 @@ const styles = StyleSheet.create({
   },
   layout: {
     flex: 1
+  },
+  eventColumn: {
+    rowGap: 8
   },
   card: {
     padding: 16

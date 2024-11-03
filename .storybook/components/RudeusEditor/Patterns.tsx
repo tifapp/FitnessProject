@@ -17,6 +17,7 @@ import { TiFFormCardView } from "@components/form-components/Card"
 import { TiFFormNavigationLinkView } from "@components/form-components/NavigationLink"
 import { Ionicon } from "@components/common/Icons"
 import { RefreshControl } from "react-native"
+import { useRefreshOnFocus } from "@lib/utils/UseRefreshOnFocus"
 
 export type RudeusPatternsHeaderProps = {
   username: string
@@ -49,6 +50,7 @@ export const RudeusPatternsView = ({
   style
 }: RudeusPatternsProps) => {
   const query = useQuery(["rudeus-patterns"], patterns)
+  useRefreshOnFocus(query.refetch)
   return (
     <View style={style}>
       {query.data && (

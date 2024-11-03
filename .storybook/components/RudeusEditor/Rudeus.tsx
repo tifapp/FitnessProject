@@ -1,5 +1,11 @@
 import { StyleProp, ViewStyle, View, StyleSheet } from "react-native"
-import { RudeusEditorPattern, RudeusPattern, RudeusUser } from "./Models"
+import {
+  EMPTY_PATTERN_EDITOR_PATTERN,
+  RudeusEditorPattern,
+  RudeusPattern,
+  RudeusUser,
+  editorPattern
+} from "./Models"
 import { SafeAreaProvider } from "react-native-safe-area-context"
 import { TiFQueryClientProvider } from "@lib/ReactQuery"
 import React, { createContext, useContext } from "react"
@@ -19,9 +25,7 @@ import { Headline } from "@components/Text"
 import { RudeusPatternsHeaderView, RudeusPatternsView } from "./Patterns"
 import { RudeusRegisterView, useRudeusRegister } from "./Register"
 import {
-  EMPTY_PATTERN_EDITOR_PATTERN,
   RudeusPatternEditorView,
-  editorPattern,
   useRudeusPatternEditor
 } from "./PatternEditor"
 

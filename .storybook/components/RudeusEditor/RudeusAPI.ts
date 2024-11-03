@@ -12,9 +12,8 @@ import { chainMiddleware } from "TiFShared/lib/Middleware"
 import { logger } from "TiFShared/logging"
 import { z } from "zod"
 import {
-  HapticPatternSchema,
   RudeusPatternSchema,
-  RudeusPlatformSchema,
+  RudeusSharePatternRequestSchema,
   RudeusUserSchema
 } from "./Models"
 
@@ -28,16 +27,8 @@ export const RudeusAPISchema = {
     },
     httpRequest: { method: "POST", endpoint: "/api/register" }
   }),
-  savePattern: endpointSchema({
-    input: {
-      body: z.object({
-        id: z.string().uuid().optional(),
-        name: z.string(),
-        description: z.string(),
-        ahapPattern: HapticPatternSchema,
-        platform: RudeusPlatformSchema
-      })
-    },
+  sharePattern: endpointSchema({
+    input: { body: RudeusSharePatternRequestSchema },
     outputs: {
       status200: RudeusPatternSchema,
       status201: RudeusPatternSchema

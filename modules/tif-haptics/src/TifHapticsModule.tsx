@@ -265,6 +265,11 @@ export const keyFrame = (
   return { ParameterValue: value, Time: time }
 }
 
+export type HapticPatternElement =
+  | { Event: HapticEvent }
+  | { Parameter: HapticDynamicParameter }
+  | { ParameterCurve: HapticParameterCurve }
+
 /**
  * A type for a haptic pattern.
  *
@@ -274,11 +279,7 @@ export const keyFrame = (
  * You can create a pattern using {@link hapticPattern}.
  */
 export type HapticPattern = {
-  Pattern: (
-    | { Event: HapticEvent }
-    | { Parameter: HapticDynamicParameter }
-    | { ParameterCurve: HapticParameterCurve }
-  )[]
+  Pattern: HapticPatternElement[]
 }
 
 /**

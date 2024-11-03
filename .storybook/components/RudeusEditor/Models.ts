@@ -1,11 +1,19 @@
 import { z } from "zod"
-import { HapticPattern, events, hapticPattern } from "@modules/tif-haptics"
+import {
+  HapticEvent,
+  HapticPattern,
+  HapticPatternElement,
+  events,
+  hapticPattern
+} from "@modules/tif-haptics"
 import { Tagged } from "TiFShared/lib/Types/HelperTypes"
 
 // NB: It's probably not super necessary to make the entire AHAP format zod compatible for now.
-export const HapticPatternSchema = z.custom<
+export const RudeusAHAPPatternSchema = z.custom<
   HapticPattern & { Version: number }
 >()
+
+export type RudeusAHAPPattern = z.rInfer<typeof RudeusAHAPPatternSchema>
 
 export const RudeusPlatformSchema = z.union([
   z.literal("ios"),
@@ -33,17 +41,17 @@ export const RudeusPatternSchema = z.object({
   name: z.string(),
   description: z.string(),
   user: RudeusUserSchema,
-  ahapPattern: HapticPatternSchema,
+  ahapPattern: RudeusAHAPPatternSchema,
   platform: RudeusPlatformSchema
 })
 
 export type RudeusPattern = z.infer<typeof RudeusPatternSchema>
 
 export const RudeusSharePatternRequestSchema = z.object({
-  id: z.string().uuid().optional(),
+  id: z.string().uuid().nullable(),
   name: z.string(),
   description: z.string(),
-  ahapPattern: HapticPatternSchema,
+  ahapPattern: RudeusAHAPPatternSchema,
   platform: RudeusPlatformSchema
 })
 
@@ -57,17 +65,28 @@ export const editorPattern = (
   pattern: RudeusPattern,
   userId: RudeusUserID
 ): RudeusEditorPattern => ({
-  id: pattern.user.id === userId ? pattern.id : undefined,
+  id: pattern.user.id === userId ? pattern.id : null,
   name: pattern.name,
   description: pattern.description,
   ahapPattern: pattern.ahapPattern
 })
 
 export const EMPTY_PATTERN_EDITOR_PATTERN = {
+  id: null,
   name: "",
   description: "",
   ahapPattern: { ...hapticPattern(events()), Version: 1 }
 } satisfies Readonly<RudeusEditorPattern>
+
+export type RudeusEditablePatternEventID = Tagged<
+  string,
+  "editablePatternEvent"
+>
+
+export type RudeusEditablePatternEvent = {
+  element: HapticPatternElement
+  isHidden: boolean
+}
 
 export const MOCK_USER_TOKEN =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjAxOTJkYWI0LWEwOGQtNzdiNi05MDJjLWEyOTdjNThhZTAzNSIsIm5hbWUiOiJCbG9iIn0.4jywZaAjYdGd2DCh1XhGExWTFvs_HgqyuZ6rINW_gtc"
