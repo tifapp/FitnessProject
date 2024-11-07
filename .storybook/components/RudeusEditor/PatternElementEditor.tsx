@@ -1,9 +1,11 @@
 import { PrimitiveAtom, useAtom } from "jotai"
 import { StyleProp, View, ViewStyle, StyleSheet } from "react-native"
 import { RudeusEditablePatternElement } from "./Models"
-import { useState } from "react"
+import { Fragment, useEffect, useState } from "react"
 import {
+  AUDIO_PARAMETER_IDS,
   AnyHapticEvent,
+  FEEDBACK_PARAMETER_IDS,
   HapticAudioParameterID,
   HapticCurvableParameterID,
   HapticDynamicParameter,
@@ -25,6 +27,20 @@ import {
   transientEvent,
   useHaptics
 } from "@modules/tif-haptics"
+import { TiFFormCardView } from "@components/form-components/Card"
+import { TiFFormMenuPickerView } from "@components/form-components/MenuPicker"
+import { TouchableIonicon } from "@components/common/Icons"
+import { AppStyles } from "@lib/AppColorStyle"
+import Animated, { FadeIn, FadeOut } from "react-native-reanimated"
+import { Headline } from "@components/Text"
+import { ShadedTextField, TextField } from "@components/TextFields"
+import { useEffectEvent } from "@lib/utils/UseEffectEvent"
+import { TiFFormLabelView } from "@components/form-components/Label"
+import { TiFFormRowItemView } from "@components/form-components/RowItem"
+import { Divider } from "react-native-elements"
+import Slider from "@react-native-community/slider"
+import { RudeusStepperView } from "./Stepper"
+import { Switch } from "react-native"
 
 export const ELEMENT_TYPES = {
   Parameter: {
@@ -63,7 +79,7 @@ export const ELEMENT_TYPES = {
 
 export type RudeusPatternElementEditorElementType = keyof typeof ELEMENT_TYPES
 
-type EditableParameters<
+type EditableEventParameters<
   ID extends HapticAudioParameterID | HapticFeedbackParameterID
 > = {
   eventParameterValue: (id: ID) => number
@@ -105,15 +121,15 @@ export type UseRudeusPatternElementEditorElement = (
       effectName: string
       effectNameChanged: (name: string) => void
     } & EditableVolumeEnvelope &
-      EditableParameters<HapticAudioParameterID>)
+      EditableEventParameters<HapticAudioParameterID>)
   | ({ type: "AudioContinuous" } & EditableDuration &
       EditableVolumeEnvelope &
-      EditableParameters<HapticAudioParameterID>)
+      EditableEventParameters<HapticAudioParameterID>)
   | ({
       type: "HapticTransient"
-    } & EditableParameters<HapticFeedbackParameterID>)
+    } & EditableEventParameters<HapticFeedbackParameterID>)
   | ({ type: "HapticContinuous" } & EditableDuration &
-      EditableParameters<HapticFeedbackParameterID>)
+      EditableEventParameters<HapticFeedbackParameterID>)
 ) & {
   time: number
   timeChanged: (newTime: number) => void
@@ -151,7 +167,9 @@ const editableElement = (
 ) => {
   const editableTime = {
     time: time(element),
-    timeChanged: (newTime: number) => onChanged(changeTime(element, newTime))
+    timeChanged: (newTime: number) => {
+      onChanged(changeTime(element, Number(newTime.toFixed(2))))
+    }
   }
   if ("Event" in element) {
     return {
@@ -316,8 +334,255 @@ export const RudeusPatternElementEditorView = ({
   state,
   onDeleteTapped,
   style
-}: RudeusPatternElementEditorProps) => {
-  return <View style={style}></View>
+}: RudeusPatternElementEditorProps) => (
+  <View style={style}>
+    <TiFFormCardView>
+      <View style={styles.container}>
+        <View style={styles.topRow}>
+          <TiFFormMenuPickerView
+            options={ELEMENT_TYPE_OPTIONS}
+            selectedOption={state.element.type}
+            onOptionSelected={state.elementTypeChanged}
+          />
+        </View>
+        <RudeusStepperView
+          title="Time"
+          value={state.element.time}
+          onValueChanged={state.element.timeChanged}
+          style={styles.stepper}
+        />
+        <Divider />
+        <View style={styles.iconRow}>
+          <TouchableIonicon
+            icon={{ name: state.isHidden ? "eye-off" : "eye" }}
+            onPress={state.hiddenToggled}
+          />
+          <TouchableIonicon icon={{ name: "play" }} onPress={state.played} />
+          <TouchableIonicon
+            icon={{ name: "trash", color: AppStyles.red.toString() }}
+            onPress={onDeleteTapped}
+          />
+          <TouchableIonicon
+            icon={{
+              name: state.isExpanded ? "chevron-down" : "chevron-forward"
+            }}
+            onPress={state.expandToggled}
+          />
+        </View>
+        {state.isExpanded && (
+          <Animated.View entering={FadeIn} exiting={FadeOut}>
+            {state.element.type === "HapticTransient" && (
+              <EventParameterControlView
+                element={state.element}
+                ids={TRANSIENT_PARAMETER_IDS}
+              />
+            )}
+            {state.element.type === "HapticContinuous" && (
+              <>
+                <RudeusStepperView
+                  title="Duration"
+                  value={state.element.duration}
+                  onValueChanged={state.element.durationChanged}
+                />
+                <EventParameterControlView
+                  element={state.element}
+                  ids={FEEDBACK_PARAMETER_IDS}
+                />
+              </>
+            )}
+            {state.element.type === "AudioCustom" && (
+              <>
+                <RudeusStepperView
+                  title="Duration"
+                  value={state.element.duration}
+                  onValueChanged={state.element.durationChanged}
+                />
+                <EventParameterControlView
+                  element={state.element}
+                  ids={AUDIO_PARAMETER_IDS}
+                />
+              </>
+            )}
+          </Animated.View>
+        )}
+      </View>
+    </TiFFormCardView>
+  </View>
+)
+
+type EditableEvent = Extract<
+  UseRudeusPatternElementEditorElement,
+  {
+    type:
+      | "HapticTransient"
+      | "HapticContinuous"
+      | "AudioCustom"
+      | "AudioContinuous"
+  }
+>
+
+type EventParameterControlProps<E extends EditableEvent> = {
+  element: E
+  ids: Parameters<E["eventParameterValue"]>[0][]
 }
 
-const styles = StyleSheet.create({})
+const EventParameterControlView = <E extends EditableEvent>({
+  element,
+  ids
+}: EventParameterControlProps<E>) => (
+  <>
+    {ids.map((id) => (
+      <Fragment key={id}>
+        {EVENT_PARAMETER_DISPLAY_PROPERTIES[id].type === "toggle" ? (
+          <EventParameterToggleView
+            title={EVENT_PARAMETER_DISPLAY_PROPERTIES[id].title}
+            value={element.eventParameterValue(id)}
+            onValueChanged={(value) => {
+              element.eventParameterValueChanged(id, value)
+            }}
+          />
+        ) : (
+          <RudeusStepperView
+            key={id}
+            title={EVENT_PARAMETER_DISPLAY_PROPERTIES[id].title}
+            value={element.eventParameterValue(id)}
+            onValueChanged={(value) => {
+              element.eventParameterValueChanged(id, value)
+            }}
+            maximumValue={EVENT_PARAMETER_DISPLAY_PROPERTIES[id].max}
+            minimumValue={EVENT_PARAMETER_DISPLAY_PROPERTIES[id].min}
+            includeSlider={
+              EVENT_PARAMETER_DISPLAY_PROPERTIES[id].max !== Infinity
+            }
+          />
+        )}
+      </Fragment>
+    ))}
+  </>
+)
+
+type EventParameterToggleProps = {
+  title: string
+  value: number
+  onValueChanged: (value: number) => void
+}
+
+const EventParameterToggleView = ({
+  title,
+  value,
+  onValueChanged
+}: EventParameterToggleProps) => (
+  <TiFFormRowItemView title={title} rowStyle={styles.formRow}>
+    <Switch
+      value={value === 1}
+      onValueChange={(value) => onValueChanged(value ? 1 : 0)}
+    />
+  </TiFFormRowItemView>
+)
+
+const TRANSIENT_PARAMETER_IDS = ["HapticIntensity", "HapticSharpness"] as const
+
+const EVENT_PARAMETER_DISPLAY_PROPERTIES = {
+  HapticIntensity: {
+    type: "stepper",
+    title: "Haptic Intensity",
+    min: 0,
+    max: 1
+  },
+  HapticSharpness: {
+    type: "stepper",
+    title: "Haptic Sharpness",
+    min: 0,
+    max: 1
+  },
+  AttackTime: { type: "stepper", title: "Attack Time", min: -1, max: 1 },
+  DecayTime: { type: "stepper", title: "Decay Time", min: -1, max: 1 },
+  ReleaseTime: {
+    type: "stepper",
+    title: "Release Time",
+    min: 0,
+    max: Infinity
+  },
+  Sustained: { type: "toggle", title: "Sustained" },
+  AudioVolume: { type: "stepper", title: "Volume", min: 0, max: 1 },
+  AudioPitch: { type: "stepper", title: "Pitch", min: -1, max: 1 },
+  AudioPan: { type: "stepper", title: "Pan", min: -1, max: 1 },
+  AudioBrightness: { type: "stepper", title: "Brightness", min: 0, max: 1 },
+  HapticIntensityControl: {
+    type: "stepper",
+    title: "Haptic Intensity",
+    min: 0,
+    max: 1
+  },
+  HapticSharpnessControl: {
+    type: "stepper",
+    title: "Haptic Sharpness",
+    min: 0,
+    max: 1
+  },
+  AudioVolumeControl: { type: "stepper", title: "Volume", min: 0, max: 1 },
+  AudioPitchControl: { type: "stepper", title: "Pitch", min: -1, max: 1 },
+  AudioPanControl: { type: "stepper", title: "Pan", min: -1, max: 1 },
+  AudioBrightnessControl: { title: "Brightness", min: 0, max: 1 },
+  HapticAttackTimeControl: {
+    type: "stepper",
+    title: "Haptic Attack Time",
+    min: -1,
+    max: 1
+  },
+  HapticDecayTimeControl: {
+    type: "stepper",
+    title: "Haptic Decay Time",
+    min: -1,
+    max: 1
+  },
+  HapticReleaseTimeControl: {
+    type: "stepper",
+    title: "Haptic Release Time",
+    min: 0,
+    max: Infinity
+  },
+  AudioAttackTimeControl: { type: "stepper", title: "Audio Attack Time" },
+  AudioDecayTimeControl: { type: "stepper", title: "Audio Decay Time" },
+  AudioReleaseTimeControl: {
+    type: "stepper",
+    title: "Audio Release Time",
+    min: 0,
+    max: Infinity
+  }
+} as const
+
+const ELEMENT_TYPE_OPTIONS = new Map<
+  RudeusPatternElementEditorElementType,
+  { title: string }
+>(
+  Object.entries(ELEMENT_TYPES).map(([key, value]) => [
+    key as RudeusPatternElementEditorElementType,
+    { title: value.display }
+  ])
+)
+
+const styles = StyleSheet.create({
+  container: {
+    padding: 16,
+    rowGap: 16
+  },
+  topRow: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "flex-start"
+  },
+  iconRow: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    columnGap: 8
+  },
+  stepper: {
+    flex: 1
+  },
+  formRow: {
+    padding: 0
+  }
+})

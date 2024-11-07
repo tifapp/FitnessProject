@@ -227,7 +227,7 @@ export const RudeusPatternEditorView = ({
                 onDeleteTapped={() => state.eventRemoved(event.id)}
               />
               <TouchableIonicon
-                icon={{ name: "add-circle" }}
+                icon={{ name: "add-circle", size: 32 }}
                 onPress={() => state.eventAdded(event.id)}
               />
             </Animated.View>
@@ -252,6 +252,7 @@ const PatternEventEditorView = ({
     <RudeusPatternElementEditorView
       state={state}
       onDeleteTapped={onDeleteTapped}
+      style={styles.elementEditor}
     />
   )
 }
@@ -308,8 +309,15 @@ const styles = StyleSheet.create({
   layout: {
     flex: 1
   },
+  elementEditor: {
+    width: "100%"
+  },
   eventColumn: {
-    rowGap: 8
+    width: "100%",
+    justifyContent: "center",
+    alignItems: "center",
+    flex: 1,
+    rowGap: 16
   },
   card: {
     padding: 16

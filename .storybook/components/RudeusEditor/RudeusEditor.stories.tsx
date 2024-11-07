@@ -12,7 +12,12 @@ const RudeusEditorMeta = {
 
 export default RudeusEditorMeta
 
-const userStorage = new RudeusUserStorage(new InMemorySecureStore())
+const userStorage = new RudeusUserStorage({
+  getItemAsync: async () =>
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiU2hzanNqIiwiaWQiOiIwMTkzMDQ3Ni0yQkU1LTcwMDAtQTVGNC00NkEzNjk1RjA2MUEifQ.ryiRrF8AK0I--y0-O826Yb3QB_uKhaYrciR5iIvwumQ",
+  setItemAsync: async () => {},
+  deleteItemAsync: async () => {}
+})
 const api = RudeusAPI(userStorage)
 
 export const Basic = () => (

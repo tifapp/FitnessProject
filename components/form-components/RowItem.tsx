@@ -8,6 +8,7 @@ export type TiFFormRowItemProps = {
   children?: ReactNode
   maximumFontScaleFactor?: number
   style?: StyleProp<ViewStyle>
+  rowStyle?: StyleProp<ViewStyle>
 }
 
 export const TiFFormRowItemView = ({
@@ -15,10 +16,11 @@ export const TiFFormRowItemView = ({
   description,
   children,
   maximumFontScaleFactor: maximumFontSizeMultipler,
-  style
+  style,
+  rowStyle
 }: TiFFormRowItemProps) => (
   <View style={style}>
-    <View style={styles.row}>
+    <View style={[styles.row, rowStyle]}>
       <TiFFormLabelView
         title={title}
         description={description}
