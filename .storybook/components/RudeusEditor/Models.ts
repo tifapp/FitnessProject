@@ -1,6 +1,5 @@
 import { z } from "zod"
 import {
-  HapticEvent,
   HapticPattern,
   HapticPatternElement,
   events,
@@ -14,6 +13,11 @@ export const RudeusAHAPPatternSchema = z.custom<
 >()
 
 export type RudeusAHAPPattern = z.rInfer<typeof RudeusAHAPPatternSchema>
+
+export const rudeusAHAPPattern = (pattern: HapticPattern) => ({
+  ...pattern,
+  Version: 1
+})
 
 export const RudeusPlatformSchema = z.union([
   z.literal("ios"),
@@ -75,7 +79,7 @@ export const EMPTY_PATTERN_EDITOR_PATTERN = {
   id: null,
   name: "",
   description: "",
-  ahapPattern: { ...hapticPattern(events()), Version: 1 }
+  ahapPattern: rudeusAHAPPattern(hapticPattern(events()))
 } satisfies Readonly<RudeusEditorPattern>
 
 export type RudeusEditablePatternEventID = Tagged<
@@ -83,7 +87,7 @@ export type RudeusEditablePatternEventID = Tagged<
   "editablePatternEvent"
 >
 
-export type RudeusEditablePatternEvent = {
+export type RudeusEditablePatternElement = {
   element: HapticPatternElement
   isHidden: boolean
 }

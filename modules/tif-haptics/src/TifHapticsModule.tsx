@@ -8,19 +8,25 @@ const TiFNativeHaptics = requireOptionalNativeModule("TifHaptics")
 
 const log = logger("tif.haptics")
 
-export type HapticFeedbackParameterID =
-  | "HapticIntensity"
-  | "HapticSharpness"
-  | "AttackTime"
-  | "DecayTime"
-  | "ReleaseTime"
-  | "Sustained"
+export const FEEDBACK_PARAMETER_IDS = [
+  "HapticIntensity",
+  "HapticSharpness",
+  "AttackTime",
+  "DecayTime",
+  "ReleaseTime",
+  "Sustained"
+] as const
 
-export type HapticAudioParameterID =
-  | "AudioVolume"
-  | "AudioPan"
-  | "AudioPitch"
-  | "AudioBrightness"
+export type HapticFeedbackParameterID = (typeof FEEDBACK_PARAMETER_IDS)[number]
+
+export const AUDIO_PARAMETER_IDS = [
+  "AudioVolume",
+  "AudioPan",
+  "AudioPitch",
+  "AudioBrightness"
+] as const
+
+export type HapticAudioParameterID = (typeof AUDIO_PARAMETER_IDS)[number]
 
 export type AudioEventWaveformProperties = {
   EventWaveformLoopEnabled: boolean
@@ -61,6 +67,18 @@ export type HapticEvent = (
       EventParameters: HapticEventParameter<HapticAudioParameterID>[]
     }
 ) & { Time: number }
+
+export type AnyHapticEvent = {
+  EventType: HapticEvent["EventType"]
+  EventDuration?: number
+  EventWaveformUseVolumeEnvelope?: boolean
+  EventWaveformLoopEnabled?: boolean
+  EventWaveformPath?: string
+  EventParameters: HapticEventParameter<
+    HapticAudioParameterID | HapticFeedbackParameterID
+  >[]
+  Time: number
+}
 
 export type HapticEventParameter<
   ID extends HapticFeedbackParameterID | HapticAudioParameterID
@@ -269,6 +287,25 @@ export type HapticPatternElement =
   | { Event: HapticEvent }
   | { Parameter: HapticDynamicParameter }
   | { ParameterCurve: HapticParameterCurve }
+
+export const time = (element: HapticPatternElement) => {
+  if ("Event" in element) return element.Event.Time
+  if ("Parameter" in element) return element.Parameter.Time
+  return element.ParameterCurve.Time
+}
+
+export const changeTime = (
+  element: HapticPatternElement,
+  value: number
+): HapticPatternElement => {
+  if ("Event" in element) {
+    return { Event: { ...element.Event, Time: value } }
+  } else if ("Parameter" in element) {
+    return { Parameter: { ...element.Parameter, Time: value } }
+  } else {
+    return { ParameterCurve: { ...element.ParameterCurve, Time: value } }
+  }
+}
 
 /**
  * A type for a haptic pattern.

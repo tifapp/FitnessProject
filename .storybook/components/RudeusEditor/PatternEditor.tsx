@@ -7,7 +7,6 @@ import { AppStyles } from "@lib/AppColorStyle"
 import { useFontScale } from "@lib/Fonts"
 import {
   HapticPatternElement,
-  hapticPattern,
   transientEvent,
   useHaptics
 } from "@modules/tif-haptics"
@@ -15,7 +14,7 @@ import { StyleProp, ViewStyle, StyleSheet, View, TextStyle } from "react-native"
 import { RudeusAPI } from "./RudeusAPI"
 import { Platform } from "react-native"
 import {
-  RudeusEditablePatternEvent,
+  RudeusEditablePatternElement,
   RudeusEditablePatternEventID,
   RudeusEditorPattern,
   RudeusPattern,
@@ -31,6 +30,10 @@ import { uuidString } from "@lib/utils/UUID"
 import { TouchableIonicon } from "@components/common/Icons"
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated"
 import { TiFDefaultLayoutTransition } from "@lib/Reanimated"
+import {
+  RudeusPatternElementEditorView,
+  useRudeusPatternElementEditor
+} from "./PatternElementEditor"
 
 export const sharePattern = async (
   pattern: RudeusEditorPattern,
@@ -139,7 +142,7 @@ export const useRudeusPatternEditor = (
 
 type RudeusPatternEditorEvent = {
   id: RudeusEditablePatternEventID
-  atom: PrimitiveAtom<RudeusEditablePatternEvent>
+  atom: PrimitiveAtom<RudeusEditablePatternElement>
 }
 
 const playablePattern = (
@@ -219,7 +222,10 @@ export const RudeusPatternEditorView = ({
               exiting={FadeOut}
               style={styles.eventColumn}
             >
-              <Headline>{event.id}</Headline>
+              <PatternEventEditorView
+                event={event}
+                onDeleteTapped={() => state.eventRemoved(event.id)}
+              />
               <TouchableIonicon
                 icon={{ name: "add-circle" }}
                 onPress={() => state.eventAdded(event.id)}
@@ -231,6 +237,24 @@ export const RudeusPatternEditorView = ({
     </TiFFormScrollableLayoutView>
   </View>
 )
+
+type PatternEventEditorProps = {
+  event: RudeusPatternEditorEvent
+  onDeleteTapped: () => void
+}
+
+const PatternEventEditorView = ({
+  event,
+  onDeleteTapped
+}: PatternEventEditorProps) => {
+  const state = useRudeusPatternElementEditor(event.atom)
+  return (
+    <RudeusPatternElementEditorView
+      state={state}
+      onDeleteTapped={onDeleteTapped}
+    />
+  )
+}
 
 type AtomTextFieldSectionProps = {
   atom: PrimitiveAtom<string>
