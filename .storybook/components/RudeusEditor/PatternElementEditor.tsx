@@ -63,6 +63,62 @@ export const ELEMENT_TYPES = {
 
 export type RudeusPatternElementEditorElementType = keyof typeof ELEMENT_TYPES
 
+type EditableParameters<
+  ID extends HapticAudioParameterID | HapticFeedbackParameterID
+> = {
+  eventParameterValue: (id: ID) => number
+  eventParameterValueChanged: (id: ID, value: number) => void
+}
+
+type EditableDuration = {
+  duration: number
+  durationChanged: (duration: number) => void
+}
+
+type EditableVolumeEnvelope = {
+  useWaveformVolumeEnvelope: boolean
+  useWaveformVolumeEnvelopeChanged: (use: boolean) => void
+}
+
+export type UseRudeusPatternElementEditorElement = (
+  | {
+      type: "Parameter"
+      parameter: HapticDynamicParameterID
+      parameterChanged: (id: HapticDynamicParameterID) => void
+      parameterValue: number
+      parameterValueChanged: (value: number) => void
+    }
+  | {
+      type: "ParameterCurve"
+      parameter: HapticCurvableParameterID
+      parameterChanged: (id: HapticCurvableParameterID) => void
+      keyFrames: HapticParameterCurveKeyFrame[]
+      keyFrameAdded: () => void
+      keyFrameRemoved: (index: number) => void
+      keyFrameChanged: (
+        index: number,
+        frame: HapticParameterCurveKeyFrame
+      ) => void
+    }
+  | ({
+      type: "AudioCustom"
+      effectName: string
+      effectNameChanged: (name: string) => void
+    } & EditableVolumeEnvelope &
+      EditableParameters<HapticAudioParameterID>)
+  | ({ type: "AudioContinuous" } & EditableDuration &
+      EditableVolumeEnvelope &
+      EditableParameters<HapticAudioParameterID>)
+  | ({
+      type: "HapticTransient"
+    } & EditableParameters<HapticFeedbackParameterID>)
+  | ({ type: "HapticContinuous" } & EditableDuration &
+      EditableParameters<HapticFeedbackParameterID>)
+) & {
+  time: number
+  timeChanged: (newTime: number) => void
+}
+
 export const useRudeusPatternElementEditor = (
   elementAtom: PrimitiveAtom<RudeusEditablePatternElement>
 ) => {
@@ -79,7 +135,7 @@ export const useRudeusPatternElementEditor = (
     },
     element: editableElement(element, (element) => {
       setElement((e) => ({ ...e, element }))
-    }),
+    }) as UseRudeusPatternElementEditorElement,
     elementTypeChanged: (type: RudeusPatternElementEditorElementType) => {
       setElement((e) => ({
         ...e,
@@ -177,6 +233,7 @@ const editableEventMetadata = (
     }
   } else if (event.EventType === "AudioCustom") {
     return {
+      effectName: event.EventWaveformPath,
       effectNameChanged: (name: string) => {
         onChanged({ ...event, EventWaveformPath: name })
       },

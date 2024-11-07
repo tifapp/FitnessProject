@@ -288,12 +288,18 @@ export type HapticPatternElement =
   | { Parameter: HapticDynamicParameter }
   | { ParameterCurve: HapticParameterCurve }
 
+/**
+ * Returns the time that this element plays relative to other events in an {@link HapticPattern}.
+ */
 export const time = (element: HapticPatternElement) => {
   if ("Event" in element) return element.Event.Time
   if ("Parameter" in element) return element.Parameter.Time
   return element.ParameterCurve.Time
 }
 
+/**
+ * Returns a new {@link HapticPatternElement} with the time value updated to the specified time.
+ */
 export const changeTime = (
   element: HapticPatternElement,
   value: number
