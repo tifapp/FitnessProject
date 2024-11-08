@@ -18,7 +18,7 @@ const soundEffectName = <const N extends string>(name: N) => {
  * The sound effect names that have files stored in the main bundle of the app.
  */
 export const BUNDLED_SOUND_EFFECT_NAMES = [
-  soundEffectName("wind"),
+  soundEffectName("debris"),
   soundEffectName("fall"),
   soundEffectName("appear")
 ] as const

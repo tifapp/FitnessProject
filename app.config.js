@@ -1,5 +1,6 @@
 import dotenv from "dotenv"
 import withTiFNativePod from "./injectTiFNativePod.js"
+import withInjectBundledSoundEffects from "./injectBundledSoundEffects.js"
 
 dotenv.config({ path: ".env.infra" })
 
@@ -120,4 +121,4 @@ const config = {
   }
 }
 
-export default withTiFNativePod(config)
+export default withInjectBundledSoundEffects(withTiFNativePod(config))

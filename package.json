@@ -36,7 +36,7 @@
     "ios": "expo run:ios",
     "format": "prettier --write \"**/*.{js,jsx,ts,tsx,md}\"",
     "prebuild-android": "npx expo prebuild --clean --platform android",
-    "prebuild-ios": "npx expo prebuild --clean --platform ios; node injectBundledSoundEffects.js"
+    "prebuild-ios": "npx expo prebuild --clean --platform ios"
   },
   "engines": {
     "npm": ">=8.3.0"
