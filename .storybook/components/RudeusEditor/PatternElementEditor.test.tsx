@@ -296,6 +296,38 @@ describe("RudeusPatternElementEditor tests", () => {
       ).toEqual(0.56)
     })
 
+    it("should reset the value to the default value when changing parameter ID for dynamic parameter", () => {
+      const element = {
+        isHidden: false,
+        element: { Parameter: dynamicParameter("HapticIntensityControl", 0, 0) }
+      }
+      const { result } = renderUseRudeusPatternElementEditor(element)
+      act(() => (result.current.element as any).parameterValueChanged(0.56))
+      act(() => {
+        ;(result.current.element as any).parameterChanged(
+          "HapticSharpnessControl"
+        )
+      })
+      expect((result.current.element as any).parameterValue).toEqual(0)
+    })
+
+    it("should reset key frames when changing parameter id for parameter curve", () => {
+      const element = {
+        isHidden: false,
+        element: {
+          ParameterCurve: parameterCurve("HapticSharpnessControl", 0, [])
+        }
+      }
+      const { result } = renderUseRudeusPatternElementEditor(element)
+      act(() => (result.current.element as any).keyFrameAdded())
+      act(() => {
+        ;(result.current.element as any).parameterChanged(
+          "HapticSharpnessControl"
+        )
+      })
+      expect((result.current.element as any).keyFrames).toEqual([])
+    })
+
     it("should set the time to 0 when playing an element", () => {
       const element = {
         isHidden: false,

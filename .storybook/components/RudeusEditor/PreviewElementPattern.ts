@@ -4,7 +4,6 @@ import {
   transientEvent,
   continuousSoundEvent,
   HapticDynamicParameterID,
-  HAPTIC_DYNAMIC_PARAMETER_IDS,
   HapticEventParameterID
 } from "@modules/tif-haptics"
 
@@ -89,3 +88,11 @@ const DYNAMIC_PARAMETER_TO_PARAMETERS = {
   AudioBrightnessControl: "AudioBrightness",
   AudioPitchControl: "AudioPitch"
 } as Record<string, HapticEventParameterID | undefined>
+
+const HAPTIC_DYNAMIC_PARAMETER_IDS = [
+  "HapticIntensityControl",
+  "HapticSharpnessControl",
+  "HapticAttackTimeControl",
+  "HapticDecayTimeControl",
+  "HapticReleaseTimeControl"
+] as HapticDynamicParameterID[]

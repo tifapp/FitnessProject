@@ -187,40 +187,28 @@ export const continuousSoundEvent = (
   }
 }
 
-export type HapticCurvableParameterID =
-  | "HapticIntensityControl"
-  | "HapticSharpnessControl"
-  | "AudioVolumeControl"
-  | "AudioPanControl"
-  | "AudioPitchControl"
-  | "AudioBrightnessControl"
-
-export type HapticDynamicParameterID =
-  | HapticCurvableParameterID
-  | "HapticAttackTimeControl"
-  | "HapticDecayTimeControl"
-  | "HapticReleaseTimeControl"
-  | "AudioAttackTimeControl"
-  | "AudioDecayTimeControl"
-  | "AudioReleaseTimeControl"
-
-export const HAPTIC_DYNAMIC_PARAMETER_IDS = [
+export const CURVABLE_PARAMETER_IDS = [
   "HapticIntensityControl",
   "HapticSharpnessControl",
-  "HapticAttackTimeControl",
-  "HapticDecayTimeControl",
-  "HapticReleaseTimeControl"
-] as HapticDynamicParameterID[]
-
-export const AUDIO_DYNAMIC_PARAMETER_IDS = [
   "AudioVolumeControl",
   "AudioPanControl",
   "AudioPitchControl",
-  "AudioBrightnessControl",
+  "AudioBrightnessControl"
+] as const
+
+export type HapticCurvableParameterID = (typeof CURVABLE_PARAMETER_IDS)[number]
+
+export const DYNAMIC_PARAMETER_IDS = [
+  ...CURVABLE_PARAMETER_IDS,
+  "HapticAttackTimeControl",
+  "HapticDecayTimeControl",
+  "HapticReleaseTimeControl",
   "AudioAttackTimeControl",
   "AudioDecayTimeControl",
   "AudioReleaseTimeControl"
-] as HapticDynamicParameterID[]
+] as const
+
+export type HapticDynamicParameterID = (typeof DYNAMIC_PARAMETER_IDS)[number]
 
 /**
  * A value that alters the playback of haptic event parameters at a particular time.
