@@ -100,8 +100,8 @@ type EditableDuration = {
 }
 
 type EditableVolumeEnvelope = {
-  useWaveformVolumeEnvelope: boolean
-  useWaveformVolumeEnvelopeChanged: (use: boolean) => void
+  useVolumeEnvelope: boolean
+  useVolumeEnvelopeChanged: (use: boolean) => void
 }
 
 export type UseRudeusPatternElementEditorElement = (
@@ -466,10 +466,8 @@ export const RudeusPatternElementEditorView = ({
                 </TiFFormRowItemView>
                 <EventParameterToggleView
                   title="Use Volume Envelope"
-                  value={state.element.useWaveformVolumeEnvelope}
-                  onValueChanged={
-                    state.element.useWaveformVolumeEnvelopeChanged
-                  }
+                  value={state.element.useVolumeEnvelope}
+                  onValueChanged={state.element.useVolumeEnvelopeChanged}
                 />
                 <EventParameterControlView
                   element={state.element}
@@ -486,10 +484,8 @@ export const RudeusPatternElementEditorView = ({
                 />
                 <EventParameterToggleView
                   title="Use Volume Envelope"
-                  value={state.element.useWaveformVolumeEnvelope}
-                  onValueChanged={
-                    state.element.useWaveformVolumeEnvelopeChanged
-                  }
+                  value={state.element.useVolumeEnvelope}
+                  onValueChanged={state.element.useVolumeEnvelopeChanged}
                 />
                 <EventParameterControlView
                   element={state.element}
