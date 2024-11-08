@@ -1,16 +1,16 @@
 import { Platform } from "react-native"
 
 /**
- * A string for the name of a sound effect that is either a `.wav` file (Android) or a `.caf` file (iOS).
+ * A string for the name of a sound effect that is either a `.mp3` file (Android) or a `.caf` file (iOS).
  */
 export type SoundEffectName<Name extends string = string> =
   | `${Name}.caf`
-  | `${Name}.wav`
+  | `${Name}.mp3`
 
 const soundEffectName = <const N extends string>(name: N) => {
   return Platform.select({
     ios: `${name}.caf`,
-    android: `${name}.wav`
+    android: `${name}.mp3`
   }) as SoundEffectName<N>
 }
 
@@ -18,7 +18,7 @@ const soundEffectName = <const N extends string>(name: N) => {
  * The sound effect names that have files stored in the main bundle of the app.
  */
 export const BUNDLED_SOUND_EFFECT_NAMES = [
-  soundEffectName("test"),
+  soundEffectName("wind"),
   soundEffectName("fall"),
   soundEffectName("appear")
 ] as const
