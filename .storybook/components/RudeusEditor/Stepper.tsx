@@ -24,7 +24,7 @@ const canStep = (
   kind: StepKind
 ) => {
   const nextValue = value + STEP_KIND_INCREMENT[kind]
-  return kind === "inc" ? nextValue < maximumValue : nextValue > minimumValue
+  return kind === "inc" ? nextValue <= maximumValue : nextValue >= minimumValue
 }
 
 export const useRudeusStepper = ({
@@ -38,18 +38,21 @@ export const useRudeusStepper = ({
   const increment = useEffectEvent((amount: number) => {
     onValueChanged(value + amount)
   })
+  const shouldIncrement = useEffectEvent((stepKind: StepKind) => {
+    return canStep(value, maximumValue, minimumValue, stepKind)
+  })
   useEffect(() => setText(value.toFixed(2)), [value])
   useEffect(() => {
     if (!stepKind) return
     const interval = setInterval(() => {
-      if (canStep(value, maximumValue, minimumValue, stepKind)) {
+      if (shouldIncrement(stepKind)) {
         increment(STEP_KIND_INCREMENT[stepKind])
       } else {
         clearInterval(interval)
       }
     }, 100)
     return () => clearInterval(interval)
-  }, [stepKind, increment])
+  }, [stepKind, shouldIncrement, increment])
   return {
     text,
     numberEntered: (text: string) => {
@@ -63,9 +66,7 @@ export const useRudeusStepper = ({
       setStepKind(kind)
     },
     steppingEnded: () => setStepKind(undefined),
-    canStep: (kind: StepKind) => {
-      return canStep(value, maximumValue, minimumValue, kind)
-    }
+    canStep: (kind: StepKind) => shouldIncrement(kind)
   }
 }
 

@@ -3,6 +3,7 @@ import { ReactNode, createContext, useContext } from "react"
 import { LocalSettings } from "@settings-storage/LocalSettings"
 import { logger } from "TiFShared/logging"
 import { SettingsStore } from "@settings-storage/Settings"
+import { SoundEffectName } from "@lib/SoundEffect"
 
 const TiFNativeHaptics = requireOptionalNativeModule("TifHaptics")
 
@@ -54,7 +55,7 @@ export type HapticEvent = (
     }
   | {
       EventType: "AudioCustom"
-      EventWaveformPath: string
+      EventWaveformPath: SoundEffectName
       EventDuration?: number
       EventWaveformLoopEnabled?: boolean
       EventWaveformUseVolumeEnvelope?: boolean
@@ -143,7 +144,7 @@ export const continuousEvent = (
  * @param relativeTime The time that this event plays relative to the other events in an {@link HapticPattern}.
  */
 export const soundEffectEvent = (
-  path: string,
+  path: SoundEffectName,
   relativeTime: number,
   parameters: Partial<Record<HapticAudioParameterID, number>>,
   waveformProperties: {

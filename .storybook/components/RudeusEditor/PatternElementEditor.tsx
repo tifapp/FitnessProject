@@ -1,7 +1,7 @@
 import { PrimitiveAtom, useAtom } from "jotai"
 import { StyleProp, View, ViewStyle, StyleSheet } from "react-native"
 import { RudeusEditablePatternElement } from "./Models"
-import { Fragment, useEffect, useState } from "react"
+import { Fragment, useState } from "react"
 import {
   AUDIO_PARAMETER_IDS,
   AnyHapticEvent,
@@ -11,7 +11,6 @@ import {
   HapticDynamicParameter,
   HapticDynamicParameterID,
   HapticEvent,
-  HapticEventParameter,
   HapticFeedbackParameterID,
   HapticParameterCurve,
   HapticParameterCurveKeyFrame,
@@ -32,15 +31,11 @@ import { TiFFormMenuPickerView } from "@components/form-components/MenuPicker"
 import { TouchableIonicon } from "@components/common/Icons"
 import { AppStyles } from "@lib/AppColorStyle"
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated"
-import { Headline } from "@components/Text"
-import { ShadedTextField, TextField } from "@components/TextFields"
-import { useEffectEvent } from "@lib/utils/UseEffectEvent"
-import { TiFFormLabelView } from "@components/form-components/Label"
 import { TiFFormRowItemView } from "@components/form-components/RowItem"
 import { Divider } from "react-native-elements"
-import Slider from "@react-native-community/slider"
 import { RudeusStepperView } from "./Stepper"
 import { Switch } from "react-native"
+import { BUNDLED_SOUND_EFFECT_NAMES, SoundEffectName } from "@lib/SoundEffect"
 
 export const ELEMENT_TYPES = {
   Parameter: {
@@ -69,7 +64,9 @@ export const ELEMENT_TYPES = {
   },
   AudioCustom: {
     display: "Sound Effect Event",
-    new: (time: number) => ({ Event: soundEffectEvent("test.wav", time, {}) })
+    new: (time: number) => ({
+      Event: soundEffectEvent(BUNDLED_SOUND_EFFECT_NAMES[0], time, {})
+    })
   },
   AudioContinuous: {
     display: "Continuous Sound Event",
@@ -118,8 +115,8 @@ export type UseRudeusPatternElementEditorElement = (
     }
   | ({
       type: "AudioCustom"
-      effectName: string
-      effectNameChanged: (name: string) => void
+      effectName: SoundEffectName
+      effectNameChanged: (name: SoundEffectName) => void
     } & EditableVolumeEnvelope &
       EditableEventParameters<HapticAudioParameterID>)
   | ({ type: "AudioContinuous" } & EditableDuration &
@@ -211,9 +208,10 @@ const editableEventParameters = <E extends HapticEvent>(
   eventParameterValue: (
     id: HapticFeedbackParameterID | HapticAudioParameterID
   ): number => {
+    const defaultValue = EVENT_PARAMETER_INFO[id].defaultValue ?? 0
     return (
       event.EventParameters.find((p) => p.ParameterID === id)?.ParameterValue ??
-      0
+      defaultValue
     )
   },
   eventParameterValueChanged: (
@@ -252,10 +250,10 @@ const editableEventMetadata = (
   } else if (event.EventType === "AudioCustom") {
     return {
       effectName: event.EventWaveformPath,
-      effectNameChanged: (name: string) => {
+      effectNameChanged: (name: SoundEffectName) => {
         onChanged({ ...event, EventWaveformPath: name })
       },
-      useVolumeEnvelope: event.EventWaveformUseVolumeEnvelope,
+      useVolumeEnvelope: event.EventWaveformUseVolumeEnvelope ?? false,
       useVolumeEnvelopeChanged: (value: boolean) => {
         onChanged({ ...event, EventWaveformUseVolumeEnvelope: value })
       }
@@ -266,7 +264,7 @@ const editableEventMetadata = (
       durationChanged: (value: number) => {
         onChanged({ ...event, EventDuration: value })
       },
-      useVolumeEnvelope: event.EventWaveformUseVolumeEnvelope,
+      useVolumeEnvelope: event.EventWaveformUseVolumeEnvelope ?? false,
       useVolumeEnvelopeChanged: (value: boolean) => {
         onChanged({ ...event, EventWaveformUseVolumeEnvelope: value })
       }
@@ -370,7 +368,11 @@ export const RudeusPatternElementEditorView = ({
           />
         </View>
         {state.isExpanded && (
-          <Animated.View entering={FadeIn} exiting={FadeOut}>
+          <Animated.View
+            entering={FadeIn}
+            exiting={FadeOut}
+            style={styles.controls}
+          >
             {state.element.type === "HapticTransient" && (
               <EventParameterControlView
                 element={state.element}
@@ -392,10 +394,36 @@ export const RudeusPatternElementEditorView = ({
             )}
             {state.element.type === "AudioCustom" && (
               <>
+                <SoundEffectPickerView
+                  name={state.element.effectName}
+                  onNameChanged={state.element.effectNameChanged}
+                />
+                <EventParameterToggleView
+                  title="Use Volume Envelope"
+                  value={state.element.useWaveformVolumeEnvelope}
+                  onValueChanged={
+                    state.element.useWaveformVolumeEnvelopeChanged
+                  }
+                />
+                <EventParameterControlView
+                  element={state.element}
+                  ids={AUDIO_PARAMETER_IDS}
+                />
+              </>
+            )}
+            {state.element.type === "AudioContinuous" && (
+              <>
                 <RudeusStepperView
                   title="Duration"
                   value={state.element.duration}
                   onValueChanged={state.element.durationChanged}
+                />
+                <EventParameterToggleView
+                  title="Use Volume Envelope"
+                  value={state.element.useWaveformVolumeEnvelope}
+                  onValueChanged={
+                    state.element.useWaveformVolumeEnvelopeChanged
+                  }
                 />
                 <EventParameterControlView
                   element={state.element}
@@ -408,6 +436,34 @@ export const RudeusPatternElementEditorView = ({
       </View>
     </TiFFormCardView>
   </View>
+)
+
+type SoundEffectPickerProps = {
+  name: SoundEffectName
+  onNameChanged: (name: SoundEffectName) => void
+  style?: StyleProp<ViewStyle>
+}
+
+const SoundEffectPickerView = ({
+  name,
+  onNameChanged,
+  style
+}: SoundEffectPickerProps) => (
+  <TiFFormRowItemView
+    title="Sound Name"
+    style={style}
+    rowStyle={styles.formRow}
+  >
+    <TiFFormMenuPickerView
+      options={SOUND_EFFECT_MENU_OPTIONS}
+      selectedOption={name}
+      onOptionSelected={onNameChanged}
+    />
+  </TiFFormRowItemView>
+)
+
+const SOUND_EFFECT_MENU_OPTIONS = new Map(
+  BUNDLED_SOUND_EFFECT_NAMES.map((name) => [name, { title: name }])
 )
 
 type EditableEvent = Extract<
@@ -423,7 +479,9 @@ type EditableEvent = Extract<
 
 type EventParameterControlProps<E extends EditableEvent> = {
   element: E
-  ids: Parameters<E["eventParameterValue"]>[0][]
+  ids: Parameters<E["eventParameterValue"]>[0] extends HapticFeedbackParameterID
+    ? typeof FEEDBACK_PARAMETER_IDS | typeof TRANSIENT_PARAMETER_IDS
+    : typeof AUDIO_PARAMETER_IDS
 }
 
 const EventParameterControlView = <E extends EditableEvent>({
@@ -431,40 +489,42 @@ const EventParameterControlView = <E extends EditableEvent>({
   ids
 }: EventParameterControlProps<E>) => (
   <>
-    {ids.map((id) => (
-      <Fragment key={id}>
-        {EVENT_PARAMETER_DISPLAY_PROPERTIES[id].type === "toggle" ? (
-          <EventParameterToggleView
-            title={EVENT_PARAMETER_DISPLAY_PROPERTIES[id].title}
-            value={element.eventParameterValue(id)}
-            onValueChanged={(value) => {
-              element.eventParameterValueChanged(id, value)
-            }}
-          />
-        ) : (
-          <RudeusStepperView
-            key={id}
-            title={EVENT_PARAMETER_DISPLAY_PROPERTIES[id].title}
-            value={element.eventParameterValue(id)}
-            onValueChanged={(value) => {
-              element.eventParameterValueChanged(id, value)
-            }}
-            maximumValue={EVENT_PARAMETER_DISPLAY_PROPERTIES[id].max}
-            minimumValue={EVENT_PARAMETER_DISPLAY_PROPERTIES[id].min}
-            includeSlider={
-              EVENT_PARAMETER_DISPLAY_PROPERTIES[id].max !== Infinity
-            }
-          />
-        )}
-      </Fragment>
-    ))}
+    {ids.map((id) => {
+      const info = EVENT_PARAMETER_INFO[id]
+      const _id = id as never // TODO: - Fix TS
+      return (
+        <Fragment key={id}>
+          {info.type === "toggle" ? (
+            <EventParameterToggleView
+              title={info.title}
+              value={element.eventParameterValue(_id) === 1}
+              onValueChanged={(value) => {
+                element.eventParameterValueChanged(_id, value ? 1 : 0)
+              }}
+            />
+          ) : (
+            <RudeusStepperView
+              key={id}
+              title={info.title}
+              value={element.eventParameterValue(_id)}
+              onValueChanged={(value) => {
+                element.eventParameterValueChanged(_id, value)
+              }}
+              maximumValue={info.max}
+              minimumValue={info.min}
+              includeSlider={info.max !== Infinity}
+            />
+          )}
+        </Fragment>
+      )
+    })}
   </>
 )
 
 type EventParameterToggleProps = {
   title: string
-  value: number
-  onValueChanged: (value: number) => void
+  value: boolean
+  onValueChanged: (value: boolean) => void
 }
 
 const EventParameterToggleView = ({
@@ -473,16 +533,23 @@ const EventParameterToggleView = ({
   onValueChanged
 }: EventParameterToggleProps) => (
   <TiFFormRowItemView title={title} rowStyle={styles.formRow}>
-    <Switch
-      value={value === 1}
-      onValueChange={(value) => onValueChanged(value ? 1 : 0)}
-    />
+    <Switch value={value} onValueChange={onValueChanged} />
   </TiFFormRowItemView>
 )
 
 const TRANSIENT_PARAMETER_IDS = ["HapticIntensity", "HapticSharpness"] as const
 
-const EVENT_PARAMETER_DISPLAY_PROPERTIES = {
+type EventParameterInfo = (
+  | {
+      type: "toggle"
+    }
+  | { type: "stepper"; min: number; max: number }
+) & {
+  title: string
+  defaultValue?: number
+}
+
+const EVENT_PARAMETER_INFO = {
   HapticIntensity: {
     type: "stepper",
     title: "Haptic Intensity",
@@ -504,7 +571,13 @@ const EVENT_PARAMETER_DISPLAY_PROPERTIES = {
     max: Infinity
   },
   Sustained: { type: "toggle", title: "Sustained" },
-  AudioVolume: { type: "stepper", title: "Volume", min: 0, max: 1 },
+  AudioVolume: {
+    type: "stepper",
+    title: "Volume",
+    min: 0,
+    max: 1,
+    defaultValue: 1
+  },
   AudioPitch: { type: "stepper", title: "Pitch", min: -1, max: 1 },
   AudioPan: { type: "stepper", title: "Pan", min: -1, max: 1 },
   AudioBrightness: { type: "stepper", title: "Brightness", min: 0, max: 1 },
@@ -523,7 +596,12 @@ const EVENT_PARAMETER_DISPLAY_PROPERTIES = {
   AudioVolumeControl: { type: "stepper", title: "Volume", min: 0, max: 1 },
   AudioPitchControl: { type: "stepper", title: "Pitch", min: -1, max: 1 },
   AudioPanControl: { type: "stepper", title: "Pan", min: -1, max: 1 },
-  AudioBrightnessControl: { title: "Brightness", min: 0, max: 1 },
+  AudioBrightnessControl: {
+    type: "stepper",
+    title: "Brightness",
+    min: 0,
+    max: 1
+  },
   HapticAttackTimeControl: {
     type: "stepper",
     title: "Haptic Attack Time",
@@ -542,15 +620,25 @@ const EVENT_PARAMETER_DISPLAY_PROPERTIES = {
     min: 0,
     max: Infinity
   },
-  AudioAttackTimeControl: { type: "stepper", title: "Audio Attack Time" },
-  AudioDecayTimeControl: { type: "stepper", title: "Audio Decay Time" },
+  AudioAttackTimeControl: {
+    type: "stepper",
+    title: "Audio Attack Time",
+    min: -1,
+    max: 1
+  },
+  AudioDecayTimeControl: {
+    type: "stepper",
+    title: "Audio Decay Time",
+    min: -1,
+    max: 1
+  },
   AudioReleaseTimeControl: {
     type: "stepper",
     title: "Audio Release Time",
     min: 0,
     max: Infinity
   }
-} as const
+} as Record<string, EventParameterInfo>
 
 const ELEMENT_TYPE_OPTIONS = new Map<
   RudeusPatternElementEditorElementType,
@@ -565,6 +653,9 @@ const ELEMENT_TYPE_OPTIONS = new Map<
 const styles = StyleSheet.create({
   container: {
     padding: 16,
+    rowGap: 16
+  },
+  controls: {
     rowGap: 16
   },
   topRow: {
