@@ -1,7 +1,7 @@
 import { PrimitiveAtom, useAtom } from "jotai"
 import { StyleProp, View, ViewStyle, StyleSheet } from "react-native"
 import { RudeusEditablePatternElement } from "./Models"
-import { useMemo, useState } from "react"
+import { Fragment, useMemo, useState } from "react"
 import {
   AUDIO_PARAMETER_IDS,
   AnyHapticEvent,
@@ -40,6 +40,7 @@ import { RudeusStepperView } from "./Stepper"
 import { Switch } from "react-native"
 import { BUNDLED_SOUND_EFFECT_NAMES, SoundEffectName } from "@lib/SoundEffect"
 import { previewElementPattern } from "./PreviewElementPattern"
+import { PrimaryButton } from "@components/Buttons"
 
 export const ELEMENT_TYPES = {
   Parameter: {
@@ -421,6 +422,16 @@ export const RudeusPatternElementEditorView = ({
                 />
               </>
             )}
+            {state.element.type === "ParameterCurve" && (
+              <>
+                <ParameterIDMenuPickerView
+                  options={_CURVABLE_PARAMETER_IDS}
+                  selectedOption={state.element.parameter}
+                  onOptionChanged={state.element.parameterChanged}
+                />
+                <KeyFrameEditorView element={state.element} />
+              </>
+            )}
             {state.element.type === "HapticTransient" && (
               <EventParameterControlView
                 element={state.element}
@@ -499,6 +510,53 @@ const _AUDIO_PARAMETER_IDS = [...AUDIO_PARAMETER_IDS]
 const _FEEDBACK_PARAMETER_IDS = [...FEEDBACK_PARAMETER_IDS]
 const TRANSIENT_PARAMETER_IDS = ["HapticIntensity", "HapticSharpness"]
 
+type KeyFrameEditorProps = {
+  element: Extract<
+    UseRudeusPatternElementEditorElement,
+    { type: "ParameterCurve" }
+  >
+}
+
+const KeyFrameEditorView = ({ element }: KeyFrameEditorProps) => (
+  <>
+    {element.keyFrames.map((frame, index, frames) => (
+      <View
+        style={styles.keyFrameRow}
+        key={`${element.parameter}-frame-${index}`}
+      >
+        <View style={styles.keyFrameControls}>
+          <RudeusStepperView
+            title="Time"
+            value={frame.Time}
+            onValueChanged={(time) => {
+              element.keyFrameChanged(index, { ...frame, Time: time })
+            }}
+          />
+          <ParameterIDControlView
+            title="Value"
+            id={element.parameter}
+            value={frame.ParameterValue}
+            onValueChanged={(value) => {
+              element.keyFrameChanged(index, {
+                ...frame,
+                ParameterValue: value
+              })
+            }}
+          />
+          {index < frames.length - 1 && <Divider />}
+        </View>
+        <TouchableIonicon
+          icon={{ name: "trash", color: AppStyles.red.toString() }}
+          onPress={() => element.keyFrameRemoved(index)}
+        />
+      </View>
+    ))}
+    <PrimaryButton onPress={element.keyFrameAdded}>
+      Add New Key Frame
+    </PrimaryButton>
+  </>
+)
+
 type ParameterIDMenuPickerProps<Option extends HapticDynamicParameterID> = {
   options: Option[]
   selectedOption: Option
@@ -559,12 +617,14 @@ const EventParameterControlView = <E extends EditableEvent>({
 )
 
 type ParameterIDControlProps = {
+  title?: string
   id: string
   value: number
   onValueChanged: (value: number) => void
 }
 
 const ParameterIDControlView = ({
+  title,
   id,
   value,
   onValueChanged
@@ -574,7 +634,7 @@ const ParameterIDControlView = ({
     <>
       {info.type === "toggle" ? (
         <EventParameterToggleView
-          title={info.title}
+          title={title ?? info.title}
           value={value === 1}
           onValueChanged={(value) => {
             onValueChanged(value ? 1 : 0)
@@ -582,7 +642,7 @@ const ParameterIDControlView = ({
         />
       ) : (
         <RudeusStepperView
-          title={info.title}
+          title={title ?? info.title}
           value={value}
           onValueChanged={onValueChanged}
           maximumValue={info.max}
@@ -750,5 +810,15 @@ const styles = StyleSheet.create({
   },
   formRow: {
     padding: 0
+  },
+  keyFrameControls: {
+    flex: 1,
+    rowGap: 16
+  },
+  keyFrameRow: {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "flex-end",
+    columnGap: 48
   }
 })
