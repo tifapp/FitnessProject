@@ -1,10 +1,11 @@
 import { PrimitiveAtom, useAtom } from "jotai"
 import { StyleProp, View, ViewStyle, StyleSheet } from "react-native"
 import { RudeusEditablePatternElement } from "./Models"
-import { Fragment, useMemo, useState } from "react"
+import { useMemo, useState } from "react"
 import {
   AUDIO_PARAMETER_IDS,
   AnyHapticEvent,
+  CURVABLE_PARAMETER_IDS,
   DYNAMIC_PARAMETER_IDS,
   FEEDBACK_PARAMETER_IDS,
   HapticAudioParameterID,
@@ -39,7 +40,6 @@ import { RudeusStepperView } from "./Stepper"
 import { Switch } from "react-native"
 import { BUNDLED_SOUND_EFFECT_NAMES, SoundEffectName } from "@lib/SoundEffect"
 import { previewElementPattern } from "./PreviewElementPattern"
-import { useConst } from "@lib/utils/UseConst"
 
 export const ELEMENT_TYPES = {
   Parameter: {
@@ -410,7 +410,7 @@ export const RudeusPatternElementEditorView = ({
             {state.element.type === "Parameter" && (
               <>
                 <ParameterIDMenuPickerView
-                  options={useConst([...DYNAMIC_PARAMETER_IDS])}
+                  options={_DYNAMIC_PARAMETER_IDS}
                   selectedOption={state.element.parameter}
                   onOptionChanged={state.element.parameterChanged}
                 />
@@ -436,7 +436,7 @@ export const RudeusPatternElementEditorView = ({
                 />
                 <EventParameterControlView
                   element={state.element}
-                  ids={useConst([...FEEDBACK_PARAMETER_IDS])}
+                  ids={_FEEDBACK_PARAMETER_IDS}
                 />
               </>
             )}
@@ -462,7 +462,7 @@ export const RudeusPatternElementEditorView = ({
                 />
                 <EventParameterControlView
                   element={state.element}
-                  ids={useConst([...AUDIO_PARAMETER_IDS])}
+                  ids={_AUDIO_PARAMETER_IDS}
                 />
               </>
             )}
@@ -482,7 +482,7 @@ export const RudeusPatternElementEditorView = ({
                 />
                 <EventParameterControlView
                   element={state.element}
-                  ids={useConst([...AUDIO_PARAMETER_IDS])}
+                  ids={_AUDIO_PARAMETER_IDS}
                 />
               </>
             )}
@@ -492,6 +492,12 @@ export const RudeusPatternElementEditorView = ({
     </TiFFormCardView>
   </View>
 )
+
+const _DYNAMIC_PARAMETER_IDS = [...DYNAMIC_PARAMETER_IDS]
+const _CURVABLE_PARAMETER_IDS = [...CURVABLE_PARAMETER_IDS]
+const _AUDIO_PARAMETER_IDS = [...AUDIO_PARAMETER_IDS]
+const _FEEDBACK_PARAMETER_IDS = [...FEEDBACK_PARAMETER_IDS]
+const TRANSIENT_PARAMETER_IDS = ["HapticIntensity", "HapticSharpness"]
 
 type ParameterIDMenuPickerProps<Option extends HapticDynamicParameterID> = {
   options: Option[]
@@ -603,8 +609,6 @@ const EventParameterToggleView = ({
     <Switch value={value} onValueChange={onValueChanged} />
   </TiFFormRowItemView>
 )
-
-const TRANSIENT_PARAMETER_IDS = ["HapticIntensity", "HapticSharpness"] as const
 
 type EventParameterInfo = (
   | {
