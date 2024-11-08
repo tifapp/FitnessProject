@@ -6,21 +6,28 @@ import {
   AUDIO_PARAMETER_IDS,
   AnyHapticEvent,
   FEEDBACK_PARAMETER_IDS,
+  HAPTIC_DYNAMIC_PARAMETER_IDS,
   HapticAudioParameterID,
   HapticCurvableParameterID,
   HapticDynamicParameter,
   HapticDynamicParameterID,
   HapticEvent,
+  HapticEventParameterID,
   HapticFeedbackParameterID,
   HapticParameterCurve,
   HapticParameterCurveKeyFrame,
+  HapticPattern,
   HapticPatternElement,
   changeTime,
   continuousEvent,
   continuousSoundEvent,
   dynamicParameter,
+  events,
+  hapticPattern,
   keyFrame,
   parameterCurve,
+  parametersRecord,
+  singleEventPattern,
   soundEffectEvent,
   time,
   transientEvent,
@@ -36,6 +43,76 @@ import { Divider } from "react-native-elements"
 import { RudeusStepperView } from "./Stepper"
 import { Switch } from "react-native"
 import { BUNDLED_SOUND_EFFECT_NAMES, SoundEffectName } from "@lib/SoundEffect"
+
+export const previewElementPattern = (
+  element: HapticPatternElement & { keyFrameIndex?: number }
+) => {
+  if ("Event" in element) {
+    const event = element.Event
+    if (event.EventType === "AudioCustom") {
+      return undefined
+    } else if (
+      event.EventType === "HapticContinuous" ||
+      event.EventType === "HapticTransient"
+    ) {
+      return singleEventPattern(
+        transientEvent(0, parametersRecord(event.EventParameters))
+      )
+    } else {
+      return singleEventPattern(
+        continuousSoundEvent(0, 0.05, parametersRecord(event.EventParameters), {
+          EventWaveformUseVolumeEnvelope: event.EventWaveformUseVolumeEnvelope
+        })
+      )
+    }
+  } else if ("Parameter" in element) {
+    const parameter = element.Parameter
+    return parameterToPreviewPattern(
+      parameter.ParameterID,
+      parameter.ParameterValue
+    )
+  } else {
+    if (element.keyFrameIndex === undefined) return undefined
+    const keyFrame =
+      element.ParameterCurve.ParameterCurveControlPoints[element.keyFrameIndex]
+    return parameterToPreviewPattern(
+      element.ParameterCurve.ParameterID,
+      keyFrame.ParameterValue
+    )
+  }
+}
+
+const parameterToPreviewPattern = (
+  id: HapticDynamicParameterID,
+  value: number
+) => {
+  const regularParameterId = DYNAMIC_PARAMETER_TO_PARAMETERS[id]
+  if (!regularParameterId) return undefined
+  if (HAPTIC_DYNAMIC_PARAMETER_IDS.includes(id)) {
+    return singleEventPattern(
+      transientEvent(0, { HapticIntensity: 0.5, [regularParameterId]: value })
+    )
+  } else {
+    return singleEventPattern(
+      continuousSoundEvent(0, 0.05, {
+        AudioVolume: 0.5,
+        [regularParameterId]: value
+      })
+    )
+  }
+}
+
+const DYNAMIC_PARAMETER_TO_PARAMETERS = {
+  HapticIntensityControl: "HapticIntensity",
+  HapticSharpnessControl: "HapticSharpness",
+  HapticAttackTimeControl: "AttackTime",
+  HapticDecayTimeControl: "DecayTime",
+  HapticReleaseTimeControl: "ReleaseTime",
+  AudioVolumeControl: "AudioVolume",
+  AudioPanControl: "AudioPan",
+  AudioBrightnessControl: "AudioBrightness",
+  AudioPitchControl: "AudioPitch"
+} as Record<string, HapticEventParameterID | undefined>
 
 export const ELEMENT_TYPES = {
   Parameter: {
@@ -146,7 +223,8 @@ export const useRudeusPatternElementEditor = (
     played: () => {
       haptics.play({ Pattern: [changeTime(element, 0)] })
     },
-    element: editableElement(element, (element) => {
+    element: editableElement(element, (element, previewPattern) => {
+      if (previewPattern) haptics.play(previewPattern)
       setElement((e) => ({ ...e, element }))
     }) as UseRudeusPatternElementEditorElement,
     elementTypeChanged: (type: RudeusPatternElementEditorElementType) => {
@@ -160,7 +238,10 @@ export const useRudeusPatternElementEditor = (
 
 const editableElement = (
   element: HapticPatternElement,
-  onChanged: (element: HapticPatternElement) => void
+  onChanged: (
+    element: HapticPatternElement,
+    previewPattern?: HapticPattern
+  ) => void
 ) => {
   const editableTime = {
     time: time(element),
@@ -171,22 +252,24 @@ const editableElement = (
   if ("Event" in element) {
     return {
       ...editableTime,
-      ...editableEvent(element.Event, (e) => {
-        onChanged({ Event: e as HapticEvent })
+      ...editableEvent(element.Event, (e, previewPattern) => {
+        onChanged({ Event: e as HapticEvent }, previewPattern)
       })
     }
   } else if ("Parameter" in element) {
     return {
       ...editableTime,
       ...editableParameter(element.Parameter, (p) => {
-        onChanged({ Parameter: p })
+        const element = { Parameter: p }
+        onChanged(element, previewElementPattern(element))
       })
     }
   } else {
     return {
       ...editableTime,
-      ...editableParameterCurve(element.ParameterCurve, (pc) => {
-        onChanged({ ParameterCurve: pc })
+      ...editableParameterCurve(element.ParameterCurve, (pc, keyFrameIndex) => {
+        const element = { ParameterCurve: pc }
+        onChanged(element, previewElementPattern({ ...element, keyFrameIndex }))
       })
     }
   }
@@ -194,10 +277,12 @@ const editableElement = (
 
 const editableEvent = (
   event: HapticEvent,
-  onChanged: (event: AnyHapticEvent) => void
+  onChanged: (event: AnyHapticEvent, previewPattern?: HapticPattern) => void
 ) => ({
   ...editableEventMetadata(event, onChanged),
-  ...editableEventParameters(event, onChanged),
+  ...editableEventParameters(event, (event) => {
+    onChanged(event, previewElementPattern({ Event: event as HapticEvent }))
+  }),
   type: event.EventType as RudeusPatternElementEditorElementType
 })
 
@@ -289,7 +374,10 @@ const editableParameter = (
 
 const editableParameterCurve = (
   parameterCurve: HapticParameterCurve,
-  onChanged: (parameterCurve: HapticParameterCurve) => void
+  onChanged: (
+    parameterCurve: HapticParameterCurve,
+    keyFrameIndex?: number
+  ) => void
 ) => ({
   type: "ParameterCurve" as RudeusPatternElementEditorElementType,
   parameter: parameterCurve.ParameterID,
@@ -314,11 +402,14 @@ const editableParameterCurve = (
     })
   },
   keyFrameChanged: (index: number, frame: HapticParameterCurveKeyFrame) => {
-    onChanged({
-      ...parameterCurve,
-      ParameterCurveControlPoints:
-        parameterCurve.ParameterCurveControlPoints.with(index, frame)
-    })
+    onChanged(
+      {
+        ...parameterCurve,
+        ParameterCurveControlPoints:
+          parameterCurve.ParameterCurveControlPoints.with(index, frame)
+      },
+      index
+    )
   }
 })
 

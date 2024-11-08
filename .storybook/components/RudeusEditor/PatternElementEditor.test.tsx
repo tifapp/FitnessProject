@@ -11,20 +11,104 @@ import {
   parameters,
   keyFrame,
   events,
+  singleEventPattern,
   HapticsProvider
 } from "@modules/tif-haptics"
 import {
   ELEMENT_TYPES,
   RudeusPatternElementEditorElementType,
+  previewElementPattern,
   useRudeusPatternElementEditor
 } from "./PatternElementEditor"
 import { TestHaptics } from "@test-helpers/Haptics"
 import { atom } from "jotai"
 
 describe("RudeusPatternElementEditor tests", () => {
+  describe("PreviewElementPattern tests", () => {
+    it.each([
+      [
+        "Haptic Transient",
+        { Event: transientEvent(0, {}) },
+        singleEventPattern(transientEvent(0, {}))
+      ],
+      [
+        "Haptic Continuous",
+        { Event: continuousEvent(1.0, 2.0, { HapticIntesity: 1 }) },
+        singleEventPattern(transientEvent(0.0, { HapticIntesity: 1 }))
+      ],
+      [
+        "Audio Custom",
+        { Event: soundEffectEvent("test.wav", 2.0, { AudioVolume: 0.5 }) },
+        undefined
+      ],
+      [
+        "Audio Continuous",
+        { Event: continuousSoundEvent(2.0, 2.0, { AudioVolume: 0.5 }) },
+        singleEventPattern(continuousSoundEvent(0, 0.05, { AudioVolume: 0.5 }))
+      ],
+      [
+        "Haptic Intensity Parameter",
+        { Parameter: dynamicParameter("HapticIntensityControl", 0.4, 0.5) },
+        singleEventPattern(transientEvent(0, { HapticIntensity: 0.4 }))
+      ],
+      [
+        "Haptic Sharpness Parameter",
+        { Parameter: dynamicParameter("HapticSharpnessControl", 0.4, 0.5) },
+        singleEventPattern(
+          transientEvent(0, { HapticIntensity: 0.5, HapticSharpness: 0.4 })
+        )
+      ],
+      [
+        "Haptic Attack Time Parameter",
+        { Parameter: dynamicParameter("HapticAttackTimeControl", 0.4, 0.5) },
+        singleEventPattern(
+          transientEvent(0, { HapticIntensity: 0.5, AttackTime: 0.4 })
+        )
+      ],
+      [
+        "Audio Volume Parameter",
+        { Parameter: dynamicParameter("AudioVolumeControl", 0.4, 0.5) },
+        singleEventPattern(continuousSoundEvent(0, 0.05, { AudioVolume: 0.4 }))
+      ],
+      [
+        "Audio Pan Parameter",
+        { Parameter: dynamicParameter("AudioPanControl", 0.4, 0.5) },
+        singleEventPattern(
+          continuousSoundEvent(0, 0.05, { AudioVolume: 0.5, AudioPan: 0.4 })
+        )
+      ],
+      [
+        "Haptic Intensity Curve",
+        {
+          ParameterCurve: parameterCurve("HapticIntensityControl", 0, [
+            keyFrame(0.7, 0.2),
+            keyFrame(0.4, 0.5)
+          ]),
+          keyFrameIndex: 1
+        },
+        singleEventPattern(transientEvent(0, { HapticIntensity: 0.4 }))
+      ],
+      [
+        "Haptic Intensity Curve No Index",
+        {
+          ParameterCurve: parameterCurve("HapticIntensityControl", 0, [
+            keyFrame(0.7, 0.2),
+            keyFrame(0.4, 0.5)
+          ])
+        },
+        undefined
+      ]
+    ])(
+      "should convert %s to a preview element",
+      (_, element, expectedPattern) => {
+        expect(previewElementPattern(element)).toEqual(expectedPattern)
+      }
+    )
+  })
+
   describe("UseRudeusPatternElementEditor tests", () => {
     let haptics = new TestHaptics()
-    beforeEach(() => (haptics = new TestHaptics()))
+    beforeEach(() => haptics.reset())
 
     it.each([
       [
@@ -125,6 +209,7 @@ describe("RudeusPatternElementEditor tests", () => {
           0.36
         )
       })
+      haptics.reset()
       act(() => result.current.played())
       expect(haptics.playedEvents).toEqual([
         hapticPattern(
@@ -148,6 +233,7 @@ describe("RudeusPatternElementEditor tests", () => {
         )
       })
       act(() => (result.current.element as any).durationChanged(2.0))
+      haptics.reset()
       act(() => result.current.played())
       expect(haptics.playedEvents).toEqual([
         hapticPattern(
@@ -175,6 +261,7 @@ describe("RudeusPatternElementEditor tests", () => {
           0.68
         )
       })
+      haptics.reset()
       act(() => result.current.played())
       expect(haptics.playedEvents).toEqual([
         hapticPattern(
@@ -197,6 +284,7 @@ describe("RudeusPatternElementEditor tests", () => {
         )
       })
       act(() => (result.current.element as any).useVolumeEnvelopeChanged(true))
+      haptics.reset()
       act(() => result.current.played())
       expect(haptics.playedEvents).toEqual([
         hapticPattern(
@@ -224,6 +312,7 @@ describe("RudeusPatternElementEditor tests", () => {
         )
       })
       act(() => (result.current.element as any).parameterValueChanged(0.56))
+      haptics.reset()
       act(() => result.current.played())
       expect(haptics.playedEvents).toEqual([
         hapticPattern(
@@ -258,6 +347,7 @@ describe("RudeusPatternElementEditor tests", () => {
       act(() => {
         ;(result.current.element as any).keyFrameRemoved(1)
       })
+      haptics.reset()
       act(() => result.current.played())
       expect(haptics.playedEvents).toEqual([
         hapticPattern(
@@ -298,6 +388,44 @@ describe("RudeusPatternElementEditor tests", () => {
       act(() => result.current.element.timeChanged(0.5))
       act(() => result.current.played())
       expect(haptics.playedEvents).toEqual([{ Pattern: [element.element] }])
+    })
+
+    it("should play a preview pattern when the element properties change", () => {
+      const element = {
+        isHidden: false,
+        element: { Event: transientEvent(0, {}) }
+      }
+      const { result } = renderUseRudeusPatternElementEditor(element)
+      act(() => {
+        ;(result.current.element as any).eventParameterValueChanged(
+          "HapticIntensity",
+          1
+        )
+      })
+      expect(haptics.playedEvents).toEqual([
+        singleEventPattern(transientEvent(0, { HapticIntensity: 1 }))
+      ])
+    })
+
+    it("should play a preview pattern when a key frame of a parameter curve changes", () => {
+      const element = {
+        isHidden: false,
+        element: {
+          ParameterCurve: parameterCurve("HapticSharpnessControl", 0, [])
+        }
+      }
+      const { result } = renderUseRudeusPatternElementEditor(element)
+      act(() => {
+        ;(result.current.element as any).keyFrameAdded()
+      })
+      act(() => {
+        ;(result.current.element as any).keyFrameChanged(0, keyFrame(0.1, 2.3))
+      })
+      expect(haptics.playedEvents).toEqual([
+        singleEventPattern(
+          transientEvent(0, { HapticIntensity: 0.5, HapticSharpness: 0.1 })
+        )
+      ])
     })
 
     it("should be able to change the element type", () => {

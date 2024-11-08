@@ -29,9 +29,21 @@ export const AUDIO_PARAMETER_IDS = [
 
 export type HapticAudioParameterID = (typeof AUDIO_PARAMETER_IDS)[number]
 
-export type AudioEventWaveformProperties = {
-  EventWaveformLoopEnabled: boolean
-  EventWaveformUseVolumeEnvelope: boolean
+export type HapticEventParameterID =
+  | HapticFeedbackParameterID
+  | HapticAudioParameterID
+
+export type HapticEventParameter<ID extends HapticEventParameterID> = {
+  ParameterID: ID
+  ParameterValue: number
+}
+
+export const parametersRecord = <ID extends HapticEventParameterID>(
+  parameters: HapticEventParameter<ID>[]
+) => {
+  return Object.fromEntries(
+    parameters.map((p) => [p.ParameterID, p.ParameterValue])
+  ) as Partial<Record<ID, number>>
 }
 
 /**
@@ -75,17 +87,8 @@ export type AnyHapticEvent = {
   EventWaveformUseVolumeEnvelope?: boolean
   EventWaveformLoopEnabled?: boolean
   EventWaveformPath?: string
-  EventParameters: HapticEventParameter<
-    HapticAudioParameterID | HapticFeedbackParameterID
-  >[]
+  EventParameters: HapticEventParameter<HapticEventParameterID>[]
   Time: number
-}
-
-export type HapticEventParameter<
-  ID extends HapticFeedbackParameterID | HapticAudioParameterID
-> = {
-  ParameterID: ID
-  ParameterValue: number
 }
 
 /**
@@ -208,6 +211,24 @@ export type HapticDynamicParameterID =
   | "AudioAttackTimeControl"
   | "AudioDecayTimeControl"
   | "AudioReleaseTimeControl"
+
+export const HAPTIC_DYNAMIC_PARAMETER_IDS = [
+  "HapticIntensityControl",
+  "HapticSharpnessControl",
+  "HapticAttackTimeControl",
+  "HapticDecayTimeControl",
+  "HapticReleaseTimeControl"
+] as HapticDynamicParameterID[]
+
+export const AUDIO_DYNAMIC_PARAMETER_IDS = [
+  "AudioVolumeControl",
+  "AudioPanControl",
+  "AudioPitchControl",
+  "AudioBrightnessControl",
+  "AudioAttackTimeControl",
+  "AudioDecayTimeControl",
+  "AudioReleaseTimeControl"
+] as HapticDynamicParameterID[]
 
 /**
  * A value that alters the playback of haptic event parameters at a particular time.
@@ -346,6 +367,13 @@ export const hapticPattern = (
       })
     ]
   }
+}
+
+/**
+ * Returns an {@link HapticPattern} consisting of a single event.
+ */
+export const singleEventPattern = (event: HapticEvent): HapticPattern => {
+  return { Pattern: [{ Event: event }] }
 }
 
 export const events = (...events: HapticEvent[]) => events
