@@ -38,14 +38,6 @@ export type HapticEventParameter<ID extends HapticEventParameterID> = {
   ParameterValue: number
 }
 
-export const parametersRecord = <ID extends HapticEventParameterID>(
-  parameters: HapticEventParameter<ID>[]
-) => {
-  return Object.fromEntries(
-    parameters.map((p) => [p.ParameterID, p.ParameterValue])
-  ) as Partial<Record<ID, number>>
-}
-
 /**
  * A type of haptic event to be played at a specified moment in time.
  *

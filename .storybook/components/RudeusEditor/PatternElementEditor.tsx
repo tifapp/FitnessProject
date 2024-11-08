@@ -6,13 +6,11 @@ import {
   AUDIO_PARAMETER_IDS,
   AnyHapticEvent,
   FEEDBACK_PARAMETER_IDS,
-  HAPTIC_DYNAMIC_PARAMETER_IDS,
   HapticAudioParameterID,
   HapticCurvableParameterID,
   HapticDynamicParameter,
   HapticDynamicParameterID,
   HapticEvent,
-  HapticEventParameterID,
   HapticFeedbackParameterID,
   HapticParameterCurve,
   HapticParameterCurveKeyFrame,
@@ -22,12 +20,8 @@ import {
   continuousEvent,
   continuousSoundEvent,
   dynamicParameter,
-  events,
-  hapticPattern,
   keyFrame,
   parameterCurve,
-  parametersRecord,
-  singleEventPattern,
   soundEffectEvent,
   time,
   transientEvent,
@@ -43,76 +37,7 @@ import { Divider } from "react-native-elements"
 import { RudeusStepperView } from "./Stepper"
 import { Switch } from "react-native"
 import { BUNDLED_SOUND_EFFECT_NAMES, SoundEffectName } from "@lib/SoundEffect"
-
-export const previewElementPattern = (
-  element: HapticPatternElement & { keyFrameIndex?: number }
-) => {
-  if ("Event" in element) {
-    const event = element.Event
-    if (event.EventType === "AudioCustom") {
-      return undefined
-    } else if (
-      event.EventType === "HapticContinuous" ||
-      event.EventType === "HapticTransient"
-    ) {
-      return singleEventPattern(
-        transientEvent(0, parametersRecord(event.EventParameters))
-      )
-    } else {
-      return singleEventPattern(
-        continuousSoundEvent(0, 0.05, parametersRecord(event.EventParameters), {
-          EventWaveformUseVolumeEnvelope: event.EventWaveformUseVolumeEnvelope
-        })
-      )
-    }
-  } else if ("Parameter" in element) {
-    const parameter = element.Parameter
-    return parameterToPreviewPattern(
-      parameter.ParameterID,
-      parameter.ParameterValue
-    )
-  } else {
-    if (element.keyFrameIndex === undefined) return undefined
-    const keyFrame =
-      element.ParameterCurve.ParameterCurveControlPoints[element.keyFrameIndex]
-    return parameterToPreviewPattern(
-      element.ParameterCurve.ParameterID,
-      keyFrame.ParameterValue
-    )
-  }
-}
-
-const parameterToPreviewPattern = (
-  id: HapticDynamicParameterID,
-  value: number
-) => {
-  const regularParameterId = DYNAMIC_PARAMETER_TO_PARAMETERS[id]
-  if (!regularParameterId) return undefined
-  if (HAPTIC_DYNAMIC_PARAMETER_IDS.includes(id)) {
-    return singleEventPattern(
-      transientEvent(0, { HapticIntensity: 0.5, [regularParameterId]: value })
-    )
-  } else {
-    return singleEventPattern(
-      continuousSoundEvent(0, 0.05, {
-        AudioVolume: 0.5,
-        [regularParameterId]: value
-      })
-    )
-  }
-}
-
-const DYNAMIC_PARAMETER_TO_PARAMETERS = {
-  HapticIntensityControl: "HapticIntensity",
-  HapticSharpnessControl: "HapticSharpness",
-  HapticAttackTimeControl: "AttackTime",
-  HapticDecayTimeControl: "DecayTime",
-  HapticReleaseTimeControl: "ReleaseTime",
-  AudioVolumeControl: "AudioVolume",
-  AudioPanControl: "AudioPan",
-  AudioBrightnessControl: "AudioBrightness",
-  AudioPitchControl: "AudioPitch"
-} as Record<string, HapticEventParameterID | undefined>
+import { previewElementPattern } from "./PreviewElementPattern"
 
 export const ELEMENT_TYPES = {
   Parameter: {
