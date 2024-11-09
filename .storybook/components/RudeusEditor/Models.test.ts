@@ -17,7 +17,7 @@ describe("Models tests", () => {
 
     it("should remove the id when the user id does not match", () => {
       expect(editorPattern(TEST_PATTERN, uuidString())).toEqual({
-        id: undefined,
+        id: null,
         name: "Blob",
         description: "This is a cool pattern",
         ahapPattern: EMPTY_PATTERN_EDITOR_PATTERN.ahapPattern
