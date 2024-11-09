@@ -155,7 +155,7 @@ const playablePattern = (
     if (predicate && !predicate(isHidden, element)) return undefined
     return element
   })
-  return { Pattern: elements, Version: pattern.version }
+  return { Pattern: elements, Version: 1 }
 }
 
 export type RudeusPatternEditorProps = {
