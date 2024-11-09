@@ -1,10 +1,8 @@
 import "@lib/TiFAPI"
 import "date-time/DateRangeFormatting"
-import { TiFMenuProvider } from "@components/TiFMenuProvider"
 import { useAppFonts } from "@lib/Fonts"
 import React from "react"
-import { RootSiblingParent } from "react-native-root-siblings"
-import { SafeAreaProvider } from "react-native-safe-area-context"
+import { StyleSheet } from "react-native"
 
 import { Geo } from "@aws-amplify/geo"
 import { ExpoEventArrivalsGeofencer } from "@arrival-tracking/geofencing"
@@ -15,12 +13,11 @@ import {
   sqliteLogs
 } from "@lib/Logging"
 import {
-  TiFQueryClientProvider,
   setupFocusRefreshes,
   setupInternetReconnectionRefreshes
 } from "@lib/ReactQuery"
 import { enableSentry } from "@lib/Sentry"
-import { AppView } from "@core-root/AppView"
+import { TiFView } from "@core-root"
 import * as Sentry from "@sentry/react-native"
 import "expo-dev-client"
 import { addPushTokenListener } from "expo-notifications"
@@ -30,6 +27,7 @@ import awsconfig from "./src/aws-exports"
 import { NetInfoInternetConnectionStatus } from "@lib/InternetConnection"
 import { consoleLogHandler, logger, addLogHandler } from "TiFShared/logging"
 import { dayjs } from "TiFShared/lib/Dayjs"
+import { eventsByRegion } from "@explore-events-boundary"
 
 const log = logger("app.root")
 
@@ -58,19 +56,19 @@ export type AppProps = {
   isFontsLoaded: boolean
 }
 
-const App = () => {
+const TiFApp = () => {
   const [isFontsLoaded] = useAppFonts()
   return (
-    <TiFQueryClientProvider>
-      <SafeAreaProvider>
-        <TiFMenuProvider>
-          <RootSiblingParent>
-            <AppView isFontsLoaded={isFontsLoaded} />
-          </RootSiblingParent>
-        </TiFMenuProvider>
-      </SafeAreaProvider>
-    </TiFQueryClientProvider>
+    <TiFView
+      fetchEvents={eventsByRegion}
+      isFontsLoaded={isFontsLoaded}
+      style={styles.tif}
+    />
   )
 }
 
-export default Sentry.wrap(App)
+const styles = StyleSheet.create({
+  tif: { flex: 1 }
+})
+
+export default Sentry.wrap(TiFApp)

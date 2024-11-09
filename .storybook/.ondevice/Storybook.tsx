@@ -65,6 +65,9 @@ import EditEventDurationsMeta, {
 import EditEventPragmaQuotesMeta, {
   Basic as EditEventPragmaQuotesBasic
 } from "../components/EditEvent/PragmaQuote.stories"
+import TiFPreviewMeta, {
+  Basic as TiFPreviewBasic
+} from "../components/TiFPreview/TiFPreview.stories"
 import { addLogHandler, consoleLogHandler } from "TiFShared/logging"
 import { sqliteLogHandler, sqliteLogs } from "@lib/Logging"
 import { dayjs } from "TiFShared/lib/Dayjs"
@@ -175,6 +178,11 @@ const stories = [
   {
     name: EditEventPragmaQuotesMeta.title,
     component: EditEventPragmaQuotesBasic,
+    args: {}
+  },
+  {
+    name: TiFPreviewMeta.title,
+    component: TiFPreviewBasic,
     args: {}
   }
   // Add more stories here...
