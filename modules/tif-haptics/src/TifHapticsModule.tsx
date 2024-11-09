@@ -9,6 +9,7 @@ const TiFNativeHaptics = requireOptionalNativeModule("TifHaptics")
 
 const log = logger("tif.haptics")
 
+<<<<<<< HEAD
 export const FEEDBACK_PARAMETER_IDS = [
   "HapticIntensity",
   "HapticSharpness",

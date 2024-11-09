@@ -70,6 +70,9 @@ import HapticsMeta, {
 import RudeusEditorMeta, {
   Basic as RudeusEditorBasic
 } from "../components/RudeusEditor/RudeusEditor.stories"
+import TiFPreviewMeta, {
+  Basic as TiFPreviewBasic
+} from "../components/TiFPreview/TiFPreview.stories"
 import { addLogHandler, consoleLogHandler } from "TiFShared/logging"
 import { sqliteLogHandler, sqliteLogs } from "@lib/Logging"
 import { dayjs } from "TiFShared/lib/Dayjs"
@@ -191,6 +194,11 @@ const stories = [
   {
     name: RudeusEditorMeta.title,
     component: RudeusEditorBasic,
+    args: {}
+  },
+  {
+    name: TiFPreviewMeta.title,
+    component: TiFPreviewBasic,
     args: {}
   }
   // Add more stories here...
