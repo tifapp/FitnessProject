@@ -95,4 +95,4 @@ jobs:
           node-version: "20.0.0"
 
       - name: Bundle project
-        run: npx expo export
+        run: npx expo export --platform ios --platform android
