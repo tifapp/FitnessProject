@@ -5,6 +5,7 @@ import { RudeusAPI } from "./RudeusAPI"
 import { InMemorySecureStore } from "@lib/SecureStore"
 import { sharePattern } from "./PatternEditor"
 import { registerUser } from "./Register"
+import * as ExpoSecureStore from "expo-secure-store"
 
 const RudeusEditorMeta = {
   title: "Rudeus Editor"
@@ -12,12 +13,7 @@ const RudeusEditorMeta = {
 
 export default RudeusEditorMeta
 
-const userStorage = new RudeusUserStorage({
-  getItemAsync: async () =>
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiU2hzanNqIiwiaWQiOiIwMTkzMDQ3Ni0yQkU1LTcwMDAtQTVGNC00NkEzNjk1RjA2MUEifQ.ryiRrF8AK0I--y0-O826Yb3QB_uKhaYrciR5iIvwumQ",
-  setItemAsync: async () => {},
-  deleteItemAsync: async () => {}
-})
+const userStorage = new RudeusUserStorage(ExpoSecureStore)
 const api = RudeusAPI(userStorage)
 
 export const Basic = () => (
