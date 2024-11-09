@@ -65,6 +65,9 @@ import EditEventDurationsMeta, {
 import EditEventPragmaQuotesMeta, {
   Basic as EditEventPragmaQuotesBasic
 } from "../components/EditEvent/PragmaQuote.stories"
+import HapticsMeta, {
+  Basic as HapticsBasic
+} from "../components/Haptics/Haptics.stories"
 import TiFPreviewMeta, {
   Basic as TiFPreviewBasic
 } from "../components/TiFPreview/TiFPreview.stories"
@@ -178,6 +181,11 @@ const stories = [
   {
     name: EditEventPragmaQuotesMeta.title,
     component: EditEventPragmaQuotesBasic,
+    args: {}
+  },
+  {
+    name: HapticsMeta.title,
+    component: HapticsBasic,
     args: {}
   },
   {
