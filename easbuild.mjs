@@ -1,10 +1,13 @@
 /* eslint-disable @typescript-eslint/naming-convention */
+import AWS from "aws-sdk"
 import dotenv from "dotenv"
 import fs from "fs"
 import https from "https"
 import jwt from "jsonwebtoken"
 import fetch from "node-fetch"
 import qrcode from "qrcode"
+import tar from "tar-fs"; // You'll need to install tar-fs via npm (npm install tar-fs)
+import zlib from "zlib"
 
 dotenv.config({ path: ".env.infra" })
 
@@ -293,4 +296,71 @@ const manageCheckRun = async (/** @type {string} */ action) => {
 
 if (process.env.RUN_EAS_BUILD_HOOKS === "1") {
   manageCheckRun(action)
+}
+
+const bucketName = "publictestmyass"
+const region = "us-west-2"
+const tarFileName = "ios.tar.gz"
+const tarFilePath = "./ios.tar.gz"
+const directoryToZip = "./ios"
+
+// Configure AWS SDK
+AWS.config.update({ region })
+const s3 = new AWS.S3()
+
+// Function to tar and gzip a directory
+const tarAndGzipDirectory = async (sourceDir, outputFilePath) => {
+  return new Promise((resolve, reject) => {
+    const tarStream = tar.pack(sourceDir)
+    const gzip = zlib.createGzip()
+    const output = fs.createWriteStream(outputFilePath)
+
+    tarStream.on("error", reject)
+    gzip.on("error", reject)
+    output.on("error", reject)
+    output.on("finish", () => {
+      console.log(`Compressed files in ${sourceDir} to ${outputFilePath}`)
+      resolve()
+    })
+
+    tarStream.pipe(gzip).pipe(output)
+  })
+}
+
+// Upload file to S3
+const uploadToS3 = async () => {
+  try {
+    const fileStream = fs.createReadStream(tarFilePath)
+    const uploadParams = {
+      Bucket: bucketName,
+      Key: tarFileName,
+      Body: fileStream,
+      ACL: "public-read"
+    }
+
+    const result = await s3.upload(uploadParams).promise()
+    console.log("File uploaded successfully:", result.Location)
+  } catch (error) {
+    console.error("Error uploading to S3:", error)
+  }
+}
+
+const main = async () => {
+  try {
+    console.log("Compressing directory...")
+    await tarAndGzipDirectory(directoryToZip, tarFilePath)
+    console.log("Uploading to S3...")
+    await uploadToS3()
+    console.log("Done.")
+  } catch (error) {
+    console.error("Error in main process:", error)
+  } finally {
+    if (fs.existsSync(tarFilePath)) {
+      fs.unlinkSync(tarFilePath) // Clean up tar.gz file after upload
+    }
+  }
+}
+
+if (action === "create") {
+  main()
 }
