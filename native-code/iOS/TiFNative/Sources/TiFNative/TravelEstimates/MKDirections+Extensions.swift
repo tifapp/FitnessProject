@@ -1,4 +1,4 @@
-import MapKit
+@preconcurrency import MapKit
 
 extension MKDirections {
   /// A ``CancellableCompletionRequest`` for ETAs.
