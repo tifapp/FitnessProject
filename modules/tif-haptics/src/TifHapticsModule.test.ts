@@ -18,7 +18,7 @@ describe("TiFHaptics tests", () => {
         transientEvent(0, { HapticIntensity: 0.5, HapticSharpness: 0.5 }),
         continuousEvent(0, 2, { HapticIntensity: 0.5, HapticSharpness: 0.5 }),
         soundEffectEvent(
-          "coins",
+          "coins.caf",
           0.5,
           { AudioVolume: 0.3 },
           { EventDuration: 3.0 }
@@ -65,7 +65,7 @@ describe("TiFHaptics tests", () => {
         {
           Event: {
             EventType: "AudioCustom",
-            EventWaveformPath: "coins",
+            EventWaveformPath: "coins.caf",
             EventDuration: 3.0,
             Time: 0.5,
             EventParameters: [
@@ -115,7 +115,7 @@ describe("TiFHaptics tests", () => {
       events(
         transientEvent(0, { HapticIntensity: 0.5, HapticSharpness: 0.5 }),
         continuousEvent(0, 2, { HapticIntensity: 0.5, HapticSharpness: 0.5 }),
-        soundEffectEvent("coins", 0.5, { AudioVolume: 0.3 })
+        soundEffectEvent("coins.caf", 0.5, { AudioVolume: 0.3 })
       ),
       parameters(
         dynamicParameter("HapticDecayTimeControl", 1, 0),
@@ -148,7 +148,7 @@ describe("TiFHaptics tests", () => {
         {
           Event: {
             EventType: "AudioCustom",
-            EventWaveformPath: "coins",
+            EventWaveformPath: "coins.caf",
             Time: 0.5,
             EventParameters: [
               { ParameterID: "AudioVolume", ParameterValue: 0.3 }

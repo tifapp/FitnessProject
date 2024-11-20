@@ -7,42 +7,48 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		00642D11EE3A4814A609BA9E /* OpenDyslexic3-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 5277D225DCF54CB180825BB9 /* OpenDyslexic3-Bold.ttf */; };
-		0074952465AD47FDB36ECEB5 /* OpenSans-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9CB5F9CDAD5E4FFBA876423C /* OpenSans-Bold.ttf */; };
-		0E892F24BAE049BEA91BB1D2 /* noop-file.swift in Sources */ = {isa = PBXBuildFile; fileRef = 906A3110A00B47E88DA66D6D /* noop-file.swift */; };
+		0DD30D3A550145B583EF7BBB /* OpenDyslexic3-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 42A418DA992A4B0DBFA740DE /* OpenDyslexic3-Bold.ttf */; };
 		13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.mm */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
+		1B73BE0EA9574697B7DFAD4C /* OpenDyslexic3-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = E798E92FF6654003AAAAEE7B /* OpenDyslexic3-Regular.ttf */; };
+		28C31D9757384E0CB3B59A5A /* appear.caf in Resources */ = {isa = PBXBuildFile; fileRef = 6642271169B5464399AAC379 /* appear.caf */; };
 		3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */; };
-		4001C6A5ADE245FDA15D51C5 /* OpenSans-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = BFF4EE3A1F4B4A2EB8EAD40F /* OpenSans-SemiBold.ttf */; };
-		63A3CB0517513E938CD571C6 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = D92780501A29283BABC4B378 /* PrivacyInfo.xcprivacy */; };
-		8C7B235F04064AF6AA52F16F /* OpenSans-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9B2C2B8E7DAA4638A428F7A6 /* OpenSans-Regular.ttf */; };
+		533D390F8B0A46EBB0CD63BC /* debris.caf in Resources */ = {isa = PBXBuildFile; fileRef = E7A9EA6D81434412B6A2FBFC /* debris.caf */; };
 		96905EF65AED1B983A6B3ABC /* libPods-FitnessApp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 58EEBF8E8E6FB1BC6CAF49B5 /* libPods-FitnessApp.a */; };
-		A4BDFBEA6BA445A0AA0B3792 /* OpenDyslexic3-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = D146875E04B34D3CB5AEB509 /* OpenDyslexic3-Regular.ttf */; };
+		9C079A19FE544BACBBC0FAB8 /* noop-file.swift in Sources */ = {isa = PBXBuildFile; fileRef = 402609343463493F9CEC2B36 /* noop-file.swift */; };
 		B18059E884C0ABDD17F3DC3D /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAC715A2D49A985799AEE119 /* ExpoModulesProvider.swift */; };
+		B342E17868AA47FFA4FD18F6 /* OpenSans-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 256A6154B17D4D7C9156F353 /* OpenSans-Regular.ttf */; };
 		BB2F792D24A3F905000567C9 /* Expo.plist in Resources */ = {isa = PBXBuildFile; fileRef = BB2F792C24A3F905000567C9 /* Expo.plist */; };
+		D1651651306640868D177796 /* fall.caf in Resources */ = {isa = PBXBuildFile; fileRef = 1C385B7157EA4364BFA47DC5 /* fall.caf */; };
+		D82B9D8BF35FAFAFD881F723 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 0103CC77900BCCA93829F91B /* PrivacyInfo.xcprivacy */; };
+		D95C1E3032404EF38E20D014 /* OpenSans-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 3C4A07B452E542BAB5C13379 /* OpenSans-Bold.ttf */; };
+		F75816B00BAA4D79A2041327 /* OpenSans-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A5D556BE5C3C4E0AB57C5263 /* OpenSans-SemiBold.ttf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		0103CC77900BCCA93829F91B /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xml; name = PrivacyInfo.xcprivacy; path = FitnessApp/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		13B07F961A680F5B00A75B9A /* FitnessApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FitnessApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = FitnessApp/AppDelegate.h; sourceTree = "<group>"; };
 		13B07FB01A68108700A75B9A /* AppDelegate.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = AppDelegate.mm; path = FitnessApp/AppDelegate.mm; sourceTree = "<group>"; };
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = FitnessApp/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = FitnessApp/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = FitnessApp/main.m; sourceTree = "<group>"; };
-		31D73D50DD0F4D6884F20234 /* FitnessApp-Bridging-Header.h */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 4; includeInIndex = 0; lastKnownFileType = sourcecode.c.h; name = "FitnessApp-Bridging-Header.h"; path = "FitnessApp/FitnessApp-Bridging-Header.h"; sourceTree = "<group>"; };
-		5277D225DCF54CB180825BB9 /* OpenDyslexic3-Bold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "OpenDyslexic3-Bold.ttf"; path = "../assets/fonts/OpenDyslexic3-Bold.ttf"; sourceTree = "<group>"; };
+		1C385B7157EA4364BFA47DC5 /* fall.caf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = fall.caf; path = FitnessApp/fall.caf; sourceTree = "<group>"; };
+		256A6154B17D4D7C9156F353 /* OpenSans-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "OpenSans-Regular.ttf"; path = "../assets/fonts/OpenSans-Regular.ttf"; sourceTree = "<group>"; };
+		3C4A07B452E542BAB5C13379 /* OpenSans-Bold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "OpenSans-Bold.ttf"; path = "../assets/fonts/OpenSans-Bold.ttf"; sourceTree = "<group>"; };
+		402609343463493F9CEC2B36 /* noop-file.swift */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 4; includeInIndex = 0; lastKnownFileType = sourcecode.swift; name = "noop-file.swift"; path = "FitnessApp/noop-file.swift"; sourceTree = "<group>"; };
+		42A418DA992A4B0DBFA740DE /* OpenDyslexic3-Bold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "OpenDyslexic3-Bold.ttf"; path = "../assets/fonts/OpenDyslexic3-Bold.ttf"; sourceTree = "<group>"; };
 		58EEBF8E8E6FB1BC6CAF49B5 /* libPods-FitnessApp.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-FitnessApp.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		6642271169B5464399AAC379 /* appear.caf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = appear.caf; path = FitnessApp/appear.caf; sourceTree = "<group>"; };
 		6C2E3173556A471DD304B334 /* Pods-FitnessApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FitnessApp.debug.xcconfig"; path = "Target Support Files/Pods-FitnessApp/Pods-FitnessApp.debug.xcconfig"; sourceTree = "<group>"; };
 		7A4D352CD337FB3A3BF06240 /* Pods-FitnessApp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FitnessApp.release.xcconfig"; path = "Target Support Files/Pods-FitnessApp/Pods-FitnessApp.release.xcconfig"; sourceTree = "<group>"; };
-		906A3110A00B47E88DA66D6D /* noop-file.swift */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 4; includeInIndex = 0; lastKnownFileType = sourcecode.swift; name = "noop-file.swift"; path = "FitnessApp/noop-file.swift"; sourceTree = "<group>"; };
-		9B2C2B8E7DAA4638A428F7A6 /* OpenSans-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "OpenSans-Regular.ttf"; path = "../assets/fonts/OpenSans-Regular.ttf"; sourceTree = "<group>"; };
-		9CB5F9CDAD5E4FFBA876423C /* OpenSans-Bold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "OpenSans-Bold.ttf"; path = "../assets/fonts/OpenSans-Bold.ttf"; sourceTree = "<group>"; };
+		A5D556BE5C3C4E0AB57C5263 /* OpenSans-SemiBold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "OpenSans-SemiBold.ttf"; path = "../assets/fonts/OpenSans-SemiBold.ttf"; sourceTree = "<group>"; };
 		AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = SplashScreen.storyboard; path = FitnessApp/SplashScreen.storyboard; sourceTree = "<group>"; };
+		AC53BD82D0F94546B32791E0 /* FitnessApp-Bridging-Header.h */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 4; includeInIndex = 0; lastKnownFileType = sourcecode.c.h; name = "FitnessApp-Bridging-Header.h"; path = "FitnessApp/FitnessApp-Bridging-Header.h"; sourceTree = "<group>"; };
 		BB2F792C24A3F905000567C9 /* Expo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Expo.plist; sourceTree = "<group>"; };
-		BFF4EE3A1F4B4A2EB8EAD40F /* OpenSans-SemiBold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "OpenSans-SemiBold.ttf"; path = "../assets/fonts/OpenSans-SemiBold.ttf"; sourceTree = "<group>"; };
-		D146875E04B34D3CB5AEB509 /* OpenDyslexic3-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "OpenDyslexic3-Regular.ttf"; path = "../assets/fonts/OpenDyslexic3-Regular.ttf"; sourceTree = "<group>"; };
-		D92780501A29283BABC4B378 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xml; name = PrivacyInfo.xcprivacy; path = FitnessApp/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		E798E92FF6654003AAAAEE7B /* OpenDyslexic3-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "OpenDyslexic3-Regular.ttf"; path = "../assets/fonts/OpenDyslexic3-Regular.ttf"; sourceTree = "<group>"; };
+		E7A9EA6D81434412B6A2FBFC /* debris.caf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = debris.caf; path = FitnessApp/debris.caf; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		FAC715A2D49A985799AEE119 /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-FitnessApp/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -69,9 +75,9 @@
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				13B07FB71A68108700A75B9A /* main.m */,
 				AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */,
-				906A3110A00B47E88DA66D6D /* noop-file.swift */,
-				31D73D50DD0F4D6884F20234 /* FitnessApp-Bridging-Header.h */,
-				D92780501A29283BABC4B378 /* PrivacyInfo.xcprivacy */,
+				402609343463493F9CEC2B36 /* noop-file.swift */,
+				AC53BD82D0F94546B32791E0 /* FitnessApp-Bridging-Header.h */,
+				0103CC77900BCCA93829F91B /* PrivacyInfo.xcprivacy */,
 			);
 			name = FitnessApp;
 			sourceTree = "<group>";
@@ -101,7 +107,7 @@
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
 				D65327D7A22EEC0BE12398D9 /* Pods */,
 				D7E4C46ADA2E9064B798F356 /* ExpoModulesProviders */,
-				8567B0A316684785B1D2DC3A /* Resources */,
+				DB468C0ABD6C4CC68493A317 /* Resources */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -114,18 +120,6 @@
 				13B07F961A680F5B00A75B9A /* FitnessApp.app */,
 			);
 			name = Products;
-			sourceTree = "<group>";
-		};
-		8567B0A316684785B1D2DC3A /* Resources */ = {
-			isa = PBXGroup;
-			children = (
-				9CB5F9CDAD5E4FFBA876423C /* OpenSans-Bold.ttf */,
-				9B2C2B8E7DAA4638A428F7A6 /* OpenSans-Regular.ttf */,
-				BFF4EE3A1F4B4A2EB8EAD40F /* OpenSans-SemiBold.ttf */,
-				5277D225DCF54CB180825BB9 /* OpenDyslexic3-Bold.ttf */,
-				D146875E04B34D3CB5AEB509 /* OpenDyslexic3-Regular.ttf */,
-			);
-			name = Resources;
 			sourceTree = "<group>";
 		};
 		92DBD88DE9BF7D494EA9DA96 /* FitnessApp */ = {
@@ -162,6 +156,21 @@
 			name = ExpoModulesProviders;
 			sourceTree = "<group>";
 		};
+		DB468C0ABD6C4CC68493A317 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				3C4A07B452E542BAB5C13379 /* OpenSans-Bold.ttf */,
+				256A6154B17D4D7C9156F353 /* OpenSans-Regular.ttf */,
+				A5D556BE5C3C4E0AB57C5263 /* OpenSans-SemiBold.ttf */,
+				42A418DA992A4B0DBFA740DE /* OpenDyslexic3-Bold.ttf */,
+				E798E92FF6654003AAAAEE7B /* OpenDyslexic3-Regular.ttf */,
+				6642271169B5464399AAC379 /* appear.caf */,
+				E7A9EA6D81434412B6A2FBFC /* debris.caf */,
+				1C385B7157EA4364BFA47DC5 /* fall.caf */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -170,14 +179,14 @@
 			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "FitnessApp" */;
 			buildPhases = (
 				08A4A3CD28434E44B6B9DE2E /* [CP] Check Pods Manifest.lock */,
-				BEFD675F52CEBC778DBBAC54 /* [Expo] Configure project */,
+				983F2115EF51FF284682960E /* [Expo] Configure project */,
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
 				800E24972A6A228C8D4807E9 /* [CP] Copy Pods Resources */,
-				48EE11F6453A4F33A4A515F7 /* Upload Debug Symbols to Sentry */,
-				7390FC10DE16EC3AA669B4F1 /* [CP] Embed Pods Frameworks */,
+				1DBBA802ACA34677BEFEA7EE /* Upload Debug Symbols to Sentry */,
+				844F03610EEAC299B66B2B7B /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -227,12 +236,15 @@
 				BB2F792D24A3F905000567C9 /* Expo.plist in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */,
-				0074952465AD47FDB36ECEB5 /* OpenSans-Bold.ttf in Resources */,
-				8C7B235F04064AF6AA52F16F /* OpenSans-Regular.ttf in Resources */,
-				4001C6A5ADE245FDA15D51C5 /* OpenSans-SemiBold.ttf in Resources */,
-				00642D11EE3A4814A609BA9E /* OpenDyslexic3-Bold.ttf in Resources */,
-				A4BDFBEA6BA445A0AA0B3792 /* OpenDyslexic3-Regular.ttf in Resources */,
-				63A3CB0517513E938CD571C6 /* PrivacyInfo.xcprivacy in Resources */,
+				D95C1E3032404EF38E20D014 /* OpenSans-Bold.ttf in Resources */,
+				B342E17868AA47FFA4FD18F6 /* OpenSans-Regular.ttf in Resources */,
+				F75816B00BAA4D79A2041327 /* OpenSans-SemiBold.ttf in Resources */,
+				0DD30D3A550145B583EF7BBB /* OpenDyslexic3-Bold.ttf in Resources */,
+				1B73BE0EA9574697B7DFAD4C /* OpenDyslexic3-Regular.ttf in Resources */,
+				28C31D9757384E0CB3B59A5A /* appear.caf in Resources */,
+				533D390F8B0A46EBB0CD63BC /* debris.caf in Resources */,
+				D1651651306640868D177796 /* fall.caf in Resources */,
+				D82B9D8BF35FAFAFD881F723 /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -276,7 +288,7 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		48EE11F6453A4F33A4A515F7 /* Upload Debug Symbols to Sentry */ = {
+		1DBBA802ACA34677BEFEA7EE /* Upload Debug Symbols to Sentry */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -289,26 +301,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "/bin/sh `${NODE_BINARY:-node} --print \"require('path').dirname(require.resolve('@sentry/react-native/package.json')) + '/scripts/sentry-xcode-debug-files.sh'\"`";
-		};
-		7390FC10DE16EC3AA669B4F1 /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-FitnessApp/Pods-FitnessApp-frameworks.sh",
-				"${PODS_XCFRAMEWORKS_BUILD_DIR}/ExpoSQLite/crsqlite.framework/crsqlite",
-				"${PODS_XCFRAMEWORKS_BUILD_DIR}/hermes-engine/Pre-built/hermes.framework/hermes",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputPaths = (
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/crsqlite.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/hermes.framework",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-FitnessApp/Pods-FitnessApp-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
 		};
 		800E24972A6A228C8D4807E9 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -366,7 +358,27 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-FitnessApp/Pods-FitnessApp-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		BEFD675F52CEBC778DBBAC54 /* [Expo] Configure project */ = {
+		844F03610EEAC299B66B2B7B /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-FitnessApp/Pods-FitnessApp-frameworks.sh",
+				"${PODS_XCFRAMEWORKS_BUILD_DIR}/ExpoSQLite/crsqlite.framework/crsqlite",
+				"${PODS_XCFRAMEWORKS_BUILD_DIR}/hermes-engine/Pre-built/hermes.framework/hermes",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/crsqlite.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/hermes.framework",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-FitnessApp/Pods-FitnessApp-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		983F2115EF51FF284682960E /* [Expo] Configure project */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
@@ -395,7 +407,7 @@
 				13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */,
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
 				B18059E884C0ABDD17F3DC3D /* ExpoModulesProvider.swift in Sources */,
-				0E892F24BAE049BEA91BB1D2 /* noop-file.swift in Sources */,
+				9C079A19FE544BACBBC0FAB8 /* noop-file.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -461,7 +473,7 @@
 					"-lc++",
 				);
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_RELEASE";
-				PRODUCT_BUNDLE_IDENTIFIER = com.tif1.FitnessApp;
+				PRODUCT_BUNDLE_IDENTIFIER = com.tif.FitnessApp;
 				PRODUCT_NAME = FitnessApp;
 				SWIFT_OBJC_BRIDGING_HEADER = "FitnessApp/FitnessApp-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
@@ -529,10 +541,7 @@
 				LIBRARY_SEARCH_PATHS = "$(SDKROOT)/usr/lib/swift\"$(inherited)\"";
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					" ",
-				);
+				OTHER_LDFLAGS = "$(inherited)  ";
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) DEBUG";
@@ -591,10 +600,7 @@
 				);
 				LIBRARY_SEARCH_PATHS = "$(SDKROOT)/usr/lib/swift\"$(inherited)\"";
 				MTL_ENABLE_DEBUG_INFO = NO;
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					" ",
-				);
+				OTHER_LDFLAGS = "$(inherited)  ";
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				USE_HERMES = true;

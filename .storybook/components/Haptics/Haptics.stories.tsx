@@ -9,7 +9,10 @@ import {
   continuousEvent,
   parameters,
   parameterCurve,
-  keyFrame
+  keyFrame,
+  continuousSoundEvent,
+  soundEffectEvent,
+  dynamicParameter
 } from "@modules/tif-haptics"
 import { Headline } from "@components/Text"
 
@@ -30,13 +33,11 @@ const testPattern = hapticPattern(
     })
   ),
   parameters(
-    parameterCurve(
-      "AudioBrightnessControl",
-      0,
+    parameterCurve("AudioBrightnessControl", 0, [
       keyFrame(1, 3),
       keyFrame(0.5, 4.5),
       keyFrame(0.1, 5.5)
-    )
+    ])
   )
 )
 

@@ -7,7 +7,7 @@ import {
   View,
   Platform
 } from "react-native"
-import { TiFFormScrollView } from "./ScrollView"
+import { TiFFormScrollView, TiFFormScrollViewProps } from "./ScrollView"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { useKeyboardState } from "@lib/Keyboard"
 
@@ -15,12 +15,13 @@ export type TiFFormScrollableLayoutProps = {
   children: ReactNode
   footer: JSX.Element
   style?: StyleProp<ViewStyle>
-}
+} & Omit<TiFFormScrollViewProps, "contentInset">
 
 export const TiFFormScrollableLayoutView = ({
   children,
   footer,
-  style
+  style,
+  ...props
 }: TiFFormScrollableLayoutProps) => {
   const [footerLayout, setFooterLayout] = useState<
     LayoutRectangle | undefined
@@ -38,9 +39,10 @@ export const TiFFormScrollableLayoutView = ({
             left: 0,
             right: 0,
             bottom: (footerLayout?.height ?? 0) - safeArea
-          }
+          },
+          ...props
         }
-      : {}
+      : props
   return (
     <View style={style}>
       <View style={styles.container}>

@@ -1,7 +1,5 @@
-import {
-  CognitoSecureStorage,
-  InMemorySecureStore
-} from "./CognitoSecureStorage"
+import { InMemorySecureStore } from "@lib/SecureStore"
+import { CognitoSecureStorage } from "./CognitoSecureStorage"
 
 const TEST_STORAGE_KEY = "TestStorageKey"
 /**
