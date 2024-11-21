@@ -19,12 +19,12 @@ public class AndroidHapticsPlayer: HapticsPlayer {
         }
     }
 
-
-    public override suspend fun playSound(filepath: String) {
+    override suspend fun playSound(element: HapticPatternElement.AudioCustom) {
         mPlayer = getMediaPlayer()
         mPlayer!!.reset()
         mPlayer?.apply {
-            setDataSource(filepath)
+            setDataSource(element.waveformPath)
+            setVolume(element.volume.toFloat(), element.volume.toFloat())
             prepare()
             start()
         }
@@ -32,7 +32,7 @@ public class AndroidHapticsPlayer: HapticsPlayer {
 
     public override suspend fun playEffect(effect: HapticPatternElement) {
         when (effect) {
-            is HapticPatternElement.AudioCustom -> playSound(effect.waveformPath)
+            is HapticPatternElement.AudioCustom -> playSound(effect)
             is HapticPatternElement.TransientEvent -> vibrator?.vibrate(
                 VibrationEffect.createOneShot(effect.time.toLong(),
                 effect.intensity.toInt()

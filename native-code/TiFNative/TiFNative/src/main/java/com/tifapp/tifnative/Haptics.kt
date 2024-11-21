@@ -76,9 +76,9 @@ sealed class HapticPatternElement (open val time: Double) {
 }
 
 interface HapticsPlayer {
-    suspend fun playSound(filepath: String)
+    suspend fun playSound(element: HapticPatternElement.AudioCustom)
     suspend fun playEffect(effect: HapticPatternElement)
-    suspend fun playPattern(pattern: Map<String, Any?>) {
+    suspend fun playPattern(pattern: ExpoObject) {
         val readablePattern = createReadablePattern(pattern)
         readablePattern.events.forEach { patternElement ->
             playEffect(patternElement)

@@ -42,13 +42,14 @@ class CustomHapticsTest {
                     )
                 )
             )
-        TestHapticsPatternPlayer().playPattern(exampleAhap)
-        val playedPattern = TestHapticsPatternPlayer().getEvents()
-        assertEquals(playedPattern, listOf("PlayEffect called at time 0.0, as ContinuousEvent", "PlayEffect called at time 0.1, as TransientEvent"))
+        val testHapticPlayer = TestHapticsPatternPlayer()
+        testHapticPlayer.playPattern(exampleAhap)
+        testHapticPlayer.getEvents()
+        assertEquals(testHapticPlayer.getEvents(), listOf(HapticPatternElement.ContinuousEvent(0.0, 0.5, 0.5), HapticPatternElement.TransientEvent(0.1, 0.5)))
     }
 
     @Test
-    fun `Test for creating a valid pattern from ahapPattern` (): Unit = runBlocking {
+    fun `Test for playing audioCustom` (): Unit = runBlocking {
         val exampleAhap: Map<String, Any?> =
             mapOf(
                 "Version" to 1,
@@ -71,17 +72,18 @@ class CustomHapticsTest {
                     mapOf(
                         "Event" to mapOf(
                             "Time" to 0.0,
-                            "EventType" to "HapticContinuous",
-                            "EventDuration" to 0.5,
+                            "EventType" to "AudioCustom",
+                            "EventWaveformPath" to "hall/lol.wav",
                             "EventParameters" to listOf(
-                                mapOf("ParameterID" to "HapticIntensity", "ParameterValue" to 0.5),
-                                mapOf("ParameterID" to "HapticSharpness", "ParameterValue" to 0.5)
+                                mapOf("ParameterID" to "AudioVolume", "ParameterValue" to 0.5),
                             )
                         )
                     )
                 )
             )
-        assertEquals(createReadablePattern(exampleAhap), HapticPattern(listOf(HapticPatternElement.ContinuousEvent(0.0, 0.5, 0.5), HapticPatternElement.TransientEvent(0.1, 0.5))))
+        val testHapticPlayer = TestHapticsPatternPlayer()
+        testHapticPlayer.playPattern(exampleAhap)
+        assertEquals(testHapticPlayer.getEvents(), listOf(HapticPatternElement.AudioCustom(0.0, "hall/lol.wav", 0.5), HapticPatternElement.TransientEvent(0.1, 0.5)))
     }
 
     @Test
@@ -184,24 +186,16 @@ class CustomHapticsTest {
 }
 
 public class TestHapticsPatternPlayer : HapticsPlayer {
-    private val playedEvents = mutableListOf<String>()
-    override suspend fun playSound(filepath: String) {
-        playedEvents.add("PlaySound called with $filepath .")
-    }
-
-    private fun testWithHapticsElementType (element: HapticPatternElement): String {
-        return when (element){
-            is HapticPatternElement.AudioCustom -> "PlayEffect called at time ${element.time}, as AudioCustom"
-            is HapticPatternElement.TransientEvent -> "PlayEffect called at time ${element.time}, as TransientEvent"
-            is HapticPatternElement.ContinuousEvent -> "PlayEffect called at time ${element.time}, as ContinuousEvent"
-        }
+    private val playedEvents = mutableListOf<HapticPatternElement>()
+    override suspend fun playSound(element: HapticPatternElement.AudioCustom) {
+        playedEvents.add(element)
     }
 
     override suspend fun playEffect(effect: HapticPatternElement) {
-        playedEvents.add(testWithHapticsElementType(effect))
+        playedEvents.add(effect)
     }
 
-    fun getEvents(): List<String> {
+    fun getEvents(): List<HapticPatternElement> {
         return playedEvents
     }
 }
