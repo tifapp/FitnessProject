@@ -1,4 +1,6 @@
-import { SetStateAction, WritableAtom, atom } from "jotai"
+import { SetStateAction, WritableAtom, atom, createStore } from "jotai"
+
+export type Store = ReturnType<typeof createStore>
 
 export type Atomize<Obj extends Record<string, any>> = {
   [K in keyof Obj]: WritableAtom<Obj[K], [Obj[K]], void>

@@ -85,7 +85,7 @@ export type CircularIoniconProps = {
   backgroundColor: string
   name: IoniconName
   style?: StyleProp<ViewStyle>
-  size: number
+  size?: number
 } & Omit<IconProps<IoniconName>, "size">
 
 /**
@@ -190,14 +190,64 @@ export type IoniconCloseButtonProps = Omit<IconProps<"close">, "name"> &
  */
 export const IoniconCloseButton = ({
   onPress,
+  size = 20,
   ...props
 }: IoniconCloseButtonProps) => (
   <TouchableOpacity {...props} onPress={onPress}>
     <RoundedIonicon
       {...props}
       name="close"
+      size={size}
       borderRadius={32}
-      backgroundColor={AppStyles.eventCardColor}
+      backgroundColor={AppStyles.cardColor}
     />
   </TouchableOpacity>
 )
+
+export type PlusIconProps = {
+  size?: number
+  maxmimumFontScaleFactor?: number
+  style?: StyleProp<ViewStyle>
+}
+
+export const PlusIconView = ({
+  size = 24,
+  maxmimumFontScaleFactor,
+  style
+}: PlusIconProps) => {
+  const fontScale = useFontScale({
+    maximumScaleFactor: maxmimumFontScaleFactor
+  })
+  return (
+    <View accessible={false} style={style}>
+      <View style={styles.plusContainer}>
+        <View
+          style={{
+            width: size * fontScale,
+            height: 2 * fontScale,
+            alignSelf: "center",
+            borderRadius: 12,
+            backgroundColor: "white"
+          }}
+        />
+        <View
+          style={{
+            position: "absolute",
+            top: (-size * fontScale) / 2 + fontScale,
+            alignSelf: "center",
+            width: 2 * fontScale,
+            height: size * fontScale,
+            borderRadius: 12,
+            backgroundColor: "white"
+          }}
+        />
+      </View>
+    </View>
+  )
+}
+
+const styles = StyleSheet.create({
+  plusContainer: {
+    position: "relative"
+  }
+})

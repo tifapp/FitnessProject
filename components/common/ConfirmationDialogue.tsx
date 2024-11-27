@@ -30,7 +30,7 @@ const ConfirmationDialogue = ({ style }: Props) => {
       <TouchableIonicon
         icon={{
           name: "ellipsis-horizontal",
-          color: AppStyles.darkColor
+          color: AppStyles.primaryColor
         }}
         onPress={showActionSheet}
       />

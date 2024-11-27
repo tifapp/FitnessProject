@@ -104,6 +104,6 @@ const styles = StyleSheet.create({
     fontSize: 16
   },
   color: {
-    color: AppStyles.darkColor
+    color: AppStyles.primaryColor
   }
 })

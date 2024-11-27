@@ -7,6 +7,7 @@ export type TiFFormNamedIconRowProps = {
   iconName: IoniconName
   iconBackgroundColor: ColorString
   name: string
+  maximumFontScaleFactor?: number
   description?: string
   children: JSX.Element
   style?: StyleProp<ViewStyle>
@@ -17,6 +18,7 @@ export const TiFFormNamedIconRowView = ({
   iconBackgroundColor,
   name,
   description,
+  maximumFontScaleFactor: maximumFontSizeMultiplier,
   children,
   style
 }: TiFFormNamedIconRowProps) => (
@@ -25,6 +27,7 @@ export const TiFFormNamedIconRowView = ({
       <CircularIonicon
         size={24}
         name={iconName}
+        maximumFontScaleFactor={maximumFontSizeMultiplier}
         backgroundColor={iconBackgroundColor.toString()}
       />
       <TiFFormLabelView
@@ -45,7 +48,7 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "row",
     alignItems: "center",
-    columnGap: 8,
+    columnGap: 16,
     padding: 16
   }
 })

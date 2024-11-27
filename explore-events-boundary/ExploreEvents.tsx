@@ -5,7 +5,6 @@ import {
   ClientSideEvent,
   clientSideEventFromResponse
 } from "@event/ClientSideEvent"
-import { eventDetailsQueryKey } from "@event/DetailsQuery"
 import { QueryHookOptions } from "@lib/ReactQuery"
 import { useLastDefinedValue } from "@lib/utils/UseLastDefinedValue"
 import {
@@ -31,24 +30,26 @@ import {
   createDefaultMapRegion,
   minRegionMeterRadius
 } from "./Region"
+import { setEventDetailsQueryEvent } from "@event/DetailsQuery"
 import { ExploreEventsSearchBar } from "./SearchBar"
 import { SkeletonEventCard } from "./SkeletonEventCard"
 
 export const eventsByRegion = async (
-  api: TiFAPI,
   region: ExploreEventsRegion,
-  signal?: AbortSignal
+  signal?: AbortSignal,
+  api: TiFAPI = TiFAPI.productionInstance
 ) => {
   return (
-    await api.exploreEvents(
-      {
-        body: {
-          userLocation: { latitude: region.latitude, longitude: region.longitude },
-          radius: minRegionMeterRadius(region)
+    await api.exploreEvents({
+      body: {
+        userLocation: {
+          latitude: region.latitude,
+          longitude: region.longitude
         },
-        signal
-      }
-    )
+        radius: minRegionMeterRadius(region)
+      },
+      signal
+    })
   ).data.events.map(clientSideEventFromResponse)
 }
 
@@ -118,7 +119,7 @@ const useExploreEventsRegion = (initialCenter: ExploreEventsInitialCenter) => {
   const exploreRegion =
     userRegion === "loading"
       ? pannedRegion
-      : pannedRegion ?? userRegion ?? SAN_FRANCISCO_DEFAULT_REGION
+      : (pannedRegion ?? userRegion ?? SAN_FRANCISCO_DEFAULT_REGION)
   return { region: exploreRegion, panToRegion: setPannedRegion }
 }
 
@@ -161,14 +162,7 @@ const useExploreEventsQuery = (
       queryKey,
       async ({ signal }) => {
         const events = await fetchEvents(region, signal)
-
-        events.forEach((event) => {
-          queryClient.setQueryData(eventDetailsQueryKey(event.id), {
-            status: "success",
-            event
-          })
-        })
-
+        events.forEach((event) => setEventDetailsQueryEvent(queryClient, event))
         return events
       },
       options
@@ -260,11 +254,9 @@ const ErrorView = ({ onRetried }: ErrorProps) => (
     <BodyText style={styles.emptyEventsText}>
       An error occurred, please try again.
     </BodyText>
-    <PrimaryButton
-      style={styles.tryAgainButton}
-      title="Try Again"
-      onPress={onRetried}
-    />
+    <PrimaryButton style={styles.tryAgainButton} onPress={onRetried}>
+      Try Again
+    </PrimaryButton>
   </View>
 )
 

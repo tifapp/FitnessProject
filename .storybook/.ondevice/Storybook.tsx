@@ -4,7 +4,6 @@ import { useAppFonts } from "../../lib/Fonts"
 
 // Import your stories
 import { setupCognito } from "@auth-boundary/CognitoHelpers"
-import { InMemorySecureStore } from "@auth-boundary/CognitoSecureStorage"
 import AttendeesListMeta, {
   Basic as AttendeesListBasic
 } from "../components/AttendeesList/AttendeesList.stories"
@@ -62,9 +61,22 @@ import VerifcationCodeMeta, {
 import EditEventDurationsMeta, {
   Basic as EditEventDurationsBasic
 } from "../components/EditEvent/DurationPicker.stories"
+import EditEventPragmaQuotesMeta, {
+  Basic as EditEventPragmaQuotesBasic
+} from "../components/EditEvent/PragmaQuote.stories"
+import HapticsMeta, {
+  Basic as HapticsBasic
+} from "../components/Haptics/Haptics.stories"
+import RudeusEditorMeta, {
+  Basic as RudeusEditorBasic
+} from "../components/RudeusEditor/RudeusEditor.stories"
+import TiFPreviewMeta, {
+  Basic as TiFPreviewBasic
+} from "../components/TiFPreview/TiFPreview.stories"
 import { addLogHandler, consoleLogHandler } from "TiFShared/logging"
 import { sqliteLogHandler, sqliteLogs } from "@lib/Logging"
 import { dayjs } from "TiFShared/lib/Dayjs"
+import { InMemorySecureStore } from "@lib/SecureStore"
 
 setupCognito(new InMemorySecureStore())
 addLogHandler(consoleLogHandler())
@@ -167,7 +179,27 @@ const stories = [
   {
     name: EditEventDurationsMeta.title,
     component: EditEventDurationsBasic,
-    args: EditEventDurationsMeta.args
+    args: {}
+  },
+  {
+    name: EditEventPragmaQuotesMeta.title,
+    component: EditEventPragmaQuotesBasic,
+    args: {}
+  },
+  {
+    name: HapticsMeta.title,
+    component: HapticsBasic,
+    args: {}
+  },
+  {
+    name: RudeusEditorMeta.title,
+    component: RudeusEditorBasic,
+    args: {}
+  },
+  {
+    name: TiFPreviewMeta.title,
+    component: TiFPreviewBasic,
+    args: {}
   }
   // Add more stories here...
 ]

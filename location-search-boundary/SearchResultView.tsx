@@ -32,7 +32,7 @@ export const LocationSearchResultView = ({
         backgroundColor={
           result.isRecentLocation
             ? AppStyles.colorOpacity35
-            : AppStyles.darkColor
+            : AppStyles.primaryColor
         }
         accessibilityLabel={
           result.isRecentLocation ? "Recent Search" : "Search Result"

@@ -469,6 +469,6 @@ const styles = StyleSheet.create({
     borderRadius: 32,
     marginHorizontal: 2,
     marginBottom: 2,
-    backgroundColor: AppStyles.darkColor
+    backgroundColor: AppStyles.primaryColor
   }
 })
