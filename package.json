@@ -141,8 +141,8 @@
     "react-native-svg": "15.2.0",
     "regenerator-runtime": "^0.13.11",
     "type-detect": "4.0.8",
-    "TiFShared": "github:tifapp/TiFShared#main",
     "use-sync-external-store": "^1.2.2",
+    "TiFShared": "github:tifapp/TiFShared#main",
     "uuid": "^9.0.0",
     "zod": "^3.20.6"
   },

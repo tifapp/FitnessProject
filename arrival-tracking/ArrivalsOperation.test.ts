@@ -22,10 +22,10 @@ describe("ArrivalsOperation tests", () => {
       EXPECTED_ARRIVAL_REGIONS
     )
 
-    const mockAPI = (endpoint: "departFromRegion" | "arriveAtRegion") =>
+    const mockAPI = (status: "arrived" | "departed") =>
       mockTiFServer({
-        [endpoint]: {
-          expectedRequest: { body: TEST_REGION },
+        updateArrivalStatus: {
+          expectedRequest: { body: { ...TEST_REGION, status } },
           mockResponse: {
             status: 200,
             data: { trackableRegions: EXPECTED_ARRIVAL_REGIONS }
@@ -34,7 +34,7 @@ describe("ArrivalsOperation tests", () => {
       })
 
     test("arrived", async () => {
-      mockAPI("arriveAtRegion")
+      mockAPI("arrived")
 
       const results = await performEventArrivalsOperation(
         TEST_REGION,
@@ -45,7 +45,7 @@ describe("ArrivalsOperation tests", () => {
     })
 
     test("departed", async () => {
-      mockAPI("departFromRegion")
+      mockAPI("departed")
 
       const results = await performEventArrivalsOperation(
         TEST_REGION,

@@ -229,7 +229,8 @@ describe("EventDetailsLoading tests", () => {
     it("should indicate the time of response on the event time when a 200 occurs", async () => {
       const clientReceivedTime = new Date(4500)
       jest.setSystemTime(clientReceivedTime)
-      const eventResponse: EventResponse = {
+      const hostId = uuidString()
+      const eventResponse = {
         id: 1,
         title: "Some Event",
         color: ColorString.parse("#FFFFFF")!,
@@ -241,7 +242,7 @@ describe("EventDetailsLoading tests", () => {
         userAttendeeStatus: "attending",
         isChatExpired: false,
         host: {
-          id: uuidString(),
+          id: hostId,
           name: "Blob",
           handle: UserHandle.optionalParse("blob")!,
           relationStatus: "not-friends"
@@ -255,12 +256,20 @@ describe("EventDetailsLoading tests", () => {
           todayOrTomorrow: "today",
           dateRange: dateRange(new Date(4000), new Date(5000))!
         },
-        joinedDateTime: undefined,
         location: mockEventLocation(),
-        previewAttendees: [{ id: uuidString() }],
-        endedDateTime: undefined
+        previewAttendees: [
+          {
+            id: hostId,
+            name: "Blob",
+            handle: UserHandle.optionalParse("blob")!,
+            relationStatus: "not-friends" as const,
+            hasArrived: false,
+            joinedDateTime: new Date("2024-03-25T07:56:28.000Z"),
+            role: "attending" as const
+          }
+        ]
       }
-      mockTiFEndpoint("eventDetails", 200, eventResponse)
+      mockTiFEndpoint("eventDetails", 200, eventResponse as EventResponse)
       const resp = await loadEventDetails(1, TiFAPI.testAuthenticatedInstance)
       expect(resp).toEqual({
         status: "success",
