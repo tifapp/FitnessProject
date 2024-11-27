@@ -62,7 +62,10 @@ describe("EditEventSubmit tests", () => {
     })
 
     it("should submit a changed valid event", async () => {
-      submit.mockResolvedValueOnce(EventMocks.PickupBasketball)
+      submit.mockResolvedValueOnce({
+        status: "success",
+        event: EventMocks.PickupBasketball
+      })
       renderUseHydrateEditEvent(TEST_VALUES, settings)
       const { result } = renderUseEditEventSubmission(10)
       const newValues = { ...TEST_VALUES, title: "Something different" }
@@ -96,8 +99,26 @@ describe("EditEventSubmit tests", () => {
       expect(onSuccess).not.toHaveBeenCalled()
     })
 
+    it("should present an error alert when the submission returns an invalid status", async () => {
+      submit.mockResolvedValueOnce({ status: "event-not-found" })
+      renderUseHydrateEditEvent(TEST_VALUES, settings)
+      const { result } = renderUseEditEventSubmission()
+      const newValues = { ...TEST_VALUES, title: "Something different" }
+      editValues(newValues)
+      act(() => (result.current.submission as any).submit())
+      await waitFor(() => {
+        expect(alertPresentationSpy).toHaveBeenPresentedWith(
+          ALERTS["event-not-found"]
+        )
+      })
+      expect(onSuccess).not.toHaveBeenCalled()
+    })
+
     it("should update the details of an event after it has been edited", async () => {
-      submit.mockResolvedValueOnce(EventMocks.PickupBasketball)
+      submit.mockResolvedValueOnce({
+        status: "success",
+        event: EventMocks.PickupBasketball
+      })
       renderUseHydrateEditEvent(TEST_VALUES, settings)
       const { result } = renderUseEditEventSubmission(
         EventMocks.PickupBasketball.id
