@@ -4,11 +4,15 @@ import React, { useMemo } from "react"
 import { useFormSubmission } from "@lib/utils/Form"
 import { StyleProp, ViewStyle, StyleSheet, View } from "react-native"
 import { PrimaryButton } from "@components/Buttons"
-import { ClientSideEvent } from "@event/ClientSideEvent"
+import {
+  ClientSideEvent,
+  clientSideEventFromResponse
+} from "@event/ClientSideEvent"
 import { useQueryClient } from "@tanstack/react-query"
 import { setEventDetailsQueryEvent } from "@event/DetailsQuery"
 import { AlertsObject, presentAlert } from "@lib/Alerts"
 import { eventEditAtom, isEditEventFormDirtyAtom } from "./FormValues"
+import { TiFAPI } from "TiFShared/api"
 
 export type SubmitEventEditResult =
   | { status: "success"; event: ClientSideEvent }
@@ -24,6 +28,21 @@ export type SubmitEventEdit = (
   eventId: EventID | undefined,
   edit: EventEdit
 ) => Promise<SubmitEventEditResult>
+
+export const submitEventEdit = async (
+  eventId: EventID | undefined,
+  edit: EventEdit,
+  api: TiFAPI = TiFAPI.productionInstance
+) => {
+  if (!eventId) {
+    const resp = await api.createEvent({ body: edit })
+    return { status: "success", event: clientSideEventFromResponse(resp.data) }
+  }
+  const resp = await api.editEvent({ params: { eventId }, body: edit })
+  return resp.status === 200
+    ? { status: "success", event: clientSideEventFromResponse(resp.data) }
+    : { status: resp.data.error }
+}
 
 export const ALERTS = {
   submissionError: (eventId?: EventID) => ({

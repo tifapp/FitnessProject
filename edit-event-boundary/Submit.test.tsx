@@ -11,22 +11,95 @@ import {
   renderUseHydrateEditEvent
 } from "./TestHelpers"
 import { act, renderHook, waitFor } from "@testing-library/react-native"
-import { ALERTS, useEditEventFormSubmission } from "./Submit"
+import { ALERTS, submitEventEdit, useEditEventFormSubmission } from "./Submit"
 import { SettingsProvider } from "@settings-storage/Hooks"
 import { Provider } from "jotai"
-import { mockPlacemark } from "@location/MockData"
+import { LocationCoordinatesMocks, mockPlacemark } from "@location/MockData"
 import { captureAlerts } from "@test-helpers/Alerts"
 import {
   TestQueryClientProvider,
   createTestQueryClient
 } from "@test-helpers/ReactQuery"
-import { EventID } from "TiFShared/domain-models/Event"
+import { EventEdit, EventID } from "TiFShared/domain-models/Event"
 import { EventMocks } from "@event-details-boundary/MockData"
 import { renderUseLoadEventDetails } from "@event-details-boundary/TestHelpers"
 import { TestInternetConnectionStatus } from "@test-helpers/InternetConnectionStatus"
 import { neverPromise } from "@test-helpers/Promise"
+import { mockTiFEndpoint } from "TiFShared/test-helpers/mockAPIServer"
+import { fakeTimers } from "@test-helpers/Timers"
+import { TiFAPI } from "TiFShared/api"
 
 describe("EditEventSubmit tests", () => {
+  describe("SubmitEventEdit tests", () => {
+    fakeTimers()
+    const TEST_CLIENT_RECEIVED_TIME = new Date()
+    const EXPECTED_CLIENT_SIDE_EVENT = {
+      ...EventMocks.MockSingleAttendeeResponse,
+      time: {
+        ...EventMocks.MockSingleAttendeeResponse.time,
+        clientReceivedTime: TEST_CLIENT_RECEIVED_TIME
+      }
+    }
+    const TEST_EVENT_EDIT = {
+      title: "Blob",
+      startDateTime: new Date(),
+      duration: 3600,
+      shouldHideAfterStartDate: false,
+      description: "This is a wonderful event.",
+      location: {
+        type: "coordinate",
+        value: LocationCoordinatesMocks.SantaCruz
+      }
+    } satisfies EventEdit
+    beforeEach(() => jest.setSystemTime(TEST_CLIENT_RECEIVED_TIME))
+
+    it("should create an event when no id specified", async () => {
+      mockTiFEndpoint("createEvent", 201, EventMocks.MockSingleAttendeeResponse)
+      const result = await submitEventEdit(
+        undefined,
+        TEST_EVENT_EDIT,
+        TiFAPI.testAuthenticatedInstance
+      )
+      expect(result).toEqual({
+        status: "success",
+        event: EXPECTED_CLIENT_SIDE_EVENT
+      })
+    })
+
+    it("should edit the event when id specified", async () => {
+      mockTiFEndpoint("editEvent", 200, EventMocks.MockSingleAttendeeResponse)
+      const result = await submitEventEdit(
+        EXPECTED_CLIENT_SIDE_EVENT.id,
+        TEST_EVENT_EDIT,
+        TiFAPI.testAuthenticatedInstance
+      )
+      expect(result).toEqual({
+        status: "success",
+        event: EXPECTED_CLIENT_SIDE_EVENT
+      })
+    })
+
+    it("should return an error status when editing in invalid conditions", async () => {
+      mockTiFEndpoint("editEvent", 403, { error: "user-not-host" })
+      const result = await submitEventEdit(
+        EXPECTED_CLIENT_SIDE_EVENT.id,
+        TEST_EVENT_EDIT,
+        TiFAPI.testAuthenticatedInstance
+      )
+      expect(result).toEqual({ status: "user-not-host" })
+    })
+
+    it("should return an error status when event not found", async () => {
+      mockTiFEndpoint("editEvent", 404, { error: "event-not-found" })
+      const result = await submitEventEdit(
+        EXPECTED_CLIENT_SIDE_EVENT.id,
+        TEST_EVENT_EDIT,
+        TiFAPI.testAuthenticatedInstance
+      )
+      expect(result).toEqual({ status: "event-not-found" })
+    })
+  })
+
   describe("UseEditEventSubmission tests", () => {
     resetTestSQLiteBeforeEach()
     const settings = PersistentSettingsStores.user(
