@@ -31,6 +31,9 @@ import ForgotPasswordMeta, {
 import LocationSearchMeta, {
   Basic as LocationSearchBasic
 } from "../components/LocationSearch/LocationSearch.stories"
+import ProfileMeta, {
+  Basic as ProfileScreenBasic
+} from "../components/ProfileScreen/Avatar.stories"
 import RegionMonitoringMeta, {
   Basic as RegionMonitoringBasic
 } from "../components/RegionMonitoring/RegionMonitoring.stories"
@@ -40,6 +43,23 @@ import SearchBarMeta, {
 import EventSettingsDurationMeta, {
   Basic as EventSettingsDurationBasic
 } from "../components/SettingsScreen/EventSettingsDurations.stories"
+
+import { sqliteLogHandler, sqliteLogs } from "@lib/Logging"
+import { InMemorySecureStore } from "@lib/SecureStore"
+import { dayjs } from "TiFShared/lib/Dayjs"
+import { addLogHandler, consoleLogHandler } from "TiFShared/logging"
+import EditEventDurationsMeta, {
+  Basic as EditEventDurationsBasic
+} from "../components/EditEvent/DurationPicker.stories"
+import EditEventPragmaQuotesMeta, {
+  Basic as EditEventPragmaQuotesBasic
+} from "../components/EditEvent/PragmaQuote.stories"
+import HapticsMeta, {
+  Basic as HapticsBasic
+} from "../components/Haptics/Haptics.stories"
+import RudeusEditorMeta, {
+  Basic as RudeusEditorBasic
+} from "../components/RudeusEditor/RudeusEditor.stories"
 import EventSettingsMeta, {
   Basic as EventSettingsBasic
 } from "../components/SettingsScreen/EventSettingsScreen.stories"
@@ -55,28 +75,12 @@ import SignUpMeta, {
 import TextFieldMeta, {
   Basic as TextFieldBasic
 } from "../components/TextField/TextField.stories"
-import VerifcationCodeMeta, {
-  Basic as VerifcationCodeBasic
-} from "../components/VerificationCode/VerifyCode.stories"
-import EditEventDurationsMeta, {
-  Basic as EditEventDurationsBasic
-} from "../components/EditEvent/DurationPicker.stories"
-import EditEventPragmaQuotesMeta, {
-  Basic as EditEventPragmaQuotesBasic
-} from "../components/EditEvent/PragmaQuote.stories"
-import HapticsMeta, {
-  Basic as HapticsBasic
-} from "../components/Haptics/Haptics.stories"
-import RudeusEditorMeta, {
-  Basic as RudeusEditorBasic
-} from "../components/RudeusEditor/RudeusEditor.stories"
 import TiFPreviewMeta, {
   Basic as TiFPreviewBasic
 } from "../components/TiFPreview/TiFPreview.stories"
-import { addLogHandler, consoleLogHandler } from "TiFShared/logging"
-import { sqliteLogHandler, sqliteLogs } from "@lib/Logging"
-import { dayjs } from "TiFShared/lib/Dayjs"
-import { InMemorySecureStore } from "@lib/SecureStore"
+import VerifcationCodeMeta, {
+  Basic as VerifcationCodeBasic
+} from "../components/VerificationCode/VerifyCode.stories"
 
 setupCognito(new InMemorySecureStore())
 addLogHandler(consoleLogHandler())
@@ -135,6 +139,11 @@ const stories = [
     name: ForgotPasswordMeta.title,
     component: ForgotPasswordBasic,
     args: ForgotPasswordMeta.args
+  },
+  {
+    name: ProfileMeta.title,
+    component: ProfileScreenBasic,
+    args: ProfileMeta.args
   },
   {
     name: SignUpMeta.title,
