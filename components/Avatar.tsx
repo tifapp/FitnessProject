@@ -43,8 +43,9 @@ const initials = (name: string) => {
 
 const styles = StyleSheet.create({
   profileFrame: {
-    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
     alignContent: "center",
-    borderRadius: 128
+    borderRadius: 32
   }
 })

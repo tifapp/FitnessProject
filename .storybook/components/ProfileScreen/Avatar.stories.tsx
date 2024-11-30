@@ -1,7 +1,7 @@
 import { NavigationContainer } from "@react-navigation/native"
 import { createStackNavigator } from "@react-navigation/stack"
 import React from "react"
-import { View } from "react-native"
+import { StyleSheet, View } from "react-native"
 import { StoryMeta } from "../../../.storybook/HelperTypes"
 import { ComponentStory } from "../../../.storybook/components"
 import { AvatarView } from "../../../components/Avatar"
@@ -34,7 +34,18 @@ const AvatarTestScreen = () => {
   }
   return (
     <View>
-      <AvatarView name={testValue.name} />
+      <AvatarView name={testValue.name} style={styles.profileFrame} />
     </View>
   )
 }
+
+const styles = StyleSheet.create({
+  profileFrame: {
+    height: 64,
+    width: 64,
+    justifyContent: "center",
+    alignItems: "center",
+    alignContent: "center",
+    borderRadius: 32
+  }
+})

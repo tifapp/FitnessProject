@@ -1,11 +1,10 @@
-import { RudeusUserStorage } from "./UserStorage"
 import { RUDEUS_API_URL } from "@env"
 import {
   APIClientCreator,
   APISchema,
+  apiTransport,
   endpointSchema,
-  jwtMiddleware,
-  apiTransport
+  jwtMiddleware
 } from "TiFShared/api"
 import { validateAPIClientCall } from "TiFShared/api/APIValidation"
 import { chainMiddleware } from "TiFShared/lib/Middleware"
@@ -16,6 +15,7 @@ import {
   RudeusSharePatternRequestSchema,
   RudeusUserSchema
 } from "./Models"
+import { RudeusUserStorage } from "./UserStorage"
 
 const log = logger("rudeus.api")
 
