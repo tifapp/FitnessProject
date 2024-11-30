@@ -1,57 +1,61 @@
 import { BASE_HEADER_SCREEN_OPTIONS } from "@components/Navigation"
 import { BodyText, Subtitle } from "@components/Text"
-import { EventAttendeeMocks } from "@event-details-boundary/MockData"
-import { AttendeesListView } from "@event-details-boundary/attendees-list/AttendeesList"
+import {
+  EventAttendeeMocks,
+  EventMocks
+} from "@event-details-boundary/MockData"
 import { NavigationContainer } from "@react-navigation/native"
 import { createStackNavigator } from "@react-navigation/stack"
-import { EventAttendee } from "@event/ClientSideEvent"
-import { ComponentMeta, ComponentStory } from "@storybook/react-native"
 import React from "react"
 import { View } from "react-native"
 import { StoryMeta } from ".storybook/HelperTypes"
+import {
+  EventAttendeesListView,
+  useEventAttendeesList
+} from "@event-details-boundary/AttendeesList"
+import { clientSideEventFromResponse } from "@event/ClientSideEvent"
+import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
 
 const AttendeesListMeta: StoryMeta = {
   title: "Attendees List Screen"
 }
 export default AttendeesListMeta
 
-type AttendeesListStory = ComponentStory<typeof SettingsScreen>
+type AttendeesListStory = ComponentStory<typeof View>
 
 const Stack = createStackNavigator()
 
 export const Basic: AttendeesListStory = () => (
-  <NavigationContainer>
-    <Stack.Navigator
-      initialRouteName="attendeesList"
-      screenOptions={{ ...BASE_HEADER_SCREEN_OPTIONS }}
-    >
-      <Stack.Screen name="attendeesList" component={AttendeesListTestScreen} />
-    </Stack.Navigator>
-  </NavigationContainer>
+  <TestQueryClientProvider>
+    <NavigationContainer>
+      <Stack.Navigator
+        initialRouteName="attendeesList"
+        screenOptions={{ ...BASE_HEADER_SCREEN_OPTIONS }}
+      >
+        <Stack.Screen
+          name="attendeesList"
+          component={AttendeesListTestScreen}
+        />
+      </Stack.Navigator>
+    </NavigationContainer>
+  </TestQueryClientProvider>
 )
 
 const AttendeesListTestScreen = () => {
-  const testValue = {
-    host: EventAttendeeMocks.Alivs,
-    attendees: [EventAttendeeMocks.AnnaAttendee, EventAttendeeMocks.BlobJr],
-    attendeeCount: 3
-  }
-  const renderAttendee = (attendee: EventAttendee) => {
-    return (
-      <View>
-        <Subtitle> {attendee.name} </Subtitle>
-        <BodyText> {attendee.handle.toString()} </BodyText>
-      </View>
-    )
-  }
   return (
     <View>
-      <AttendeesListView
-        attendees={testValue.attendees}
-        renderAttendee={renderAttendee}
-        totalAttendeeCount={testValue.attendeeCount}
-        refresh={() => console.log("Refresh")}
-        isRefetching={false}
+      <EventAttendeesListView
+        state={useEventAttendeesList({
+          eventId: 1,
+          event: async () => ({
+            status: "success",
+            event: clientSideEventFromResponse(
+              EventMocks.MockSingleAttendeeResponse
+            )
+          })
+        })}
+        onExploreOtherEventsTapped={() => console.log("Explore others")}
+        style={{ height: "100%" }}
       />
     </View>
   )
