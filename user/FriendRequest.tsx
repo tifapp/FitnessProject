@@ -1,12 +1,13 @@
 import { TextToastView } from "@components/common/Toasts"
 import { AlertsObject, presentAlert } from "@lib/Alerts"
 import { useFormSubmission } from "@lib/utils/Form"
+import { TiFAPI } from "TiFShared/api"
 import {
   UserHandle,
   UserID,
   UserRelationsStatus
 } from "TiFShared/domain-models/User"
-import { ReactNode } from "react"
+import { ReactNode, createContext, useContext } from "react"
 import { View, ViewStyle, StyleProp } from "react-native"
 
 export const ALERTS = {
@@ -28,6 +29,21 @@ export const ALERTS = {
   }
 } satisfies AlertsObject
 
+export type SendFriendRequestResult =
+  | "friends"
+  | "friend-request-sent"
+  | "user-not-found"
+  | "blocked-you"
+
+export const sendFriendRequest = async (
+  userId: UserID,
+  api: TiFAPI = TiFAPI.productionInstance
+): Promise<SendFriendRequestResult> => {
+  const resp = await api.sendFriendRequest({ params: { userId } })
+  if (resp.status === 403 || resp.status === 404) return resp.data.error
+  return resp.data.relationStatus
+}
+
 export type FriendRequestUser = {
   id: UserID
   name: string
@@ -37,13 +53,29 @@ export type FriendRequestUser = {
 
 export type UseFriendRequestEnvironment = {
   user: FriendRequestUser
-  sendFriendRequest: (
-    id: UserID
-  ) => Promise<
-    "friends" | "friend-request-sent" | "user-not-found" | "blocked-you"
-  >
   onSuccess: (status: "friends" | "friend-request-sent") => void
 }
+
+export type FriendRequestContextValues = {
+  sendFriendRequest: (id: UserID) => Promise<SendFriendRequestResult>
+}
+
+const FriendRequestContext = createContext<FriendRequestContextValues>({
+  sendFriendRequest
+})
+
+export type FriendRequestProviderProps = FriendRequestContextValues & {
+  children: JSX.Element
+}
+
+export const FriendRequestProvider = ({
+  children,
+  ...values
+}: FriendRequestProviderProps) => (
+  <FriendRequestContext.Provider value={values}>
+    {children}
+  </FriendRequestContext.Provider>
+)
 
 const REQUESTABLE_RELATION_STATUSES = ["not-friends", "friend-request-received"]
 
@@ -66,9 +98,9 @@ const isSuccessfulStatus = (
  */
 export const useFriendRequest = ({
   user,
-  sendFriendRequest,
   onSuccess
 }: UseFriendRequestEnvironment) => {
+  const { sendFriendRequest } = useContext(FriendRequestContext)
   const submission = useFormSubmission(
     (user: FriendRequestUser) => sendFriendRequest(user.id),
     () => {
