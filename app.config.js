@@ -10,17 +10,17 @@ const { EXPO_PROJECT_ID, EXPO_PROJECT_OWNER, EAS_BUILD_TYPE } = process.env
 const { bundleIdentifier, icon, splash, name } =
   EAS_BUILD_TYPE === "development"
     ? {
-        bundleIdentifier: "com.tif.FitnessAppDevelopment",
+        bundleIdentifier: "com.tif.FitnessApp",
         icon: ".storybook/assets/icon.png",
         splash: ".storybook/assets/splash.png",
-        name: "FitnessAppDevelopment"
+        name: "FitnessApp"
       }
     : EAS_BUILD_TYPE === "preview"
       ? {
-          bundleIdentifier: "com.tif.FitnessAppPreview",
+          bundleIdentifier: "com.tif.FitnessApp",
           icon: "./assets/icon.png",
           splash: "./assets/splash.png",
-          name: "FitnessAppPreview"
+          name: "FitnessApp"
         }
       : {
           bundleIdentifier: "com.tif.FitnessApp",
@@ -52,6 +52,17 @@ const config = {
   },
   plugins: [
     [
+      "expo-build-properties",
+      {
+        ios: {
+          newArchEnabled: true
+        },
+        android: {
+          newArchEnabled: true
+        }
+      }
+    ],
+    [
       "@sentry/react-native/expo",
       {
         url: "https://sentry.io",
@@ -79,9 +90,9 @@ const config = {
     bundleIdentifier,
     infoPlist: {
       NSLocationAlwaysAndWhenInUseUsageDescription:
-        'To inform others of your arrival, tap "Change to Always Allow."',
+        "To inform others of your arrival, tap \"Change to Always Allow.\"",
       NSLocationWhenInUseUsageDescription:
-        'Discover events and receive travel estimates for events by tapping "Allow Once" or "Allow While Using App."',
+        "Discover events and receive travel estimates for events by tapping \"Allow Once\" or \"Allow While Using App.\"",
       UIBackgroundModes: ["location", "fetch"],
       LSApplicationQueriesSchemes: [
         "comgooglemaps",
