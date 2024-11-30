@@ -105,8 +105,10 @@ export const createSignUpEnvironment = (
         verificationCode
       )
       return await tifAPI
-        .createCurrentUserProfile()
-        .then((resp) => resp.data.handle)
+        .createCurrentUserProfile({
+          body: { name: "TODO - Different Auth Flow" }
+        })
+        .then((resp) => resp.status === 201 && resp.data.handle)
     } catch (error) {
       if (isCognitoErrorWithCode(error, "CodeMismatchException")) {
         return "invalid-verification-code" as const

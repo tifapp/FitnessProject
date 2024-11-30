@@ -134,7 +134,7 @@ describe("SignUpEnvironment tests", () => {
       users: [
         {
           id: uuidString(),
-          handle: "thing",
+          handle: UserHandle.optionalParse("thing")!,
           name: "Bitchell Dickle"
         }
       ]
@@ -185,6 +185,8 @@ describe("SignUpEnvironment tests", () => {
 
       mockTiFEndpoint("createCurrentUserProfile", 201, {
         id: uuidString(),
+        name: "Test",
+        token: "mock token",
         handle
       })
 
