@@ -28,7 +28,7 @@ import { EventID, EventWhenBlockedByHost } from "TiFShared/domain-models/Event"
  * calculating accurate countdown times.
  */
 export const loadEventDetails = async (
-  eventId: number,
+  eventId: EventID,
   tifAPI: TiFAPI
 ): Promise<EventDetailsLoadingResult> => {
   const resp = await tifAPI.eventDetails({ params: { eventId } })
