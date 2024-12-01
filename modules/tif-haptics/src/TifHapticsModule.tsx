@@ -1,9 +1,9 @@
+import { SoundEffectName } from "@lib/SoundEffect"
+import { LocalSettings } from "@settings-storage/LocalSettings"
+import { SettingsStore } from "@settings-storage/Settings"
 import { requireOptionalNativeModule } from "expo"
 import { ReactNode, createContext, useContext } from "react"
-import { LocalSettings } from "@settings-storage/LocalSettings"
 import { logger } from "TiFShared/logging"
-import { SettingsStore } from "@settings-storage/Settings"
-import { SoundEffectName } from "@lib/SoundEffect"
 
 const TiFNativeHaptics = requireOptionalNativeModule("TifHaptics")
 
@@ -421,7 +421,7 @@ export type HapticsContextValues = Haptics & HapticsCompatibility
 
 const HapticsContext = createContext<HapticsContextValues>({
   ...TiFHaptics,
-  ...(TiFNativeHaptics?.deviceSupport() ?? {
+  ...(TiFNativeHaptics?.deviceSupport?.() ?? {
     isFeedbackSupportedOnDevice: false,
     isAudioSupportedOnDevice: false
   })
