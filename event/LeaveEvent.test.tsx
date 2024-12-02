@@ -7,8 +7,8 @@ import {
 } from "@test-helpers/ReactQuery"
 import { act, renderHook, waitFor } from "@testing-library/react-native"
 import { ALERTS, LeaveEventResult, useLeaveEvent } from "./LeaveEvent"
-import { EventMocks } from "./MockData"
-import { renderSuccessfulUseLoadEventDetails } from "./TestHelpers"
+import { EventMocks } from "@event-details-boundary/MockData"
+import { renderSuccessfulUseLoadEventDetails } from "@event-details-boundary/TestHelpers"
 import { neverPromise } from "@test-helpers/Promise"
 
 describe("LeaveEvent tests", () => {

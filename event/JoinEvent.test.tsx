@@ -23,8 +23,8 @@ import {
   saveRecentLocationJoinEventHandler,
   useJoinEventStages
 } from "./JoinEvent"
-import { EventMocks, mockEventLocation } from "./MockData"
-import { renderSuccessfulUseLoadEventDetails } from "./TestHelpers"
+import { EventMocks, mockEventLocation } from "@event-details-boundary/MockData"
+import { renderSuccessfulUseLoadEventDetails } from "@event-details-boundary/TestHelpers"
 
 describe("JoinEvent tests", () => {
   describe("UseJoinEvent tests", () => {
