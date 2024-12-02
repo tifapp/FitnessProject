@@ -33,7 +33,7 @@ import { TiFDefaultLayoutTransition } from "@lib/Reanimated"
 import { metersToMiles } from "TiFShared/lib/MetricConversions"
 import { EventAttendee, EventLocation } from "TiFShared/domain-models/Event"
 import { LocationCoordinate2D } from "TiFShared/domain-models/LocationCoordinate2D"
-import { openEventLocationInMaps } from "./LocationIdentifier"
+import { openEventLocationInMaps } from "@event/LocationIdentifier"
 
 export type UseEventTravelEstimatesResult =
   | {
