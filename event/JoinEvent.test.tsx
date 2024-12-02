@@ -21,7 +21,7 @@ import {
   JoinEventResult,
   joinEvent,
   saveRecentLocationJoinEventHandler,
-  useJoinEventStages
+  useJoinEvent
 } from "./JoinEvent"
 import { EventMocks, mockEventLocation } from "@event-details-boundary/MockData"
 import { renderSuccessfulUseLoadEventDetails } from "@event-details-boundary/TestHelpers"
@@ -34,7 +34,8 @@ describe("JoinEvent tests", () => {
     const env = {
       joinEvent: jest.fn(),
       monitor: TrueRegionMonitor,
-      loadPermissions: jest.fn()
+      loadPermissions: jest.fn(),
+      onSuccess: jest.fn()
     }
 
     const TEST_EVENT = {
@@ -110,8 +111,14 @@ describe("JoinEvent tests", () => {
         })
       })
 
+      expect(env.onSuccess).not.toHaveBeenCalled()
       act(() => (result.current as any).requestButtonTapped())
-      await waitFor(() => expect(result.current).toEqual({ stage: "success" }))
+      await waitFor(() =>
+        expect(result.current).toMatchObject({ stage: "idle" })
+      )
+      await waitFor(() => {
+        expect(env.onSuccess).toHaveBeenCalledTimes(1)
+      })
     })
 
     test("join event flow, skips false permissions", async () => {
@@ -136,9 +143,32 @@ describe("JoinEvent tests", () => {
       env.joinEvent.mockResolvedValueOnce("success")
       const { result } = renderUseJoinEvent()
 
+      expect(env.onSuccess).not.toHaveBeenCalled()
       act(() => (result.current as any).joinButtonTapped())
       await waitFor(() => {
-        expect(result.current).toEqual({ stage: "success" })
+        expect(result.current).toMatchObject({ stage: "idle" })
+      })
+      await waitFor(() => {
+        expect(env.onSuccess).toHaveBeenCalledTimes(1)
+      })
+    })
+
+    test("join event flow, can join multiple times", async () => {
+      env.loadPermissions.mockResolvedValueOnce(NON_REQUESTABLE_PERMISSIONS)
+      env.joinEvent.mockResolvedValue("success")
+      const { result } = renderUseJoinEvent()
+
+      expect(env.onSuccess).not.toHaveBeenCalled()
+      act(() => (result.current as any).joinButtonTapped())
+      await waitFor(() => {
+        expect(result.current).toMatchObject({ stage: "idle" })
+      })
+      await waitFor(() => {
+        expect(env.onSuccess).toHaveBeenCalledTimes(1)
+      })
+      act(() => (result.current as any).joinButtonTapped())
+      await waitFor(() => {
+        expect(env.onSuccess).toHaveBeenCalledTimes(2)
       })
     })
 
@@ -162,7 +192,7 @@ describe("JoinEvent tests", () => {
       })
 
       act(() => (result.current as any).dismissButtonTapped())
-      expect(result.current).toEqual({ stage: "success" })
+      expect(result.current).toMatchObject({ stage: "idle" })
     })
 
     test("join event flow, error alerts", async () => {
@@ -219,7 +249,7 @@ describe("JoinEvent tests", () => {
     })
 
     const expectErrorAlertState = async (
-      result: { current: ReturnType<typeof useJoinEventStages> },
+      result: { current: ReturnType<typeof useJoinEvent> },
       callIndex: number,
       key: keyof typeof JOIN_EVENT_ERROR_ALERTS
     ) => {
@@ -241,7 +271,7 @@ describe("JoinEvent tests", () => {
     }
 
     const renderUseJoinEvent = () => {
-      return renderHook(() => useJoinEventStages(TEST_EVENT, env), {
+      return renderHook(() => useJoinEvent(TEST_EVENT, env), {
         wrapper: ({ children }: any) => (
           <TestQueryClientProvider client={queryClient}>
             {children}

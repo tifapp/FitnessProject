@@ -1,10 +1,14 @@
+import { PrimaryButton } from "@components/Buttons"
 import { ClientSideEvent } from "@event/ClientSideEvent"
 import { updateEventDetailsQueryEvent } from "@event/DetailsQuery"
 import { AlertsObject, presentAlert } from "@lib/Alerts"
+import { AppStyles } from "@lib/AppColorStyle"
+import { FontScaleFactors } from "@lib/Fonts"
 import { useFormSubmission } from "@lib/utils/Form"
 import { useQueryClient } from "@tanstack/react-query"
 import { TiFAPI } from "TiFShared/api"
 import { EventID } from "TiFShared/domain-models/Event"
+import { ViewStyle, StyleProp, StyleSheet } from "react-native"
 
 export const leaveEvent = async (
   id: EventID,
@@ -114,3 +118,25 @@ export const useLeaveEvent = (
         : undefined
   }
 }
+
+export type LeaveEventButtonProps = {
+  state: ReturnType<typeof useLeaveEvent>
+  style?: StyleProp<ViewStyle>
+}
+
+export const LeaveEventButton = ({ state, style }: LeaveEventButtonProps) => (
+  <PrimaryButton
+    disabled={!state.leaveStarted}
+    onPress={() => state.leaveStarted?.()}
+    maximumFontSizeMultiplier={FontScaleFactors.xxxLarge}
+    style={[style, styles.button]}
+  >
+    Leave
+  </PrimaryButton>
+)
+
+const styles = StyleSheet.create({
+  button: {
+    backgroundColor: AppStyles.red.toString()
+  }
+})

@@ -1,11 +1,10 @@
-import React, { useEffect } from "react"
+import React, { useCallback, useEffect } from "react"
 import { SafeAreaProvider } from "react-native-safe-area-context"
 import {
   EventAttendeeMocks,
   EventMocks,
   mockEventLocation
 } from "@event-details-boundary/MockData"
-import { BottomSheetModalProvider } from "@gorhom/bottom-sheet"
 import { UserLocationFunctionsProvider } from "@location/UserLocation"
 import {
   getCurrentPositionAsync,
@@ -24,14 +23,13 @@ import { TiFQueryClientProvider } from "@lib/ReactQuery"
 import { dateRange } from "TiFShared/domain-models/FixedDateRange"
 import { dayjs, now } from "TiFShared/lib/Dayjs"
 import { StoryMeta } from ".storybook/HelperTypes"
-import {
-  JoinEventStagesView,
-  loadJoinEventPermissions,
-  useJoinEventStages
-} from "@event-details-boundary/JoinEvent"
-import { TrueRegionMonitor } from "@arrival-tracking/region-monitoring/MockRegionMonitors"
 import { GestureHandlerRootView } from "react-native-gesture-handler"
 import { TiFBottomSheetProvider } from "@components/BottomSheet"
+import {
+  EventUserAttendanceButton,
+  EventUserAttendanceProvider
+} from "@event/UserAttendance"
+import { loadJoinEventPermissions } from "@event/JoinEvent"
 
 const EventDetailsMeta: StoryMeta = {
   title: "Event Details"
@@ -95,21 +93,13 @@ const time = {
 const Test = () => {
   const result = useLoadEventDetails(event.id, async () => ({
     status: "success",
-    event
+    event: { ...event, userAttendeeStatus: "not-participating" }
   }))
   if (result.status !== "success") return undefined
   return <Menu event={result.event} />
 }
 
 const Menu = ({ event }: { event: ClientSideEvent }) => {
-  const stage = useJoinEventStages(event, {
-    monitor: TrueRegionMonitor,
-    joinEvent: async () => "success",
-    loadPermissions: async () => {
-      const perms = await loadJoinEventPermissions()
-      return perms.map((p) => ({ ...p, canRequestPermission: true }))
-    }
-  })
   return (
     <View
       style={{
@@ -117,7 +107,20 @@ const Menu = ({ event }: { event: ClientSideEvent }) => {
         justifyContent: "center"
       }}
     >
-      <JoinEventStagesView stage={stage} />
+      <EventUserAttendanceProvider
+        joinEvent={async () => "success"}
+        loadPermissions={async () => {
+          const perms = await loadJoinEventPermissions()
+          return perms.map((p) => ({ ...p, canRequestPermission: true }))
+        }}
+        leaveEvent={async () => "success"}
+      >
+        <EventUserAttendanceButton
+          event={event}
+          onJoinSuccess={useCallback(() => console.log("Joined"), [])}
+          onLeaveSuccess={() => console.log("Left")}
+        />
+      </EventUserAttendanceProvider>
     </View>
   )
 }
