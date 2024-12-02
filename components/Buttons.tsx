@@ -1,5 +1,6 @@
 import { Headline } from "@components/Text"
 import { AppStyles } from "@lib/AppColorStyle"
+import { FormSubmission } from "@lib/utils/Form"
 import React, { ReactNode } from "react"
 import {
   StyleProp,
@@ -14,6 +15,65 @@ import {
 type ContentStyle<Children extends ReactNode> = Children extends string | number
   ? { contentStyle?: StyleProp<TextStyle> }
   : { contentStyle?: StyleProp<ViewStyle> }
+
+export type FormSubmissionButtonProps<
+  SubmissionArgs,
+  SubmissionResult,
+  InvalidValidationResult extends { status: "invalid" },
+  Children extends ReactNode
+> = Omit<TouchableOpacityProps, "onPress" | "disabled"> & {
+  submission: FormSubmission<
+    SubmissionArgs,
+    SubmissionResult,
+    InvalidValidationResult
+  >
+} & ContentStyle<Children> & {
+    maximumFontSizeMultiplier?: number
+  }
+
+/**
+ * The button that should be used for main CTAs and should have visual hierarchy
+ * precedence over other ui elements.
+ *
+ * By default, the button uses a dark background with white text, though this can
+ * be overriden by using the `style` prop. The button is also 48px tall, and
+ * uses 16px horizontal paddings, to get a full screen button override `width` to
+ * 100% in the `style` prop.
+ */
+export const FormSubmissionPrimaryButton = <
+  SubmissionArgs,
+  SubmissionResult,
+  InvalidValidationResult extends { status: "invalid" },
+  Children extends ReactNode
+>({
+  style,
+  contentStyle,
+  submission,
+  ...props
+}: FormSubmissionButtonProps<
+  SubmissionArgs,
+  SubmissionResult,
+  InvalidValidationResult,
+  Children
+>) => (
+  <BaseButton
+    style={[
+      styles.defaultPrimaryBackground,
+      styles.container,
+      style,
+      { opacity: submission.status !== "submittable" ? 0.5 : 1 }
+    ]}
+    disabled={submission.status !== "submittable"}
+    activeOpacity={0.8}
+    contentStyle={[styles.primaryContent, contentStyle]}
+    onPress={() => {
+      if (submission.status === "submittable") {
+        submission.submit()
+      }
+    }}
+    {...props}
+  />
+)
 
 /**
  * Props for a button.

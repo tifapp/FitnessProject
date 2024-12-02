@@ -12,7 +12,7 @@ describe("EventAttendeesList tests", () => {
 
     beforeEach(() => jest.resetAllMocks())
 
-    it("should load the preview attendees of the event", async () => {
+    it("should load the host of the event", async () => {
       event.mockResolvedValueOnce({
         status: "success",
         event: EventMocks.MockSingleAttendeeResponse
@@ -21,9 +21,28 @@ describe("EventAttendeesList tests", () => {
         EventMocks.MockSingleAttendeeResponse.id
       )
       await waitFor(() => {
-        expect((result.current as any).attendees).toEqual(
-          EventMocks.MockSingleAttendeeResponse.previewAttendees
+        expect((result.current as any).host).toEqual(
+          EventMocks.MockSingleAttendeeResponse.previewAttendees[0]
         )
+      })
+      expect(event).toHaveBeenCalledWith(
+        EventMocks.MockSingleAttendeeResponse.id
+      )
+      expect(event).toHaveBeenCalledTimes(1)
+    })
+
+    it("should load the preview attendees of the event", async () => {
+      event.mockResolvedValueOnce({
+        status: "success",
+        event: EventMocks.MockMultipleAttendeeResponse
+      })
+      const { result } = renderUseEventAttendeesList(
+        EventMocks.MockMultipleAttendeeResponse.id
+      )
+      await waitFor(() => {
+        expect((result.current as any).attendees).toEqual([
+          EventMocks.MockMultipleAttendeeResponse.previewAttendees[1]
+        ])
       })
       expect(event).toHaveBeenCalledWith(
         EventMocks.MockSingleAttendeeResponse.id
@@ -34,10 +53,10 @@ describe("EventAttendeesList tests", () => {
     it("should be able to update the relation status of a user", async () => {
       event.mockResolvedValueOnce({
         status: "success",
-        event: EventMocks.MockSingleAttendeeResponse
+        event: EventMocks.MockMultipleAttendeeResponse
       })
       const { result } = renderUseEventAttendeesList(
-        EventMocks.MockSingleAttendeeResponse.id
+        EventMocks.MockMultipleAttendeeResponse.id
       )
       await waitFor(() => {
         expect(result.current.status).toEqual("success")
@@ -49,7 +68,7 @@ describe("EventAttendeesList tests", () => {
       act(() => {
         const current = result.current as any
         current.relationStatusChanged(
-          EventMocks.MockSingleAttendeeResponse.previewAttendees[0].id,
+          EventMocks.MockMultipleAttendeeResponse.previewAttendees[1].id,
           "friend-request-sent"
         )
       })

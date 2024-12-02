@@ -1639,9 +1639,6 @@ PODS:
   - react-native-netinfo (11.3.1):
     - React-Core
   - react-native-pager-view (6.4.1):
-  - react-native-safe-area-context (4.10.5):
-    - React-Core
-  - react-native-slider (4.5.3):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -2667,4 +2664,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: 6fffa45d76309ad6b1bbc06d2f2ba39dc4cb7120
 
-COCOAPODS: 1.15.2
+COCOAPODS: 1.16.2

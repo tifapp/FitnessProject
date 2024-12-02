@@ -15,6 +15,11 @@ import {
 } from "@event-details-boundary/AttendeesList"
 import { clientSideEventFromResponse } from "@event/ClientSideEvent"
 import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
+import { FriendRequestProvider } from "@user/FriendRequest"
+import { RootSiblingParent } from "react-native-root-siblings"
+import { uuidString } from "@lib/utils/UUID"
+import { delayData, sleep } from "@lib/utils/DelayData"
+import { UserHandle } from "TiFShared/domain-models/User"
 
 const AttendeesListMeta: StoryMeta = {
   title: "Attendees List Screen"
@@ -26,37 +31,80 @@ type AttendeesListStory = ComponentStory<typeof View>
 const Stack = createStackNavigator()
 
 export const Basic: AttendeesListStory = () => (
-  <TestQueryClientProvider>
-    <NavigationContainer>
-      <Stack.Navigator
-        initialRouteName="attendeesList"
-        screenOptions={{ ...BASE_HEADER_SCREEN_OPTIONS }}
-      >
-        <Stack.Screen
-          name="attendeesList"
-          component={AttendeesListTestScreen}
-        />
-      </Stack.Navigator>
-    </NavigationContainer>
-  </TestQueryClientProvider>
+  <RootSiblingParent>
+    <TestQueryClientProvider>
+      <NavigationContainer>
+        <Stack.Navigator
+          initialRouteName="attendeesList"
+          screenOptions={{ ...BASE_HEADER_SCREEN_OPTIONS }}
+        >
+          <Stack.Screen
+            name="attendeesList"
+            component={AttendeesListTestScreen}
+          />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </TestQueryClientProvider>
+  </RootSiblingParent>
 )
 
 const AttendeesListTestScreen = () => {
   return (
     <View>
-      <EventAttendeesListView
-        state={useEventAttendeesList({
-          eventId: 1,
-          event: async () => ({
-            status: "success",
-            event: clientSideEventFromResponse(
-              EventMocks.MockSingleAttendeeResponse
-            )
-          })
-        })}
-        onExploreOtherEventsTapped={() => console.log("Explore others")}
-        style={{ height: "100%" }}
-      />
+      <FriendRequestProvider
+        sendFriendRequest={async () => delayData("friends", 3000)}
+      >
+        <EventAttendeesListView
+          state={useEventAttendeesList({
+            eventId: 1,
+            event: async () => {
+              // await sleep(10_000)
+              return {
+                status: "success",
+                event: clientSideEventFromResponse({
+                  ...EventMocks.MockSingleAttendeeResponse,
+                  previewAttendees: [
+                    {
+                      ...EventMocks.MockSingleAttendeeResponse
+                        .previewAttendees[0],
+                      relationStatus: "not-friends",
+                      arrivedDateTime: new Date()
+                    },
+                    {
+                      ...EventMocks.MockSingleAttendeeResponse
+                        .previewAttendees[0],
+                      id: uuidString(),
+                      name: "Blob the OompaLoompa",
+                      handle: UserHandle.optionalParse("blob_oompa")!,
+                      arrivedDateTime: new Date(),
+                      relationStatus: "friend-request-sent"
+                    },
+                    {
+                      ...EventMocks.MockSingleAttendeeResponse
+                        .previewAttendees[0],
+                      id: uuidString(),
+                      handle: UserHandle.optionalParse("sean_blovity")!,
+                      name: "Sean Blovity",
+                      relationStatus: "friend-request-received"
+                    },
+                    {
+                      ...EventMocks.MockSingleAttendeeResponse
+                        .previewAttendees[0],
+                      id: uuidString(),
+                      handle: UserHandle.optionalParse("big_chungus")!,
+                      name: "Big Chungus",
+                      relationStatus: "not-friends"
+                    }
+                  ]
+                })
+              }
+            }
+          })}
+          onExploreOtherEventsTapped={() => console.log("Explore others")}
+          onProfileTapped={(id) => console.log("Tapped", id)}
+          style={{ height: "100%" }}
+        />
+      </FriendRequestProvider>
     </View>
   )
 }

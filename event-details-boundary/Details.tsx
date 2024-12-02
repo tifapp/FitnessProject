@@ -153,7 +153,8 @@ export const EventDetailsView = <
         style={styles.noContent}
       />
     )}
-    {result.status === "success" && children(result)}
+    {result.status === "success" &&
+      children(result as Extract<Result, { status: "success" }>)}
   </View>
 )
 
@@ -395,7 +396,7 @@ type NoContentProps = {
   onActionButtonTapped?: () => void
 }
 
-const NoContentView = ({
+export const NoContentView = ({
   style,
   renderTitle,
   possibleMessages,
