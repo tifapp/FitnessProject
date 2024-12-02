@@ -38,7 +38,11 @@ export const JOIN_EVENT_ERROR_ALERTS = {
     title: "Event was canceled",
     description: "This event was canceled, tbd tbd tbd"
   },
-  "user-is-blocked": {
+  "event-not-found": {
+    title: "Event not Found",
+    description: "It seems that this event does not exist."
+  },
+  "blocked-you": {
     title: "Event Access Restricted",
     description: "The host has restricted you from joining this event."
   },
@@ -54,6 +58,12 @@ export const loadJoinEventPermissions = async () => [
     canRequestPermission: (await getNotificationPermissions()).canAskAgain,
     requestPermission: async () => {
       await requestNotificationPermissions()
+    },
+    bannerContents: {
+      title: "Don’t miss out on the fun!",
+      description:
+        "Enable notifications to stay informed on all the exciting events happening around you.",
+      ctaText: "Turn on Notifications"
     }
   } as const,
   {
@@ -62,14 +72,27 @@ export const loadJoinEventPermissions = async () => [
       .canAskAgain,
     requestPermission: async () => {
       await requestBackgroundLocationPermissions()
+    },
+    bannerContents: {
+      title: "Don’t get left behind!",
+      description:
+        "Enable Location Sharing to inform others of your location in the event.",
+      ctaText: "Turn on Location Sharing"
     }
   } as const
 ]
 
 export type JoinEventPermissionKind = "notifications" | "backgroundLocation"
 
+export type JoinEventPermissionBannerContents = {
+  title: string
+  description: string
+  ctaText: string
+}
+
 export type JoinEventPermission = {
   kind: JoinEventPermissionKind
+  bannerContents: JoinEventPermissionBannerContents
   canRequestPermission: boolean
   requestPermission: () => Promise<void>
 }
@@ -81,8 +104,8 @@ export type JoinEventResult =
   | "success"
   | "event-has-ended"
   | "event-was-cancelled"
-  | "user-is-blocked"
   | "event-not-found"
+  | "blocked-you"
 
 export type JoinEventRequest = Pick<ClientSideEvent, "id"> & {
   location: Omit<EventLocation, "timezoneIdentifier">
@@ -165,6 +188,7 @@ export type UseJoinEventEnvironment = {
 
 export type UseJoinEventPermissionStage = {
   permissionKind: JoinEventPermissionKind
+  bannerContents: JoinEventPermissionBannerContents
   requestButtonTapped: () => void
   dismissButtonTapped: () => void
 }
@@ -255,6 +279,7 @@ const useCurrentJoinEventPermission = (
   if (permissionIndex >= availablePermissions.length) return "done"
   return {
     permissionKind: availablePermissions[permissionIndex].kind,
+    bannerContents: availablePermissions[permissionIndex].bannerContents,
     requestButtonTapped: () => {
       permissionRequestMutation.mutate(availablePermissions)
     },
@@ -294,7 +319,7 @@ const JoinEventPermissionBannerModal = ({
     currentStage.stage === "permission" ? currentStage : undefined
   return (
     <TiFBottomSheet
-      item={permissionStage?.permissionKind}
+      item={permissionStage}
       sizing="content-size"
       handleStyle={styles.sheetHandle}
       canSwipeToDismiss={false}
@@ -303,48 +328,25 @@ const JoinEventPermissionBannerModal = ({
         currentStage.dismissButtonTapped()
       }}
     >
-      {(permissionKind) => (
+      {(stage) => (
         <BottomSheetView>
-          <JoinEventPermissionBanner
-            {...permissionStage}
-            permissionKind={permissionKind}
-          />
+          <JoinEventPermissionBanner {...stage} />
         </BottomSheetView>
       )}
     </TiFBottomSheet>
   )
 }
 
-export type JoinEventPermissionBannerProps = {
-  permissionKind: JoinEventPermissionKind
-  requestButtonTapped?: () => void
-  dismissButtonTapped?: () => void
+type JoinEventPermissionBannerProps = UseJoinEventPermissionStage & {
   style?: StyleProp<ViewStyle>
 }
 
-const JOIN_EVENT_PERMISSION_BANNER_CONTENTS = {
-  notifications: {
-    title: "Don’t miss out on the fun!",
-    description:
-      "Enable notifications to stay informed on all the exciting events happening around you.",
-    ctaText: "Turn on Notifications"
-  },
-  backgroundLocation: {
-    title: "Don’t get left behind!",
-    description:
-      "Enable Location Sharing to inform others of your location in the event.",
-    ctaText: "Turn on Location Sharing"
-  }
-}
-
 const JoinEventPermissionBanner = ({
-  permissionKind,
+  bannerContents: { title, ctaText, description },
   requestButtonTapped,
   dismissButtonTapped,
   style
 }: JoinEventPermissionBannerProps) => {
-  const { title, ctaText, description } =
-    JOIN_EVENT_PERMISSION_BANNER_CONTENTS[permissionKind]
   const { bottom } = useSafeAreaInsets()
   const paddingForNonSafeAreaScreens = bottom === 0 ? 24 : 0
   return (

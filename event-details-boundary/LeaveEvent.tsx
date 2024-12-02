@@ -2,7 +2,6 @@ import { ClientSideEvent } from "@event/ClientSideEvent"
 import { updateEventDetailsQueryEvent } from "@event/DetailsQuery"
 import { AlertsObject, presentAlert } from "@lib/Alerts"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { Alert } from "react-native"
 
 export const LEAVE_EVENT_ALERTS = {
   "event-has-ended": {

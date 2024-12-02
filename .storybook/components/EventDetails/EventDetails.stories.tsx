@@ -26,6 +26,7 @@ import { dayjs, now } from "TiFShared/lib/Dayjs"
 import { StoryMeta } from ".storybook/HelperTypes"
 import {
   JoinEventStagesView,
+  loadJoinEventPermissions,
   useJoinEventStages
 } from "@event-details-boundary/JoinEvent"
 import { TrueRegionMonitor } from "@arrival-tracking/region-monitoring/MockRegionMonitors"
@@ -104,18 +105,10 @@ const Menu = ({ event }: { event: ClientSideEvent }) => {
   const stage = useJoinEventStages(event, {
     monitor: TrueRegionMonitor,
     joinEvent: async () => "success",
-    loadPermissions: async () => [
-      {
-        kind: "notifications",
-        canRequestPermission: true,
-        requestPermission: async () => {}
-      } as const,
-      {
-        kind: "backgroundLocation",
-        canRequestPermission: true,
-        requestPermission: async () => {}
-      } as const
-    ]
+    loadPermissions: async () => {
+      const perms = await loadJoinEventPermissions()
+      return perms.map((p) => ({ ...p, canRequestPermission: true }))
+    }
   })
   return (
     <View
