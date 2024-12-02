@@ -21,13 +21,10 @@ import {
   JoinEventResult,
   joinEvent,
   saveRecentLocationJoinEventHandler,
-  useJoinEventStages
+  useJoinEvent
 } from "./JoinEvent"
-import {
-  EventMocks,
-  mockEventLocation
-} from "./MockData"
-import { renderSuccessfulUseLoadEventDetails } from "./TestHelpers"
+import { EventMocks, mockEventLocation } from "@event-details-boundary/MockData"
+import { renderSuccessfulUseLoadEventDetails } from "@event-details-boundary/TestHelpers"
 
 describe("JoinEvent tests", () => {
   describe("UseJoinEvent tests", () => {
@@ -37,7 +34,8 @@ describe("JoinEvent tests", () => {
     const env = {
       joinEvent: jest.fn(),
       monitor: TrueRegionMonitor,
-      loadPermissions: jest.fn()
+      loadPermissions: jest.fn(),
+      onSuccess: jest.fn()
     }
 
     const TEST_EVENT = {
@@ -47,16 +45,24 @@ describe("JoinEvent tests", () => {
       userAttendeeStatus: "not-participating"
     } as const
 
+    const TEST_BANNER_CONTENTS = {
+      title: "Test",
+      description: "Test",
+      ctaText: "TEST"
+    }
+
     const NON_REQUESTABLE_PERMISSIONS = [
       {
         kind: "notifications",
         canRequestPermission: false,
-        requestPermission: jest.fn().mockResolvedValueOnce(true)
+        requestPermission: jest.fn().mockResolvedValueOnce(true),
+        bannerContents: TEST_BANNER_CONTENTS
       },
       {
         kind: "backgroundLocation",
         canRequestPermission: false,
-        requestPermission: jest.fn().mockResolvedValueOnce(true)
+        requestPermission: jest.fn().mockResolvedValueOnce(true),
+        bannerContents: TEST_BANNER_CONTENTS
       }
     ] as const
 
@@ -105,8 +111,14 @@ describe("JoinEvent tests", () => {
         })
       })
 
+      expect(env.onSuccess).not.toHaveBeenCalled()
       act(() => (result.current as any).requestButtonTapped())
-      await waitFor(() => expect(result.current).toEqual({ stage: "success" }))
+      await waitFor(() =>
+        expect(result.current).toMatchObject({ stage: "idle" })
+      )
+      await waitFor(() => {
+        expect(env.onSuccess).toHaveBeenCalledTimes(1)
+      })
     })
 
     test("join event flow, skips false permissions", async () => {
@@ -131,9 +143,32 @@ describe("JoinEvent tests", () => {
       env.joinEvent.mockResolvedValueOnce("success")
       const { result } = renderUseJoinEvent()
 
+      expect(env.onSuccess).not.toHaveBeenCalled()
       act(() => (result.current as any).joinButtonTapped())
       await waitFor(() => {
-        expect(result.current).toEqual({ stage: "success" })
+        expect(result.current).toMatchObject({ stage: "idle" })
+      })
+      await waitFor(() => {
+        expect(env.onSuccess).toHaveBeenCalledTimes(1)
+      })
+    })
+
+    test("join event flow, can join multiple times", async () => {
+      env.loadPermissions.mockResolvedValueOnce(NON_REQUESTABLE_PERMISSIONS)
+      env.joinEvent.mockResolvedValue("success")
+      const { result } = renderUseJoinEvent()
+
+      expect(env.onSuccess).not.toHaveBeenCalled()
+      act(() => (result.current as any).joinButtonTapped())
+      await waitFor(() => {
+        expect(result.current).toMatchObject({ stage: "idle" })
+      })
+      await waitFor(() => {
+        expect(env.onSuccess).toHaveBeenCalledTimes(1)
+      })
+      act(() => (result.current as any).joinButtonTapped())
+      await waitFor(() => {
+        expect(env.onSuccess).toHaveBeenCalledTimes(2)
       })
     })
 
@@ -157,7 +192,7 @@ describe("JoinEvent tests", () => {
       })
 
       act(() => (result.current as any).dismissButtonTapped())
-      expect(result.current).toEqual({ stage: "success" })
+      expect(result.current).toMatchObject({ stage: "idle" })
     })
 
     test("join event flow, error alerts", async () => {
@@ -170,8 +205,8 @@ describe("JoinEvent tests", () => {
       env.joinEvent.mockResolvedValueOnce("event-was-cancelled")
       await expectErrorAlertState(result, 2, "event-was-cancelled")
 
-      env.joinEvent.mockResolvedValueOnce("user-is-blocked")
-      await expectErrorAlertState(result, 3, "user-is-blocked")
+      env.joinEvent.mockResolvedValueOnce("blocked-you")
+      await expectErrorAlertState(result, 3, "blocked-you")
 
       env.joinEvent.mockRejectedValueOnce(new Error())
       await expectErrorAlertState(result, 4, "generic")
@@ -214,7 +249,7 @@ describe("JoinEvent tests", () => {
     })
 
     const expectErrorAlertState = async (
-      result: { current: ReturnType<typeof useJoinEventStages> },
+      result: { current: ReturnType<typeof useJoinEvent> },
       callIndex: number,
       key: keyof typeof JOIN_EVENT_ERROR_ALERTS
     ) => {
@@ -236,7 +271,7 @@ describe("JoinEvent tests", () => {
     }
 
     const renderUseJoinEvent = () => {
-      return renderHook(() => useJoinEventStages(TEST_EVENT, env), {
+      return renderHook(() => useJoinEvent(TEST_EVENT, env), {
         wrapper: ({ children }: any) => (
           <TestQueryClientProvider client={queryClient}>
             {children}
@@ -324,7 +359,10 @@ describe("JoinEvent tests", () => {
       ])
     }
 
-    const setTestRequestHandler = <Status extends 200 | 201 | 403 | 404, Data extends TiFEndpointResponse<"joinEvent", Status>>(
+    const setTestRequestHandler = <
+      Status extends 200 | 201 | 403 | 404,
+      Data extends TiFEndpointResponse<"joinEvent", Status>
+    >(
       status: Status,
       data: Data,
       bodyExpectation: "no-request-body" | "request-body" = "request-body"
@@ -335,12 +373,16 @@ describe("JoinEvent tests", () => {
             params: {
               eventId: "1"
             },
-            body: bodyExpectation === "no-request-body" ? undefined : {
-              region: {
-                coordinate: TEST_REQUEST.location.coordinate,
-                arrivalRadiusMeters: TEST_REQUEST.location.arrivalRadiusMeters
-              }
-            }
+            body:
+              bodyExpectation === "no-request-body"
+                ? undefined
+                : {
+                    region: {
+                      coordinate: TEST_REQUEST.location.coordinate,
+                      arrivalRadiusMeters:
+                        TEST_REQUEST.location.arrivalRadiusMeters
+                    }
+                  }
           },
           mockResponse: { status, data } as any // NB: Typescript not inferring response properly
         }
