@@ -19,4 +19,5 @@ export namespace AppStyles {
   export const green = ColorString.parse("#14B329")!
   export const purple = ColorString.parse("#A882DD")!
   export const orange = ColorString.parse("#FB5607")!
+  export const emerald = ColorString.parse("#5BC087")!
 }

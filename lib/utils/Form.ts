@@ -74,3 +74,15 @@ export const useFormSubmission = <
     }
   } as const
 }
+
+export type FormSubmission<
+  SubmissionArgs,
+  SubmissionResult,
+  InvalidValidationResult extends { status: "invalid" }
+> = ReturnType<
+  typeof useFormSubmission<
+    SubmissionArgs,
+    SubmissionResult,
+    InvalidValidationResult
+  >
+>

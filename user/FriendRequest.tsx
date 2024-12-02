@@ -1,5 +1,9 @@
+import { FormSubmissionPrimaryButton } from "@components/Buttons"
+import { BoldFootnote, Headline } from "@components/Text"
+import { Ionicon } from "@components/common/Icons"
 import { TextToastView } from "@components/common/Toasts"
 import { AlertsObject, presentAlert } from "@lib/Alerts"
+import { AppStyles } from "@lib/AppColorStyle"
 import { useFormSubmission } from "@lib/utils/Form"
 import { TiFAPI } from "TiFShared/api"
 import {
@@ -8,7 +12,7 @@ import {
   UserRelationsStatus
 } from "TiFShared/domain-models/User"
 import { ReactNode, createContext, useContext } from "react"
-import { View, ViewStyle, StyleProp } from "react-native"
+import { View, ViewStyle, StyleProp, StyleSheet } from "react-native"
 
 export const ALERTS = {
   // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -21,7 +25,7 @@ export const ALERTS = {
   // eslint-disable-next-line @typescript-eslint/naming-convention
   "blocked-you": (user: Omit<FriendRequestUser, "relationStatus" | "id">) => ({
     title: "You've Been Blocked",
-    description: `It seems that ${user.name} (${user.handle}) has blocked you. Try getting on better terms with them before becoming friends.`
+    description: `It seems that ${user.name} (${user.handle}) has blocked you.`
   }),
   genericError: {
     title: "Uh Oh!",
@@ -157,3 +161,91 @@ export const FriendRequestView = ({
     />
   </View>
 )
+
+export type FriendRequestButtonProps = Omit<FriendRequestProps, "children"> & {
+  size?: "normal" | "large"
+}
+
+export const FriendRequestButton = ({
+  state,
+  size = "normal",
+  style
+}: FriendRequestButtonProps) => {
+  const [ButtonText, iconSize, buttonStyle] = BUTTON_SIZE_PROPS[size]
+  return (
+    <FriendRequestView state={state} style={style}>
+      {state.user.relationStatus === "friends" && (
+        <View style={styles.friendButtonRow}>
+          <Ionicon
+            name="people"
+            color={AppStyles.colorOpacity35}
+            size={iconSize}
+          />
+          <ButtonText style={styles.nonActionableFriendText}>
+            Friends
+          </ButtonText>
+        </View>
+      )}
+      {state.user.relationStatus === "friend-request-sent" && (
+        <View style={styles.friendButtonRow}>
+          <Ionicon
+            name="paper-plane"
+            color={AppStyles.colorOpacity35}
+            size={iconSize}
+          />
+          <ButtonText style={styles.nonActionableFriendText}>
+            Request Sent
+          </ButtonText>
+        </View>
+      )}
+      {state.user.relationStatus === "friend-request-received" && (
+        <FormSubmissionPrimaryButton
+          submission={state.submission}
+          style={buttonStyle}
+        >
+          <View style={styles.friendButtonRow}>
+            <Ionicon name="mail" color="white" size={iconSize} />
+            <ButtonText style={styles.friendButtonText}>Accept</ButtonText>
+          </View>
+        </FormSubmissionPrimaryButton>
+      )}
+      {state.user.relationStatus === "not-friends" && (
+        <FormSubmissionPrimaryButton
+          submission={state.submission}
+          style={buttonStyle}
+        >
+          <View style={styles.friendButtonRow}>
+            <Ionicon name="person-add" color="white" size={iconSize} />
+            <ButtonText style={styles.friendButtonText}>Friend</ButtonText>
+          </View>
+        </FormSubmissionPrimaryButton>
+      )}
+    </FriendRequestView>
+  )
+}
+
+const styles = StyleSheet.create({
+  friendButtonRow: {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    columnGap: 8
+  },
+  friendButtonText: {
+    color: "white"
+  },
+  nonActionableFriendText: {
+    color: AppStyles.colorOpacity35
+  },
+  friendButton: {
+    padding: 8
+  },
+  largeFriendButton: {
+    padding: 12
+  }
+})
+
+const BUTTON_SIZE_PROPS = {
+  normal: [BoldFootnote, 16, styles.friendButton],
+  large: [Headline, 20, styles.largeFriendButton]
+} as const

@@ -3,10 +3,12 @@ import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 import { Headline } from "./Text"
 
 const COLORS = [
-  AppStyles.blue,
   AppStyles.red,
+  AppStyles.purple,
+  AppStyles.orange,
   AppStyles.green,
-  AppStyles.orange
+  AppStyles.yellow,
+  AppStyles.blue
 ]
 
 export type AvatarProps = {
@@ -22,7 +24,7 @@ export const AvatarView = ({ name, style }: AvatarProps) => (
       { backgroundColor: COLORS[name.length % COLORS.length].toString() }
     ]}
   >
-    <Headline>{initials(name)}</Headline>
+    <Headline style={styles.text}>{initials(name)}</Headline>
   </View>
 )
 
@@ -47,5 +49,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     alignContent: "center",
     borderRadius: 32
+  },
+  text: {
+    color: "white"
   }
 })

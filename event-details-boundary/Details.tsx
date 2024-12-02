@@ -105,20 +105,26 @@ const refreshStatus = (
   }
 }
 
-export type EventDetailsProps = {
-  result: UseLoadEventDetailsResult
+export type EventDetailsProps<
+  Result extends UseLoadEventDetailsResult = UseLoadEventDetailsResult
+> = {
+  result: Result
   onExploreOtherEventsTapped: () => void
+  children: (result: Extract<Result, { status: "success" }>) => JSX.Element
   style?: StyleProp<ViewStyle>
 }
 
 /**
  * The main event details view.
  */
-export const EventDetailsView = ({
+export const EventDetailsView = <
+  Result extends UseLoadEventDetailsResult = UseLoadEventDetailsResult
+>({
   result,
   onExploreOtherEventsTapped,
+  children,
   style
-}: EventDetailsProps) => (
+}: EventDetailsProps<Result>) => (
   <View style={style}>
     {result.status === "loading" && (
       <NoContentView
@@ -147,7 +153,8 @@ export const EventDetailsView = ({
         style={styles.noContent}
       />
     )}
-    {result.status === "success" && <Title>TODO</Title>}
+    {result.status === "success" &&
+      children(result as Extract<Result, { status: "success" }>)}
   </View>
 )
 
@@ -389,7 +396,7 @@ type NoContentProps = {
   onActionButtonTapped?: () => void
 }
 
-const NoContentView = ({
+export const NoContentView = ({
   style,
   renderTitle,
   possibleMessages,
