@@ -4,6 +4,7 @@ import { updateEventDetailsQueryEvent } from "@event/DetailsQuery"
 import { useFontScale } from "@lib/Fonts"
 import { MenuAction, MenuView } from "@react-native-menu/menu"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { useUserBlocking } from "@user/Blocking"
 import { useIsSignedIn } from "@user/Session"
 import {
   Platform,
@@ -19,11 +20,6 @@ import {
 
 export type EventMenuActionsListKey = keyof typeof EVENT_MENU_ACTIONS_LISTS
 
-export type UseEventActionsMenuEnvironment = {
-  blockHost: (id: UserID) => Promise<void>
-  unblockHost: (id: UserID) => Promise<void>
-}
-
 type ToggleBlockMutationArgs = {
   hostId: UserID
   isBlocking: boolean
@@ -34,16 +30,16 @@ type ToggleBlockMutationArgs = {
  * A hook that controls the state of the menu actions.
  */
 export const useEventActionsMenu = (
-  event: Pick<ClientSideEvent, "id" | "userAttendeeStatus" | "host">,
-  env: UseEventActionsMenuEnvironment
+  event: Pick<ClientSideEvent, "id" | "userAttendeeStatus" | "host">
 ) => {
+  const { blockUser, unblockUser } = useUserBlocking()
   const queryClient = useQueryClient()
   const toggleBlockMutation = useMutation(
     async ({ isBlocking, hostId }: ToggleBlockMutationArgs) => {
       if (isBlocking) {
-        await env.blockHost(hostId)
+        await blockUser(hostId)
       } else {
-        await env.unblockHost(hostId)
+        await unblockUser(hostId)
       }
     },
     {
@@ -81,7 +77,7 @@ export const useEventActionsMenu = (
 export type EventActionsMenuProps = {
   event: ClientSideEvent
   state: ReturnType<typeof useEventActionsMenu>
-  eventShareContent: () => Promise<ShareContent>
+  eventShareContent: (event: ClientSideEvent) => Promise<ShareContent>
   onCopyEventTapped: () => void
   onEditEventTapped: () => void
   style?: StyleProp<ViewStyle>
@@ -117,7 +113,7 @@ export const EventActionsMenuView = ({
         "edit-event": onEditEventTapped,
         // eslint-disable-next-line @typescript-eslint/naming-convention
         "share-event": async () => {
-          Share.share(await eventShareContent())
+          Share.share(await eventShareContent(event))
         }
       } as const
       callbacks[nativeEvent.event as keyof typeof callbacks]()
