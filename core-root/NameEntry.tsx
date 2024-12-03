@@ -6,30 +6,9 @@ import { TiFFormScrollableLayoutView } from "@components/form-components/Scrolla
 import { AlertsObject, presentAlert } from "@lib/Alerts"
 import { useFontScale } from "@lib/Fonts"
 import { useFormSubmission } from "@lib/utils/Form"
-import { TiFAPI } from "TiFShared/api"
-import { UserHandle, UserID } from "TiFShared/domain-models/User"
+import { AlphaUser } from "@user/alpha"
 import { useState } from "react"
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
-
-export type AlphaUser = {
-  name: string;
-  id: UserID;
-  handle: UserHandle;
-  token: string;
-}
-
-export const registerUser = async (
-  name: string,
-  api: TiFAPI = TiFAPI.productionInstance
-): Promise<AlphaUser> => {
-  const resp = await api.createCurrentUserProfile({ body: { name } })
-
-  if (resp.status === 400) {
-    throw new Error("invalid name")
-  }
-
-  return resp.data
-}
 
 export const ALERTS = {
   failedToRegister: {
@@ -89,9 +68,7 @@ export const AlphaRegisterView = ({ state, style }: AlphaRegisterProps) => (
     >
       <View style={styles.text}>
         <Subtitle>Register</Subtitle>
-        <BodyText>
-          Enter your name.
-        </BodyText>
+        <BodyText>Enter your name.</BodyText>
       </View>
       <ShadedTextField
         placeholder="Enter a Name"
