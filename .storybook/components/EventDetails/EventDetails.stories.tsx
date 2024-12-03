@@ -124,6 +124,7 @@ const Menu = ({ event }: { event: ClientSideEvent }) => {
     >
       <EventActionsMenuView event={event} state={state} />
       {/* <EventUserAttendanceProvider
+      <EventUserAttendanceProvider
         joinEvent={async () => "success"}
         loadPermissions={async () => {
           const perms = await loadJoinEventPermissions()
