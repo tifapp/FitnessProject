@@ -22,6 +22,7 @@ import { mergeWithPartial } from "TiFShared/lib/Object"
 import { EventRegionMonitor } from "@arrival-tracking"
 import { TrueRegionMonitor } from "@arrival-tracking/region-monitoring/MockRegionMonitors"
 import { ClientSideEvent } from "./ClientSideEvent"
+import { BoldFootnote, Headline } from "@components/Text"
 
 export type EventUserAttendanceContextValues = {
   monitor: EventRegionMonitor
@@ -59,6 +60,8 @@ export const EventUserAttendanceProvider = ({
 
 export type EventAttendanceButtonProps = {
   event: ClientSideEvent
+  size?: "small" | "normal"
+  maximumFontSizeMultiplier?: number
   onJoinSuccess: () => void
   onLeaveSuccess: () => void
   style?: StyleProp<ViewStyle>
@@ -74,6 +77,8 @@ export const EventUserAttendanceButton = ({
   event,
   onJoinSuccess,
   onLeaveSuccess,
+  size = "normal",
+  maximumFontSizeMultiplier,
   style
 }: EventAttendanceButtonProps) => {
   const { monitor, joinEvent, loadPermissions, leaveEvent } =
@@ -88,14 +93,30 @@ export const EventUserAttendanceButton = ({
     leaveEvent,
     onSuccess: onLeaveSuccess
   })
+  const Text = SIZE_TEXT_COMPONENT[size]
   return (
     <>
       {isAttendingEvent(event.userAttendeeStatus) ? (
-        <LeaveEventButton state={leaveState} style={style} />
+        <LeaveEventButton
+          Text={Text}
+          maximumFontSizeMultipler={maximumFontSizeMultiplier}
+          state={leaveState}
+          style={style}
+        />
       ) : (
-        <JoinEventButton state={joinState} style={style} />
+        <JoinEventButton
+          Text={Text}
+          maximumFontSizeMultipler={maximumFontSizeMultiplier}
+          state={joinState}
+          style={style}
+        />
       )}
       <JoinEventPermissionsSheetView state={joinState} />
     </>
   )
+}
+
+const SIZE_TEXT_COMPONENT = {
+  small: BoldFootnote,
+  normal: Headline
 }

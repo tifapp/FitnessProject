@@ -1,4 +1,4 @@
-import { PrimaryButton } from "@components/Buttons"
+import { PrimaryButton, SecondaryOutlinedButton } from "@components/Buttons"
 import { ClientSideEvent } from "@event/ClientSideEvent"
 import { updateEventDetailsQueryEvent } from "@event/DetailsQuery"
 import { AlertsObject, presentAlert } from "@lib/Alerts"
@@ -8,7 +8,7 @@ import { useFormSubmission } from "@lib/utils/Form"
 import { useQueryClient } from "@tanstack/react-query"
 import { TiFAPI } from "TiFShared/api"
 import { EventID } from "TiFShared/domain-models/Event"
-import { ViewStyle, StyleProp, StyleSheet } from "react-native"
+import { ViewStyle, StyleProp, StyleSheet, TextProps } from "react-native"
 
 export const leaveEvent = async (
   id: EventID,
@@ -121,22 +121,23 @@ export const useLeaveEvent = (
 
 export type LeaveEventButtonProps = {
   state: ReturnType<typeof useLeaveEvent>
+  Text: (props: TextProps) => JSX.Element
+  maximumFontSizeMultipler?: number
   style?: StyleProp<ViewStyle>
 }
 
-export const LeaveEventButton = ({ state, style }: LeaveEventButtonProps) => (
-  <PrimaryButton
+export const LeaveEventButton = ({
+  state,
+  Text,
+  maximumFontSizeMultipler,
+  style
+}: LeaveEventButtonProps) => (
+  <SecondaryOutlinedButton
     disabled={!state.leaveStarted}
     onPress={() => state.leaveStarted?.()}
-    maximumFontSizeMultiplier={FontScaleFactors.xxxLarge}
-    style={[style, styles.button]}
+    maximumFontSizeMultiplier={maximumFontSizeMultipler}
+    style={style}
   >
-    Leave
-  </PrimaryButton>
+    <Text maxFontSizeMultiplier={maximumFontSizeMultipler}>Joined</Text>
+  </SecondaryOutlinedButton>
 )
-
-const styles = StyleSheet.create({
-  button: {
-    backgroundColor: AppStyles.red.toString()
-  }
-})

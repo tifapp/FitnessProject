@@ -10,11 +10,14 @@ import { UserHandle } from "TiFShared/domain-models/User"
 import { BodyText, Caption, Headline, Subtitle } from "../Text"
 import ProfileImage from "./ProfileImage"
 import { AvatarView } from "@components/Avatar"
+import { ProfileCircleView } from "./ProfileCircle"
+import { useFontScale } from "@lib/Fonts"
 
 interface ImageAndNameProps {
   name: string
   handle: UserHandle
-  imageURL: string | null
+  imageURL: string | null | undefined
+  maximumFontSizeMultiplier?: number
   style?: StyleProp<ViewStyle>
   size?: "normal" | "large"
   imageStyle?: StyleProp<ImageStyle>
@@ -31,21 +34,26 @@ const ProfileImageAndName = ({
   imageURL,
   style,
   size = "normal",
+  maximumFontSizeMultiplier,
   imageStyle
 }: ImageAndNameProps) => {
+  const fontScale = useFontScale({
+    maximumScaleFactor: maximumFontSizeMultiplier
+  })
   const profileImageStyle =
-    imageStyle ?? (size === "normal" ? styles.image : styles.largeImage)
+    imageStyle ??
+    (size === "normal"
+      ? { width: 40 * fontScale, height: 40 * fontScale }
+      : { width: 64 * fontScale, height: 64 * fontScale })
   const [Name, Handle] = SIZE_TEXT_COMPONENTS[size]
   return (
     <View style={[style, styles.container]}>
-      {imageURL ? (
-        <ProfileImage
-          imageURL={imageURL ?? undefined}
-          style={profileImageStyle}
-        />
-      ) : (
-        <AvatarView name={name} style={profileImageStyle} />
-      )}
+      <ProfileCircleView
+        imageURL={imageURL}
+        name={name}
+        maximumFontSizeMultiplier={maximumFontSizeMultiplier}
+        style={profileImageStyle}
+      />
       <View style={styles.textContainer}>
         <Name>{name}</Name>
         <Handle style={styles.handle}>{handle.toString()}</Handle>

@@ -13,10 +13,15 @@ const COLORS = [
 
 export type AvatarProps = {
   name: string
+  maximumFontSizeMultiplier?: number
   style?: StyleProp<ViewStyle>
 }
 
-export const AvatarView = ({ name, style }: AvatarProps) => (
+export const AvatarView = ({
+  name,
+  maximumFontSizeMultiplier,
+  style
+}: AvatarProps) => (
   <View
     style={[
       style,
@@ -24,7 +29,12 @@ export const AvatarView = ({ name, style }: AvatarProps) => (
       { backgroundColor: COLORS[name.length % COLORS.length].toString() }
     ]}
   >
-    <Headline style={styles.text}>{initials(name)}</Headline>
+    <Headline
+      maxFontSizeMultiplier={maximumFontSizeMultiplier}
+      style={styles.text}
+    >
+      {initials(name)}
+    </Headline>
   </View>
 )
 

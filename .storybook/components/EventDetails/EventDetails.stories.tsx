@@ -17,7 +17,10 @@ import { createStackNavigator } from "@react-navigation/stack"
 import { BASE_HEADER_SCREEN_OPTIONS } from "@components/Navigation"
 import { createTestQueryClient } from "@test-helpers/ReactQuery"
 import { View } from "react-native"
-import { ClientSideEvent } from "@event/ClientSideEvent"
+import {
+  ClientSideEvent,
+  clientSideEventFromResponse
+} from "@event/ClientSideEvent"
 import { useLoadEventDetails } from "@event-details-boundary/Details"
 import { TiFQueryClientProvider } from "@lib/ReactQuery"
 import { dateRange } from "TiFShared/domain-models/FixedDateRange"
@@ -34,6 +37,8 @@ import { EventActionsMenuView, useEventActionsMenu } from "@event/Menu"
 import { UserSessionProvider } from "@user/Session"
 import { uuidString } from "@lib/utils/UUID"
 import { EmailAddress } from "@user/privacy"
+import { EventCard } from "@event/EventCard"
+import { ScrollView } from "react-native"
 
 const EventDetailsMeta: StoryMeta = {
   title: "Event Details"
@@ -102,28 +107,42 @@ const time = {
 } as const
 
 const Test = () => {
-  const result = useLoadEventDetails(event.id, async () => ({
-    status: "success",
-    event: { ...event, userAttendeeStatus: "hosting" }
-  }))
+  const result = useLoadEventDetails(
+    EventMocks.MockMultipleAttendeeResponse.id,
+    async () => ({
+      status: "success",
+      event: clientSideEventFromResponse({
+        ...EventMocks.MockMultipleAttendeeResponse,
+        attendeeCount: 4,
+        userAttendeeStatus: "hosting",
+        previewAttendees: [
+          ...EventMocks.MockMultipleAttendeeResponse.previewAttendees,
+          {
+            ...EventMocks.MockMultipleAttendeeResponse.previewAttendees[0],
+            id: uuidString(),
+            name: "Mario"
+          },
+          {
+            ...EventMocks.MockMultipleAttendeeResponse.previewAttendees[1],
+            id: uuidString(),
+            name: "Luigi"
+          }
+        ]
+      })
+    })
+  )
   if (result.status !== "success") return undefined
   return <Menu event={result.event} />
 }
 
 const Menu = ({ event }: { event: ClientSideEvent }) => {
-  const state = useEventActionsMenu(event, {
-    blockHost: async () => {},
-    unblockHost: async () => {}
-  })
+  console.log(event)
   return (
-    <View
+    <ScrollView
       style={{
-        height: "100%",
-        justifyContent: "center"
+        height: "100%"
       }}
     >
-      <EventActionsMenuView event={event} state={state} />
-      {/* <EventUserAttendanceProvider
       <EventUserAttendanceProvider
         joinEvent={async () => "success"}
         loadPermissions={async () => {
@@ -132,12 +151,8 @@ const Menu = ({ event }: { event: ClientSideEvent }) => {
         }}
         leaveEvent={async () => "success"}
       >
-        <EventUserAttendanceButton
-          event={event}
-          onJoinSuccess={useCallback(() => console.log("Joined"), [])}
-          onLeaveSuccess={() => console.log("Left")}
-        />
-      </EventUserAttendanceProvider> */}
-    </View>
+        <EventCard event={event} style={{ paddingHorizontal: 24 }} />
+      </EventUserAttendanceProvider>
+    </ScrollView>
   )
 }
