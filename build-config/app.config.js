@@ -1,7 +1,7 @@
 import dotenv from "dotenv"
-import withTiFNativePod from "./injectTiFNativePod.js"
 import withInjectBundledSoundEffects from "./injectBundledSoundEffects.js"
 import withGradleSecretsPlugin from "./injectGradleSecretsPlugin.js"
+import withTiFNativePod from "./injectTiFNativePod.js"
 
 dotenv.config({ path: ".env.infra" })
 
@@ -52,6 +52,17 @@ const config = {
   },
   plugins: [
     [
+      "expo-build-properties",
+      {
+        ios: {
+          newArchEnabled: true
+        },
+        android: {
+          newArchEnabled: true
+        }
+      }
+    ],
+    [
       "@sentry/react-native/expo",
       {
         url: "https://sentry.io",
@@ -79,9 +90,9 @@ const config = {
     bundleIdentifier,
     infoPlist: {
       NSLocationAlwaysAndWhenInUseUsageDescription:
-        'To inform others of your arrival, tap "Change to Always Allow."',
+        "To inform others of your arrival, tap \"Change to Always Allow.\"",
       NSLocationWhenInUseUsageDescription:
-        'Discover events and receive travel estimates for events by tapping "Allow Once" or "Allow While Using App."',
+        "Discover events and receive travel estimates for events by tapping \"Allow Once\" or \"Allow While Using App.\"",
       UIBackgroundModes: ["location", "fetch"],
       LSApplicationQueriesSchemes: [
         "comgooglemaps",
