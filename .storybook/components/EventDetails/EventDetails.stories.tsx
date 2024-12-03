@@ -30,6 +30,10 @@ import {
   EventUserAttendanceProvider
 } from "@event/UserAttendance"
 import { loadJoinEventPermissions } from "@event/JoinEvent"
+import { EventActionsMenuView, useEventActionsMenu } from "@event/Menu"
+import { UserSessionProvider } from "@user/Session"
+import { uuidString } from "@lib/utils/UUID"
+import { EmailAddress } from "@user/privacy"
 
 const EventDetailsMeta: StoryMeta = {
   title: "Event Details"
@@ -59,23 +63,30 @@ export const Basic: EventDetailsStory = () => {
   return (
     <GestureHandlerRootView>
       <SafeAreaProvider>
-        <UserLocationFunctionsProvider
-          getCurrentLocation={getCurrentPositionAsync}
-          requestBackgroundPermissions={requestBackgroundPermissionsAsync}
-          requestForegroundPermissions={requestForegroundPermissionsAsync}
+        <UserSessionProvider
+          userSession={async () => ({
+            id: uuidString(),
+            primaryContactInfo: EmailAddress.peacock69
+          })}
         >
-          <TiFQueryClientProvider>
-            <TiFBottomSheetProvider>
-              <NavigationContainer>
-                <Stack.Navigator
-                  screenOptions={{ ...BASE_HEADER_SCREEN_OPTIONS }}
-                >
-                  <Stack.Screen name="test" component={Test} />
-                </Stack.Navigator>
-              </NavigationContainer>
-            </TiFBottomSheetProvider>
-          </TiFQueryClientProvider>
-        </UserLocationFunctionsProvider>
+          <UserLocationFunctionsProvider
+            getCurrentLocation={getCurrentPositionAsync}
+            requestBackgroundPermissions={requestBackgroundPermissionsAsync}
+            requestForegroundPermissions={requestForegroundPermissionsAsync}
+          >
+            <TiFQueryClientProvider>
+              <TiFBottomSheetProvider>
+                <NavigationContainer>
+                  <Stack.Navigator
+                    screenOptions={{ ...BASE_HEADER_SCREEN_OPTIONS }}
+                  >
+                    <Stack.Screen name="test" component={Test} />
+                  </Stack.Navigator>
+                </NavigationContainer>
+              </TiFBottomSheetProvider>
+            </TiFQueryClientProvider>
+          </UserLocationFunctionsProvider>
+        </UserSessionProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>
   )
@@ -93,13 +104,17 @@ const time = {
 const Test = () => {
   const result = useLoadEventDetails(event.id, async () => ({
     status: "success",
-    event: { ...event, userAttendeeStatus: "not-participating" }
+    event: { ...event, userAttendeeStatus: "hosting" }
   }))
   if (result.status !== "success") return undefined
   return <Menu event={result.event} />
 }
 
 const Menu = ({ event }: { event: ClientSideEvent }) => {
+  const state = useEventActionsMenu(event, {
+    blockHost: async () => {},
+    unblockHost: async () => {}
+  })
   return (
     <View
       style={{
@@ -107,7 +122,8 @@ const Menu = ({ event }: { event: ClientSideEvent }) => {
         justifyContent: "center"
       }}
     >
-      <EventUserAttendanceProvider
+      <EventActionsMenuView event={event} state={state} />
+      {/* <EventUserAttendanceProvider
         joinEvent={async () => "success"}
         loadPermissions={async () => {
           const perms = await loadJoinEventPermissions()
@@ -120,7 +136,7 @@ const Menu = ({ event }: { event: ClientSideEvent }) => {
           onJoinSuccess={useCallback(() => console.log("Joined"), [])}
           onLeaveSuccess={() => console.log("Left")}
         />
-      </EventUserAttendanceProvider>
+      </EventUserAttendanceProvider> */}
     </View>
   )
 }

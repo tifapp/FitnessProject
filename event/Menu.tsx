@@ -19,7 +19,7 @@ import {
 
 export type EventMenuActionsListKey = keyof typeof EVENT_MENU_ACTIONS_LISTS
 
-export type UseEventDetailsMenuActionsEnvironment = {
+export type UseEventActionsMenuEnvironment = {
   blockHost: (id: UserID) => Promise<void>
   unblockHost: (id: UserID) => Promise<void>
 }
@@ -33,9 +33,9 @@ type ToggleBlockMutationArgs = {
 /**
  * A hook that controls the state of the menu actions.
  */
-export const useEventDetailsMenuActions = (
+export const useEventActionsMenu = (
   event: Pick<ClientSideEvent, "id" | "userAttendeeStatus" | "host">,
-  env: UseEventDetailsMenuActionsEnvironment
+  env: UseEventActionsMenuEnvironment
 ) => {
   const queryClient = useQueryClient()
   const toggleBlockMutation = useMutation(
@@ -66,7 +66,7 @@ export const useEventDetailsMenuActions = (
         ...e,
         host: {
           ...e.host,
-          relationStatus: isBlocking ? "blocked-them" : "not-friends" as const
+          relationStatus: isBlocking ? "blocked-them" : ("not-friends" as const)
         }
       }))
       toggleBlockMutation.mutate({
@@ -78,15 +78,12 @@ export const useEventDetailsMenuActions = (
   }
 }
 
-export type EventDetailsMenuProps = {
+export type EventActionsMenuProps = {
   event: ClientSideEvent
-  state: ReturnType<typeof useEventDetailsMenuActions>
+  state: ReturnType<typeof useEventActionsMenu>
   eventShareContent: () => Promise<ShareContent>
   onCopyEventTapped: () => void
-  onReportEventTapped: () => void
-  onContactHostTapped: () => void
-  onInviteFriendsTapped: () => void
-  onAssignNewHostTapped: () => void
+  onEditEventTapped: () => void
   style?: StyleProp<ViewStyle>
 }
 
@@ -103,32 +100,27 @@ export type EventDetailsMenuProps = {
  * - Inviting friends (Host, Attendee).
  * - Assiging a new host (Host).
  */
-export const EventDetailsMenuView = ({
+export const EventActionsMenuView = ({
   event,
   state,
   eventShareContent,
   onCopyEventTapped,
-  onReportEventTapped,
-  onContactHostTapped,
-  onInviteFriendsTapped,
-  onAssignNewHostTapped,
+  onEditEventTapped,
   style
-}: EventDetailsMenuProps) => (
+}: EventActionsMenuProps) => (
   <MenuView
     // TODO: - Error UI
     onPressAction={({ nativeEvent }) => {
       const callbacks = {
         "copy-event": onCopyEventTapped,
-        "report-event": onReportEventTapped,
-        "contact-host": onContactHostTapped,
         "toggle-block-host": state.blockHostToggled,
-        "invite-friends": onInviteFriendsTapped,
-        "assign-host": onAssignNewHostTapped,
+        "edit-event": onEditEventTapped,
+        // eslint-disable-next-line @typescript-eslint/naming-convention
         "share-event": async () => {
           Share.share(await eventShareContent())
         }
-      } as const satisfies Record<EventMenuActionID, () => void>
-      callbacks[nativeEvent.event as EventMenuActionID]()
+      } as const
+      callbacks[nativeEvent.event as keyof typeof callbacks]()
     }}
     actions={formatEventMenuActions(
       event,
@@ -172,6 +164,14 @@ type BaseEventMenuAction = Omit<MenuAction, "title" | "image"> & {
 }
 
 export const EVENT_MENU_ACTION = {
+  editEvent: {
+    id: "edit-event",
+    title: "Edit Event",
+    image: Platform.select({
+      ios: "pencil.line",
+      android: "ic_menu_edit"
+    })
+  },
   copyEvent: {
     id: "copy-event",
     title: "Copy Event",
@@ -250,25 +250,19 @@ export const EVENT_MENU_ACTION = {
 
 const EVENT_MENU_ACTIONS_LISTS = {
   hosting: [
-    EVENT_MENU_ACTION.assignHost,
     EVENT_MENU_ACTION.copyEvent,
-    EVENT_MENU_ACTION.inviteFriends,
+    EVENT_MENU_ACTION.editEvent,
     EVENT_MENU_ACTION.shareEvent
   ],
   attending: [
-    EVENT_MENU_ACTION.reportEvent,
     EVENT_MENU_ACTION.toggleBlockHost,
     EVENT_MENU_ACTION.copyEvent,
-    EVENT_MENU_ACTION.contactHost,
-    EVENT_MENU_ACTION.inviteFriends,
     EVENT_MENU_ACTION.shareEvent
   ],
   "not-participating": [
-    EVENT_MENU_ACTION.reportEvent,
     EVENT_MENU_ACTION.toggleBlockHost,
     EVENT_MENU_ACTION.copyEvent,
-    EVENT_MENU_ACTION.contactHost,
     EVENT_MENU_ACTION.shareEvent
   ],
-  "not-signed-in": [EVENT_MENU_ACTION.reportEvent, EVENT_MENU_ACTION.shareEvent]
+  "not-signed-in": [EVENT_MENU_ACTION.shareEvent]
 } as const satisfies Readonly<Record<string, EventMenuAction[]>>

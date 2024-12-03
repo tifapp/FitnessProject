@@ -14,7 +14,7 @@ import { UseLoadEventDetailsResult } from "./Details"
 import {
   EVENT_MENU_ACTION,
   formatEventMenuActions,
-  useEventDetailsMenuActions
+  useEventActionsMenu
 } from "./Menu"
 import { EventAttendeeMocks, EventMocks } from "./MockData"
 import { renderSuccessfulUseLoadEventDetails } from "./TestHelpers"
@@ -202,7 +202,7 @@ describe("EventDetailsMenu tests", () => {
 
     const renderUseEventDetailsMenuActions = (event: ClientSideEvent) => {
       return renderHook(
-        () => useEventDetailsMenuActions(event, { blockHost, unblockHost }),
+        () => useEventActionsMenu(event, { blockHost, unblockHost }),
         {
           wrapper: ({ children }: any) => (
             <TestQueryClientProvider client={queryClient}>
