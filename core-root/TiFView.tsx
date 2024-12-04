@@ -9,6 +9,7 @@ import { TiFMenuProvider } from "@components/TiFMenuProvider"
 import { SafeAreaProvider } from "react-native-safe-area-context"
 import { RootSiblingParent } from "react-native-root-siblings"
 import { TiFQueryClientProvider } from "@lib/ReactQuery"
+import { withAlphaRegistration } from "./AlphaRegister"
 
 const Stack = createStackNavigator()
 
@@ -47,7 +48,7 @@ export const TiFView = ({ isFontsLoaded, style, ...props }: TiFProps) => {
   )
 }
 
-const HomeScreen = () => (
+const HomeScreen = withAlphaRegistration(() => (
   <HomeView
     onProfileTapped={() => console.log("TODO: Navigate to Profile")}
     onCreateEventTapped={() => {
@@ -56,7 +57,7 @@ const HomeScreen = () => (
     onViewEventTapped={() => console.log("TODO: Navigate to Event Details")}
     style={styles.home}
   />
-)
+))
 
 const styles = StyleSheet.create({
   home: {

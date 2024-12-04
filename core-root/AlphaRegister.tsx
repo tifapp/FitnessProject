@@ -15,6 +15,7 @@ import {
 import { AlphaUser, alphaUserSession, registerAlphaUser } from "@user/alpha"
 import { ReactNode, createContext, useContext, useState } from "react"
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
+import { SafeAreaView } from "react-native-safe-area-context"
 
 export const ALERTS = {
   failedToRegister: {
@@ -101,20 +102,27 @@ export const AlphaRegisterView = ({ state, style }: AlphaRegisterProps) => (
   </View>
 )
 
+export type WithAlphaRegistrationProps<Props> = Props & { session: UserSession }
+
 /**
  * Ensures that a component renders with a user session based on data from an {@link AlphaUser}.
  *
  * If the user is not authenticated, the {@link AlphaRegisterView} is presented instead.
  */
 export const withAlphaRegistration = <Props,>(
-  Component: (props: Props & { session: UserSession }) => ReactNode
+  Component: (props: WithAlphaRegistrationProps<Props>) => ReactNode
 ) => {
   // eslint-disable-next-line react/display-name
   return (props: Props) => (
     <IfAuthenticated
       thenRender={(session) => <Component {...props} session={session} />}
       elseRender={
-        <AlphaRegisterView state={useAlphaRegister()} style={styles.register} />
+        <SafeAreaView style={styles.register}>
+          <AlphaRegisterView
+            state={useAlphaRegister()}
+            style={styles.register}
+          />
+        </SafeAreaView>
       }
     />
   )

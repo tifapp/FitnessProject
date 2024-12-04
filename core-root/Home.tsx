@@ -16,9 +16,10 @@ import { AnimatedPagerView } from "@components/Pager"
 import { useAnimatedStyle, useSharedValue } from "react-native-reanimated"
 import { colorWithOpacity } from "TiFShared/lib/Color"
 import { PrimaryButton } from "@components/Buttons"
-import ProfileImage from "@components/profileImageComponents/ProfileImage"
 import { PlusIconView } from "@components/common/Icons"
 import { FontScaleFactors } from "@lib/Fonts"
+import { ProfileCircleView } from "@components/profileImageComponents/ProfileCircle"
+import { IfAuthenticated } from "@user/Session"
 
 export type HomeProps = {
   onViewEventTapped: (event: ClientSideEvent) => void
@@ -139,12 +140,15 @@ const FooterView = ({
         onPress={onProfileTapped}
         style={styles.footerProfileImageContainer}
       >
-        <ProfileImage
-          imageURL={
-            // TODO: - Fetch this from user profile.
-            "https://pbs.twimg.com/profile_images/531870591515521024/LnwT_zyx_400x400.jpeg"
-          }
-          style={styles.footerProfileImage}
+        <IfAuthenticated
+          thenRender={(session) => (
+            <ProfileCircleView
+              name={session.name}
+              imageURL={session.profileImageURL}
+              maximumFontSizeMultiplier={FontScaleFactors.xxxLarge}
+              style={styles.footerProfileImage}
+            />
+          )}
         />
         <View style={styles.footerProfileLineIndicator} />
       </Pressable>
