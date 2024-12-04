@@ -4,14 +4,17 @@ import {
   createTestQueryClient
 } from "@test-helpers/ReactQuery"
 import { captureAlerts } from "@test-helpers/Alerts"
-import { ALERTS, useAlphaRegister } from "./AlphaRegister"
+import {
+  ALERTS,
+  AlphaRegisterProvider,
+  useAlphaRegister
+} from "./AlphaRegister"
 import { AlphaUserMocks } from "@user/alpha/MockData"
 import { UserSessionProvider, useUserSessionQuery } from "@user/Session"
 
 describe("AlphaRegister tests", () => {
   describe("UseAlphaRegister tests", () => {
     const registerUser = jest.fn()
-    const onSuccess = jest.fn()
     const queryClient = createTestQueryClient()
 
     beforeEach(() => {
@@ -39,18 +42,6 @@ describe("AlphaRegister tests", () => {
       })
     })
 
-    test("submission success", async () => {
-      const { result } = renderUseAlphaRegister()
-      act(() => result.current.nameChanged(AlphaUserMocks.TheDarkLord.name))
-      registerUser.mockResolvedValueOnce(AlphaUserMocks.TheDarkLord)
-      act(() => (result.current.submission as any).submit())
-
-      await waitFor(() => {
-        expect(onSuccess).toHaveBeenCalledWith(AlphaUserMocks.TheDarkLord)
-      })
-      expect(alertPresentationSpy).not.toHaveBeenCalled()
-    })
-
     test("submission failure", async () => {
       const { result } = renderUseAlphaRegister()
       act(() => result.current.nameChanged(AlphaUserMocks.TheDarkLord.name))
@@ -62,7 +53,7 @@ describe("AlphaRegister tests", () => {
           ALERTS.failedToRegister
         )
       })
-      expect(onSuccess).not.toHaveBeenCalled()
+      expect((result.current.submission as any).data).toEqual(undefined)
     })
 
     const { alertPresentationSpy } = captureAlerts()
@@ -84,16 +75,15 @@ describe("AlphaRegister tests", () => {
     }
 
     const renderUseAlphaRegister = () => {
-      return renderHook(
-        () => useAlphaRegister({ register: registerUser, onSuccess }),
-        {
-          wrapper: ({ children }) => (
-            <TestQueryClientProvider client={queryClient}>
+      return renderHook(useAlphaRegister, {
+        wrapper: ({ children }) => (
+          <TestQueryClientProvider client={queryClient}>
+            <AlphaRegisterProvider register={registerUser}>
               {children}
-            </TestQueryClientProvider>
-          )
-        }
-      )
+            </AlphaRegisterProvider>
+          </TestQueryClientProvider>
+        )
+      })
     }
   })
 })

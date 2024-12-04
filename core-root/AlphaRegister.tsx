@@ -7,9 +7,13 @@ import { AlertsObject, presentAlert } from "@lib/Alerts"
 import { useFontScale } from "@lib/Fonts"
 import { useFormSubmission } from "@lib/utils/Form"
 import { useQueryClient } from "@tanstack/react-query"
-import { setUserSessionQueryData } from "@user/Session"
-import { AlphaUser, alphaUserSession } from "@user/alpha"
-import { useState } from "react"
+import {
+  IfAuthenticated,
+  UserSession,
+  setUserSessionQueryData
+} from "@user/Session"
+import { AlphaUser, alphaUserSession, registerAlphaUser } from "@user/alpha"
+import { ReactNode, createContext, useContext, useState } from "react"
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 
 export const ALERTS = {
@@ -19,17 +23,29 @@ export const ALERTS = {
   }
 } satisfies AlertsObject
 
-export type UseAlphaRegisterEnvironment = {
+export type AlphaRegisterContextValues = {
   register: (name: string) => Promise<AlphaUser>
-  onSuccess: (user: AlphaUser) => void
 }
 
-export const useAlphaRegister = ({
-  register,
-  onSuccess
-}: UseAlphaRegisterEnvironment) => {
+const RegisterContext = createContext<AlphaRegisterContextValues>({
+  register: registerAlphaUser
+})
+
+export type AlphaRegisterProviderProps = AlphaRegisterContextValues & {
+  children: ReactNode
+}
+
+export const AlphaRegisterProvider = ({
+  children,
+  ...values
+}: AlphaRegisterProviderProps) => (
+  <RegisterContext.Provider value={values}>{children}</RegisterContext.Provider>
+)
+
+export const useAlphaRegister = () => {
   const [name, setName] = useState("")
   const queryClient = useQueryClient()
+  const { register } = useContext(RegisterContext)
   return {
     name,
     nameChanged: setName,
@@ -42,7 +58,6 @@ export const useAlphaRegister = ({
       {
         onSuccess: (user) => {
           setUserSessionQueryData(queryClient, alphaUserSession(user))
-          onSuccess(user)
         },
         onError: () => {
           presentAlert(ALERTS.failedToRegister)
@@ -86,6 +101,25 @@ export const AlphaRegisterView = ({ state, style }: AlphaRegisterProps) => (
   </View>
 )
 
+/**
+ * Ensures that a component renders with a user session based on data from an {@link AlphaUser}.
+ *
+ * If the user is not authenticated, the {@link AlphaRegisterView} is presented instead.
+ */
+export const withAlphaRegistration = <Props,>(
+  Component: (props: Props & { session: UserSession }) => ReactNode
+) => {
+  // eslint-disable-next-line react/display-name
+  return (props: Props) => (
+    <IfAuthenticated
+      thenRender={(session) => <Component {...props} session={session} />}
+      elseRender={
+        <AlphaRegisterView state={useAlphaRegister()} style={styles.register} />
+      }
+    />
+  )
+}
+
 const styles = StyleSheet.create({
   text: {
     rowGap: 8
@@ -94,6 +128,9 @@ const styles = StyleSheet.create({
     width: "100%"
   },
   layout: {
+    flex: 1
+  },
+  register: {
     flex: 1
   }
 })

@@ -39,6 +39,12 @@ import { uuidString } from "@lib/utils/UUID"
 import { EmailAddress } from "@user/privacy"
 import { EventCard } from "@event/EventCard"
 import { ScrollView } from "react-native"
+import { AlphaUserSessionProvider, AlphaUserStorage } from "@user/alpha"
+import {
+  AlphaRegisterProvider,
+  withAlphaRegistration
+} from "@core-root/AlphaRegister"
+import { AlphaUserMocks } from "@user/alpha/MockData"
 
 const EventDetailsMeta: StoryMeta = {
   title: "Event Details"
@@ -60,6 +66,8 @@ const location = {
 
 const queryClient = createTestQueryClient()
 
+const storage = AlphaUserStorage.ephemeral()
+
 export const Basic: EventDetailsStory = () => {
   useEffect(() => {
     queryClient.resetQueries()
@@ -68,30 +76,29 @@ export const Basic: EventDetailsStory = () => {
   return (
     <GestureHandlerRootView>
       <SafeAreaProvider>
-        <UserSessionProvider
-          userSession={async () => ({
-            id: uuidString(),
-            primaryContactInfo: EmailAddress.peacock69
-          })}
-        >
-          <UserLocationFunctionsProvider
-            getCurrentLocation={getCurrentPositionAsync}
-            requestBackgroundPermissions={requestBackgroundPermissionsAsync}
-            requestForegroundPermissions={requestForegroundPermissionsAsync}
+        <AlphaUserSessionProvider storage={storage}>
+          <AlphaRegisterProvider
+            register={async () => AlphaUserMocks.TheDarkLord}
           >
-            <TiFQueryClientProvider>
-              <TiFBottomSheetProvider>
-                <NavigationContainer>
-                  <Stack.Navigator
-                    screenOptions={{ ...BASE_HEADER_SCREEN_OPTIONS }}
-                  >
-                    <Stack.Screen name="test" component={Test} />
-                  </Stack.Navigator>
-                </NavigationContainer>
-              </TiFBottomSheetProvider>
-            </TiFQueryClientProvider>
-          </UserLocationFunctionsProvider>
-        </UserSessionProvider>
+            <UserLocationFunctionsProvider
+              getCurrentLocation={getCurrentPositionAsync}
+              requestBackgroundPermissions={requestBackgroundPermissionsAsync}
+              requestForegroundPermissions={requestForegroundPermissionsAsync}
+            >
+              <TiFQueryClientProvider>
+                <TiFBottomSheetProvider>
+                  <NavigationContainer>
+                    <Stack.Navigator
+                      screenOptions={{ ...BASE_HEADER_SCREEN_OPTIONS }}
+                    >
+                      <Stack.Screen name="test" component={Test} />
+                    </Stack.Navigator>
+                  </NavigationContainer>
+                </TiFBottomSheetProvider>
+              </TiFQueryClientProvider>
+            </UserLocationFunctionsProvider>
+          </AlphaRegisterProvider>
+        </AlphaUserSessionProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>
   )
@@ -106,7 +113,7 @@ const time = {
   dateRange: dateRange(new Date(), now().add(1, "hour").toDate())
 } as const
 
-const Test = () => {
+const Test = withAlphaRegistration(() => {
   const result = useLoadEventDetails(
     EventMocks.MockMultipleAttendeeResponse.id,
     async () => ({
@@ -133,7 +140,7 @@ const Test = () => {
   )
   if (result.status !== "success") return undefined
   return <Menu event={result.event} />
-}
+})
 
 const Menu = ({ event }: { event: ClientSideEvent }) => {
   console.log(event)
