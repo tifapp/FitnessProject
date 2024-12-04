@@ -6,7 +6,9 @@ import { TiFFormScrollableLayoutView } from "@components/form-components/Scrolla
 import { AlertsObject, presentAlert } from "@lib/Alerts"
 import { useFontScale } from "@lib/Fonts"
 import { useFormSubmission } from "@lib/utils/Form"
-import { AlphaUser } from "@user/alpha"
+import { useQueryClient } from "@tanstack/react-query"
+import { setUserSessionQueryData } from "@user/Session"
+import { AlphaUser, alphaUserSession } from "@user/alpha"
 import { useState } from "react"
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 
@@ -27,6 +29,7 @@ export const useAlphaRegister = ({
   onSuccess
 }: UseAlphaRegisterEnvironment) => {
   const [name, setName] = useState("")
+  const queryClient = useQueryClient()
   return {
     name,
     nameChanged: setName,
@@ -37,7 +40,10 @@ export const useAlphaRegister = ({
         return { status: "submittable", submissionValues: name }
       },
       {
-        onSuccess: (user) => onSuccess(user),
+        onSuccess: (user) => {
+          setUserSessionQueryData(queryClient, alphaUserSession(user))
+          onSuccess(user)
+        },
         onError: () => {
           presentAlert(ALERTS.failedToRegister)
         }

@@ -1,5 +1,5 @@
 import { SecureStore, InMemorySecureStore } from "@lib/SecureStore"
-import { UserSessionProvider } from "@user/Session"
+import { UserSession, UserSessionProvider } from "@user/Session"
 import { EmailAddress } from "@user/privacy"
 import { TiFAPI } from "TiFShared/api"
 import {
@@ -113,10 +113,14 @@ export const AlphaUserSessionProvider = ({
     userSession={useCallback(async () => {
       const user = await storage.user()
       if (!user) throw new Error("No stored alpha user.")
-      // NB: Alpha users don't need to register with their email, so use a mock.
-      return { id: user.id, primaryContactInfo: EmailAddress.alphaUser }
+      return alphaUserSession(user)
     }, [storage])}
   >
     {children}
   </UserSessionProvider>
 )
+
+export const alphaUserSession = (user: AlphaUser): UserSession => {
+  // NB: Alpha users don't need to register with their email, so use a mock.
+  return { ...user, primaryContactInfo: EmailAddress.alphaUser }
+}

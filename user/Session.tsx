@@ -1,11 +1,14 @@
 import { QueryHookOptions } from "@lib/ReactQuery"
-import { useQuery } from "@tanstack/react-query"
-import { UserID } from "TiFShared/domain-models/User"
+import { QueryClient, useQuery } from "@tanstack/react-query"
+import { UserHandle, UserID } from "TiFShared/domain-models/User"
 import { ReactNode, createContext, useContext } from "react"
 import { ContactInfoFormattable } from "./privacy"
 
 export type UserSession = {
   id: UserID
+  name: string
+  handle: UserHandle
+  profileImageURL?: string
   primaryContactInfo: ContactInfoFormattable
 }
 
@@ -17,11 +20,24 @@ const UserSessionContext = createContext<UserSessionFunctions | undefined>(
   undefined
 )
 
+const USER_SESSION_QUERY_KEY = ["userSession"]
+
 export const useUserSessionQuery = (
   options?: QueryHookOptions<UserSession>
 ) => {
   const { userSession } = useUserSession()
-  return useQuery(["userSession"], async () => await userSession(), options)
+  return useQuery(
+    USER_SESSION_QUERY_KEY,
+    async () => await userSession(),
+    options
+  )
+}
+
+export const setUserSessionQueryData = (
+  queryClient: QueryClient,
+  session: UserSession
+) => {
+  queryClient.setQueryData(USER_SESSION_QUERY_KEY, session)
 }
 
 export const useIsSignedIn = () => {
