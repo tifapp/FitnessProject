@@ -11,7 +11,8 @@ import {
   Share,
   ShareContent,
   StyleProp,
-  ViewStyle
+  ViewStyle,
+  StyleSheet
 } from "react-native"
 import {
   UnblockedUserRelationsStatus,
@@ -125,7 +126,7 @@ export const EventActionsMenuView = ({
     shouldOpenOnLongPress={false}
     style={[style, { width: 44 * useFontScale(), height: 44 * useFontScale() }]}
   >
-    <Ionicon name="ellipsis-horizontal" />
+    <Ionicon name="ellipsis-horizontal" style={styles.icon} />
   </MenuView>
 )
 
@@ -262,3 +263,9 @@ const EVENT_MENU_ACTIONS_LISTS = {
   ],
   "not-signed-in": [EVENT_MENU_ACTION.shareEvent]
 } as const satisfies Readonly<Record<string, EventMenuAction[]>>
+
+const styles = StyleSheet.create({
+  icon: {
+    alignSelf: "center"
+  }
+})
