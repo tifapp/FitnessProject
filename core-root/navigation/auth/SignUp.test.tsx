@@ -131,7 +131,9 @@ describe("SignUpNavigation tests", () => {
 
     endSignUpTest()
 
-    expect(isAtEnd()).toEqual(true)
+    await waitFor(() => {
+      expect(isAtEnd()).toEqual(true)
+    })
   })
 
   test("leave sign-up flow warning alert flow", async () => {
@@ -144,7 +146,9 @@ describe("SignUpNavigation tests", () => {
 
     await confirmExit()
 
-    expect(isAtEnd()).toEqual(true)
+    await waitFor(() => {
+      expect(isAtEnd()).toEqual(true)
+    })
   })
 
   const renderSignUpFlow = () => {

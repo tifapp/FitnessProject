@@ -86,7 +86,9 @@ describe("SignInNavigation tests", () => {
     renderSignInScreens()
     beginSignInTest()
     tapForgotPassword()
-    expect(forgotPaswordFlow()).toBeDisplayed()
+    await waitFor(() => {
+      expect(forgotPaswordFlow()).toBeDisplayed()
+    })
   })
 
   const tapForgotPassword = () => {
