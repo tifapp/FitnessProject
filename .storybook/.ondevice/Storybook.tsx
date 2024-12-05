@@ -1,11 +1,13 @@
-import React, { useState } from "react";
+import React, { useState } from "react"
 
-import { FlatList, Text, TouchableOpacity, View } from "react-native";
-import { useAppFonts } from "../../lib/Fonts";
+import { FlatList, Text, TouchableOpacity, View } from "react-native"
+import { useAppFonts } from "../../lib/Fonts"
 
-// Import your 
-import { setupCognito } from "@auth-boundary/CognitoHelpers";
-import NameEntryMeta, { Basic as NameEntryBasic } from "@components/NameEntry/NameEntry.stories";
+// Import your
+import { setupCognito } from "@auth-boundary/CognitoHelpers"
+import NameEntryMeta, {
+  Basic as NameEntryBasic
+} from "../components/NameEntry/NameEntry.stories"
 import AttendeesListMeta, {
   Basic as AttendeesListBasic
 } from "../components/AttendeesList/AttendeesList.stories";
