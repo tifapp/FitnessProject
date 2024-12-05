@@ -10,81 +10,81 @@ import NameEntryMeta, {
 } from "../components/NameEntry/NameEntry.stories"
 import AttendeesListMeta, {
   Basic as AttendeesListBasic
-} from "../components/AttendeesList/AttendeesList.stories"
+} from "../components/AttendeesList/AttendeesList.stories";
 import ButtonsMeta, {
   Basic as ButtonsBasic
-} from "../components/Buttons/Buttons.stories"
+} from "../components/Buttons/Buttons.stories";
 import ChangePasswordMeta, {
   Basic as ChangePasswordBasic
-} from "../components/ChangePassword/ChangePassword.stories"
+} from "../components/ChangePassword/ChangePassword.stories";
 import ContentReportingMeta, {
   Default as DefaultReportingFlow
-} from "../components/ContentReporting/ContentReporting.stories"
+} from "../components/ContentReporting/ContentReporting.stories";
 import ContentTextMeta, {
   Basic as ContentTextBasic
-} from "../components/ContentText/ContextText.stories"
+} from "../components/ContentText/ContextText.stories";
 import EventDetailsMeta, {
   Basic as EventDetailsBasic
-} from "../components/EventDetails/EventDetails.stories"
+} from "../components/EventDetails/EventDetails.stories";
 import ExploreEventsMeta, {
   Basic as ExploreEventsBasic
-} from "../components/Explore/Explore.stories"
+} from "../components/Explore/Explore.stories";
 import ForgotPasswordMeta, {
   Basic as ForgotPasswordBasic
-} from "../components/ForgotPassword/ForgotPasswordForm.stories"
+} from "../components/ForgotPassword/ForgotPasswordForm.stories";
 import LocationSearchMeta, {
   Basic as LocationSearchBasic
-} from "../components/LocationSearch/LocationSearch.stories"
+} from "../components/LocationSearch/LocationSearch.stories";
 import ProfileMeta, {
   Basic as ProfileScreenBasic
-} from "../components/ProfileScreen/Avatar.stories"
+} from "../components/ProfileScreen/Avatar.stories";
 import RegionMonitoringMeta, {
   Basic as RegionMonitoringBasic
-} from "../components/RegionMonitoring/RegionMonitoring.stories"
+} from "../components/RegionMonitoring/RegionMonitoring.stories";
 import SearchBarMeta, {
   Default as SearchBarBasic
-} from "../components/SearchBar/SearchBar.stories"
+} from "../components/SearchBar/SearchBar.stories";
 import EventSettingsDurationMeta, {
   Basic as EventSettingsDurationBasic
-} from "../components/SettingsScreen/EventSettingsDurations.stories"
+} from "../components/SettingsScreen/EventSettingsDurations.stories";
 
-import { sqliteLogHandler, sqliteLogs } from "@lib/Logging"
-import { InMemorySecureStore } from "@lib/SecureStore"
-import { dayjs } from "TiFShared/lib/Dayjs"
-import { addLogHandler, consoleLogHandler } from "TiFShared/logging"
+import { sqliteLogHandler, sqliteLogs } from "@lib/Logging";
+import { InMemorySecureStore } from "@lib/SecureStore";
+import { dayjs } from "TiFShared/lib/Dayjs";
+import { addLogHandler, consoleLogHandler } from "TiFShared/logging";
 import EditEventDurationsMeta, {
   Basic as EditEventDurationsBasic
-} from "../components/EditEvent/DurationPicker.stories"
+} from "../components/EditEvent/DurationPicker.stories";
 import EditEventPragmaQuotesMeta, {
   Basic as EditEventPragmaQuotesBasic
-} from "../components/EditEvent/PragmaQuote.stories"
+} from "../components/EditEvent/PragmaQuote.stories";
 import HapticsMeta, {
   Basic as HapticsBasic
-} from "../components/Haptics/Haptics.stories"
+} from "../components/Haptics/Haptics.stories";
 import RudeusEditorMeta, {
   Basic as RudeusEditorBasic
-} from "../components/RudeusEditor/RudeusEditor.stories"
+} from "../components/RudeusEditor/RudeusEditor.stories";
 import EventSettingsMeta, {
   Basic as EventSettingsBasic
-} from "../components/SettingsScreen/EventSettingsScreen.stories"
+} from "../components/SettingsScreen/EventSettingsScreen.stories";
 import SettingsMeta, {
   Basic as SettingsScreenBasic
-} from "../components/SettingsScreen/SettingsScreen.stories"
+} from "../components/SettingsScreen/SettingsScreen.stories";
 import SignInMeta, {
   Basic as SignInBasic
-} from "../components/SignIn/SignIn.stories"
+} from "../components/SignIn/SignIn.stories";
 import SignUpMeta, {
   Basic as SignUpBasic
-} from "../components/SignUp/SignUp.stories"
+} from "../components/SignUp/SignUp.stories";
 import TextFieldMeta, {
   Basic as TextFieldBasic
-} from "../components/TextField/TextField.stories"
+} from "../components/TextField/TextField.stories";
 import TiFPreviewMeta, {
   Basic as TiFPreviewBasic
-} from "../components/TiFPreview/TiFPreview.stories"
+} from "../components/TiFPreview/TiFPreview.stories";
 import VerifcationCodeMeta, {
   Basic as VerifcationCodeBasic
-} from "../components/VerificationCode/VerifyCode.stories"
+} from "../components/VerificationCode/VerifyCode.stories";
 
 setupCognito(new InMemorySecureStore())
 addLogHandler(consoleLogHandler())
