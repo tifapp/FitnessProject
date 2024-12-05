@@ -1,4 +1,5 @@
 import { StoryMeta } from ".storybook/HelperTypes"
+import { awsTiFAPITransport } from "@api"
 import { createForgotPasswordEnvironment } from "@auth-boundary/forgot-password"
 import { CognitoSignInAuthenticator } from "@auth-boundary/sign-in"
 import {
@@ -15,7 +16,6 @@ import {
 import { createSignUpScreens } from "@core-root/navigation/auth/SignUp"
 import { API_URL } from "@env"
 import { TiFQueryClientProvider } from "@lib/ReactQuery"
-import { awsTiFAPITransport } from "@lib/TiFAPI"
 import { NavigationContainer } from "@react-navigation/native"
 import { createStackNavigator } from "@react-navigation/stack"
 import { ComponentStory } from "@storybook/react-native"
