@@ -1,10 +1,11 @@
 import { PrimaryButton } from "@components/Buttons"
-import { Ionicon } from "@components/common/Icons"
 import { BodyText, Title } from "@components/Text"
+import { Ionicon } from "@components/common/Icons"
 import {
   ClientSideEvent,
   clientSideEventFromResponse
 } from "@event/ClientSideEvent"
+import { setEventDetailsQueryEvent } from "@event/DetailsQuery"
 import { QueryHookOptions } from "@lib/ReactQuery"
 import { useLastDefinedValue } from "@lib/utils/UseLastDefinedValue"
 import {
@@ -12,12 +13,12 @@ import {
   useUserCoordinatesQuery
 } from "@location/index"
 import { UseQueryResult, useQuery, useQueryClient } from "@tanstack/react-query"
-import { LocationAccuracy, PermissionResponse } from "expo-location"
-import React, { useState } from "react"
-import { Pressable, StyleProp, StyleSheet, View, ViewStyle } from "react-native"
-import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { TiFAPI } from "TiFShared/api"
 import { LocationCoordinate2D } from "TiFShared/domain-models/LocationCoordinate2D"
+import { LocationAccuracy, PermissionResponse } from "expo-location"
+import React, { useState } from "react"
+import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
+import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { ExploreEventsBottomSheet } from "./BottomSheet"
 import {
   ExploreEventsInitialCenter,
@@ -30,8 +31,6 @@ import {
   createDefaultMapRegion,
   minRegionMeterRadius
 } from "./Region"
-import { setEventDetailsQueryEvent } from "@event/DetailsQuery"
-import { ExploreEventsSearchBar } from "./SearchBar"
 import { SkeletonEventCard } from "./SkeletonEventCard"
 
 export const eventsByRegion = async (
@@ -174,13 +173,11 @@ const useExploreEventsQuery = (
 }
 
 export type ExploreEventsProps = {
-  searchText?: string
   region?: ExploreEventsRegion
   data: ExploreEventsData
   onRegionUpdated: (region: ExploreEventsRegion) => void
   onMapLongPress: (coordinate: LocationCoordinate2D) => void
   onEventTapped: (event: ClientSideEvent) => void
-  onSearchTapped: () => void
   style?: StyleProp<ViewStyle>
 }
 
@@ -188,13 +185,11 @@ export type ExploreEventsProps = {
  * A view which allows users to interactively explore events in any given area.
  */
 export const ExploreEventsView = ({
-  searchText,
   region,
   data,
   onRegionUpdated,
   onMapLongPress,
   onEventTapped,
-  onSearchTapped,
   style
 }: ExploreEventsProps) => {
   const insets = useSafeAreaInsets()
@@ -217,11 +212,6 @@ export const ExploreEventsView = ({
       ) : (
         <Water />
       )}
-      <View style={[{ paddingTop: insets.top + 4 }, styles.searchBarContainer]}>
-        <Pressable onPress={onSearchTapped} style={styles.searchBar}>
-          <ExploreEventsSearchBar text={searchText} />
-        </Pressable>
-      </View>
       <ExploreEventsBottomSheet
         onEventSelected={onEventTapped}
         events={data.events ?? []}
