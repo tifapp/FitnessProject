@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 module.exports = {
   verbose: true,
   preset: "jest-expo",
@@ -22,7 +21,7 @@ module.exports = {
     "node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@unimodules/.*|unimodules|native-base|react-native-svg|@alessiocancian/react-native-actionsheet|@sentry/.*|node-fetch|data-uri-to-buffer|fetch-blob|formdata-polyfill|TiFShared)"
   ],
   transform: {
-    "^.+\\.jsx$": "babel-jest"
+    "^.+\\.[jt]sx?$": ["babel-jest", { configFile: "./build-config/babel.config.js" }]
   },
   moduleNameMapper: {
     "^uuid$": require.resolve("uuid"),
