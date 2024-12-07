@@ -1,25 +1,25 @@
+import { PrimaryButton } from "@components/Buttons"
 import { TiFFooterView } from "@components/Footer"
+import { AnimatedPagerView } from "@components/Pager"
 import { Headline } from "@components/Text"
-import { AppStyles } from "@lib/AppColorStyle"
-import { useContext, useRef, useState } from "react"
-import { StyleProp, ViewStyle, View, StyleSheet, Pressable } from "react-native"
-import PagerView from "react-native-pager-view"
-import { TiFContext } from "./Context"
+import { PlusIconView } from "@components/common/Icons"
+import { ClientSideEvent } from "@event/ClientSideEvent"
 import {
   ExploreEventsView,
   createInitialCenter,
   isSignificantlyDifferentRegions,
   useExploreEvents
 } from "@explore-events-boundary"
-import { ClientSideEvent } from "@event/ClientSideEvent"
-import { AnimatedPagerView } from "@components/Pager"
 import { useAnimatedStyle, useSharedValue } from "react-native-reanimated"
 import { colorWithOpacity } from "TiFShared/lib/Color"
-import { PrimaryButton } from "@components/Buttons"
-import { PlusIconView } from "@components/common/Icons"
 import { FontScaleFactors } from "@lib/Fonts"
 import { ProfileCircleView } from "@components/profileImageComponents/ProfileCircle"
 import { IfAuthenticated } from "@user/Session"
+import { AppStyles } from "@lib/AppColorStyle"
+import { useRef, useState, useContext } from "react"
+import { StyleProp, ViewStyle, View, Pressable, StyleSheet } from "react-native"
+import PagerView from "react-native-pager-view"
+import { TiFContext } from "./Context"
 
 export type HomeProps = {
   onViewEventTapped: (event: ClientSideEvent) => void
@@ -203,7 +203,6 @@ const ExploreView = ({ onViewEventTapped }: ExploreProps) => {
       onRegionUpdated={updateRegion}
       onEventTapped={onViewEventTapped}
       onMapLongPress={console.log}
-      onSearchTapped={() => console.log("TODO")}
       style={styles.exploreEvents}
     />
   )

@@ -220,7 +220,7 @@ export namespace EventMocks {
   } as EventResponse
 
   export const MockMultipleAttendeeResponse = {
-    id: 1,
+    id: 2,
     title: "Some Event",
     color: ColorString.parse("#FFFFFF")!,
     description: "This is an event.",
