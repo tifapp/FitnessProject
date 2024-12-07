@@ -160,14 +160,14 @@ describe("SignUpNavigation tests", () => {
         <NavigationContainer>
           <Stack.Navigator
             initialRouteName="test"
-            screenOptions={{ animationEnabled: false }}
+            screenOptions={{ animation: "none" }}
           >
             <Stack.Screen name="test" component={TestScreen} />
             <Stack.Screen name="signUp">
               {() => (
                 <ModalStack.Navigator
                   initialRouteName="signUpCredentialsForm"
-                  screenOptions={{ animationEnabled: false }}
+                  screenOptions={{ animation: "none" }}
                 >
                   {signUpScreens}
                 </ModalStack.Navigator>
