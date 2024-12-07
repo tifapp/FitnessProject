@@ -1,58 +1,110 @@
 import { BASE_HEADER_SCREEN_OPTIONS } from "@components/Navigation"
 import { BodyText, Subtitle } from "@components/Text"
-import { EventAttendeeMocks } from "@event-details-boundary/MockData"
-import { AttendeesListView } from "@event-details-boundary/attendees-list/AttendeesList"
+import {
+  EventAttendeeMocks,
+  EventMocks
+} from "@event-details-boundary/MockData"
 import { NavigationContainer } from "@react-navigation/native"
 import { createStackNavigator } from "@react-navigation/stack"
-import { EventAttendee } from "@event/ClientSideEvent"
-import { ComponentMeta, ComponentStory } from "@storybook/react-native"
 import React from "react"
 import { View } from "react-native"
 import { StoryMeta } from ".storybook/HelperTypes"
+import {
+  EventAttendeesListView,
+  useEventAttendeesList
+} from "@event-details-boundary/AttendeesList"
+import { clientSideEventFromResponse } from "@event/ClientSideEvent"
+import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
+import { FriendRequestProvider } from "@user/FriendRequest"
+import { RootSiblingParent } from "react-native-root-siblings"
+import { uuidString } from "@lib/utils/UUID"
+import { delayData, sleep } from "@lib/utils/DelayData"
+import { UserHandle } from "TiFShared/domain-models/User"
 
 const AttendeesListMeta: StoryMeta = {
   title: "Attendees List Screen"
 }
 export default AttendeesListMeta
 
-type AttendeesListStory = ComponentStory<typeof SettingsScreen>
+type AttendeesListStory = ComponentStory<typeof View>
 
 const Stack = createStackNavigator()
 
 export const Basic: AttendeesListStory = () => (
-  <NavigationContainer>
-    <Stack.Navigator
-      initialRouteName="attendeesList"
-      screenOptions={{ ...BASE_HEADER_SCREEN_OPTIONS }}
-    >
-      <Stack.Screen name="attendeesList" component={AttendeesListTestScreen} />
-    </Stack.Navigator>
-  </NavigationContainer>
+  <RootSiblingParent>
+    <TestQueryClientProvider>
+      <NavigationContainer>
+        <Stack.Navigator
+          initialRouteName="attendeesList"
+          screenOptions={{ ...BASE_HEADER_SCREEN_OPTIONS }}
+        >
+          <Stack.Screen
+            name="attendeesList"
+            component={AttendeesListTestScreen}
+          />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </TestQueryClientProvider>
+  </RootSiblingParent>
 )
 
 const AttendeesListTestScreen = () => {
-  const testValue = {
-    host: EventAttendeeMocks.Alivs,
-    attendees: [EventAttendeeMocks.AnnaAttendee, EventAttendeeMocks.BlobJr],
-    attendeeCount: 3
-  }
-  const renderAttendee = (attendee: EventAttendee) => {
-    return (
-      <View>
-        <Subtitle> {attendee.name} </Subtitle>
-        <BodyText> {attendee.handle.toString()} </BodyText>
-      </View>
-    )
-  }
   return (
     <View>
-      <AttendeesListView
-        attendees={testValue.attendees}
-        renderAttendee={renderAttendee}
-        totalAttendeeCount={testValue.attendeeCount}
-        refresh={() => console.log("Refresh")}
-        isRefetching={false}
-      />
+      <FriendRequestProvider
+        sendFriendRequest={async () => delayData("friends", 3000)}
+      >
+        <EventAttendeesListView
+          state={useEventAttendeesList({
+            eventId: 1,
+            event: async () => {
+              // await sleep(10_000)
+              return {
+                status: "success",
+                event: clientSideEventFromResponse({
+                  ...EventMocks.MockSingleAttendeeResponse,
+                  previewAttendees: [
+                    {
+                      ...EventMocks.MockSingleAttendeeResponse
+                        .previewAttendees[0],
+                      relationStatus: "not-friends",
+                      arrivedDateTime: new Date()
+                    },
+                    {
+                      ...EventMocks.MockSingleAttendeeResponse
+                        .previewAttendees[0],
+                      id: uuidString(),
+                      name: "Blob the OompaLoompa",
+                      handle: UserHandle.optionalParse("blob_oompa")!,
+                      arrivedDateTime: new Date(),
+                      relationStatus: "friend-request-sent"
+                    },
+                    {
+                      ...EventMocks.MockSingleAttendeeResponse
+                        .previewAttendees[0],
+                      id: uuidString(),
+                      handle: UserHandle.optionalParse("sean_blovity")!,
+                      name: "Sean Blovity",
+                      relationStatus: "friend-request-received"
+                    },
+                    {
+                      ...EventMocks.MockSingleAttendeeResponse
+                        .previewAttendees[0],
+                      id: uuidString(),
+                      handle: UserHandle.optionalParse("big_chungus")!,
+                      name: "Big Chungus",
+                      relationStatus: "not-friends"
+                    }
+                  ]
+                })
+              }
+            }
+          })}
+          onExploreOtherEventsTapped={() => console.log("Explore others")}
+          onProfileTapped={(id) => console.log("Tapped", id)}
+          style={{ height: "100%" }}
+        />
+      </FriendRequestProvider>
     </View>
   )
 }

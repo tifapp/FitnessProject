@@ -1,12 +1,11 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-// @ts-nocheck
 /* eslint-disable comma-dangle */
 /* eslint-disable semi */
-const path = require("path")
+const path = require("path");
 
-const modulePath = (dir) => {
-  return path.join(__dirname, dir)
-}
+const modulePath = (/** @type {string} */ dir) => {
+  return path.join(__dirname, "..", dir);
+};
 
 const MODULES = [
   "components",
@@ -29,16 +28,16 @@ const MODULES = [
   "settings-storage",
   "settings-boundary",
   "edit-event-boundary"
-]
+];
 
-module.exports = function (api) {
-  api.cache(true)
+module.exports = function (/** @type {{ cache: (arg0: boolean) => void; }} */ api) {
+  api.cache(true);
   return {
     presets: ["babel-preset-expo"],
     plugins: [
       [
         "module:react-native-dotenv",
-        { moduleName: "@env", path: ".env", safe: true }
+        { moduleName: "@env", path: modulePath(".env"), safe: true }
       ],
       ["@babel/plugin-transform-flow-strip-types"],
       ["@babel/plugin-proposal-decorators", { legacy: true }],
@@ -54,5 +53,5 @@ module.exports = function (api) {
       ],
       ["react-native-reanimated/plugin"]
     ]
-  }
-}
+  };
+};

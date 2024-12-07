@@ -16,7 +16,7 @@ import {
   getPermissionsAsync as getNotificationPermissions,
   requestPermissionsAsync as requestNotificationPermissions
 } from "expo-notifications"
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 import { IoniconCloseButton } from "@components/common/Icons"
 import { BodyText, Title } from "@components/Text"
@@ -38,7 +38,11 @@ export const JOIN_EVENT_ERROR_ALERTS = {
     title: "Event was canceled",
     description: "This event was canceled, tbd tbd tbd"
   },
-  "user-is-blocked": {
+  "event-not-found": {
+    title: "Event not Found",
+    description: "It seems that this event does not exist."
+  },
+  "blocked-you": {
     title: "Event Access Restricted",
     description: "The host has restricted you from joining this event."
   },
@@ -54,6 +58,12 @@ export const loadJoinEventPermissions = async () => [
     canRequestPermission: (await getNotificationPermissions()).canAskAgain,
     requestPermission: async () => {
       await requestNotificationPermissions()
+    },
+    bannerContents: {
+      title: "Don’t miss out on the fun!",
+      description:
+        "Enable notifications to stay informed on all the exciting events happening around you.",
+      ctaText: "Turn on Notifications"
     }
   } as const,
   {
@@ -62,14 +72,27 @@ export const loadJoinEventPermissions = async () => [
       .canAskAgain,
     requestPermission: async () => {
       await requestBackgroundLocationPermissions()
+    },
+    bannerContents: {
+      title: "Don’t get left behind!",
+      description:
+        "Enable Location Sharing to inform others of your location in the event.",
+      ctaText: "Turn on Location Sharing"
     }
   } as const
 ]
 
 export type JoinEventPermissionKind = "notifications" | "backgroundLocation"
 
+export type JoinEventPermissionBannerContents = {
+  title: string
+  description: string
+  ctaText: string
+}
+
 export type JoinEventPermission = {
   kind: JoinEventPermissionKind
+  bannerContents: JoinEventPermissionBannerContents
   canRequestPermission: boolean
   requestPermission: () => Promise<void>
 }
@@ -81,8 +104,8 @@ export type JoinEventResult =
   | "success"
   | "event-has-ended"
   | "event-was-cancelled"
-  | "user-is-blocked"
   | "event-not-found"
+  | "blocked-you"
 
 export type JoinEventRequest = Pick<ClientSideEvent, "id"> & {
   location: Omit<EventLocation, "timezoneIdentifier">
@@ -111,7 +134,7 @@ export type JoinEventSuccess = {
 export const joinEvent = async (
   request: JoinEventRequest,
   tifAPI: TiFAPI,
-  onSuccessHandlers: [(resp: JoinEventSuccess) => void]
+  onSuccessHandlers: ((resp: JoinEventSuccess) => void)[]
 ): Promise<JoinEventResult> => {
   const shouldIncludeArrivalRegion =
     request.hasArrived && request.location.isInArrivalTrackingPeriod
@@ -161,18 +184,20 @@ export type UseJoinEventEnvironment = {
   monitor: EventRegionMonitor
   joinEvent: (request: JoinEventRequest) => Promise<JoinEventResult>
   loadPermissions: () => Promise<JoinEventPermission[]>
+  onSuccess: () => void
 }
 
-export type UseJoinEventPermissionStage = {
+export type UseJoinEventPermission = {
   permissionKind: JoinEventPermissionKind
+  bannerContents: JoinEventPermissionBannerContents
   requestButtonTapped: () => void
   dismissButtonTapped: () => void
 }
 
-export type UseJoinEventStage =
+export type UseJoinEvent =
   | { stage: "idle"; joinButtonTapped: () => void }
   | { stage: "loading" | "success" }
-  | ({ stage: "permission" } & UseJoinEventPermissionStage)
+  | ({ stage: "permission" } & UseJoinEventPermission)
 
 /**
  * A hook to power the join event flow UI.
@@ -191,11 +216,10 @@ export type UseJoinEventStage =
  * (notifications and background permissions). However, only permissions with
  * `canRequestPermission` set to true are displayed in the flow.
  */
-export const useJoinEventStages = (
+export const useJoinEvent = (
   event: Omit<JoinEventRequest, "hasArrived">,
-  env: UseJoinEventEnvironment
-): UseJoinEventStage => {
-  const { loadPermissions, joinEvent, monitor } = env
+  { loadPermissions, joinEvent, monitor, onSuccess }: UseJoinEventEnvironment
+): UseJoinEvent => {
   const hasArrived = useHasArrivedAtRegion(event.location, monitor)
   const currentPermission = useCurrentJoinEventPermission(loadPermissions)
   const queryClient = useQueryClient()
@@ -218,11 +242,16 @@ export const useJoinEventStages = (
   const hasJoined =
     joinEventMutation.isSuccess && joinEventMutation.data === "success"
   const isSuccess = hasJoined && currentPermission === "done"
+  const reset = joinEventMutation.reset
+
+  useEffect(() => {
+    if (!isSuccess) return
+    onSuccess()
+    reset()
+  }, [isSuccess, onSuccess, reset])
 
   if (hasJoined && typeof currentPermission === "object") {
     return { stage: "permission", ...currentPermission }
-  } else if (isSuccess) {
-    return { stage: "success" }
   } else if (
     joinEventMutation.isLoading ||
     (hasJoined && currentPermission === "loading")
@@ -255,6 +284,7 @@ const useCurrentJoinEventPermission = (
   if (permissionIndex >= availablePermissions.length) return "done"
   return {
     permissionKind: availablePermissions[permissionIndex].kind,
+    bannerContents: availablePermissions[permissionIndex].bannerContents,
     requestButtonTapped: () => {
       permissionRequestMutation.mutate(availablePermissions)
     },
@@ -262,89 +292,63 @@ const useCurrentJoinEventPermission = (
   }
 }
 
-export type JoinEventStagesProps = {
-  stage: UseJoinEventStage
+export type JoinEventButtonProps = {
+  state: UseJoinEvent
   style?: StyleProp<ViewStyle>
 }
 
-export const JoinEventStagesView = ({ stage, style }: JoinEventStagesProps) => (
-  <View style={style}>
-    <PrimaryButton
-      disabled={stage.stage !== "idle"}
-      onPress={() => {
-        if (stage.stage !== "idle") return
-        stage.joinButtonTapped()
-      }}
-      maximumFontSizeMultiplier={FontScaleFactors.xxxLarge}
-    >
-      Join Now!
-    </PrimaryButton>
-    <JoinEventPermissionBannerModal currentStage={stage} />
-  </View>
+export const JoinEventButton = ({ state, style }: JoinEventButtonProps) => (
+  <PrimaryButton
+    disabled={state.stage !== "idle"}
+    onPress={() => {
+      if (state.stage !== "idle") return
+      state.joinButtonTapped()
+    }}
+    maximumFontSizeMultiplier={FontScaleFactors.xxxLarge}
+    style={style}
+  >
+    Join Now!
+  </PrimaryButton>
 )
 
-export type JoinEventPermissionBannerModalProps = {
-  currentStage: UseJoinEventStage
-}
-
-const JoinEventPermissionBannerModal = ({
-  currentStage
-}: JoinEventPermissionBannerModalProps) => {
-  const permissionStage =
-    currentStage.stage === "permission" ? currentStage : undefined
-  return (
-    <TiFBottomSheet
-      item={permissionStage?.permissionKind}
-      sizing="content-size"
-      handleStyle={styles.sheetHandle}
-      canSwipeToDismiss={false}
-      onDismiss={() => {
-        if (currentStage.stage !== "permission") return
-        currentStage.dismissButtonTapped()
-      }}
-    >
-      {(permissionKind) => (
-        <BottomSheetView>
-          <JoinEventPermissionBanner
-            {...permissionStage}
-            permissionKind={permissionKind}
-          />
-        </BottomSheetView>
-      )}
-    </TiFBottomSheet>
-  )
-}
-
-export type JoinEventPermissionBannerProps = {
-  permissionKind: JoinEventPermissionKind
-  requestButtonTapped?: () => void
-  dismissButtonTapped?: () => void
+export type JoinEventPermissionsSheetProps = {
+  state: UseJoinEvent
   style?: StyleProp<ViewStyle>
 }
 
-const JOIN_EVENT_PERMISSION_BANNER_CONTENTS = {
-  notifications: {
-    title: "Don’t miss out on the fun!",
-    description:
-      "Enable notifications to stay informed on all the exciting events happening around you.",
-    ctaText: "Turn on Notifications"
-  },
-  backgroundLocation: {
-    title: "Don’t get left behind!",
-    description:
-      "Enable Location Sharing to inform others of your location in the event.",
-    ctaText: "Turn on Location Sharing"
-  }
+export const JoinEventPermissionsSheetView = ({
+  state,
+  style
+}: JoinEventPermissionsSheetProps) => (
+  <TiFBottomSheet
+    item={state.stage === "permission" ? state : undefined}
+    sizing="content-size"
+    handleStyle={styles.sheetHandle}
+    canSwipeToDismiss={false}
+    onDismiss={() => {
+      if (state.stage !== "permission") return
+      state.dismissButtonTapped()
+    }}
+    style={style}
+  >
+    {(state) => (
+      <BottomSheetView>
+        <JoinEventPermissionBanner {...state} />
+      </BottomSheetView>
+    )}
+  </TiFBottomSheet>
+)
+
+type JoinEventPermissionBannerProps = UseJoinEventPermission & {
+  style?: StyleProp<ViewStyle>
 }
 
 const JoinEventPermissionBanner = ({
-  permissionKind,
+  bannerContents: { title, ctaText, description },
   requestButtonTapped,
   dismissButtonTapped,
   style
 }: JoinEventPermissionBannerProps) => {
-  const { title, ctaText, description } =
-    JOIN_EVENT_PERMISSION_BANNER_CONTENTS[permissionKind]
   const { bottom } = useSafeAreaInsets()
   const paddingForNonSafeAreaScreens = bottom === 0 ? 24 : 0
   return (

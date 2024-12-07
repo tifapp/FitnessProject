@@ -13,11 +13,7 @@ import {
   editEventFormValueAtoms,
   editEventFormValuesAtom
 } from "./FormValues"
-import {
-  EventEdit,
-  EventEditLocation,
-  EventID
-} from "TiFShared/domain-models/Event"
+import { EventEditLocation, EventID } from "TiFShared/domain-models/Event"
 import {
   PragmaQuoteView,
   createEventQuote,
@@ -46,7 +42,11 @@ import {
 import { TiFFormNamedToggleView } from "@components/form-components/NamedToggle"
 import { settingsSelector } from "@settings-storage/Settings"
 import { useEffectEvent } from "@lib/utils/UseEffectEvent"
-import { EditEventFormSubmitButton, useEditEventFormSubmission } from "./Submit"
+import {
+  EditEventFormSubmitButton,
+  SubmitEventEdit,
+  useEditEventFormSubmission
+} from "./Submit"
 import { ClientSideEvent } from "@event/ClientSideEvent"
 import { BottomSheetView } from "@gorhom/bottom-sheet"
 import { DurationPickerView } from "@modules/tif-duration-picker"
@@ -64,10 +64,7 @@ import { TiFFooterView } from "@components/Footer"
 export type EditEventProps = {
   hostProfileImageURL?: string
   eventId?: EventID
-  submit: (
-    eventId: EventID | undefined,
-    edit: EventEdit
-  ) => Promise<ClientSideEvent>
+  submit: SubmitEventEdit
   onSuccess: (event: ClientSideEvent) => void
   onSelectLocationTapped: () => void
   currentDate?: Date
@@ -396,7 +393,7 @@ const EndTimeView = ({ style }: EndTimeProps) => {
 
 type FooterProps = {
   eventId?: EventID
-  submit: (eventId: EventID | undefined, edit: EventEdit) => Promise<void>
+  submit: SubmitEventEdit
   onSuccess: (event: ClientSideEvent) => void
 }
 

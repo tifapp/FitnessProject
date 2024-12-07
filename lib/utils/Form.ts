@@ -11,7 +11,7 @@ export const useReactHookFormContext = <T extends FieldValues>() => {
   if (!formContext) {
     throw new Error(`
     Attempted to use a component that required a form context, but none was available.
-          
+
     To fix this, make sure to wrap the component with a FormProvider from react-hook-form.
     `)
   }
@@ -45,30 +45,44 @@ export const useFormSubmission = <
   SubmissionResult,
   InvalidValidationResult extends { status: "invalid" }
 >(
-    submit: (args: SubmissionArgs) => Promise<SubmissionResult>,
-    validate: (
+  submit: (args: SubmissionArgs) => Promise<SubmissionResult>,
+  validate: (
     submissionMutation: FormSubmissionMutation<SubmissionResult, SubmissionArgs>
   ) => FormValidationResult<InvalidValidationResult, SubmissionArgs>,
-    options?: MutationHookOptions<SubmissionResult, SubmissionArgs>
-  ) => {
+  options?: MutationHookOptions<SubmissionResult, SubmissionArgs>
+) => {
   const submissionMutation = useMutation(submit, options)
   const validationResult = validate(submissionMutation)
 
   if (validationResult.status === "invalid") {
-    return validationResult
+    return { result: submissionMutation.data, ...validationResult }
   }
 
   if (submissionMutation.isLoading) {
     return {
+      result: submissionMutation.data,
       status: "submitting",
       submissionValues: validationResult.submissionValues
     } as const
   }
 
   return {
+    result: submissionMutation.data,
     ...validationResult,
     submit: () => {
       submissionMutation.mutate(validationResult.submissionValues)
     }
   } as const
 }
+
+export type FormSubmission<
+  SubmissionArgs,
+  SubmissionResult,
+  InvalidValidationResult extends { status: "invalid" }
+> = ReturnType<
+  typeof useFormSubmission<
+    SubmissionArgs,
+    SubmissionResult,
+    InvalidValidationResult
+  >
+>

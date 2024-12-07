@@ -16,7 +16,7 @@ import {
 import { fakeTimers, timeTravel } from "@test-helpers/Timers"
 import { act, renderHook, waitFor } from "@testing-library/react-native"
 import { TiFAPI } from "TiFShared/api"
-import { EventID } from "TiFShared/domain-models/Event"
+import { EventAttendee, EventID } from "TiFShared/domain-models/Event"
 import { dateRange } from "TiFShared/domain-models/FixedDateRange"
 import { UserHandle } from "TiFShared/domain-models/User"
 import { mockTiFServer } from "TiFShared/test-helpers/mockAPIServer"
@@ -28,6 +28,7 @@ import {
   createDefaultMapRegion,
   minRegionMeterRadius
 } from "./Region"
+import { EventResponse, EventsInAreaResponse } from "TiFShared/api/models/Event"
 
 const TEST_EVENTS = [EventMocks.Multiday, EventMocks.PickupBasketball]
 
@@ -72,10 +73,22 @@ describe("ExploreEvents tests", () => {
           },
           previewAttendees: [
             {
-              id: "269851f0-64ae-4fc6-a2e3-e1b957cc7769"
+              id: "269851f0-64ae-4fc6-a2e3-e1b957cc7769",
+              handle: UserHandle.optionalParse("marygoodwin3187")!,
+              hasArrived: false,
+              joinedDateTime: new Date("2024-03-25T07:54:28.000Z"),
+              role: "hosting" as const,
+              relationStatus: "friends" as const,
+              name: "Mary Goodwin"
             },
             {
-              id: "b144faae-8519-40ab-9af4-99a27bf7bccd"
+              id: "b144faae-8519-40ab-9af4-99a27bf7bccd",
+              name: "Bitchell Dickle",
+              handle: UserHandle.optionalParse("bitchell_dickle")!,
+              hasArrived: false,
+              joinedDateTime: new Date("2024-03-25T07:56:28.000Z"),
+              role: "attending" as const,
+              relationStatus: "not-friends" as const
             }
           ],
           settings: {
@@ -127,10 +140,22 @@ describe("ExploreEvents tests", () => {
           },
           previewAttendees: [
             {
-              id: "269851f0-64ae-4fc6-a2e3-e1b957cc7769"
+              id: "269851f0-64ae-4fc6-a2e3-e1b957cc7769",
+              handle: UserHandle.optionalParse("marygoodwin3187")!,
+              hasArrived: false,
+              joinedDateTime: new Date("2024-03-25T07:54:28.000Z"),
+              role: "hosting" as const,
+              relationStatus: "friends" as const,
+              name: "Mary Goodwin"
             },
             {
-              id: "b144faae-8519-40ab-9af4-99a27bf7bccd"
+              id: "b144faae-8519-40ab-9af4-99a27bf7bccd",
+              name: "Bitchell Dickle",
+              handle: UserHandle.optionalParse("bitchell_dickle")!,
+              hasArrived: false,
+              joinedDateTime: new Date("2024-03-25T07:56:28.000Z"),
+              role: "attending" as const,
+              relationStatus: "not-friends" as const
             }
           ],
           settings: {
@@ -187,7 +212,10 @@ describe("ExploreEvents tests", () => {
           expectedRequest: {
             body: { userLocation: { latitude, longitude }, radius }
           },
-          mockResponse: { status: 200, data: TEST_EXPLORE_RESPONSE }
+          mockResponse: {
+            status: 200,
+            data: TEST_EXPLORE_RESPONSE as unknown as EventsInAreaResponse
+          }
         }
       })
     }

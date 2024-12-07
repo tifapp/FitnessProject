@@ -19,7 +19,10 @@ import {
 } from "@testing-library/react-native"
 import { TiFAPI } from "TiFShared/api"
 import { UserHandle } from "TiFShared/domain-models/User"
-import { mockTiFEndpoint, mockTiFServer } from "TiFShared/test-helpers/mockAPIServer"
+import {
+  mockTiFEndpoint,
+  mockTiFServer
+} from "TiFShared/test-helpers/mockAPIServer"
 import { useCallback, useState } from "react"
 import { Button, View } from "react-native"
 import { SignUpParamsList, createSignUpScreens } from "./SignUp"
@@ -47,6 +50,8 @@ describe("SignUpNavigation tests", () => {
           status: 201,
           data: {
             id: uuidString(),
+            name: "Test",
+            token: "mock token",
             handle: TEST_GENERATED_USER_HANDLE
           }
         }

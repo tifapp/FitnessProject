@@ -10,6 +10,7 @@ import { uuidString } from "@lib/utils/UUID"
 import { mockLocationCoordinate2D, mockPlacemark } from "@location/MockData"
 
 import { ChatTokenRequest } from "TiFShared/api/models/Chat"
+import { EventResponse } from "TiFShared/api/models/Event"
 import { ColorString } from "TiFShared/domain-models/ColorString"
 import { EventAttendee, EventLocation } from "TiFShared/domain-models/Event"
 import { dateRange } from "TiFShared/domain-models/FixedDateRange"
@@ -175,4 +176,95 @@ export namespace EventMocks {
     isChatExpired: false,
     endedDateTime: undefined
   } as ClientSideEvent
+
+  const mockResponseHostId = uuidString()
+
+  export const MockSingleAttendeeResponse = {
+    id: 1,
+    title: "Some Event",
+    color: ColorString.parse("#FFFFFF")!,
+    description: "This is an event.",
+    hasArrived: false,
+    createdDateTime: new Date(2000),
+    updatedDateTime: new Date(3000),
+    attendeeCount: 10,
+    userAttendeeStatus: "attending",
+    isChatExpired: false,
+    host: {
+      id: mockResponseHostId,
+      name: "Blob",
+      handle: UserHandle.optionalParse("blob")!,
+      relationStatus: "not-friends"
+    },
+    settings: {
+      shouldHideAfterStartDate: false,
+      isChatEnabled: true
+    },
+    time: {
+      secondsToStart: dayjs.duration(3, "hours").asSeconds(),
+      todayOrTomorrow: "today",
+      dateRange: dateRange(new Date(4000), new Date(5000))!
+    },
+    location: mockEventLocation(),
+    previewAttendees: [
+      {
+        id: mockResponseHostId,
+        name: "Blob",
+        handle: UserHandle.optionalParse("blob")!,
+        relationStatus: "not-friends" as const,
+        hasArrived: false,
+        joinedDateTime: new Date("2024-03-25T07:56:28.000Z"),
+        role: "attending" as const
+      }
+    ]
+  } as EventResponse
+
+  export const MockMultipleAttendeeResponse = {
+    id: 1,
+    title: "Some Event",
+    color: ColorString.parse("#FFFFFF")!,
+    description: "This is an event.",
+    hasArrived: false,
+    createdDateTime: new Date(2000),
+    updatedDateTime: new Date(3000),
+    attendeeCount: 10,
+    userAttendeeStatus: "attending",
+    isChatExpired: false,
+    host: {
+      id: mockResponseHostId,
+      name: "Blob",
+      handle: UserHandle.optionalParse("blob")!,
+      relationStatus: "not-friends"
+    },
+    settings: {
+      shouldHideAfterStartDate: false,
+      isChatEnabled: true
+    },
+    time: {
+      secondsToStart: dayjs.duration(3, "hours").asSeconds(),
+      todayOrTomorrow: "today",
+      dateRange: dateRange(new Date(4000), new Date(5000))!
+    },
+    location: mockEventLocation(),
+    previewAttendees: [
+      {
+        id: mockResponseHostId,
+        name: "Blob",
+        handle: UserHandle.optionalParse("blob")!,
+        relationStatus: "not-friends" as const,
+        hasArrived: false,
+        joinedDateTime: new Date("2024-03-25T07:56:28.000Z"),
+        role: "hosting" as const
+      },
+      {
+        id: uuidString(),
+        name: "Blob Jr.",
+        handle: UserHandle.optionalParse("blob_jr")!,
+        relationStatus: "not-friends" as const,
+        hasArrived: false,
+        joinedDateTime: new Date("2024-03-25T07:58:56.000Z"),
+        role: "attending" as const
+      }
+    ]
+  } as EventResponse
 }

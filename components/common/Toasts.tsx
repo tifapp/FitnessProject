@@ -1,5 +1,5 @@
-import React from "react"
-import Toast, { ToastContainer } from "react-native-root-toast"
+import React, { useEffect, useState } from "react"
+import Toast from "react-native-root-toast"
 import { AppStyles } from "../../lib/AppColorStyle"
 import { StyleSheet, View, Platform, useWindowDimensions } from "react-native"
 import { Ionicon } from "./Icons"
@@ -38,26 +38,35 @@ export const TextToastView = ({
   text,
   offset = 0,
   duration = 3000
-}: TextToastProps) => (
-  <ToastContainer
-    visible={isVisible}
-    opacity={1}
-    position={Toast.positions.BOTTOM + offset}
-    shadow={false}
-    animation={true}
-    hideOnPress={true}
-    containerStyle={[
-      styles.toastStyle,
-      { width: useWindowDimensions().width - 32 }
-    ]}
-    duration={duration}
-  >
-    <View style={styles.containerStyle}>
-      <Ionicon color="white" name="close" />
-      <BodyText style={styles.text}>{text}</BodyText>
-    </View>
-  </ToastContainer>
-)
+}: TextToastProps) => {
+  const [isShowing, setIsShowing] = useState(isVisible)
+
+  useEffect(() => {
+    if (isVisible) {
+      setIsShowing(true)
+      setTimeout(() => setIsShowing(false), duration)
+    }
+  }, [isVisible, duration])
+  return (
+    <Toast
+      visible={isShowing}
+      opacity={1}
+      position={Toast.positions.BOTTOM + offset}
+      shadow={false}
+      animation={true}
+      hideOnPress={true}
+      containerStyle={[
+        styles.toastStyle,
+        { width: useWindowDimensions().width - 32 }
+      ]}
+    >
+      <View style={styles.containerStyle}>
+        <Ionicon color="white" name="close" />
+        <BodyText style={styles.text}>{text}</BodyText>
+      </View>
+    </Toast>
+  )
+}
 
 const styles = StyleSheet.create({
   toastStyle: {

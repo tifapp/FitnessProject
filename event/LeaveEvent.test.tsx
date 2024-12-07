@@ -6,13 +6,10 @@ import {
   createTestQueryClient
 } from "@test-helpers/ReactQuery"
 import { act, renderHook, waitFor } from "@testing-library/react-native"
-import {
-  LEAVE_EVENT_ALERTS,
-  LeaveEventResult,
-  useLeaveEvent
-} from "./LeaveEvent"
-import { EventMocks } from "./MockData"
-import { renderSuccessfulUseLoadEventDetails } from "./TestHelpers"
+import { ALERTS, LeaveEventResult, useLeaveEvent } from "./LeaveEvent"
+import { EventMocks } from "@event-details-boundary/MockData"
+import { renderSuccessfulUseLoadEventDetails } from "@event-details-boundary/TestHelpers"
+import { neverPromise } from "@test-helpers/Promise"
 
 describe("LeaveEvent tests", () => {
   const queryClient = createTestQueryClient()
@@ -28,8 +25,8 @@ describe("LeaveEvent tests", () => {
     const TEST_EVENT = EventMocks.PickupBasketball
     const { tapAlertButton, alertPresentationSpy } = captureAlerts()
 
-    const alertDeleteButtonTapped = async () => {
-      await tapAlertButton("Delete")
+    const confirmLeave = async () => {
+      await tapAlertButton("Leave")
     }
 
     const renderUseEventDetails = (event: ClientSideEvent) => {
@@ -43,7 +40,7 @@ describe("LeaveEvent tests", () => {
         () =>
           useLeaveEvent(
             {
-              id: TEST_EVENT.id,
+              ...TEST_EVENT,
               userAttendeeStatus: testUserStatus.userAttendeeStatus
             },
             testEnv
@@ -67,19 +64,13 @@ describe("LeaveEvent tests", () => {
       const { result } = renderUseLeaveEvent({
         userAttendeeStatus: "attending"
       })
-
-      expect(result.current).toMatchObject({
-        status: "select",
-        isLoading: false,
-        attendeeStatus: "attending"
-      })
-      act(() => (result.current as any).confirmButtonTapped())
+      act(() => result.current.leaveStarted?.())
+      expect(alertPresentationSpy).toHaveBeenPresentedWith(
+        ALERTS.confirmLeaveAttendee(TEST_EVENT.host)
+      )
+      await confirmLeave()
       act(() => resolveLeave?.("success"))
-      await waitFor(() => {
-        expect(result.current).toMatchObject({
-          status: "success"
-        })
-      })
+      await waitFor(() => expect(testEnv.onSuccess).toHaveBeenCalled())
     })
     test("Host leave event flow, delete option selected", async () => {
       let resolveLeave: ((result: LeaveEventResult) => void) | undefined
@@ -89,50 +80,46 @@ describe("LeaveEvent tests", () => {
       testEnv.leaveEvent.mockReturnValueOnce(leavePromise)
       const { result } = renderUseLeaveEvent({ userAttendeeStatus: "hosting" })
 
-      expect(result.current).toMatchObject({
-        status: "select",
-        isLoading: false,
-        attendeeStatus: "hosting"
-      })
-      act(() => (result.current as any).deleteButtonTapped())
-      await waitFor(() => {
-        expect(alertPresentationSpy).toHaveBeenCalled()
-      })
-      await alertDeleteButtonTapped()
+      act(() => result.current.leaveStarted?.())
+      expect(alertPresentationSpy).toHaveBeenPresentedWith(
+        ALERTS.confirmLeaveHost(TEST_EVENT.attendeeCount)
+      )
+      await confirmLeave()
       act(() => resolveLeave?.("success"))
-      await waitFor(() => {
-        expect(result.current).toMatchObject({
-          status: "success"
-        })
-      })
+      await waitFor(() => expect(testEnv.onSuccess).toHaveBeenCalled())
     })
-    it("should change attendee status to host when Leave Event returns co-host-not-found", async () => {
-      const { result: leaveEventResult } = renderUseLeaveEvent({
+    it("should not allow leaving the event when attendee status is not-participating", async () => {
+      const { result } = renderUseLeaveEvent({
+        userAttendeeStatus: "not-participating"
+      })
+      expect(result.current.leaveStarted).toEqual(undefined)
+    })
+
+    it("should not allow leaving the event when submitting leave", async () => {
+      let resolveLeave: ((result: LeaveEventResult) => void) | undefined
+      const leavePromise = new Promise<LeaveEventResult>(
+        (resolve) => (resolveLeave = resolve)
+      )
+      testEnv.leaveEvent.mockReturnValueOnce(leavePromise)
+      const { result } = renderUseLeaveEvent({
         userAttendeeStatus: "attending"
       })
-      const { result: eventDetailsResult } = renderUseEventDetails({
-        ...TEST_EVENT,
-        userAttendeeStatus: "attending"
-      })
+      act(() => result.current.leaveStarted?.())
+      await confirmLeave()
       await waitFor(() => {
-        expect(eventDetailsResult.current).toMatchObject({
-          event: { userAttendeeStatus: "attending" }
-        })
+        expect(result.current.leaveStarted).toEqual(undefined)
       })
-      testEnv.leaveEvent.mockResolvedValueOnce("co-host-not-found")
-      act(() => (leaveEventResult.current as any).confirmButtonTapped())
-      await waitFor(() => {
-        expect(eventDetailsResult.current).toMatchObject({
-          event: { userAttendeeStatus: "hosting" }
-        })
-      })
+
+      // NB: Ensure we don't get an "import after teardown" error.
+      act(() => resolveLeave?.("success"))
     })
     it("should not call onSuccess on non-successful Leave Event result", async () => {
       const { result: leaveEventResult } = renderUseLeaveEvent({
         userAttendeeStatus: "attending"
       })
-      testEnv.leaveEvent.mockResolvedValueOnce("co-host-not-found")
-      act(() => (leaveEventResult.current as any).confirmButtonTapped())
+      testEnv.leaveEvent.mockResolvedValueOnce("event-not-found")
+      act(() => leaveEventResult.current.leaveStarted?.())
+      await confirmLeave()
       await verifyNeverOccurs(() =>
         expect(testEnv.onSuccess).toHaveBeenCalled()
       )
@@ -151,7 +138,8 @@ describe("LeaveEvent tests", () => {
         })
       })
       testEnv.leaveEvent.mockResolvedValueOnce("success")
-      act(() => (leaveEventResult.current as any).confirmButtonTapped())
+      act(() => leaveEventResult.current.leaveStarted?.())
+      await confirmLeave()
       await waitFor(() => {
         expect(eventDetailsResult.current).toMatchObject({
           event: { userAttendeeStatus: "not-participating" }
@@ -163,36 +151,22 @@ describe("LeaveEvent tests", () => {
         userAttendeeStatus: "attending"
       })
       testEnv.leaveEvent.mockResolvedValueOnce("event-has-ended")
-      act(() => (leaveEventResult.current as any).confirmButtonTapped())
+      act(() => leaveEventResult.current.leaveStarted?.())
+      await confirmLeave()
       await waitFor(() => {
         expect(alertPresentationSpy).toHaveBeenPresentedWith(
-          LEAVE_EVENT_ALERTS["event-has-ended"]
+          ALERTS["event-has-ended"]
         )
       })
 
       testEnv.leaveEvent.mockResolvedValueOnce("event-was-cancelled")
-      act(() => (leaveEventResult.current as any).confirmButtonTapped())
+      act(() => leaveEventResult.current.leaveStarted?.())
+      await confirmLeave()
       await waitFor(() => {
         expect(alertPresentationSpy).toHaveBeenPresentedWith(
-          LEAVE_EVENT_ALERTS["event-was-cancelled"]
+          ALERTS["event-was-cancelled"]
         )
       })
-
-      testEnv.leaveEvent.mockResolvedValueOnce("co-host-not-found")
-      act(() => (leaveEventResult.current as any).confirmButtonTapped())
-      await waitFor(() => {
-        expect(alertPresentationSpy).toHaveBeenPresentedWith(
-          LEAVE_EVENT_ALERTS["co-host-not-found"]
-        )
-      })
-    })
-    test("onSuccess should be called correctly if given a success status", async () => {
-      const { result: leaveEventResult } = renderUseLeaveEvent({
-        userAttendeeStatus: "attending"
-      })
-      testEnv.leaveEvent.mockResolvedValueOnce("success")
-      act(() => (leaveEventResult.current as any).confirmButtonTapped())
-      await waitFor(() => expect(testEnv.onSuccess).toHaveBeenCalled())
     })
   })
 })

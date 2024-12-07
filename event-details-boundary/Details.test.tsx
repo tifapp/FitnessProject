@@ -229,37 +229,7 @@ describe("EventDetailsLoading tests", () => {
     it("should indicate the time of response on the event time when a 200 occurs", async () => {
       const clientReceivedTime = new Date(4500)
       jest.setSystemTime(clientReceivedTime)
-      const eventResponse: EventResponse = {
-        id: 1,
-        title: "Some Event",
-        color: ColorString.parse("#FFFFFF")!,
-        description: "This is an event.",
-        hasArrived: false,
-        createdDateTime: new Date(2000),
-        updatedDateTime: new Date(3000),
-        attendeeCount: 10,
-        userAttendeeStatus: "attending",
-        isChatExpired: false,
-        host: {
-          id: uuidString(),
-          name: "Blob",
-          handle: UserHandle.optionalParse("blob")!,
-          relationStatus: "not-friends"
-        },
-        settings: {
-          shouldHideAfterStartDate: false,
-          isChatEnabled: true
-        },
-        time: {
-          secondsToStart: dayjs.duration(3, "hours").asSeconds(),
-          todayOrTomorrow: "today",
-          dateRange: dateRange(new Date(4000), new Date(5000))!
-        },
-        joinedDateTime: undefined,
-        location: mockEventLocation(),
-        previewAttendees: [{ id: uuidString() }],
-        endedDateTime: undefined
-      }
+      const eventResponse = EventMocks.MockSingleAttendeeResponse
       mockTiFEndpoint("eventDetails", 200, eventResponse)
       const resp = await loadEventDetails(1, TiFAPI.testAuthenticatedInstance)
       expect(resp).toEqual({

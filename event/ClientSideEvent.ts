@@ -1,5 +1,5 @@
 import { EventResponse } from "TiFShared/api/models/Event"
-import { Reassign } from "TiFShared/lib/HelperTypes"
+import { Reassign } from "TiFShared/lib/Types/HelperTypes"
 
 /**
  * Adds a `clientReceivedTime` field to the time object in an event response.
