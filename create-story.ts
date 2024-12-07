@@ -1,13 +1,15 @@
 const fs = require("fs")
 const path = require("path")
 
-const COMPONENTS_DIR = path.resolve(__dirname, "components")
-const STORYBOOK_FILE = path.resolve(__dirname, ".storybook/.ondevice/Storybook.tsx")
+const COMPONENTS_DIR = path.resolve(__dirname, "./storybook/components")
+const STORYBOOK_FILE = path.resolve(
+  __dirname,
+  ".storybook/.ondevice/Storybook.tsx"
+)
 
-// Helper to add import and story entry
-function addStoryToStorybook(storyName, componentName) {
+const addStoryToStorybook = (storyName: string): void => {
   let storybookContent = fs.readFileSync(STORYBOOK_FILE, "utf-8")
-  const importStatement = `import ${storyName}Meta, { Basic as ${componentName} } from "../components/${storyName}/${storyName}.stories";`
+  const importStatement = `import ${storyName}Meta, { Basic as ${storyName} } from "../components/${storyName}/${storyName}.stories";`
 
   // Add import at the top
   if (!storybookContent.includes(importStatement)) {
@@ -23,17 +25,25 @@ function addStoryToStorybook(storyName, componentName) {
   // Add to the `stories` array
   const storiesArrayStartIndex = storybookContent.indexOf("const stories = [")
   if (storiesArrayStartIndex === -1) {
-    console.error("Error: Could not find `stories` array in Storybook.tsx.")
-    process.exit(1)
+    throw new Error("Could not find `stories` array in Storybook.tsx.")
   }
 
-  const storiesArrayEndIndex = storybookContent.indexOf("];", storiesArrayStartIndex)
-  const insertionPoint = storybookContent.lastIndexOf("},", storiesArrayEndIndex)
-  const insertionOffset = insertionPoint !== -1 ? insertionPoint + 2 : storiesArrayStartIndex + "const stories = [".length
+  const storiesArrayEndIndex = storybookContent.indexOf(
+    "];",
+    storiesArrayStartIndex
+  )
+  const insertionPoint = storybookContent.lastIndexOf(
+    "},",
+    storiesArrayEndIndex
+  )
+  const insertionOffset =
+    insertionPoint !== -1
+      ? insertionPoint + 2
+      : storiesArrayStartIndex + "const stories = [".length
 
   const storyEntry = `  {
     name: ${storyName}Meta.title,
-    component: ${componentName},
+    component: ${storyName},
     args: ${storyName}Meta.args
   },`
 
@@ -46,14 +56,14 @@ function addStoryToStorybook(storyName, componentName) {
   fs.writeFileSync(STORYBOOK_FILE, storybookContent, "utf-8")
 }
 
-// Helper to create component folder and stories file
-function createComponentFolder(storyName) {
+const createComponentFolder = (storyName: string): void => {
   const storyFolderPath = path.join(COMPONENTS_DIR, storyName)
   if (!fs.existsSync(storyFolderPath)) {
     fs.mkdirSync(storyFolderPath, { recursive: true })
   }
 
   const storiesFileContent = `import React from "react";
+import { View, Text } from "react-native";
 import { StoryMeta } from "storybook/HelperTypes";
 
 export const ${storyName}Meta: StoryMeta = {
@@ -62,22 +72,30 @@ export const ${storyName}Meta: StoryMeta = {
 
 export default ${storyName}Meta;
 
-export const Basic = () => <div>${storyName}</div>;
+export const Basic = () => (
+  <View>
+    <Text>${storyName}</Text>
+  </View>
+);
 `
 
   const storiesFilePath = path.join(storyFolderPath, `${storyName}.stories.tsx`)
   fs.writeFileSync(storiesFilePath, storiesFileContent, "utf-8")
 }
 
-// Main
-const args = process.argv.slice(2)
-if (args.length !== 2) {
-  console.error("Usage: npm run create-story <StoryName> <ComponentName>")
-  process.exit(1)
+// @ts-ignore Node types not recognized
+if (process.argv[1].includes(__dirname)) {
+  // @ts-ignore Node types not recognized
+  const args = process.argv.slice(2)
+  if (args.length !== 1) {
+    console.error("Usage: npm run create-story <StoryName>")
+    // @ts-ignore Node types not recognized
+    process.exit(1)
+  }
+
+  const [storyName] = args
+  createComponentFolder(storyName)
+  addStoryToStorybook(storyName)
+
+  console.log(`Story "${storyName}" created successfully.`)
 }
-
-const [storyName, componentName] = args
-createComponentFolder(storyName)
-addStoryToStorybook(storyName, componentName)
-
-console.log(`Story "${storyName}" created successfully.`)
