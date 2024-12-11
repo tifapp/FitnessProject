@@ -101,7 +101,6 @@ const AttendeesListTestScreen = () => {
             }
           })}
           onExploreOtherEventsTapped={() => console.log("Explore others")}
-          onProfileTapped={(id) => console.log("Tapped", id)}
           style={{ height: "100%" }}
         />
       </FriendRequestProvider>

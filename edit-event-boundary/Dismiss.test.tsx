@@ -1,9 +1,4 @@
 import { act, renderHook } from "@testing-library/react-native"
-import {
-  DEFAULT_EDIT_EVENT_FORM_VALUES,
-  EditEventFormValues,
-  editEventFormValuesAtom
-} from "./FormValues"
 import { ALERTS, useDismissEditEventForm } from "./Dismiss"
 import { PersistentSettingsStores } from "@settings-storage/PersistentStores"
 import { SQLiteUserSettingsStorage } from "@settings-storage/UserSettings"
@@ -14,6 +9,11 @@ import {
 } from "./TestHelpers"
 import { captureAlerts } from "@test-helpers/Alerts"
 import { Provider } from "jotai"
+import {
+  DEFAULT_EDIT_EVENT_FORM_VALUES,
+  EditEventFormValues
+} from "@event/EditFormValues"
+import { editEventFormValuesAtom } from "./FormAtoms"
 
 describe("DismissEditEventForm tests", () => {
   describe("UseDismissEditEventForm tests", () => {

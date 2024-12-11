@@ -1,5 +1,5 @@
 import { useAtomValue } from "jotai"
-import { isEditEventFormDirtyAtom } from "./FormValues"
+import { isEditEventFormDirtyAtom } from "./FormAtoms"
 import { StyleProp, ViewStyle, StyleSheet, View } from "react-native"
 import { TouchableIonicon } from "@components/common/Icons"
 import { AlertsObject, presentAlert } from "@lib/Alerts"

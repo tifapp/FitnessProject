@@ -371,7 +371,7 @@ describe("JoinEvent tests", () => {
         joinEvent: {
           expectedRequest: {
             params: {
-              eventId: 1
+              eventId: "1"
             },
             body:
               bodyExpectation === "no-request-body"

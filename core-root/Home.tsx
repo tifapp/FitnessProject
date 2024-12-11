@@ -3,7 +3,6 @@ import { TiFFooterView } from "@components/Footer"
 import { AnimatedPagerView } from "@components/Pager"
 import { Headline } from "@components/Text"
 import { PlusIconView } from "@components/common/Icons"
-import { ClientSideEvent } from "@event/ClientSideEvent"
 import {
   ExploreEventsView,
   createInitialCenter,
@@ -20,20 +19,14 @@ import { useRef, useState, useContext } from "react"
 import { StyleProp, ViewStyle, View, Pressable, StyleSheet } from "react-native"
 import PagerView from "react-native-pager-view"
 import { TiFContext } from "./Context"
+import { useCoreNavigation } from "@components/Navigation"
+import { DEFAULT_EDIT_EVENT_FORM_VALUES } from "@event/EditFormValues"
 
 export type HomeProps = {
-  onViewEventTapped: (event: ClientSideEvent) => void
-  onCreateEventTapped: () => void
-  onProfileTapped: () => void
   style?: StyleProp<ViewStyle>
 }
 
-export const HomeView = ({
-  onViewEventTapped,
-  onCreateEventTapped,
-  onProfileTapped,
-  style
-}: HomeProps) => {
+export const HomeView = ({ style }: HomeProps) => {
   const pagerRef = useRef<PagerView>(null)
   const [pageIndex, setPageIndex] = useState(0)
   const footerBackgroundOpacity = useSharedValue(0)
@@ -59,7 +52,7 @@ export const HomeView = ({
             <TODO />
           </View>
           <View key="2" style={styles.screen}>
-            <ExploreView onViewEventTapped={onViewEventTapped} />
+            <ExploreView />
           </View>
         </AnimatedPagerView>
         <TiFFooterView
@@ -74,8 +67,6 @@ export const HomeView = ({
           <FooterView
             pageIndex={pageIndex}
             onPageIndexTapped={(index) => pagerRef.current?.setPage(index)}
-            onProfileTapped={onProfileTapped}
-            onCreateEventTapped={onCreateEventTapped}
           />
         </TiFFooterView>
       </View>
@@ -92,69 +83,65 @@ const TODO = () => (
 type FooterProps = {
   pageIndex: number
   onPageIndexTapped: (index: number) => void
-  onCreateEventTapped: () => void
-  onProfileTapped: () => void
 }
 
-const FooterView = ({
-  pageIndex,
-  onPageIndexTapped,
-  onProfileTapped,
-  onCreateEventTapped
-}: FooterProps) => (
-  <View style={styles.footerContainer}>
-    <View style={styles.footerItem}>
-      <PrimaryButton
-        onPress={onCreateEventTapped}
-        style={styles.footerCreateEventButton}
-        contentStyle={styles.footerCreateEventButtonContent}
-      >
-        <PlusIconView
-          maxmimumFontScaleFactor={FontScaleFactors.xxxLarge}
-          size={16}
-        />
-        <Headline
-          maxFontSizeMultiplier={FontScaleFactors.xxxLarge}
-          style={styles.footerCreateEventButtonText}
+const FooterView = ({ pageIndex, onPageIndexTapped }: FooterProps) => {
+  const { presentProfile, presentEditEvent } = useCoreNavigation()
+  return (
+    <View style={styles.footerContainer}>
+      <View style={styles.footerItem}>
+        <PrimaryButton
+          onPress={() => presentEditEvent(DEFAULT_EDIT_EVENT_FORM_VALUES)}
+          style={styles.footerCreateEventButton}
+          contentStyle={styles.footerCreateEventButtonContent}
         >
-          Event
-        </Headline>
-      </PrimaryButton>
-    </View>
-    <View style={[styles.footerItem, styles.footerBreadcrumbs]}>
-      <View style={styles.footerBreadcrumbsContainer}>
-        <PageDotView
-          index={0}
-          selectedIndex={pageIndex}
-          onTapped={onPageIndexTapped}
-        />
-        <PageDotView
-          index={1}
-          selectedIndex={pageIndex}
-          onTapped={onPageIndexTapped}
+          <PlusIconView
+            maxmimumFontScaleFactor={FontScaleFactors.xxxLarge}
+            size={16}
+          />
+          <Headline
+            maxFontSizeMultiplier={FontScaleFactors.xxxLarge}
+            style={styles.footerCreateEventButtonText}
+          >
+            Event
+          </Headline>
+        </PrimaryButton>
+      </View>
+      <View style={[styles.footerItem, styles.footerBreadcrumbs]}>
+        <View style={styles.footerBreadcrumbsContainer}>
+          <PageDotView
+            index={0}
+            selectedIndex={pageIndex}
+            onTapped={onPageIndexTapped}
+          />
+          <PageDotView
+            index={1}
+            selectedIndex={pageIndex}
+            onTapped={onPageIndexTapped}
+          />
+        </View>
+      </View>
+      <View style={styles.footerItem}>
+        <IfAuthenticated
+          thenRender={(session) => (
+            <Pressable
+              onPress={() => presentProfile(session.id)}
+              style={styles.footerProfileImageContainer}
+            >
+              <ProfileCircleView
+                name={session.name}
+                imageURL={session.profileImageURL}
+                maximumFontSizeMultiplier={FontScaleFactors.xxxLarge}
+                style={styles.footerProfileImage}
+              />
+              <View style={styles.footerProfileLineIndicator} />
+            </Pressable>
+          )}
         />
       </View>
     </View>
-    <View style={styles.footerItem}>
-      <Pressable
-        onPress={onProfileTapped}
-        style={styles.footerProfileImageContainer}
-      >
-        <IfAuthenticated
-          thenRender={(session) => (
-            <ProfileCircleView
-              name={session.name}
-              imageURL={session.profileImageURL}
-              maximumFontSizeMultiplier={FontScaleFactors.xxxLarge}
-              style={styles.footerProfileImage}
-            />
-          )}
-        />
-        <View style={styles.footerProfileLineIndicator} />
-      </Pressable>
-    </View>
-  </View>
-)
+  )
+}
 
 type PageDotProps = {
   index: number
@@ -186,11 +173,7 @@ const PageDotView = ({ index, selectedIndex, onTapped }: PageDotProps) => (
   </Pressable>
 )
 
-type ExploreProps = {
-  onViewEventTapped: (event: ClientSideEvent) => void
-}
-
-const ExploreView = ({ onViewEventTapped }: ExploreProps) => {
+const ExploreView = () => {
   const { fetchEvents } = useContext(TiFContext)!
   const { region, data, updateRegion } = useExploreEvents(
     createInitialCenter(),
@@ -201,8 +184,6 @@ const ExploreView = ({ onViewEventTapped }: ExploreProps) => {
       region={region}
       data={data}
       onRegionUpdated={updateRegion}
-      onEventTapped={onViewEventTapped}
-      onMapLongPress={console.log}
       style={styles.exploreEvents}
     />
   )

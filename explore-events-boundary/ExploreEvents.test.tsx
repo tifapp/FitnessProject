@@ -16,7 +16,7 @@ import {
 import { fakeTimers, timeTravel } from "@test-helpers/Timers"
 import { act, renderHook, waitFor } from "@testing-library/react-native"
 import { TiFAPI } from "TiFShared/api"
-import { EventAttendee, EventID } from "TiFShared/domain-models/Event"
+import { EventID } from "TiFShared/domain-models/Event"
 import { dateRange } from "TiFShared/domain-models/FixedDateRange"
 import { UserHandle } from "TiFShared/domain-models/User"
 import { mockTiFServer } from "TiFShared/test-helpers/mockAPIServer"
@@ -28,7 +28,7 @@ import {
   createDefaultMapRegion,
   minRegionMeterRadius
 } from "./Region"
-import { EventResponse, EventsInAreaResponse } from "TiFShared/api/models/Event"
+import { EventsInAreaResponse } from "TiFShared/api/models/Event"
 
 const TEST_EVENTS = [EventMocks.Multiday, EventMocks.PickupBasketball]
 

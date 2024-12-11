@@ -7,12 +7,10 @@ import {
   Platform
 } from "react-native"
 import {
-  DEFAULT_EDIT_EVENT_FORM_VALUES,
-  EditEventFormValues,
   editEventFormInitialValuesAtom,
   editEventFormValueAtoms,
   editEventFormValuesAtom
-} from "./FormValues"
+} from "./FormAtoms"
 import { EventEditLocation, EventID } from "TiFShared/domain-models/Event"
 import {
   PragmaQuoteView,
@@ -60,8 +58,13 @@ import { formatDateTimeFromBasis } from "@date-time"
 import { EditEventFormLocationView, useEditEventFormLocation } from "./Location"
 import { TiFFormScrollableLayoutView } from "@components/form-components/ScrollableFormLayout"
 import { TiFFooterView } from "@components/Footer"
+import {
+  EditEventFormValues,
+  DEFAULT_EDIT_EVENT_FORM_VALUES
+} from "@event/EditFormValues"
 
 export type EditEventProps = {
+  hostName: string
   hostProfileImageURL?: string
   eventId?: EventID
   submit: SubmitEventEdit
@@ -102,6 +105,7 @@ const formLocation = (location: EventEditLocation) => {
 }
 
 export const EditEventView = ({
+  hostName,
   hostProfileImageURL,
   eventId,
   currentDate = new Date(),
@@ -122,6 +126,7 @@ export const EditEventView = ({
       <QuoteSectionView eventId={eventId} currentDate={currentDate} />
       <TitleSectionView />
       <LocationSectionView
+        hostName={hostName}
         hostProfileImageURL={hostProfileImageURL}
         onSelectLocationTapped={onSelectLocationTapped}
       />
@@ -170,6 +175,7 @@ const TitleSectionView = () => {
 
 type LocationSectionProps = {
   onSelectLocationTapped: () => void
+  hostName: string
   hostProfileImageURL?: string
 }
 

@@ -14,11 +14,9 @@ import {
 } from "@location/index"
 import { UseQueryResult, useQuery, useQueryClient } from "@tanstack/react-query"
 import { TiFAPI } from "TiFShared/api"
-import { LocationCoordinate2D } from "TiFShared/domain-models/LocationCoordinate2D"
 import { LocationAccuracy, PermissionResponse } from "expo-location"
 import React, { useState } from "react"
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
-import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { ExploreEventsBottomSheet } from "./BottomSheet"
 import {
   ExploreEventsInitialCenter,
@@ -176,8 +174,6 @@ export type ExploreEventsProps = {
   region?: ExploreEventsRegion
   data: ExploreEventsData
   onRegionUpdated: (region: ExploreEventsRegion) => void
-  onMapLongPress: (coordinate: LocationCoordinate2D) => void
-  onEventTapped: (event: ClientSideEvent) => void
   style?: StyleProp<ViewStyle>
 }
 
@@ -188,24 +184,17 @@ export const ExploreEventsView = ({
   region,
   data,
   onRegionUpdated,
-  onMapLongPress,
-  onEventTapped,
   style
 }: ExploreEventsProps) => {
-  const insets = useSafeAreaInsets()
-
   // NB: - Ensure the current events are still on the map when the
   // user pans to a new region
   const mapEventsData = useLastDefinedValue(data.events)
-
   return (
     <View style={[style, styles.container]}>
       {region ? (
         <ExploreEventsMap
           initialRegion={region}
-          onLongPress={onMapLongPress}
           onRegionChanged={onRegionUpdated}
-          onEventSelected={onEventTapped}
           events={mapEventsData ?? []}
           style={styles.map}
         />
@@ -213,7 +202,6 @@ export const ExploreEventsView = ({
         <Water />
       )}
       <ExploreEventsBottomSheet
-        onEventSelected={onEventTapped}
         events={data.events ?? []}
         HeaderComponent={
           <Title style={styles.sheetHeaderText}>

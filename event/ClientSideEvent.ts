@@ -57,6 +57,9 @@ export type ClientSideEvent = Reassign<
   ClientSideEventTime
 >
 
+/**
+ * Adds the client received time to an {@link EventResponse}.
+ */
 export const clientSideEventFromResponse = (response: EventResponse) => ({
   ...response,
   time: { ...response.time, clientReceivedTime: new Date() }

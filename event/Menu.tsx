@@ -1,4 +1,5 @@
 import { Ionicon } from "@components/common/Icons"
+import { useCoreNavigation } from "@components/Navigation"
 import { ClientSideEvent } from "@event/ClientSideEvent"
 import { updateEventDetailsQueryEvent } from "@event/DetailsQuery"
 import { useFontScale } from "@lib/Fonts"
@@ -18,6 +19,7 @@ import {
   UnblockedUserRelationsStatus,
   UserID
 } from "TiFShared/domain-models/User"
+import { editFormValues } from "./EditFormValues"
 
 export type EventMenuActionsListKey = keyof typeof EVENT_MENU_ACTIONS_LISTS
 
@@ -79,8 +81,6 @@ export type EventActionsMenuProps = {
   event: ClientSideEvent
   state: ReturnType<typeof useEventActionsMenu>
   eventShareContent: (event: ClientSideEvent) => Promise<ShareContent>
-  onCopyEventTapped: () => void
-  onEditEventTapped: () => void
   style?: StyleProp<ViewStyle>
 }
 
@@ -101,34 +101,40 @@ export const EventActionsMenuView = ({
   event,
   state,
   eventShareContent,
-  onCopyEventTapped,
-  onEditEventTapped,
   style
-}: EventActionsMenuProps) => (
-  <MenuView
-    // TODO: - Error UI
-    onPressAction={({ nativeEvent }) => {
-      const callbacks = {
-        "copy-event": onCopyEventTapped,
-        "toggle-block-host": state.blockHostToggled,
-        "edit-event": onEditEventTapped,
-        // eslint-disable-next-line @typescript-eslint/naming-convention
-        "share-event": async () => {
-          Share.share(await eventShareContent(event))
-        }
-      } as const
-      callbacks[nativeEvent.event as keyof typeof callbacks]()
-    }}
-    actions={formatEventMenuActions(
-      event,
-      EVENT_MENU_ACTIONS_LISTS[state.actionsListKey]
-    )}
-    shouldOpenOnLongPress={false}
-    style={[style, { width: 44 * useFontScale(), height: 44 * useFontScale() }]}
-  >
-    <Ionicon name="ellipsis-horizontal" style={styles.icon} />
-  </MenuView>
-)
+}: EventActionsMenuProps) => {
+  const { presentEditEvent } = useCoreNavigation()
+  const callbacks = {
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    "copy-event": () => presentEditEvent(editFormValues(event)),
+    "toggle-block-host": state.blockHostToggled,
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    "edit-event": () => presentEditEvent(editFormValues(event), event.id),
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    "share-event": async () => {
+      Share.share(await eventShareContent(event))
+    }
+  } as const
+  return (
+    <MenuView
+      // TODO: - Error UI
+      onPressAction={({ nativeEvent }) => {
+        callbacks[nativeEvent.event as keyof typeof callbacks]()
+      }}
+      actions={formatEventMenuActions(
+        event,
+        EVENT_MENU_ACTIONS_LISTS[state.actionsListKey]
+      )}
+      shouldOpenOnLongPress={false}
+      style={[
+        style,
+        { width: 44 * useFontScale(), height: 44 * useFontScale() }
+      ]}
+    >
+      <Ionicon name="ellipsis-horizontal" style={styles.icon} />
+    </MenuView>
+  )
+}
 
 export type EventMenuAction =
   (typeof EVENT_MENU_ACTION)[keyof typeof EVENT_MENU_ACTION]

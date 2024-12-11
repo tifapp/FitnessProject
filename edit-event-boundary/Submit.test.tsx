@@ -1,11 +1,7 @@
 import { PersistentSettingsStores } from "@settings-storage/PersistentStores"
 import { SQLiteUserSettingsStorage } from "@settings-storage/UserSettings"
 import { resetTestSQLiteBeforeEach, testSQLite } from "@test-helpers/SQLite"
-import {
-  DEFAULT_EDIT_EVENT_FORM_VALUES,
-  EditEventFormValues,
-  editEventFormValuesAtom
-} from "./FormValues"
+import { editEventFormValuesAtom } from "./FormAtoms"
 import {
   TEST_EDIT_EVENT_FORM_STORE,
   renderUseHydrateEditEvent
@@ -28,6 +24,10 @@ import { neverPromise } from "@test-helpers/Promise"
 import { mockTiFEndpoint } from "TiFShared/test-helpers/mockAPIServer"
 import { fakeTimers } from "@test-helpers/Timers"
 import { TiFAPI } from "TiFShared/api"
+import {
+  DEFAULT_EDIT_EVENT_FORM_VALUES,
+  EditEventFormValues
+} from "@event/EditFormValues"
 
 describe("EditEventSubmit tests", () => {
   describe("SubmitEventEdit tests", () => {

@@ -7,7 +7,7 @@ import {
   LayoutRectangle,
   ActivityIndicator
 } from "react-native"
-import { EditEventFormLocation, editEventFormValueAtoms } from "./FormValues"
+import { editEventFormValueAtoms } from "./FormAtoms"
 import {
   DEFAULT_GEOCODE_QUERY_OPTIONS,
   useGeocodeQuery,
@@ -22,6 +22,7 @@ import { TiFFormCardView } from "@components/form-components/Card"
 import { placemarkToFormattedAddress } from "@lib/AddressFormatting"
 import { FontScaleFactors } from "@lib/Fonts"
 import { AvatarMapMarkerView } from "@components/AvatarMapMarker"
+import { EditEventFormLocation } from "@event/EditFormValues"
 
 export const useEditEventFormLocation = () => {
   const [location, setLocation] = useAtom(editEventFormValueAtoms.location)
@@ -50,6 +51,7 @@ export const useEditEventFormLocation = () => {
 }
 
 export type EditEventFormLocationProps = {
+  hostName: string
   hostProfileImageURL?: string
   location?: EditEventFormLocation
   onSelectLocationTapped: () => void
@@ -57,6 +59,7 @@ export type EditEventFormLocationProps = {
 }
 
 export const EditEventFormLocationView = ({
+  hostName,
   hostProfileImageURL,
   location,
   onSelectLocationTapped,
@@ -75,6 +78,7 @@ export const EditEventFormLocationView = ({
       />
     ) : (
       <LocationView
+        hostName={hostName}
         hostProfileImageURL={hostProfileImageURL}
         location={location}
         onSelectLocationTapped={onSelectLocationTapped}
@@ -84,12 +88,14 @@ export const EditEventFormLocationView = ({
 )
 
 type LocationProps = {
+  hostName: string
   hostProfileImageURL?: string
   location: EditEventFormLocation
   onSelectLocationTapped: () => void
 }
 
 const LocationView = ({
+  hostName,
   hostProfileImageURL,
   location,
   onSelectLocationTapped
@@ -131,7 +137,10 @@ const LocationView = ({
               ]}
             >
               <Marker coordinate={location.coordinate}>
-                <AvatarMapMarkerView imageURL={hostProfileImageURL} />
+                <AvatarMapMarkerView
+                  name={hostName}
+                  imageURL={hostProfileImageURL}
+                />
               </Marker>
             </MapView>
           ) : (

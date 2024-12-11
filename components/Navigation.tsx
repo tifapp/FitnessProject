@@ -7,6 +7,9 @@ import { createStackNavigator } from "@react-navigation/stack"
 import React from "react"
 import { StyleProp, StyleSheet, ViewStyle } from "react-native"
 import { TouchableIonicon } from "./common/Icons"
+import { EventID } from "TiFShared/domain-models/Event"
+import { UserHandle, UserID } from "TiFShared/domain-models/User"
+import { EditEventFormValues } from "@event/EditFormValues"
 
 /**
  * A helper type that's useful for making reusable navigation flows.
@@ -14,6 +17,28 @@ import { TouchableIonicon } from "./common/Icons"
 export type StackNavigatorType<
   ParamsList extends Record<string, object | undefined>
 > = ReturnType<typeof createStackNavigator<ParamsList>>
+
+/**
+ * Returns an object of functions to navigate to essential app screens.
+ */
+export const useCoreNavigation = () => {
+  // TODO: - Actually Navigate
+  const navigation = useNavigation()
+  return {
+    presentEditEvent: (edit: EditEventFormValues, id?: EventID) => {
+      console.log("Edit", edit, id)
+    },
+    presentProfile: (id: UserID | UserHandle) => {
+      console.log("Profile", id)
+    },
+    pushEventDetails: (id: EventID) => {
+      console.log("Details", id)
+    },
+    pushAttendeesList: (id: EventID) => {
+      console.log("Attendees List", id)
+    }
+  }
+}
 
 /**
  * Base styles that all navigation headers should use.

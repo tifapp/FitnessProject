@@ -45,7 +45,7 @@ describe("EventAttendeesList tests", () => {
         ])
       })
       expect(event).toHaveBeenCalledWith(
-        EventMocks.MockSingleAttendeeResponse.id
+        EventMocks.MockMultipleAttendeeResponse.id
       )
       expect(event).toHaveBeenCalledTimes(1)
     })

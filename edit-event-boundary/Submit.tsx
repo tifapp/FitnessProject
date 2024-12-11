@@ -11,7 +11,7 @@ import {
 import { useQueryClient } from "@tanstack/react-query"
 import { setEventDetailsQueryEvent } from "@event/DetailsQuery"
 import { AlertsObject, presentAlert } from "@lib/Alerts"
-import { eventEditAtom, isEditEventFormDirtyAtom } from "./FormValues"
+import { eventEditAtom, isEditEventFormDirtyAtom } from "./FormAtoms"
 import { TiFAPI } from "TiFShared/api"
 
 export type SubmitEventEditResult =

@@ -5,8 +5,8 @@ import { Provider } from "jotai"
 import { TEST_EDIT_EVENT_FORM_STORE } from "./TestHelpers"
 import { GeocodingFunctionsProvider } from "@location/Geocoding"
 import { mockLocationCoordinate2D, mockPlacemark } from "@location/MockData"
-import { editEventFormValueAtoms } from "./FormValues"
 import { verifyNeverOccurs } from "@test-helpers/ExpectNeverOccurs"
+import { editEventFormValueAtoms } from "./FormAtoms"
 
 describe("EditEventFormLocation tests", () => {
   describe("UseEditEventFormLocation tests", () => {

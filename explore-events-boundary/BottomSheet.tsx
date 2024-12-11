@@ -11,10 +11,10 @@ import {
   ViewStyle
 } from "react-native"
 import { TiFBottomSheet, TiFBottomSheetProvider } from "@components/BottomSheet"
+import { useCoreNavigation } from "@components/Navigation"
 
 export type ExploreEventsBottomSheetProps = {
   events: ClientSideEvent[]
-  onEventSelected: (event: ClientSideEvent) => void
   HeaderComponent: ReactElement
   EmptyEventsComponent: ReactElement
   style?: StyleProp<ViewStyle>
@@ -28,39 +28,41 @@ const STICKY_HEADER_INDICIES = [0]
  */
 export const ExploreEventsBottomSheet = ({
   events,
-  onEventSelected,
   HeaderComponent,
   EmptyEventsComponent,
   style
-}: ExploreEventsBottomSheetProps) => (
-  <TiFBottomSheetProvider>
-    <View style={style}>
-      <TiFBottomSheet
-        isPresented
-        sizing={{ snapPoints: SNAP_POINTS }}
-        initialSnapPointIndex={1}
-        canSwipeToDismiss={false}
-        shouldIncludeBackdrop={false}
-      >
-        <BottomSheetFlatList
-          data={events}
-          keyExtractor={(event) => event.id.toString()}
-          renderItem={({ item }: ListRenderItemInfo<ClientSideEvent>) => (
-            <Pressable
-              onPress={() => onEventSelected(item)}
-              style={styles.eventContainer}
-            >
-              <EventCard event={item} style={styles.event} />
-            </Pressable>
-          )}
-          ListEmptyComponent={EmptyEventsComponent}
-          ListHeaderComponent={HeaderComponent}
-          stickyHeaderIndices={STICKY_HEADER_INDICIES}
-        />
-      </TiFBottomSheet>
-    </View>
-  </TiFBottomSheetProvider>
-)
+}: ExploreEventsBottomSheetProps) => {
+  const { pushEventDetails } = useCoreNavigation()
+  return (
+    <TiFBottomSheetProvider>
+      <View style={style}>
+        <TiFBottomSheet
+          isPresented
+          sizing={{ snapPoints: SNAP_POINTS }}
+          initialSnapPointIndex={1}
+          canSwipeToDismiss={false}
+          shouldIncludeBackdrop={false}
+        >
+          <BottomSheetFlatList
+            data={events}
+            keyExtractor={(event) => event.id.toString()}
+            renderItem={({ item }: ListRenderItemInfo<ClientSideEvent>) => (
+              <Pressable
+                onPress={() => pushEventDetails(item.id)}
+                style={styles.eventContainer}
+              >
+                <EventCard event={item} style={styles.event} />
+              </Pressable>
+            )}
+            ListEmptyComponent={EmptyEventsComponent}
+            ListHeaderComponent={HeaderComponent}
+            stickyHeaderIndices={STICKY_HEADER_INDICIES}
+          />
+        </TiFBottomSheet>
+      </View>
+    </TiFBottomSheetProvider>
+  )
+}
 
 const styles = StyleSheet.create({
   eventContainer: {

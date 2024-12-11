@@ -1,9 +1,9 @@
-import { DEFAULT_EDIT_EVENT_FORM_VALUES } from "./FormValues"
 import { PersistentSettingsStores } from "@settings-storage/PersistentStores"
 import { resetTestSQLiteBeforeEach, testSQLite } from "@test-helpers/SQLite"
 import { SQLiteUserSettingsStorage } from "@settings-storage/UserSettings"
 import { mockPlacemark } from "@location/MockData"
 import { renderUseHydrateEditEvent } from "./TestHelpers"
+import { DEFAULT_EDIT_EVENT_FORM_VALUES } from "@event/EditFormValues"
 
 describe("EditEvent tests", () => {
   describe("UseHydrateEditEvent tests", () => {

@@ -1,33 +1,11 @@
+import {
+  EditEventFormValues,
+  DEFAULT_EDIT_EVENT_FORM_VALUES
+} from "@event/EditFormValues"
 import { Atomize } from "@lib/Jotai"
 import { EventEdit, EventEditSchema } from "TiFShared/domain-models/Event"
-import { LocationCoordinate2D } from "TiFShared/domain-models/LocationCoordinate2D"
-import { Placemark } from "TiFShared/domain-models/Placemark"
 import { shallowEquals } from "TiFShared/lib/ShallowEquals"
-import { Reassign } from "TiFShared/lib/Types/HelperTypes"
 import { atom } from "jotai"
-
-export type EditEventFormLocation =
-  | {
-      placemark: Placemark
-      coordinate: undefined
-    }
-  | { placemark: undefined; coordinate: LocationCoordinate2D }
-  | { placemark: Placemark; coordinate: LocationCoordinate2D }
-
-export type EditEventFormValues = Reassign<
-  Required<EventEdit>,
-  "location",
-  EditEventFormLocation | undefined
->
-
-export const DEFAULT_EDIT_EVENT_FORM_VALUES = {
-  title: "",
-  description: "",
-  location: undefined,
-  startDateTime: new Date(),
-  duration: 3600,
-  shouldHideAfterStartDate: false
-} as const
 
 export const editEventFormValuesAtom = atom<EditEventFormValues>(
   DEFAULT_EDIT_EVENT_FORM_VALUES

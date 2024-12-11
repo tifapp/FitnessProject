@@ -7,10 +7,6 @@ import {
 } from "@edit-event-boundary/PragmaQuotes"
 import { Provider, atom, useAtomValue } from "jotai"
 import { EditEventView } from "@edit-event-boundary/EditEvent"
-import {
-  DEFAULT_EDIT_EVENT_FORM_VALUES,
-  editEventFormValuesAtom
-} from "@edit-event-boundary/FormValues"
 import { SafeAreaProvider } from "react-native-safe-area-context"
 import { SQLiteLocalSettingsStorage } from "@settings-storage/LocalSettings"
 import { PersistentSettingsStores } from "@settings-storage/PersistentStores"
@@ -40,6 +36,8 @@ import { EventMocks } from "@event-details-boundary/MockData"
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet"
 import { GeocodingFunctionsProvider } from "@location/Geocoding"
 import { neverPromise } from "@test-helpers/Promise"
+import { DEFAULT_EDIT_EVENT_FORM_VALUES } from "@event/EditFormValues"
+import { editEventFormValuesAtom } from "@edit-event-boundary/FormAtoms"
 
 const EditEventPragmaQuotesMeta = {
   title: "Edit Event Pragma Quotes"

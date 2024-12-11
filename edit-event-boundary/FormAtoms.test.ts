@@ -1,11 +1,8 @@
 import { createStore } from "jotai"
-import {
-  editEventFormValueAtoms,
-  eventEditAtom,
-  DEFAULT_EDIT_EVENT_FORM_VALUES
-} from "./FormValues"
+import { editEventFormValueAtoms, eventEditAtom } from "./FormAtoms"
 import { mockLocationCoordinate2D, mockPlacemark } from "@location/MockData"
 import { faker } from "@faker-js/faker"
+import { DEFAULT_EDIT_EVENT_FORM_VALUES } from "@event/EditFormValues"
 
 describe("EventFormValues tests", () => {
   test("Default Values should not be submittable", () => {

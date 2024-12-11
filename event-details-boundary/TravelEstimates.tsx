@@ -231,6 +231,7 @@ export const EventTravelEstimatesView = ({
             >
               <Marker coordinate={location.coordinate}>
                 <AvatarMapMarkerView
+                  name={host.name}
                   imageURL={host.profileImageURL ?? undefined}
                 />
               </Marker>

@@ -48,16 +48,7 @@ export const TiFView = ({ isFontsLoaded, style, ...props }: TiFProps) => {
   )
 }
 
-const HomeScreen = withAlphaRegistration(() => (
-  <HomeView
-    onProfileTapped={() => console.log("TODO: Navigate to Profile")}
-    onCreateEventTapped={() => {
-      console.log("TODO: Navigate to Edit Event Form")
-    }}
-    onViewEventTapped={() => console.log("TODO: Navigate to Event Details")}
-    style={styles.home}
-  />
-))
+const HomeScreen = withAlphaRegistration(() => <HomeView style={styles.home} />)
 
 const styles = StyleSheet.create({
   home: {

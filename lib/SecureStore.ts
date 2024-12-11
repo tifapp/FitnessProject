@@ -12,7 +12,7 @@ export type SecureStore = Pick<
  * An in memory secure storage useful for testing and storybook.
  */
 export class InMemorySecureStore implements SecureStore {
-  private readonly map = new Map<string, string>()
+  readonly map = new Map<string, string>()
 
   async setItemAsync(key: string, value: string) {
     this.map.set(key, value)
