@@ -7,14 +7,14 @@ import {
   onlineManager
 } from "@tanstack/react-query"
 import React, { ReactNode } from "react"
-import { InternetConnectionStatus } from "./InternetConnection"
 import { AppState } from "react-native"
+import { InternetConnectionStatus } from "./InternetConnection"
 
 /**
  * A helper type for creating custom hooks that wrap `useQuery`.
  */
 export type QueryHookOptions<Data, Error = unknown> = Omit<
-  UseQueryOptions<Data, Error, Data, string[]>,
+  UseQueryOptions<Data, Error, Data>,
   "queryKey" | "queryFn"
 >
 

@@ -1,6 +1,6 @@
 import { QueryClient, useQuery } from "@tanstack/react-query"
+import { EventID, EventWhenBlockedByHost } from "TiFShared/domain-models/Event"
 import { ClientSideEvent } from "./ClientSideEvent"
-import { EventWhenBlockedByHost, EventID } from "TiFShared/domain-models/Event"
 
 /**
  * A result from loading a single event for the details screen.
@@ -18,7 +18,10 @@ export const useEventDetailsQuery = (
   id: EventID,
   loadEvent: (id: EventID) => Promise<EventDetailsLoadingResult>
 ) => {
-  return useQuery(eventDetailsQueryKey(id), async () => await loadEvent(id))
+  return useQuery({
+    queryKey: eventDetailsQueryKey(id),
+    queryFn: async () => await loadEvent(id)
+  })
 }
 
 /**

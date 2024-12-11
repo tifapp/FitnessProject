@@ -1,14 +1,16 @@
 import { EventArrivals } from "@arrival-tracking"
 import { mockEventRegion } from "@arrival-tracking/MockData"
 import { TrueRegionMonitor } from "@arrival-tracking/region-monitoring/MockRegionMonitors"
+import { EventMocks, mockEventLocation } from "@event-details-boundary/MockData"
+import { renderSuccessfulUseLoadEventDetails } from "@event-details-boundary/TestHelpers"
 import { mockLocationCoordinate2D, mockTiFLocation } from "@location/MockData"
 import { SQLiteRecentLocationsStorage } from "@location/Recents"
 import { captureAlerts } from "@test-helpers/Alerts"
 import { verifyNeverOccurs } from "@test-helpers/ExpectNeverOccurs"
 import "@test-helpers/Matchers"
 import {
-  TestQueryClientProvider,
-  createTestQueryClient
+    TestQueryClientProvider,
+    createTestQueryClient
 } from "@test-helpers/ReactQuery"
 import { resetTestSQLiteBeforeEach, testSQLite } from "@test-helpers/SQLite"
 import { renderHook, waitFor } from "@testing-library/react-native"
@@ -16,15 +18,13 @@ import { act } from "react-test-renderer"
 import { TiFAPI, TiFEndpointResponse } from "TiFShared/api"
 import { mockTiFServer } from "TiFShared/test-helpers/mockAPIServer"
 import {
-  JOIN_EVENT_ERROR_ALERTS,
-  JoinEventRequest,
-  JoinEventResult,
-  joinEvent,
-  saveRecentLocationJoinEventHandler,
-  useJoinEvent
+    JOIN_EVENT_ERROR_ALERTS,
+    JoinEventRequest,
+    JoinEventResult,
+    joinEvent,
+    saveRecentLocationJoinEventHandler,
+    useJoinEvent
 } from "./JoinEvent"
-import { EventMocks, mockEventLocation } from "@event-details-boundary/MockData"
-import { renderSuccessfulUseLoadEventDetails } from "@event-details-boundary/TestHelpers"
 
 describe("JoinEvent tests", () => {
   describe("UseJoinEvent tests", () => {
@@ -90,7 +90,7 @@ describe("JoinEvent tests", () => {
       })
 
       act(() => (result.current as any).joinButtonTapped())
-      await waitFor(() => expect(result.current.stage).toEqual("loading"))
+      await waitFor(() => expect(result.current.stage).toEqual("pending"))
       act(() => resolveJoin?.("success"))
       await waitFor(() => {
         expect(result.current).toMatchObject({

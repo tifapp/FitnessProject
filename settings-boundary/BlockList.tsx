@@ -83,15 +83,16 @@ export const useBlockListSettings = (env: UseBlockListSettingsEnvironment) => ({
 const useBlockListSettingsUsers = ({
   nextPage
 }: Pick<UseBlockListSettingsEnvironment, "nextPage">) => {
-  const query = useInfiniteQuery(
-    BLOCK_LIST_QUERY_KEY,
-    async ({ pageParam }) => await nextPage(pageParam),
-    { getNextPageParam: (page) => page.nextPageToken }
-  )
+  const query = useInfiniteQuery({
+    queryKey: BLOCK_LIST_QUERY_KEY,
+    queryFn: async ({ pageParam }) => await nextPage(pageParam),
+    initialPageParam: null,
+    getNextPageParam: (page) => page.nextPageToken
+  })
   return {
     get status() {
       if (query.isRefetching) return "refreshing"
-      return query.isFetching ? "loading" : query.status
+      return query.isFetching ? "pending" : query.status
     },
     isRefreshing: query.isRefetching,
     users: useMemo(
@@ -131,30 +132,29 @@ const useBlocklistSettingsUnblocking = ({
   >()
   const [isShowingErrorAlert, setIsShowingErrorAlert] = useState(false)
   const queryClient = useQueryClient()
-  const { mutate: unblock } = useMutation(
-    async (user: BlockListUser) => await unblockUser(user.id),
-    {
-      onSuccess: (_, user) => {
-        setMostRecentUnblockedUser(user)
-        updateBlockListQueryUserPages(queryClient, (pages) => {
-          return removeUsersFromBlockListPages(pages, [user.id])
+  const { mutate: unblock } = useMutation({
+    mutationFn: async (user: BlockListUser) => await unblockUser(user.id),
+    onSuccess: (_, user) => {
+      setMostRecentUnblockedUser(user)
+      updateBlockListQueryUserPages(queryClient, (pages) => {
+        return removeUsersFromBlockListPages(pages, [user.id])
+      })
+    },
+    onError: () => {
+      if (isShowingErrorAlert) return
+      setIsShowingErrorAlert(true)
+      presentAlert(
+        BLOCK_LIST_SETTINGS_ALERTS.unblockUserFailed(() => {
+          setIsShowingErrorAlert(false)
         })
-      },
-      onError: () => {
-        if (isShowingErrorAlert) return
-        setIsShowingErrorAlert(true)
-        presentAlert(
-          BLOCK_LIST_SETTINGS_ALERTS.unblockUserFailed(() => {
-            setIsShowingErrorAlert(false)
-          })
-        )
-      },
-      onSettled: (_, __, user) => {
-        setActiveUnblockingIds((activeIds) => {
-          return activeIds.filter((id) => id !== user.id)
-        })
-      }
+      )
+    },
+    onSettled: (_, __, user) => {
+      setActiveUnblockingIds((activeIds) => {
+        return activeIds.filter((id) => id !== user.id)
+      })
     }
+  }
   )
   return {
     activeUnblockingIds,
@@ -226,7 +226,7 @@ export const BlockListSettingsView = ({
             (state.status === "refreshing" && (
               <Headline>No users have been blocked.</Headline>
             ))}
-          {state.status === "loading" && (
+          {state.status === "pending" && (
             <ActivityIndicator style={styles.loadingIndicator} />
           )}
           {state.status === "error" && (
@@ -236,7 +236,7 @@ export const BlockListSettingsView = ({
       }
       ListFooterComponent={
         <>
-          {state.status === "loading" && state.users.length > 0 && (
+          {state.status === "pending" && state.users.length > 0 && (
             <Animated.View entering={FadeIn} exiting={FadeOut}>
               <ActivityIndicator style={styles.loadingIndicator} />
             </Animated.View>

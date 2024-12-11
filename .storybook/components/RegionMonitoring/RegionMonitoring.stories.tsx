@@ -1,5 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react"
-import { SafeAreaProvider } from "react-native-safe-area-context"
+import { StoryMeta } from ".storybook/HelperTypes"
 import {
   EventArrivals,
   EventArrivalsTracker,
@@ -10,32 +9,32 @@ import {
   SQLiteEventArrivalsStorage,
   useHasArrivedAtRegion
 } from "@arrival-tracking"
-import { Button, Modal, ScrollView, View } from "react-native"
+import { BodyText, Headline, Title } from "@components/Text"
+import { EventArrivalBannerView } from "@event-details-boundary/ArrivalBanner"
+import { TiFQueryClientProvider } from "@lib/ReactQuery"
+import { Migrations, TiFSQLite } from "@lib/SQLite"
+import Slider from "@react-native-community/slider"
+import { useQuery } from "@tanstack/react-query"
 import {
   LocationAccuracy,
   requestBackgroundPermissionsAsync,
   requestForegroundPermissionsAsync,
   watchPositionAsync
 } from "expo-location"
-import { BodyText, Headline, Title } from "@components/Text"
-import { TiFQueryClientProvider } from "@lib/ReactQuery"
-import Slider from "@react-native-community/slider"
-import MapView, { MapMarker } from "react-native-maps"
-import { EventArrivalBannerView } from "@event-details-boundary/ArrivalBanner"
-import { StoryMeta } from ".storybook/HelperTypes"
-import {
-  LocationCoordinate2D,
-  coordinateDistance
-} from "TiFShared/domain-models/LocationCoordinate2D"
-import { EventRegion } from "TiFShared/domain-models/Event"
-import { Migrations, TiFSQLite } from "@lib/SQLite"
-import { useQuery } from "@tanstack/react-query"
 import {
   requestPermissionsAsync as requestNotificationPermissionsAsync,
   scheduleNotificationAsync,
   setNotificationHandler
 } from "expo-notifications"
-import { Switch } from "react-native"
+import React, { useEffect, useMemo, useRef, useState } from "react"
+import { Button, Modal, ScrollView, Switch, View } from "react-native"
+import MapView, { MapMarker } from "react-native-maps"
+import { SafeAreaProvider } from "react-native-safe-area-context"
+import { EventRegion } from "TiFShared/domain-models/Event"
+import {
+  LocationCoordinate2D,
+  coordinateDistance
+} from "TiFShared/domain-models/LocationCoordinate2D"
 
 const MT_FUJI_REGION = {
   coordinate: {
@@ -126,9 +125,9 @@ export const Basic = () => (
 )
 
 const StoryView = () => {
-  const { data: arePermissionsGranted } = useQuery(
-    ["region-monitoring-permissions"],
-    async () => {
+  const { data: arePermissionsGranted } = useQuery({
+    queryKey: ["region-monitoring-permissions"],
+    queryFn: async () => {
       const notificationsGranted = (await requestNotificationPermissionsAsync())
         .granted
       await requestForegroundPermissionsAsync()
@@ -137,8 +136,8 @@ const StoryView = () => {
         notificationsGranted
       )
     },
-    { initialData: false }
-  )
+    initialData: false
+  })
   if (!arePermissionsGranted) {
     return (
       <BodyText>
@@ -170,7 +169,7 @@ const MainView = () => {
   const [coordinate, setCoordinate] = useState<
     LocationCoordinate2D | undefined
   >()
-  const timeoutRef = useRef<NodeJS.Timeout>(undefined)
+  const timeoutRef = useRef<NodeJS.Timeout>()
   const region = useMemo(() => {
     if (!coordinate) return undefined
     return { arrivalRadiusMeters, coordinate }

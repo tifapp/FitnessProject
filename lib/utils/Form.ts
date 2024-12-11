@@ -51,14 +51,17 @@ export const useFormSubmission = <
   ) => FormValidationResult<InvalidValidationResult, SubmissionArgs>,
   options?: MutationHookOptions<SubmissionResult, SubmissionArgs>
 ) => {
-  const submissionMutation = useMutation(submit, options)
+  const submissionMutation = useMutation({
+    mutationFn: submit,
+    ...options
+  })
   const validationResult = validate(submissionMutation)
 
   if (validationResult.status === "invalid") {
     return { result: submissionMutation.data, ...validationResult }
   }
 
-  if (submissionMutation.isLoading) {
+  if (submissionMutation.isPending) {
     return {
       result: submissionMutation.data,
       status: "submitting",

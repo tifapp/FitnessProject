@@ -5,6 +5,7 @@ import {
   ClientSideEvent,
   clientSideEventFromResponse
 } from "@event/ClientSideEvent"
+import { setEventDetailsQueryEvent } from "@event/DetailsQuery"
 import { QueryHookOptions } from "@lib/ReactQuery"
 import { useLastDefinedValue } from "@lib/utils/UseLastDefinedValue"
 import {
@@ -30,7 +31,6 @@ import {
   createDefaultMapRegion,
   minRegionMeterRadius
 } from "./Region"
-import { setEventDetailsQueryEvent } from "@event/DetailsQuery"
 import { ExploreEventsSearchBar } from "./SearchBar"
 import { SkeletonEventCard } from "./SkeletonEventCard"
 
@@ -57,7 +57,7 @@ export const eventsByRegion = async (
  * Data representation of events explored in a given area.
  */
 export type ExploreEventsData =
-  | { status: "loading"; events?: ClientSideEvent[] }
+  | { status: "pending"; events?: ClientSideEvent[] }
   | { status: "error"; events?: ClientSideEvent[]; retry: () => void }
   | { status: "no-results"; events: [] }
   | { status: "success"; events: ClientSideEvent[] }
@@ -101,8 +101,8 @@ export const useExploreEvents = (
 const eventsQueryToExploreEventsData = (
   query: UseQueryResult<ClientSideEvent[], unknown>
 ): ExploreEventsData => {
-  if (query.isLoading) {
-    return { status: "loading" }
+  if (query.isPending) {
+    return { status: "pending" }
   } else if (query.isSuccess && query.data.length === 0) {
     return { status: "no-results", events: [] }
   } else if (query.isError) {
@@ -117,13 +117,13 @@ const useExploreEventsRegion = (initialCenter: ExploreEventsInitialCenter) => {
   )
   const userRegion = useUserRegion({ enabled: !pannedRegion })
   const exploreRegion =
-    userRegion === "loading"
+    userRegion === "pending"
       ? pannedRegion
       : (pannedRegion ?? userRegion ?? SAN_FRANCISCO_DEFAULT_REGION)
   return { region: exploreRegion, panToRegion: setPannedRegion }
 }
 
-type UserRegionResult = "loading" | (ExploreEventsRegion | undefined)
+type UserRegionResult = "pending" | (ExploreEventsRegion | undefined)
 
 const useUserRegion = (
   options: QueryHookOptions<PermissionResponse>
@@ -136,7 +136,7 @@ const useUserRegion = (
     }
   )
   if (permissionQuery.isFetching || locationQuery.isFetching) {
-    return "loading"
+    return "pending"
   }
   const coords = locationQuery.data ? locationQuery.data?.coords : undefined
   return !coords
@@ -158,15 +158,15 @@ const useExploreEventsQuery = (
   const queryClient = useQueryClient()
   const queryKey = ["explore-events", region]
   return {
-    events: useQuery(
+    events: useQuery({
       queryKey,
-      async ({ signal }) => {
+      queryFn: async ({ signal }) => {
         const events = await fetchEvents(region, signal)
         events.forEach((event) => setEventDetailsQueryEvent(queryClient, event))
         return events
       },
-      options
-    ),
+      ...options
+    }),
     cancel: () => {
       queryClient.cancelQueries({ queryKey })
     }
@@ -227,14 +227,14 @@ export const ExploreEventsView = ({
         events={data.events ?? []}
         HeaderComponent={
           <Title style={styles.sheetHeaderText}>
-            {data.status !== "loading"
+            {data.status !== "pending"
               ? "Nearby Events"
               : "Finding Nearby Events..."}
           </Title>
         }
         EmptyEventsComponent={
           <View style={styles.emptyEventsContainer}>
-            {data.status === "loading" && <LoadingView />}
+            {data.status === "pending" && <LoadingView />}
             {data.status === "error" && <ErrorView onRetried={data.retry} />}
             {data.status === "no-results" && <NoResultsView />}
           </View>

@@ -1,3 +1,7 @@
+import { TiFFormNavigationLinkView } from "@components/form-components/NavigationLink"
+import { TiFFormScrollView } from "@components/form-components/ScrollView"
+import { TiFFormCardSectionView } from "@components/form-components/Section"
+import { AlertsObject, presentAlert } from "@lib/Alerts"
 import { AppStyles } from "@lib/AppColorStyle"
 import {
   EmailCompositionResult,
@@ -7,11 +11,7 @@ import {
 import { useOpenWeblink } from "@modules/tif-weblinks"
 import { useQuery } from "@tanstack/react-query"
 import React from "react"
-import { Alert, StyleProp, ViewStyle } from "react-native"
-import { TiFFormNavigationLinkView } from "@components/form-components/NavigationLink"
-import { TiFFormScrollView } from "@components/form-components/ScrollView"
-import { TiFFormCardSectionView } from "@components/form-components/Section"
-import { AlertsObject, presentAlert } from "@lib/Alerts"
+import { StyleProp, ViewStyle } from "react-native"
 
 export const COMPILING_LOGS_INFO_URL = "https://logs.com"
 
@@ -181,11 +181,11 @@ export type UseHelpAndSupportSettingsEnvironment = {
 export const useHelpAndSupportSettings = (
   env: UseHelpAndSupportSettingsEnvironment
 ) => {
-  const { data: isShowingContactSection } = useQuery(
-    ["isMailComposerAvailable"],
-    async () => await env.isMailComposerAvailable(),
-    { initialData: true }
-  )
+  const { data: isShowingContactSection } = useQuery({
+    queryKey: ["isMailComposerAvailable"],
+    queryFn: async () => await env.isMailComposerAvailable(),
+    initialData: true
+  })
   const open = useOpenWeblink()
 
   return {

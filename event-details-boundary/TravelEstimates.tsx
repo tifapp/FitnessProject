@@ -1,44 +1,44 @@
+import { AvatarMapMarkerView } from "@components/AvatarMapMarker"
+import { BodyText, Caption, CaptionTitle, Headline } from "@components/Text"
+import { Ionicon, RoundedIonicon } from "@components/common/Icons"
+import { openEventLocationInMaps } from "@event/LocationIdentifier"
+import { AppStyles } from "@lib/AppColorStyle"
+import { compactFormatDistance } from "@lib/DistanceFormatting"
+import { FontScaleFactors, useFontScale } from "@lib/Fonts"
 import { QueryHookOptions } from "@lib/ReactQuery"
-import { useUserCoordinatesQuery } from "@location/UserLocation"
+import { TiFDefaultLayoutTransition } from "@lib/Reanimated"
 import { EXPO_LOCATION_ERRORS } from "@location/Expo"
-import { useQuery } from "@tanstack/react-query"
-import { LocationAccuracy } from "expo-location"
-import {
-  Platform,
-  StyleProp,
-  View,
-  ViewStyle,
-  StyleSheet,
-  TouchableOpacity,
-  LayoutRectangle
-} from "react-native"
+import { useUserCoordinatesQuery } from "@location/UserLocation"
 import {
   EventTravelEstimates,
   eventTravelEstimates
 } from "@modules/tif-travel-estimates"
-import { CodedError } from "expo-modules-core"
-import { ReactNode, useState } from "react"
-import { BodyText, Caption, CaptionTitle, Headline } from "@components/Text"
-import { Ionicon, RoundedIonicon } from "@components/common/Icons"
-import { AppStyles } from "@lib/AppColorStyle"
-import { compactFormatDistance } from "@lib/DistanceFormatting"
-import { dayjs } from "TiFShared/lib/Dayjs"
-import duration from "dayjs/plugin/duration"
-import { AvatarMapMarkerView } from "@components/AvatarMapMarker"
-import MapView, { Marker } from "react-native-maps"
-import { FontScaleFactors, useFontScale } from "@lib/Fonts"
-import Animated, { FadeIn } from "react-native-reanimated"
-import { openSettings } from "expo-linking"
-import { TiFDefaultLayoutTransition } from "@lib/Reanimated"
-import { metersToMiles } from "TiFShared/lib/MetricConversions"
+import { useQuery } from "@tanstack/react-query"
 import { EventAttendee, EventLocation } from "TiFShared/domain-models/Event"
 import { LocationCoordinate2D } from "TiFShared/domain-models/LocationCoordinate2D"
-import { openEventLocationInMaps } from "@event/LocationIdentifier"
+import { dayjs } from "TiFShared/lib/Dayjs"
+import { metersToMiles } from "TiFShared/lib/MetricConversions"
+import duration from "dayjs/plugin/duration"
+import { openSettings } from "expo-linking"
+import { LocationAccuracy } from "expo-location"
+import { CodedError } from "expo-modules-core"
+import { ReactNode, useState } from "react"
+import {
+  LayoutRectangle,
+  Platform,
+  StyleProp,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+  ViewStyle
+} from "react-native"
+import MapView, { Marker } from "react-native-maps"
+import Animated, { FadeIn } from "react-native-reanimated"
 
 export type UseEventTravelEstimatesResult =
   | {
       status:
-        | "loading"
+        | "pending"
         | "error"
         | "unsupported"
         | "disabled"
@@ -139,13 +139,13 @@ const useEventTravelEstimatesQuery = (
   loadTravelEstimates: typeof eventTravelEstimates,
   options?: QueryHookOptions<EventTravelEstimates>
 ) => {
-  return useQuery(
-    ["event-travel-estimates", eventCoordinate, userCoordinate],
-    async ({ signal }) => {
+  return useQuery({
+    queryKey: ["event-travel-estimates", eventCoordinate, userCoordinate],
+    queryFn: async ({ signal }) => {
       return await loadTravelEstimates(userCoordinate, eventCoordinate, signal)
     },
-    options
-  )
+    ...options
+  })
 }
 
 export type EventTravelEstimatesProps = {
@@ -339,7 +339,7 @@ const TravelTypeButton = ({
           backgroundColor={AppStyles.cardColor}
           accessibilityLabel={TRAVEL_KEYS_INFO[travelKey].accessibilityLabel}
         />
-        {result.status !== "loading" ? (
+        {result.status !== "pending" ? (
           result.status !== "unsupported" && (
             <Animated.View
               style={{ height: 40 * fontscale }}
