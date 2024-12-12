@@ -31,9 +31,15 @@ export const useCoreNavigation = () => {
     presentEditEvent: (edit: EditEventFormValues, id?: EventID) => {
       const formValues = toRouteableEditFormValues(edit)
       if (id) {
-        navigation.navigate("editEvent", { ...formValues, id })
+        navigation.navigate("editEvent", {
+          screen: "editEventForm",
+          params: { ...formValues, id }
+        })
       } else {
-        navigation.navigate("createEvent", formValues)
+        navigation.navigate("editEvent", {
+          screen: "createEventForm",
+          params: formValues
+        })
       }
     },
     presentProfile: (id: UserID | UserHandle) => {

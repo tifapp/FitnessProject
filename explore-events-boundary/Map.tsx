@@ -6,7 +6,7 @@ import MapView, { Marker } from "react-native-maps"
 import { ExploreEventsRegion } from "./Region"
 import { useCoreNavigation } from "@components/Navigation"
 import { AppStyles } from "@lib/AppColorStyle"
-import { DEFAULT_EDIT_EVENT_FORM_VALUES } from "@event/EditFormValues"
+import { defaultEditFormValues } from "@event/EditFormValues"
 
 export type ExploreEventsMapProps = {
   initialRegion: ExploreEventsRegion
@@ -30,7 +30,7 @@ export const ExploreEventsMap = ({
       toolbarEnabled={false}
       onLongPress={(e) => {
         presentEditEvent({
-          ...DEFAULT_EDIT_EVENT_FORM_VALUES,
+          ...defaultEditFormValues(),
           location: {
             coordinate: e.nativeEvent.coordinate,
             placemark: undefined

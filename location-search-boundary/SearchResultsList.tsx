@@ -165,6 +165,6 @@ const styles = StyleSheet.create({
     borderRadius: 12
   },
   horizontalPadding: {
-    paddingHorizontal: 16
+    paddingHorizontal: 24
   }
 })

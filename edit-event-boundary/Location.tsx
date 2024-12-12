@@ -13,7 +13,7 @@ import {
   useGeocodeQuery,
   useReverseGeocodeQuery
 } from "@location/Geocoding"
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import { TiFFormNavigationLinkView } from "@components/form-components/NavigationLink"
 import { AppStyles } from "@lib/AppColorStyle"
 import MapView, { Marker } from "react-native-maps"
@@ -23,6 +23,7 @@ import { placemarkToFormattedAddress } from "@lib/AddressFormatting"
 import { FontScaleFactors } from "@lib/Fonts"
 import { AvatarMapMarkerView } from "@components/AvatarMapMarker"
 import { EditEventFormLocation } from "@event/EditFormValues"
+import { LocationCoordinate2D } from "TiFShared/domain-models/LocationCoordinate2D"
 
 export const useEditEventFormLocation = () => {
   const [location, setLocation] = useAtom(editEventFormValueAtoms.location)
@@ -100,9 +101,15 @@ const LocationView = ({
   location,
   onSelectLocationTapped
 }: LocationProps) => {
+  const mapRef = useRef<MapView>(null)
   const [overlayLayout, setOverlayLayout] = useState<
     LayoutRectangle | undefined
   >(undefined)
+  useEffect(() => {
+    if (location.coordinate) {
+      mapRef.current?.animateToRegion(mapRegion(location.coordinate))
+    }
+  }, [location.coordinate])
   const mapHeight = overlayLayout && Math.max(300, 200 + overlayLayout.height)
   return (
     <View style={styles.locationContainer}>
@@ -112,13 +119,10 @@ const LocationView = ({
             <MapView
               style={[styles.mapDimensions, { height: mapHeight }]}
               loadingEnabled
+              ref={mapRef}
               zoomEnabled={false}
               scrollEnabled={false}
-              initialRegion={{
-                ...location.coordinate,
-                latitudeDelta: 0.007,
-                longitudeDelta: 0.007
-              }}
+              initialRegion={mapRegion(location.coordinate)}
               mapPadding={{
                 top: 0,
                 left: 0,
@@ -193,6 +197,12 @@ const LocationView = ({
     </View>
   )
 }
+
+const mapRegion = (coordinate: LocationCoordinate2D) => ({
+  ...coordinate,
+  latitudeDelta: 0.07,
+  longitudeDelta: 0.07
+})
 
 const styles = StyleSheet.create({
   locationNavigationLink: {

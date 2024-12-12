@@ -36,7 +36,7 @@ import { EventMocks } from "@event-details-boundary/MockData"
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet"
 import { GeocodingFunctionsProvider } from "@location/Geocoding"
 import { neverPromise } from "@test-helpers/Promise"
-import { DEFAULT_EDIT_EVENT_FORM_VALUES } from "@event/EditFormValues"
+import { defaultEditFormValues } from "@event/EditFormValues"
 import { editEventFormValuesAtom } from "@edit-event-boundary/FormAtoms"
 
 const EditEventPragmaQuotesMeta = {
@@ -91,7 +91,7 @@ const TestScreen = () => {
     <Button
       title="Edit Event"
       onPress={() => {
-        console.log(DEFAULT_EDIT_EVENT_FORM_VALUES, values)
+        console.log(defaultEditFormValues(), values)
         navigation.navigate("editEvent")
       }}
     />
@@ -108,6 +108,12 @@ const date = new Date("2024-10-30T00:00:00")
 const placemark = mockPlacemark()
 const coordinate = LocationCoordinatesMocks.SanFrancisco
 
+const intialValues = {
+  ...defaultEditFormValues(),
+  title: "Blob",
+  location: { coordinate, placemark }
+}
+
 const EditEventScreen = () => {
   const navigation = useNavigation()
   return (
@@ -118,11 +124,7 @@ const EditEventScreen = () => {
       >
         <EditEventView
           hostProfileImageURL="https://image.civitai.com/xG1nkqKTMzGDvpLrqFT7WA/13a3f4c3-cc99-40b2-ab5e-3d052a1e9286/width=450/00047-375332095-a%20_(xenoblade_),%201girl,%20%20_lora_A-v1.0-000020_0.4_1.4_.jpeg"
-          initialValues={{
-            ...DEFAULT_EDIT_EVENT_FORM_VALUES,
-            title: "Blob",
-            location: undefined
-          }}
+          initialValues={intialValues}
           submit={async (id, edit) => {
             await sleep(3000)
             throw new Error()

@@ -61,8 +61,8 @@ const styles = StyleSheet.create({
     overflow: "hidden"
   },
   imageBackground: {
-    width: AVATAR_MARKER_SIZE - 2,
-    height: AVATAR_MARKER_SIZE - 2,
+    width: AVATAR_MARKER_SIZE - 4,
+    height: AVATAR_MARKER_SIZE - 4,
     borderRadius: 128,
     overflow: "hidden"
   },

@@ -4,6 +4,7 @@ import { SearchBar } from "@components/SearchBar"
 import { searchTextAtoms } from "./state"
 import { TouchableIonicon } from "@components/common/Icons"
 import { StyleProp, ViewStyle } from "react-native"
+import { useFontScale } from "@lib/Fonts"
 
 export type LocationSearchBarProps = {
   onBackTapped: () => void
@@ -24,6 +25,7 @@ export const LocationSearchBar = ({
   return (
     <SearchBar
       style={style}
+      textStyle={{ height: 32 * useFontScale() }}
       placeholder={placeholder}
       leftAddon={
         <TouchableIonicon

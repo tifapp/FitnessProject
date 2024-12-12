@@ -1,5 +1,5 @@
 import React from "react"
-import { StyleProp, ViewStyle, StyleSheet } from "react-native"
+import { StyleProp, ViewStyle, StyleSheet, TextStyle } from "react-native"
 import { TouchableIonicon } from "./common/Icons"
 import { TextField } from "./TextFields"
 
@@ -8,6 +8,7 @@ export type SearchBarProps = {
   onTextChanged: (text: string) => void
   leftAddon?: JSX.Element
   placeholder?: string
+  textStyle?: StyleProp<TextStyle>
   style?: StyleProp<ViewStyle>
 }
 
@@ -19,11 +20,13 @@ export const SearchBar = ({
   text,
   onTextChanged,
   placeholder,
-  style
+  style,
+  textStyle
 }: SearchBarProps) => (
   <TextField
     style={style}
     value={text}
+    textStyle={textStyle}
     onChangeText={onTextChanged}
     leftAddon={leftAddon}
     placeholder={placeholder}
