@@ -203,7 +203,7 @@ export namespace EventMocks {
     time: {
       secondsToStart: dayjs.duration(3, "hours").asSeconds(),
       todayOrTomorrow: "today",
-      dateRange: dateRange(new Date(4000), new Date(5000))!
+      dateRange: dateRange(new Date(), new Date().ext.addSeconds(3600))!
     },
     location: mockEventLocation(),
     previewAttendees: [
@@ -243,7 +243,7 @@ export namespace EventMocks {
     time: {
       secondsToStart: dayjs.duration(3, "hours").asSeconds(),
       todayOrTomorrow: "today",
-      dateRange: dateRange(new Date(4000), new Date(5000))!
+      dateRange: dateRange(new Date(), new Date().ext.addSeconds(3600))!
     },
     location: mockEventLocation(),
     previewAttendees: [

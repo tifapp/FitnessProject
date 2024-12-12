@@ -20,7 +20,10 @@ import { StyleProp, ViewStyle, View, Pressable, StyleSheet } from "react-native"
 import PagerView from "react-native-pager-view"
 import { TiFContext } from "./Context"
 import { useCoreNavigation } from "@components/Navigation"
-import { DEFAULT_EDIT_EVENT_FORM_VALUES } from "@event/EditFormValues"
+import {
+  DEFAULT_EDIT_EVENT_FORM_VALUES,
+  defaultEditFormValues
+} from "@event/EditFormValues"
 
 export type HomeProps = {
   style?: StyleProp<ViewStyle>
@@ -91,7 +94,7 @@ const FooterView = ({ pageIndex, onPageIndexTapped }: FooterProps) => {
     <View style={styles.footerContainer}>
       <View style={styles.footerItem}>
         <PrimaryButton
-          onPress={() => presentEditEvent(DEFAULT_EDIT_EVENT_FORM_VALUES)}
+          onPress={() => presentEditEvent(defaultEditFormValues())}
           style={styles.footerCreateEventButton}
           contentStyle={styles.footerCreateEventButtonContent}
         >

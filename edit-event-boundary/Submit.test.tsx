@@ -25,7 +25,7 @@ import { mockTiFEndpoint } from "TiFShared/test-helpers/mockAPIServer"
 import { fakeTimers } from "@test-helpers/Timers"
 import { TiFAPI } from "TiFShared/api"
 import {
-  DEFAULT_EDIT_EVENT_FORM_VALUES,
+  defaultEditFormValues,
   EditEventFormValues
 } from "@event/EditFormValues"
 
@@ -102,6 +102,7 @@ describe("EditEventSubmit tests", () => {
 
   describe("UseEditEventSubmission tests", () => {
     resetTestSQLiteBeforeEach()
+    fakeTimers()
     const settings = PersistentSettingsStores.user(
       new SQLiteUserSettingsStorage(testSQLite)
     )
@@ -110,13 +111,14 @@ describe("EditEventSubmit tests", () => {
     const queryClient = createTestQueryClient()
 
     beforeEach(() => {
+      jest.setSystemTime(new Date(20_000))
       queryClient.resetQueries()
       onSuccess.mockReset()
       submit.mockReset()
     })
 
     const TEST_VALUES = {
-      ...DEFAULT_EDIT_EVENT_FORM_VALUES,
+      ...defaultEditFormValues(),
       title: "Blob",
       location: { placemark: mockPlacemark(), coordinate: undefined }
     }

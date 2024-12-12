@@ -1,18 +1,18 @@
 import {
   EditEventFormValues,
-  DEFAULT_EDIT_EVENT_FORM_VALUES
+  defaultEditFormValues
 } from "@event/EditFormValues"
 import { Atomize } from "@lib/Jotai"
 import { EventEdit, EventEditSchema } from "TiFShared/domain-models/Event"
 import { shallowEquals } from "TiFShared/lib/ShallowEquals"
 import { atom } from "jotai"
 
-export const editEventFormValuesAtom = atom<EditEventFormValues>(
-  DEFAULT_EDIT_EVENT_FORM_VALUES
-)
-export const editEventFormInitialValuesAtom = atom<EditEventFormValues>(
-  DEFAULT_EDIT_EVENT_FORM_VALUES
-)
+export const _DEFAULT_FORM_VALUES = defaultEditFormValues()
+
+export const editEventFormValuesAtom =
+  atom<EditEventFormValues>(_DEFAULT_FORM_VALUES)
+export const editEventFormInitialValuesAtom =
+  atom<EditEventFormValues>(_DEFAULT_FORM_VALUES)
 
 export const isEditEventFormDirtyAtom = atom((get) => {
   const initialValues = get(editEventFormInitialValuesAtom)
@@ -37,11 +37,13 @@ const editEventAtom = <
   )
 }
 
-export const editEventFormValueAtoms = Object.keys(
-  DEFAULT_EDIT_EVENT_FORM_VALUES
-).reduce((acc, key: keyof EditEventFormValues) => {
-  return { ...acc, [key]: editEventAtom(key) }
-}, {} as Atomize<EditEventFormValues>)
+export const editEventFormValueAtoms = Object.keys(_DEFAULT_FORM_VALUES).reduce(
+  (acc, key: keyof EditEventFormValues) => ({
+    ...acc,
+    [key]: editEventAtom(key)
+  }),
+  {} as Atomize<EditEventFormValues>
+)
 
 export const eventEditAtom = atom<EventEdit | undefined>((get) => {
   const formValues = get(editEventFormValuesAtom)

@@ -18,14 +18,17 @@ export type EditEventFormValues = Reassign<
   EditEventFormLocation | undefined
 >
 
-export const DEFAULT_EDIT_EVENT_FORM_VALUES = {
+/**
+ * Returns an object containing default values for the edit event form.
+ */
+export const defaultEditFormValues = (): EditEventFormValues => ({
   title: "",
   description: "",
   location: undefined,
   startDateTime: new Date(),
   duration: 3600,
   shouldHideAfterStartDate: false
-} as const
+})
 
 /**
  * Returns an {@link EditEventFormValues} from an {@link ClientSideEvent}.
@@ -42,4 +45,32 @@ export const editFormValues = (
     coordinate: event.location.coordinate,
     placemark: event.location.placemark
   }
+})
+
+export type RouteableEditEventFormValues = Reassign<
+  EditEventFormValues,
+  "startDateTime",
+  string
+>
+
+/**
+ * Returns the specifed {@link EditEventFormValues} in a manner that's suitable for use as a
+ * react-navigation route parameter object.
+ */
+export const toRouteableEditFormValues = (
+  values: EditEventFormValues
+): RouteableEditEventFormValues => ({
+  ...values,
+  startDateTime: values.startDateTime.toISOString()
+})
+
+/**
+ * Returns the specifed {@link RouteableEditEventFormValues} as a canonical
+ * {@link EditEventFormValues}.
+ */
+export const fromRouteableEditFormValues = (
+  values: RouteableEditEventFormValues
+): EditEventFormValues => ({
+  ...values,
+  startDateTime: new Date(values.startDateTime)
 })

@@ -1,8 +1,11 @@
 import { createStore } from "jotai"
-import { editEventFormValueAtoms, eventEditAtom } from "./FormAtoms"
+import {
+  _DEFAULT_FORM_VALUES,
+  editEventFormValueAtoms,
+  eventEditAtom
+} from "./FormAtoms"
 import { mockLocationCoordinate2D, mockPlacemark } from "@location/MockData"
 import { faker } from "@faker-js/faker"
-import { DEFAULT_EDIT_EVENT_FORM_VALUES } from "@event/EditFormValues"
 
 describe("EventFormValues tests", () => {
   test("Default Values should not be submittable", () => {
@@ -20,7 +23,7 @@ describe("EventFormValues tests", () => {
       placemark: undefined
     })
     expect(store.get(eventEditAtom)).toEqual({
-      ...DEFAULT_EDIT_EVENT_FORM_VALUES,
+      ..._DEFAULT_FORM_VALUES,
       title,
       location: { type: "coordinate", value: coordinate }
     })
@@ -36,7 +39,7 @@ describe("EventFormValues tests", () => {
       placemark
     })
     expect(store.get(eventEditAtom)).toEqual({
-      ...DEFAULT_EDIT_EVENT_FORM_VALUES,
+      ..._DEFAULT_FORM_VALUES,
       title,
       location: { type: "placemark", value: placemark }
     })
@@ -52,7 +55,7 @@ describe("EventFormValues tests", () => {
       placemark
     })
     expect(store.get(eventEditAtom)).toEqual({
-      ...DEFAULT_EDIT_EVENT_FORM_VALUES,
+      ..._DEFAULT_FORM_VALUES,
       title,
       location: { type: "placemark", value: placemark }
     })

@@ -3,7 +3,8 @@ import { resetTestSQLiteBeforeEach, testSQLite } from "@test-helpers/SQLite"
 import { SQLiteUserSettingsStorage } from "@settings-storage/UserSettings"
 import { mockPlacemark } from "@location/MockData"
 import { renderUseHydrateEditEvent } from "./TestHelpers"
-import { DEFAULT_EDIT_EVENT_FORM_VALUES } from "@event/EditFormValues"
+import { defaultEditFormValues } from "@event/EditFormValues"
+import { fakeTimers } from "@test-helpers/Timers"
 
 describe("EditEvent tests", () => {
   describe("UseHydrateEditEvent tests", () => {
@@ -11,6 +12,8 @@ describe("EditEvent tests", () => {
     const settings = PersistentSettingsStores.user(
       new SQLiteUserSettingsStorage(testSQLite)
     )
+    fakeTimers()
+    beforeEach(() => jest.setSystemTime(new Date(20_000)))
 
     it("should hydrate with presets and default values when no initial values provided", async () => {
       const placemark = mockPlacemark()
@@ -20,7 +23,7 @@ describe("EditEvent tests", () => {
       })
       const { result } = renderUseHydrateEditEvent(undefined, settings)
       expect(result.current).toEqual({
-        ...DEFAULT_EDIT_EVENT_FORM_VALUES,
+        ...defaultEditFormValues(),
         shouldHideAfterStartDate: true,
         location: { placemark, coordinate: undefined }
       })
@@ -28,7 +31,7 @@ describe("EditEvent tests", () => {
 
     it("should hydrate with initial values when provided", async () => {
       const values = {
-        ...DEFAULT_EDIT_EVENT_FORM_VALUES,
+        ...defaultEditFormValues(),
         name: "Test Event",
         description: "We are a test event!"
       }
@@ -43,7 +46,7 @@ describe("EditEvent tests", () => {
 
     it("should be able to hydrate twice in a row", async () => {
       const values = {
-        ...DEFAULT_EDIT_EVENT_FORM_VALUES,
+        ...defaultEditFormValues(),
         name: "Test Event",
         description: "We are a test event!"
       }

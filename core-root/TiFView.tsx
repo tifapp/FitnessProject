@@ -1,5 +1,9 @@
-import { NavigationContainer } from "@react-navigation/native"
-import { createStackNavigator } from "@react-navigation/stack"
+import {
+  NavigationContainer,
+  createStaticNavigation,
+  useNavigation
+} from "@react-navigation/native"
+import { StackScreenProps, createStackNavigator } from "@react-navigation/stack"
 import { StyleSheet, StyleProp, ViewStyle, View } from "react-native"
 import React from "react"
 import { HomeView } from "./Home"
@@ -9,9 +13,89 @@ import { TiFMenuProvider } from "@components/TiFMenuProvider"
 import { SafeAreaProvider } from "react-native-safe-area-context"
 import { RootSiblingParent } from "react-native-root-siblings"
 import { TiFQueryClientProvider } from "@lib/ReactQuery"
-import { withAlphaRegistration } from "./AlphaRegister"
+import {
+  WithAlphaRegistrationProps,
+  withAlphaRegistration
+} from "./AlphaRegister"
+import { EditEventView } from "@edit-event-boundary/EditEvent"
+import {
+  EditEventFormValues,
+  RouteableEditEventFormValues,
+  fromRouteableEditFormValues
+} from "@event/EditFormValues"
+import { EventID } from "TiFShared/domain-models/Event"
+import { clientSideEventFromResponse } from "@event/ClientSideEvent"
+import { EventMocks } from "@event-details-boundary/MockData"
+import { BottomSheetModalProvider } from "@gorhom/bottom-sheet"
+import {
+  EditEventFormDismissButton,
+  useDismissEditEventForm
+} from "@edit-event-boundary/Dismiss"
+import { GestureHandlerRootView } from "react-native-gesture-handler"
 
-const Stack = createStackNavigator()
+const HomeScreen = withAlphaRegistration(() => (
+  <HomeView style={styles.screen} />
+))
+
+type EditEventScreenProps = StackScreenProps<
+  { editEvent: RouteableEditEventFormValues & { id?: EventID } },
+  "editEvent"
+>
+const EditEventScreen = withAlphaRegistration(
+  ({ session, route }: WithAlphaRegistrationProps<EditEventScreenProps>) => (
+    <EditEventView
+      eventId={route.params.id}
+      initialValues={fromRouteableEditFormValues(route.params)}
+      hostName={session.name}
+      hostProfileImageURL={session.profileImageURL}
+      submit={async (e, id) => ({
+        status: "success",
+        event: clientSideEventFromResponse(
+          EventMocks.MockSingleAttendeeResponse
+        )
+      })}
+      onSelectLocationTapped={() => console.log("Select Location")}
+      onSuccess={(e) => console.log("Success", e)}
+      style={styles.screen}
+    />
+  )
+)
+
+const BackButton = () => (
+  <EditEventFormDismissButton onDismiss={useNavigation().goBack} />
+)
+
+const Stack = createStackNavigator({
+  screenOptions: BASE_HEADER_SCREEN_OPTIONS,
+  screens: {
+    home: {
+      options: { headerShown: false },
+      screen: HomeScreen
+    }
+  },
+  groups: {
+    editEvent: {
+      screenOptions: { presentation: "modal" },
+      screens: {
+        editEvent: {
+          options: {
+            headerTitle: "Edit Event",
+            headerLeft: BackButton
+          },
+          screen: EditEventScreen
+        },
+        createEvent: {
+          options: { headerTitle: "Create Event", headerLeft: BackButton },
+          screen: EditEventScreen
+        }
+      }
+    }
+  }
+})
+
+const Navigation = createStaticNavigation(Stack)
+
+const linking = { prefixes: ["tifapp://"] }
 
 export type TiFProps = {
   isFontsLoaded: boolean
@@ -24,34 +108,28 @@ export type TiFProps = {
 export const TiFView = ({ isFontsLoaded, style, ...props }: TiFProps) => {
   if (!isFontsLoaded) return null
   return (
-    <TiFQueryClientProvider>
-      <SafeAreaProvider>
-        <TiFMenuProvider>
-          <RootSiblingParent>
-            <View style={style}>
-              <TiFContext.Provider value={props}>
-                <NavigationContainer>
-                  <Stack.Navigator screenOptions={BASE_HEADER_SCREEN_OPTIONS}>
-                    <Stack.Screen
-                      name="home"
-                      component={HomeScreen}
-                      options={{ headerShown: false }}
-                    />
-                  </Stack.Navigator>
-                </NavigationContainer>
-              </TiFContext.Provider>
-            </View>
-          </RootSiblingParent>
-        </TiFMenuProvider>
-      </SafeAreaProvider>
-    </TiFQueryClientProvider>
+    <GestureHandlerRootView>
+      <TiFQueryClientProvider>
+        <BottomSheetModalProvider>
+          <SafeAreaProvider>
+            <TiFMenuProvider>
+              <RootSiblingParent>
+                <View style={style}>
+                  <TiFContext.Provider value={props}>
+                    <Navigation linking={linking} />
+                  </TiFContext.Provider>
+                </View>
+              </RootSiblingParent>
+            </TiFMenuProvider>
+          </SafeAreaProvider>
+        </BottomSheetModalProvider>
+      </TiFQueryClientProvider>
+    </GestureHandlerRootView>
   )
 }
 
-const HomeScreen = withAlphaRegistration(() => <HomeView style={styles.home} />)
-
 const styles = StyleSheet.create({
-  home: {
+  screen: {
     flex: 1
   }
 })

@@ -9,7 +9,10 @@ import { StyleProp, StyleSheet, ViewStyle } from "react-native"
 import { TouchableIonicon } from "./common/Icons"
 import { EventID } from "TiFShared/domain-models/Event"
 import { UserHandle, UserID } from "TiFShared/domain-models/User"
-import { EditEventFormValues } from "@event/EditFormValues"
+import {
+  EditEventFormValues,
+  toRouteableEditFormValues
+} from "@event/EditFormValues"
 
 /**
  * A helper type that's useful for making reusable navigation flows.
@@ -26,7 +29,12 @@ export const useCoreNavigation = () => {
   const navigation = useNavigation()
   return {
     presentEditEvent: (edit: EditEventFormValues, id?: EventID) => {
-      console.log("Edit", edit, id)
+      const formValues = toRouteableEditFormValues(edit)
+      if (id) {
+        navigation.navigate("editEvent", { ...formValues, id })
+      } else {
+        navigation.navigate("createEvent", formValues)
+      }
     },
     presentProfile: (id: UserID | UserHandle) => {
       console.log("Profile", id)

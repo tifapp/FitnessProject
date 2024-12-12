@@ -60,7 +60,7 @@ import { TiFFormScrollableLayoutView } from "@components/form-components/Scrolla
 import { TiFFooterView } from "@components/Footer"
 import {
   EditEventFormValues,
-  DEFAULT_EDIT_EVENT_FORM_VALUES
+  defaultEditFormValues
 } from "@event/EditFormValues"
 
 export type EditEventProps = {
@@ -83,7 +83,7 @@ export const useHydrateEditEvent = (initialValues?: EditEventFormValues) => {
     )
   )
   const initialFormValues = initialValues ?? {
-    ...DEFAULT_EDIT_EVENT_FORM_VALUES,
+    ...defaultEditFormValues(),
     location: settings.eventPresetLocation
       ? formLocation(settings.eventPresetLocation)
       : undefined,

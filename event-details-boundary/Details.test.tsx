@@ -243,7 +243,6 @@ describe("EventDetailsLoading tests", () => {
           },
           time: {
             ...eventResponse.time,
-            dateRange: dateRange(new Date(4000), new Date(5000))!,
             clientReceivedTime
           }
         }
