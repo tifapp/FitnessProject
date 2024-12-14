@@ -5,7 +5,7 @@ import { TiFQueryClientProvider } from "@lib/ReactQuery"
 import { delayData } from "@lib/utils/DelayData"
 import {
   LocationSearchPicker,
-  useLocationSearchPicker,
+  useLocationsSearch,
   LocationSearchBar
 } from "@location-search-boundary"
 import { mockLocationSearchResult } from "@location-search-boundary/MockData"
@@ -63,7 +63,7 @@ const LocationSearchHeader = () => {
 }
 
 const LocationSearchScreen = () => {
-  const picker = useLocationSearchPicker({
+  const picker = useLocationsSearch({
     loadSearchResults: async () => {
       return await delayData(
         repeatElements(15, () => mockLocationSearchResult()),

@@ -1,7 +1,7 @@
 import React from "react"
 import { useAtomValue, useSetAtom } from "jotai"
 import { SearchBar } from "@components/SearchBar"
-import { searchTextAtoms } from "./state"
+import { searchTextAtoms } from "./SearchTextAtoms"
 import { TouchableIonicon } from "@components/common/Icons"
 import { StyleProp, ViewStyle } from "react-native"
 import { useFontScale } from "@lib/Fonts"

@@ -2,7 +2,6 @@ import {
   BASE_HEADER_SCREEN_OPTIONS,
   XMarkBackButton
 } from "@components/Navigation"
-import { useScreenBottomPadding } from "@components/Padding"
 import { Headline } from "@components/Text"
 import {
   withAlphaRegistration,
@@ -18,19 +17,14 @@ import {
   fromRouteableEditFormValues
 } from "@event/EditFormValues"
 import {
-  LocationSearchBar,
-  LocationSearchPicker,
-  useLocationSearchPicker
+  LocationsSearchView,
+  useLocationsSearch
 } from "@location-search-boundary"
 import { useNavigation } from "@react-navigation/native"
 import { StackScreenProps, createStackNavigator } from "@react-navigation/stack"
 import { EventID } from "TiFShared/domain-models/Event"
-import { repeatElements } from "TiFShared/lib/Array"
 import { useSetAtom } from "jotai"
-import { mockLocationSearchResult } from "location-search-boundary/MockData"
-import { useState } from "react"
-import { StyleSheet, Platform, View, LayoutRectangle } from "react-native"
-import { SafeAreaView } from "react-native-safe-area-context"
+import { StyleSheet } from "react-native"
 
 type EditEventScreenProps = WithAlphaRegistrationProps<
   StackScreenProps<
@@ -67,44 +61,19 @@ const EditEventScreen = withAlphaRegistration(
 
 const LocationSearchScreen = () => {
   const setLocation = useSetAtom(editEventFormValueAtoms.location)
-  const picker = useLocationSearchPicker({
-    loadSearchResults: async () =>
-      repeatElements(20, () => mockLocationSearchResult())
-  })
-  const [headerLayout, setHeaderLayout] = useState<
-    LayoutRectangle | undefined
-  >()
   const navigation = useNavigation()
-  const safeAreaEdges =
-    Platform.OS === "android" ? undefined : (["bottom"] as const)
-  const padding = useScreenBottomPadding({
-    safeAreaScreens: (headerLayout?.height ?? 0) + 24,
-    nonSafeAreaScreens: 24
-  })
   return (
-    <SafeAreaView edges={safeAreaEdges}>
-      <View onLayout={(e) => setHeaderLayout(e.nativeEvent.layout)}>
-        <LocationSearchBar
-          onBackTapped={navigation.goBack}
-          placeholder="Enter a Location"
-          style={styles.locationSearchBarHeaderSpacing}
-        />
-      </View>
-      <LocationSearchPicker
-        {...picker}
-        savePickedLocation={async () => {}}
-        onUserLocationSelected={(location) => {
-          setLocation({ coordinate: location.coords, placemark: undefined })
-          navigation.goBack()
-        }}
-        onLocationSelected={(location) => {
-          setLocation(location)
-          navigation.goBack()
-        }}
-        contentContainerStyle={{ paddingBottom: padding }}
-        style={styles.locationSearchPicker}
-      />
-    </SafeAreaView>
+    <LocationsSearchView
+      state={useLocationsSearch()}
+      onUserLocationSelected={(location) => {
+        setLocation({ coordinate: location.coords, placemark: undefined })
+        navigation.goBack()
+      }}
+      onLocationSelected={(location) => {
+        setLocation(location)
+        navigation.goBack()
+      }}
+    />
   )
 }
 

@@ -300,3 +300,8 @@ export namespace Migrations {
     `
   }
 }
+
+/**
+ * The main app database.
+ */
+export const tiFSQLite = new TiFSQLite("tif-main", Migrations.main)

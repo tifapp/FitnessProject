@@ -19,7 +19,8 @@ import {
   LocationSearchPicker,
   LocationSearchResultProps,
   LocationSearchResultView,
-  useLocationSearchPicker
+  LocationsSearchProvider,
+  useLocationsSearch
 } from "."
 import { mockLocationSearchResult } from "./MockData"
 import { NamedLocation } from "@location/NamedLocation"
@@ -305,31 +306,25 @@ describe("LocationSearch tests", () => {
         return `${name} | ${Math.trunc(distance ?? 0.0)}`
       }
 
-      const TestView = () => {
-        const picker = useLocationSearchPicker({
-          loadSearchResults: searchForLocations
-        })
-        return (
-          <LocationSearchPicker
-            {...picker}
-            savePickedLocation={(location) => (savedLocation = location)}
-            onUserLocationSelected={(coordinates) => {
-              selectedUserLocationObject = coordinates
-            }}
-            onLocationSelected={(location) => (selectedLocation = location)}
-            SearchResultView={(props: LocationSearchResultProps) => (
-              <View
-                testID={searchResultTestId(
-                  props.result.location.placemark.name!,
-                  props.distanceMiles
-                )}
-              >
-                <LocationSearchResultView {...props} />
-              </View>
-            )}
-          />
-        )
-      }
+      const TestView = () => (
+        <LocationSearchPicker
+          state={useLocationsSearch()}
+          onUserLocationSelected={(coordinates) => {
+            selectedUserLocationObject = coordinates
+          }}
+          onLocationSelected={(location) => (selectedLocation = location)}
+          SearchResultView={(props: LocationSearchResultProps) => (
+            <View
+              testID={searchResultTestId(
+                props.result.location.placemark.name!,
+                props.distanceMiles
+              )}
+            >
+              <LocationSearchResultView {...props} />
+            </View>
+          )}
+        />
+      )
 
       const renderPicker = () => {
         return render(
@@ -337,11 +332,16 @@ describe("LocationSearch tests", () => {
             <UserLocationFunctionsProvider
               getCurrentLocation={queryUserCoordinates}
             >
-              <LocationSearchBar
-                onBackTapped={jest.fn()}
-                placeholder={searchBarPlaceholder}
-              />
-              <TestView />
+              <LocationsSearchProvider
+                searchResults={searchForLocations}
+                saveLocation={(location) => (savedLocation = location)}
+              >
+                <LocationSearchBar
+                  onBackTapped={jest.fn()}
+                  placeholder={searchBarPlaceholder}
+                />
+                <TestView />
+              </LocationsSearchProvider>
             </UserLocationFunctionsProvider>
           </TestQueryClientProvider>
         )
