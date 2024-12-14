@@ -1,6 +1,6 @@
 import { placemarkToFormattedAddress } from "@lib/AddressFormatting"
 import { QueryHookOptions } from "@lib/ReactQuery"
-import { useQuery } from "@tanstack/react-query"
+import { QueryObserverOptions, useQuery } from "@tanstack/react-query"
 import { LocationCoordinate2D } from "TiFShared/domain-models/LocationCoordinate2D"
 import { Placemark } from "TiFShared/domain-models/Placemark"
 import { mergeWithPartial } from "TiFShared/lib/Object"
@@ -40,8 +40,8 @@ export const useGeocodeQuery = (
 
 // NB: Geocoded data rarely ever changes, so we can
 // get away with infinite cache time.
-export const DEFAULT_GEOCODE_QUERY_OPTIONS = {
-  cacheTime: Infinity,
+export const DEFAULT_GEOCODE_QUERY_OPTIONS: Partial<QueryObserverOptions<NamedLocation | null>> = {
+  gcTime: Infinity,
   staleTime: Infinity
 }
 
