@@ -50,7 +50,7 @@ export const useCoreNavigation = () => {
       id: EventID,
       method: "navigate" | "replace" = "navigate"
     ) => {
-      navigation[method]("eventDetails", { id })
+      navigation[method]("eventDetails", { id, method })
     },
     pushAttendeesList: (id: EventID) => {
       navigation.navigate("eventAttendeesList", { id })
@@ -110,6 +110,6 @@ export const XMarkBackButton = ({
 
 const styles = StyleSheet.create({
   backButtonPadding: {
-    paddingLeft: 16
+    marginRight: 24
   }
 })

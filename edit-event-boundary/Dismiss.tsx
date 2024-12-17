@@ -56,6 +56,6 @@ export const EditEventFormDismissButton = ({
 
 const styles = StyleSheet.create({
   button: {
-    marginLeft: 16
+    marginRight: 24
   }
 })

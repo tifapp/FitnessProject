@@ -1,17 +1,27 @@
-import { ChevronBackButton, XMarkBackButton } from "@components/Navigation"
+import {
+  BackButtonProps,
+  ChevronBackButton,
+  XMarkBackButton
+} from "@components/Navigation"
 import { Headline } from "@components/Text"
 import {
   EventAttendeesListView,
   useEventAttendeesList
 } from "@event-details-boundary/AttendeesList"
-import { useNavigation } from "@react-navigation/native"
+import {
+  StaticParamList,
+  StaticScreenProps,
+  useNavigation,
+  useRoute
+} from "@react-navigation/native"
 import { StackScreenProps } from "@react-navigation/stack"
 import { EventID } from "TiFShared/domain-models/Event"
+import { useEffect } from "react"
 
 export const eventDetailsScreens = () => ({
   eventDetails: {
-    options: { headerLeft: XMarkBackButton, headerTitle: "Event" },
-    screen: EditEventDetailsScreen
+    options: { headerTitle: "Event" },
+    screen: EventDetailsScreen
   },
   eventAttendeesList: {
     options: { headerLeft: ChevronBackButton, headerTitle: "Attendees" },
@@ -33,6 +43,18 @@ const AttendeesListScreen = ({ route }: AttendeesListScreenProps) => {
   )
 }
 
-const EditEventDetailsScreen = () => {
+type EventDetailsScreenProps = StaticScreenProps<{
+  id: EventID
+  method?: "navigate" | "replace"
+}>
+
+const EventDetailsScreen = ({ route }: EventDetailsScreenProps) => {
+  const navigation = useNavigation()
+  useEffect(() => {
+    navigation.setOptions({
+      headerLeft:
+        route.params.method === "navigate" ? ChevronBackButton : XMarkBackButton
+    })
+  }, [route.params.method, navigation])
   return <Headline>TODO: I am the event details</Headline>
 }
