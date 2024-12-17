@@ -5,7 +5,7 @@ import {
 } from "@event/ClientSideEvent"
 import { EventCard } from "@event/EventCard"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
-import { FlatList, StyleProp, View, ViewStyle } from "react-native"
+import { StyleProp, View, ViewStyle } from "react-native"
 import { TiFAPI } from "TiFShared/api"
 import { UserID } from "TiFShared/domain-models/User"
 import { userProfileQueryKey } from "./UserProfile"
@@ -60,14 +60,11 @@ export const BaseUpcomingEventsView = ({
   return (
     <View style={style}>
       <Subtitle>{"Upcoming Events"}</Subtitle>
-      <FlatList
-        data={events}
-        renderItem={(e) => (
-          <View style={{ paddingBottom: 16 }}>
-            <EventCard event={e.item} />
-          </View>
-        )}
-      />
+      {events.map((item, index) => (
+        <View key={index} style={{ paddingBottom: 16 }}>
+          <EventCard event={item} />
+        </View>
+      ))}
     </View>
   )
 }

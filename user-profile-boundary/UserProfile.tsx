@@ -1,12 +1,21 @@
 import { AvatarView } from "@components/Avatar"
 import { TiFFormScrollView } from "@components/form-components/ScrollView"
-import { Headline, Title } from "@components/Text"
+import { Caption, Headline } from "@components/Text"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { AlphaUserStorage } from "@user/alpha"
+import {
+  FriendRequestButton,
+  FriendRequestView,
+  useFriendRequest
+} from "@user/FriendRequest"
 import React, { createContext } from "react"
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 import { TiFAPI } from "TiFShared/api"
-import { UserID, UserProfile } from "TiFShared/domain-models/User"
+import {
+  UnblockedUserRelationsStatus,
+  UserID,
+  UserProfile
+} from "TiFShared/domain-models/User"
 import {
   BaseUpcomingEventsView,
   UpcomingEventsResult,
@@ -103,6 +112,11 @@ export const UserProfileProvider = ({
 export type UserProfileProps = {
   userId: UserID
   userInfoState: ReturnType<typeof useUserProfile>
+  friendRequestState: ReturnType<typeof useFriendRequest>
+  onRelationStatusChanged: (
+    id: UserID,
+    status: UnblockedUserRelationsStatus
+  ) => void
   upcomingEventsState: ReturnType<typeof useUpcomingEvents>
   style?: StyleProp<ViewStyle>
 }
@@ -110,12 +124,19 @@ export type UserProfileProps = {
 export const UserProfileView = ({
   userId,
   userInfoState,
+  friendRequestState,
+  onRelationStatusChanged,
   upcomingEventsState,
   style
 }: UserProfileProps) => {
   return (
     <TiFFormScrollView style={style}>
-      <UserInfoView state={userInfoState} />
+      <FriendRequestView state={friendRequestState}>
+        <UserInfoView
+          state={userInfoState}
+          onRelationStatusChanged={onRelationStatusChanged}
+        />
+      </FriendRequestView>
       <UpcomingEventsView
         state={upcomingEventsState}
         isShown={upcomingEventsState.status === "success"}
@@ -126,25 +147,51 @@ export const UserProfileView = ({
 
 export type UserInfoProps = {
   state: ReturnType<typeof useUserProfile>
+  onRelationStatusChanged: (
+    id: UserID,
+    status: UnblockedUserRelationsStatus
+  ) => void
   style?: StyleProp<ViewStyle>
 }
 
-export const UserInfoView = ({ state, style }: UserInfoProps) => (
-  <View style={style}>
-    {state.status === "success" ? (
-      <BaseUserInfoView user={state.user} style={style} />
-    ) : (
-      <View></View>
-    )}
-  </View>
-)
+export const UserInfoView = ({
+  state,
+  onRelationStatusChanged,
+  style
+}: UserInfoProps) => {
+  return (
+    <View style={style}>
+      {state.status === "success" ? (
+        <BaseUserInfoView
+          user={state.user}
+          style={style}
+          onRelationStatusChanged={onRelationStatusChanged}
+        />
+      ) : (
+        <View></View>
+      )}
+    </View>
+  )
+}
 
 export type BaseUserInfoViewProps = {
   user: BasicUser
+  onRelationStatusChanged: (
+    id: UserID,
+    status: UnblockedUserRelationsStatus
+  ) => void
   style?: StyleProp<ViewStyle>
 }
 
-export const BaseUserInfoView = ({ user, style }: BaseUserInfoViewProps) => {
+export const BaseUserInfoView = ({
+  user,
+  onRelationStatusChanged,
+  style
+}: BaseUserInfoViewProps) => {
+  const state = useFriendRequest({
+    user,
+    onSuccess: (status) => onRelationStatusChanged(user.id, status)
+  })
   return (
     <View style={style}>
       <AvatarView
@@ -152,8 +199,9 @@ export const BaseUserInfoView = ({ user, style }: BaseUserInfoViewProps) => {
         maximumFontSizeMultiplier={1.2}
         style={styles.profileFrame}
       />
-      <Title style={styles.username}>{user.name}</Title>
-      <Headline style={styles.handle}>{user.handle.toString()}</Headline>
+      <Headline style={styles.username}>{user.name}</Headline>
+      <Caption style={styles.handle}>{user.handle.toString()}</Caption>
+      <FriendRequestButton state={state} />
     </View>
   )
 }

@@ -10,6 +10,7 @@ import {
 } from "@test-helpers/ReactQuery"
 import { AlphaUserSessionProvider, AlphaUserStorage } from "@user/alpha"
 import { AlphaUserMocks } from "@user/alpha/MockData"
+import { FriendRequestProvider, useFriendRequest } from "@user/FriendRequest"
 import { EmailAddress } from "@user/privacy"
 import React from "react"
 import { useUpcomingEvents } from "user-profile-boundary/UpcomingEvents"
@@ -25,6 +26,7 @@ import {
   useUserProfile
 } from "../../../user-profile-boundary/UserProfile"
 import { StoryMeta } from "../../HelperTypes"
+import { delayData } from "@lib/utils/DelayData"
 
 const ProfileMeta: StoryMeta = {
   title: "Profile Screen"
@@ -69,43 +71,100 @@ export const Basic: ProfileStory = () => {
 
 const ProfileTestScreen = () => {
   return (
-    <UserProfileView
-      userInfoState={useUserProfile({
-        fetchUserProfile: async () => ({
-          status: "success",
-          user: { ...AlphaUserMocks.TheDarkLord, relationStatus: "friends" }
-        }),
-        userId: EventAttendeeMocks.Alivs.id
-      })}
-      upcomingEventsState={useUpcomingEvents({
-        fetchUpcomingEvents: async () => ({
-          status: "success",
-          events: [
-            clientSideEventFromResponse({
-              ...EventMocks.MockMultipleAttendeeResponse,
-              attendeeCount: 4,
-              userAttendeeStatus: "hosting",
-              previewAttendees: [
-                ...EventMocks.MockMultipleAttendeeResponse.previewAttendees,
-                {
-                  ...EventMocks.MockMultipleAttendeeResponse
-                    .previewAttendees[0],
-                  id: uuidString(),
-                  name: "Mario"
-                },
-                {
-                  ...EventMocks.MockMultipleAttendeeResponse
-                    .previewAttendees[1],
-                  id: uuidString(),
-                  name: "Luigi"
-                }
-              ]
-            })
-          ]
-        }),
-        userId: EventAttendeeMocks.Alivs.id
-      })}
-      userId={AlphaUserMocks.TheDarkLord.id}
-    />
+    <FriendRequestProvider
+      sendFriendRequest={async () => delayData("friends", 3000)}
+    >
+      <UserProfileView
+        userInfoState={useUserProfile({
+          fetchUserProfile: async () => ({
+            status: "success",
+            user: {
+              ...AlphaUserMocks.TheDarkLord,
+              relationStatus: "not-friends"
+            }
+          }),
+          userId: EventAttendeeMocks.Alivs.id
+        })}
+        friendRequestState={useFriendRequest({
+          user: {
+            ...AlphaUserMocks.TheDarkLord,
+            relationStatus: "not-friends"
+          },
+          onSuccess: (e) => {
+            console.log(e)
+          }
+        })}
+        upcomingEventsState={useUpcomingEvents({
+          fetchUpcomingEvents: async () => ({
+            status: "success",
+            events: [
+              clientSideEventFromResponse({
+                ...EventMocks.MockMultipleAttendeeResponse,
+                attendeeCount: 4,
+                userAttendeeStatus: "hosting",
+                previewAttendees: [
+                  ...EventMocks.MockMultipleAttendeeResponse.previewAttendees,
+                  {
+                    ...EventMocks.MockMultipleAttendeeResponse
+                      .previewAttendees[0],
+                    id: uuidString(),
+                    name: "Mario"
+                  },
+                  {
+                    ...EventMocks.MockMultipleAttendeeResponse
+                      .previewAttendees[1],
+                    id: uuidString(),
+                    name: "Luigi"
+                  }
+                ]
+              }),
+              clientSideEventFromResponse({
+                ...EventMocks.MockMultipleAttendeeResponse,
+                attendeeCount: 4,
+                userAttendeeStatus: "hosting",
+                previewAttendees: [
+                  ...EventMocks.MockMultipleAttendeeResponse.previewAttendees,
+                  {
+                    ...EventMocks.MockMultipleAttendeeResponse
+                      .previewAttendees[0],
+                    id: uuidString(),
+                    name: "Mario"
+                  },
+                  {
+                    ...EventMocks.MockMultipleAttendeeResponse
+                      .previewAttendees[1],
+                    id: uuidString(),
+                    name: "Luigi"
+                  }
+                ]
+              }),
+              clientSideEventFromResponse({
+                ...EventMocks.MockMultipleAttendeeResponse,
+                attendeeCount: 4,
+                userAttendeeStatus: "hosting",
+                previewAttendees: [
+                  ...EventMocks.MockMultipleAttendeeResponse.previewAttendees,
+                  {
+                    ...EventMocks.MockMultipleAttendeeResponse
+                      .previewAttendees[0],
+                    id: uuidString(),
+                    name: "Mario"
+                  },
+                  {
+                    ...EventMocks.MockMultipleAttendeeResponse
+                      .previewAttendees[1],
+                    id: uuidString(),
+                    name: "Luigi"
+                  }
+                ]
+              })
+            ]
+          }),
+          userId: EventAttendeeMocks.Alivs.id
+        })}
+        userId={AlphaUserMocks.TheDarkLord.id}
+        onRelationStatusChanged={(e) => console.log(e)}
+      />
+    </FriendRequestProvider>
   )
 }
