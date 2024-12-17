@@ -12,6 +12,7 @@ import { TiFSQLite } from "@lib/SQLite"
 import { testSQLite } from "@test-helpers/SQLite"
 import { SQLiteUserSettingsStorage } from "@settings-storage/UserSettings"
 import { SettingsProvider } from "@settings-storage/Hooks"
+import { EditEventFeature } from "@edit-event-boundary/EditEvent"
 
 const TiFPreview = {
   title: "TiF Preview"
@@ -28,18 +29,27 @@ const userSettings = PersistentSettingsStores.user(
 )
 
 export const Basic = () => (
-  <SettingsProvider
-    localSettingsStore={localSettings}
-    userSettingsStore={userSettings}
+  <EditEventFeature.Provider
+    submit={async () => ({
+      status: "success",
+      event: clientSideEventFromResponse(
+        EventMocks.MockMultipleAttendeeResponse
+      )
+    })}
   >
-    <AlphaUserSessionProvider storage={storage}>
-      <TiFView
-        fetchEvents={async () => [
-          clientSideEventFromResponse(EventMocks.MockMultipleAttendeeResponse)
-        ]}
-        isFontsLoaded={true}
-        style={{ flex: 1 }}
-      />
-    </AlphaUserSessionProvider>
-  </SettingsProvider>
+    <SettingsProvider
+      localSettingsStore={localSettings}
+      userSettingsStore={userSettings}
+    >
+      <AlphaUserSessionProvider storage={storage}>
+        <TiFView
+          fetchEvents={async () => [
+            clientSideEventFromResponse(EventMocks.MockMultipleAttendeeResponse)
+          ]}
+          isFontsLoaded={true}
+          style={{ flex: 1 }}
+        />
+      </AlphaUserSessionProvider>
+    </SettingsProvider>
+  </EditEventFeature.Provider>
 )

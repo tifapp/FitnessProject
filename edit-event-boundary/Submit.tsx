@@ -33,7 +33,7 @@ export const submitEventEdit = async (
   eventId: EventID | undefined,
   edit: EventEdit,
   api: TiFAPI = TiFAPI.productionInstance
-) => {
+): Promise<SubmitEventEditResult> => {
   if (!eventId) {
     const resp = await api.createEvent({ body: edit })
     return { status: "success", event: clientSideEventFromResponse(resp.data) }

@@ -41,12 +41,6 @@ const EditEventScreen = withAlphaRegistration(
         initialValues={fromRouteableEditFormValues(route.params)}
         hostName={session.name}
         hostProfileImageURL={session.profileImageURL}
-        submit={async (e, id) => ({
-          status: "success",
-          event: clientSideEventFromResponse(
-            EventMocks.MockSingleAttendeeResponse
-          )
-        })}
         onSelectLocationTapped={() => {
           navigation.navigate("editEventLocationSearch")
         }}
