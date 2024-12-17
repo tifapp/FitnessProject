@@ -5,6 +5,7 @@ import { EventID } from "TiFShared/domain-models/Event"
 import { InternetConnectionStatusProvider } from "@lib/InternetConnection"
 import { TestInternetConnectionStatus } from "@test-helpers/InternetConnectionStatus"
 import { EventMocks } from "./MockData"
+import { EventDetailsFeature } from "./Details"
 
 describe("EventAttendeesList tests", () => {
   describe("UseEventAttendeesList tests", () => {
@@ -81,11 +82,13 @@ describe("EventAttendeesList tests", () => {
 
     const renderUseEventAttendeesList = (eventId: EventID) => {
       const status = new TestInternetConnectionStatus(true)
-      return renderHook(() => useEventAttendeesList({ event, eventId }), {
+      return renderHook(() => useEventAttendeesList({ eventId }), {
         wrapper: ({ children }) => (
-          <InternetConnectionStatusProvider status={status}>
-            <TestQueryClientProvider>{children}</TestQueryClientProvider>
-          </InternetConnectionStatusProvider>
+          <EventDetailsFeature.Provider eventDetails={event}>
+            <InternetConnectionStatusProvider status={status}>
+              <TestQueryClientProvider>{children}</TestQueryClientProvider>
+            </InternetConnectionStatusProvider>
+          </EventDetailsFeature.Provider>
         )
       })
     }

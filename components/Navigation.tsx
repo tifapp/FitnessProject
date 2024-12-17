@@ -13,6 +13,7 @@ import {
   EditEventFormValues,
   toRouteableEditFormValues
 } from "@event/EditFormValues"
+import { NativeStackHeaderLeftProps } from "@react-navigation/native-stack"
 
 /**
  * A helper type that's useful for making reusable navigation flows.
@@ -45,11 +46,14 @@ export const useCoreNavigation = () => {
     presentProfile: (id: UserID | UserHandle) => {
       console.log("Profile", id)
     },
-    pushEventDetails: (id: EventID) => {
-      console.log("Details", id)
+    pushEventDetails: (
+      id: EventID,
+      method: "navigate" | "replace" = "navigate"
+    ) => {
+      navigation[method]("eventDetails", { id })
     },
     pushAttendeesList: (id: EventID) => {
-      console.log("Attendees List", id)
+      navigation.navigate("eventAttendeesList", { id })
     }
   }
 }
@@ -58,20 +62,18 @@ export const useCoreNavigation = () => {
  * Base styles that all navigation headers should use.
  */
 export const BASE_HEADER_SCREEN_OPTIONS = {
-  headerStyle: {
-    shadowColor: "transparent",
-    elevation: 0
-  },
   cardStyle: {
     backgroundColor: "white"
   },
+  headerShadowVisible: false,
+  contentStyle: { backgroundColor: "white" },
   headerTitleStyle: {
     fontSize: 16,
     fontFamily: "OpenSansBold"
   }
 }
 
-export type BackButtonProps = {
+export type BackButtonProps = NativeStackHeaderLeftProps & {
   style?: StyleProp<ViewStyle>
 }
 

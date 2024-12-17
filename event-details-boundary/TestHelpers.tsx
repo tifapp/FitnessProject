@@ -4,7 +4,7 @@ import {
 } from "@lib/InternetConnection"
 import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
 import { renderHook } from "@testing-library/react-native"
-import { useLoadEventDetails } from "./Details"
+import { EventDetailsFeature, useLoadEventDetails } from "./Details"
 import { ClientSideEvent } from "@event/ClientSideEvent"
 import { EventDetailsLoadingResult } from "@event/DetailsQuery"
 import { QueryClient } from "@tanstack/react-query"
@@ -17,19 +17,18 @@ export const renderUseLoadEventDetails = (
   loadEvent: (eventId: EventID) => Promise<EventDetailsLoadingResult>,
   queryClient?: QueryClient
 ) => {
-  return renderHook(
-    (eventId: EventID) => useLoadEventDetails(eventId, loadEvent),
-    {
-      initialProps: eventId,
-      wrapper: ({ children }: any) => (
+  return renderHook((eventId: EventID) => useLoadEventDetails(eventId), {
+    initialProps: eventId,
+    wrapper: ({ children }: any) => (
+      <EventDetailsFeature.Provider eventDetails={loadEvent}>
         <InternetConnectionStatusProvider status={connectionStatus}>
           <TestQueryClientProvider client={queryClient}>
             {children}
           </TestQueryClientProvider>
         </InternetConnectionStatusProvider>
-      )
-    }
-  )
+      </EventDetailsFeature.Provider>
+    )
+  })
 }
 
 export const renderSuccessfulUseLoadEventDetails = (

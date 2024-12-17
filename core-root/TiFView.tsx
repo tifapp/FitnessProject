@@ -12,18 +12,22 @@ import { withAlphaRegistration } from "./AlphaRegister"
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet"
 import { GestureHandlerRootView } from "react-native-gesture-handler"
 import { EditEventNavigator } from "./navigation/EditEvent"
+import { eventDetailsScreens } from "./navigation/EventDetails"
+import { createNativeStackNavigator } from "@react-navigation/native-stack"
+import { TiFBottomSheetProvider } from "@components/BottomSheet"
 
 const HomeScreen = withAlphaRegistration(() => (
   <HomeView style={styles.screen} />
 ))
 
-const Stack = createStackNavigator({
+const Stack = createNativeStackNavigator({
   screenOptions: BASE_HEADER_SCREEN_OPTIONS,
   screens: {
     home: {
       options: { headerShown: false },
       screen: HomeScreen
-    }
+    },
+    ...eventDetailsScreens()
   },
   groups: {
     modals: {
@@ -50,17 +54,17 @@ export const TiFView = ({ isFontsLoaded, style, ...props }: TiFProps) => {
   return (
     <GestureHandlerRootView>
       <TiFQueryClientProvider>
-        <BottomSheetModalProvider>
-          <SafeAreaProvider>
-            <RootSiblingParent>
+        <SafeAreaProvider>
+          <RootSiblingParent>
+            <TiFBottomSheetProvider>
               <View style={style}>
                 <TiFContext.Provider value={props}>
                   <Navigation linking={linking} />
                 </TiFContext.Provider>
               </View>
-            </RootSiblingParent>
-          </SafeAreaProvider>
-        </BottomSheetModalProvider>
+            </TiFBottomSheetProvider>
+          </RootSiblingParent>
+        </SafeAreaProvider>
       </TiFQueryClientProvider>
     </GestureHandlerRootView>
   )

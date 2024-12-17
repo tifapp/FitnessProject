@@ -1,8 +1,7 @@
 import {
   BASE_HEADER_SCREEN_OPTIONS,
-  XMarkBackButton
+  useCoreNavigation
 } from "@components/Navigation"
-import { Headline } from "@components/Text"
 import {
   withAlphaRegistration,
   WithAlphaRegistrationProps
@@ -10,8 +9,6 @@ import {
 import { EditEventFormDismissButton } from "@edit-event-boundary/Dismiss"
 import { EditEventView } from "@edit-event-boundary/EditEvent"
 import { editEventFormValueAtoms } from "@edit-event-boundary/FormAtoms"
-import { EventMocks } from "@event-details-boundary/MockData"
-import { clientSideEventFromResponse } from "@event/ClientSideEvent"
 import {
   RouteableEditEventFormValues,
   fromRouteableEditFormValues
@@ -21,10 +18,12 @@ import {
   useLocationsSearch
 } from "@location-search-boundary"
 import { useNavigation } from "@react-navigation/native"
-import { StackScreenProps, createStackNavigator } from "@react-navigation/stack"
+import { StackScreenProps } from "@react-navigation/stack"
+import { createNativeStackNavigator } from "@react-navigation/native-stack"
 import { EventID } from "TiFShared/domain-models/Event"
 import { useSetAtom } from "jotai"
 import { StyleSheet } from "react-native"
+import { eventDetailsScreens } from "./EventDetails"
 
 type EditEventScreenProps = WithAlphaRegistrationProps<
   StackScreenProps<
@@ -35,6 +34,7 @@ type EditEventScreenProps = WithAlphaRegistrationProps<
 const EditEventScreen = withAlphaRegistration(
   ({ session, route }: EditEventScreenProps) => {
     const navigation = useNavigation()
+    const { pushEventDetails } = useCoreNavigation()
     return (
       <EditEventView
         eventId={route.params.id}
@@ -44,9 +44,7 @@ const EditEventScreen = withAlphaRegistration(
         onSelectLocationTapped={() => {
           navigation.navigate("editEventLocationSearch")
         }}
-        onSuccess={(e) => {
-          navigation.replace("editEventDetails", { id: e.id })
-        }}
+        onSuccess={(e) => pushEventDetails(e.id, "replace")}
         style={styles.screen}
       />
     )
@@ -75,11 +73,7 @@ const EditEventFormBackButton = () => (
   <EditEventFormDismissButton onDismiss={useNavigation().goBack} />
 )
 
-const EditEventDetailsScreen = () => {
-  return <Headline>TODO: I am the event details</Headline>
-}
-
-export const EditEventNavigator = createStackNavigator({
+export const EditEventNavigator = createNativeStackNavigator({
   screenOptions: BASE_HEADER_SCREEN_OPTIONS,
   screens: {
     editEventForm: {
@@ -100,10 +94,7 @@ export const EditEventNavigator = createStackNavigator({
       options: { headerShown: false },
       screen: LocationSearchScreen
     },
-    editEventDetails: {
-      options: { headerLeft: XMarkBackButton, headerTitle: "Event" },
-      screen: EditEventDetailsScreen
-    }
+    ...eventDetailsScreens()
   }
 })
 

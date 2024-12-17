@@ -38,6 +38,7 @@ export const ExploreEventsBottomSheet = ({
       <View style={style}>
         <TiFBottomSheet
           isPresented
+          overlay="on-screen"
           sizing={{ snapPoints: SNAP_POINTS }}
           initialSnapPointIndex={1}
           canSwipeToDismiss={false}

@@ -3,18 +3,12 @@ import { TestInternetConnectionStatus } from "@test-helpers/InternetConnectionSt
 import { fakeTimers } from "@test-helpers/Timers"
 import { act, renderHook, waitFor } from "@testing-library/react-native"
 import { TiFAPI } from "TiFShared/api"
-import { EventResponse } from "TiFShared/api/models/Event"
 import { ColorString } from "TiFShared/domain-models/ColorString"
 import { EventID, EventWhenBlockedByHost } from "TiFShared/domain-models/Event"
-import { dateRange } from "TiFShared/domain-models/FixedDateRange"
 import { UserHandle } from "TiFShared/domain-models/User"
 import { mockTiFEndpoint } from "TiFShared/test-helpers/mockAPIServer"
-import dayjs from "dayjs"
-import {
-  loadEventDetails,
-  useDisplayedEventDetailsLoadingBalls
-} from "./Details"
-import { EventMocks, mockEventLocation } from "./MockData"
+import { eventDetails, useDisplayedEventDetailsLoadingBalls } from "./Details"
+import { EventMocks } from "./MockData"
 import { renderUseLoadEventDetails } from "./TestHelpers"
 
 describe("EventDetailsLoading tests", () => {
@@ -194,7 +188,7 @@ describe("EventDetailsLoading tests", () => {
 
     it("should return not-found when a 404 occurs", async () => {
       mockTiFEndpoint("eventDetails", 404, { error: "event-not-found" })
-      const result = await loadEventDetails(1, TiFAPI.testAuthenticatedInstance)
+      const result = await eventDetails(1, TiFAPI.testAuthenticatedInstance)
       expect(result).toEqual({ status: "not-found" })
     })
 
@@ -213,7 +207,7 @@ describe("EventDetailsLoading tests", () => {
         }
       }
       mockTiFEndpoint("eventDetails", 403, blockedEventResponse)
-      const result = await loadEventDetails(1, TiFAPI.testAuthenticatedInstance)
+      const result = await eventDetails(1, TiFAPI.testAuthenticatedInstance)
       expect(result).toEqual({
         status: "blocked",
         event: {
@@ -231,7 +225,7 @@ describe("EventDetailsLoading tests", () => {
       jest.setSystemTime(clientReceivedTime)
       const eventResponse = EventMocks.MockSingleAttendeeResponse
       mockTiFEndpoint("eventDetails", 200, eventResponse)
-      const resp = await loadEventDetails(1, TiFAPI.testAuthenticatedInstance)
+      const resp = await eventDetails(1, TiFAPI.testAuthenticatedInstance)
       expect(resp).toEqual({
         status: "success",
         event: {

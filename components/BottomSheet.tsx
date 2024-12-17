@@ -6,7 +6,7 @@ import {
 } from "@gorhom/bottom-sheet"
 import { AppStyles } from "@lib/AppColorStyle"
 import { useLastDefinedValue } from "@lib/utils/UseLastDefinedValue"
-import { useEffect, useRef } from "react"
+import { ReactNode, useEffect, useRef } from "react"
 import {
   ViewStyle,
   Pressable,
@@ -21,11 +21,13 @@ import Animated, {
   useAnimatedStyle,
   useSharedValue
 } from "react-native-reanimated"
+import { FullWindowOverlay } from "react-native-screens"
 
 export const TiFBottomSheetProvider = BottomSheetModalProvider
 
 type BaseTiFBottomSheetProps = {
   sizing: TiFBottomSheetSizing
+  overlay?: "on-screen" | "above-screen"
   initialSnapPointIndex?: number
   canSwipeToDismiss?: boolean
   shouldIncludeBackdrop?: boolean
@@ -52,6 +54,7 @@ export type TiFBottomSheetProps<Item = boolean> = BaseTiFBottomSheetProps &
 
 export const TiFBottomSheet = <Item = boolean,>({
   sizing,
+  overlay = "above-screen",
   canSwipeToDismiss = true,
   enableContentPanningGesture = true,
   shouldIncludeBackdrop = true,
@@ -93,6 +96,9 @@ export const TiFBottomSheet = <Item = boolean,>({
       handleStyle={bottomSheetHandleStyle}
       animatedIndex={animatedIndex}
       onDismiss={onDismiss}
+      containerComponent={
+        overlay === "above-screen" ? ContainerView : undefined
+      }
       backdropComponent={shouldIncludeBackdrop ? TiFBackdropView : null}
       style={style}
       {...sizeProp}
@@ -101,6 +107,10 @@ export const TiFBottomSheet = <Item = boolean,>({
     </BottomSheetModal>
   )
 }
+
+const ContainerView = ({ children }: { children: ReactNode }) => (
+  <FullWindowOverlay>{children}</FullWindowOverlay>
+)
 
 const TiFBackdropView = ({
   animatedPosition,
