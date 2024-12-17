@@ -4,6 +4,7 @@ import { BodyText, Subtitle } from "@components/Text"
 import { ShadedTextField } from "@components/TextFields"
 import { TiFFormScrollableLayoutView } from "@components/form-components/ScrollableFormLayout"
 import { AlertsObject, presentAlert } from "@lib/Alerts"
+import { featureContext } from "@lib/FeatureContext"
 import { useFontScale } from "@lib/Fonts"
 import { useFormSubmission } from "@lib/utils/Form"
 import { useQueryClient } from "@tanstack/react-query"
@@ -12,8 +13,8 @@ import {
   UserSession,
   setUserSessionQueryData
 } from "@user/Session"
-import { AlphaUser, alphaUserSession, registerAlphaUser } from "@user/alpha"
-import { ReactNode, createContext, useContext, useState } from "react"
+import { alphaUserSession, registerAlphaUser } from "@user/alpha"
+import { ReactNode, useState } from "react"
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
 
@@ -24,29 +25,14 @@ export const ALERTS = {
   }
 } satisfies AlertsObject
 
-export type AlphaRegisterContextValues = {
-  register: (name: string) => Promise<AlphaUser>
-}
-
-const RegisterContext = createContext<AlphaRegisterContextValues>({
+export const AlphaRegisterFeature = featureContext({
   register: registerAlphaUser
 })
-
-export type AlphaRegisterProviderProps = AlphaRegisterContextValues & {
-  children: ReactNode
-}
-
-export const AlphaRegisterProvider = ({
-  children,
-  ...values
-}: AlphaRegisterProviderProps) => (
-  <RegisterContext.Provider value={values}>{children}</RegisterContext.Provider>
-)
 
 export const useAlphaRegister = () => {
   const [name, setName] = useState("")
   const queryClient = useQueryClient()
-  const { register } = useContext(RegisterContext)
+  const { register } = AlphaRegisterFeature.useContext()
   return {
     name,
     nameChanged: setName,

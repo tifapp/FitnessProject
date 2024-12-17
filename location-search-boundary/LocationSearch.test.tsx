@@ -19,7 +19,7 @@ import {
   LocationSearchPicker,
   LocationSearchResultProps,
   LocationSearchResultView,
-  LocationsSearchProvider,
+  LocationsSearchFeature,
   useLocationsSearch
 } from "."
 import { mockLocationSearchResult } from "./MockData"
@@ -332,16 +332,18 @@ describe("LocationSearch tests", () => {
             <UserLocationFunctionsProvider
               getCurrentLocation={queryUserCoordinates}
             >
-              <LocationsSearchProvider
+              <LocationsSearchFeature.Provider
                 searchResults={searchForLocations}
-                saveLocation={(location) => (savedLocation = location)}
+                saveLocation={async (location) => {
+                  savedLocation = location
+                }}
               >
                 <LocationSearchBar
                   onBackTapped={jest.fn()}
                   placeholder={searchBarPlaceholder}
                 />
                 <TestView />
-              </LocationsSearchProvider>
+              </LocationsSearchFeature.Provider>
             </UserLocationFunctionsProvider>
           </TestQueryClientProvider>
         )

@@ -4,9 +4,8 @@ import { AppStyles } from "@lib/AppColorStyle"
 import { NamedLocation } from "@location/NamedLocation"
 import { useUserCoordinatesQuery } from "@location/UserLocation"
 import { UseQueryResult, useQuery } from "@tanstack/react-query"
-import { LocationCoordinate2D } from "TiFShared/domain-models/LocationCoordinate2D"
 import { LocationAccuracy, LocationObject } from "expo-location"
-import React, { ReactNode, createContext, useContext, useState } from "react"
+import React, { useState } from "react"
 import {
   LayoutRectangle,
   Platform,
@@ -18,18 +17,13 @@ import {
 } from "react-native"
 import Animated, { FadeIn } from "react-native-reanimated"
 import { LocationSearchLoadingResult } from "./LoadingResult"
-import {
-  LocationSearchResult,
-  LocationsSearchQueryText,
-  locationSearch
-} from "./SearchClient"
+import { LocationSearchResult, locationSearch } from "./SearchClient"
 import {
   LocationSearchResultProps,
   LocationSearchResultView
 } from "./SearchResultView"
 import { LocationSearchResultsListView } from "./SearchResultsList"
 import { debouncedSearchTextAtom } from "./SearchTextAtoms"
-import { mergeWithPartial } from "TiFShared/lib/Object"
 import { useAtomValue } from "jotai"
 import { useScreenBottomPadding } from "@components/Padding"
 import { useNavigation } from "@react-navigation/native"
@@ -37,20 +31,13 @@ import { LocationSearchBar } from "./SearchBar"
 import { SafeAreaView } from "react-native-safe-area-context"
 import { logger } from "TiFShared/logging"
 import { recentLocationsStorage } from "@location/Recents"
-
-export type LocationsSearchContextValues = {
-  searchResults: (
-    query: LocationsSearchQueryText,
-    center?: LocationCoordinate2D
-  ) => Promise<LocationSearchResult[]>
-  saveLocation: (result: NamedLocation) => void
-}
+import { featureContext } from "@lib/FeatureContext"
 
 const log = logger("location.search")
 
-const LocationsSearchContext = createContext<LocationsSearchContextValues>({
+export const LocationsSearchFeature = featureContext({
   searchResults: locationSearch,
-  saveLocation: async (result) => {
+  saveLocation: async (result: NamedLocation) => {
     try {
       await recentLocationsStorage.save(result)
     } catch (e) {
@@ -59,28 +46,12 @@ const LocationsSearchContext = createContext<LocationsSearchContextValues>({
   }
 })
 
-export type LocationsSearchProviderProps =
-  Partial<LocationsSearchContextValues> & {
-    children: ReactNode
-  }
-
-export const LocationsSearchProvider = ({
-  children,
-  ...values
-}: LocationsSearchProviderProps) => (
-  <LocationsSearchContext.Provider
-    value={mergeWithPartial(useContext(LocationsSearchContext), values)}
-  >
-    {children}
-  </LocationsSearchContext.Provider>
-)
-
 /**
  * A hook to provide data to the location search picker.
  */
 export const useLocationsSearch = () => {
   const query = useAtomValue(debouncedSearchTextAtom)
-  const { searchResults } = useContext(LocationsSearchContext)
+  const { searchResults } = LocationsSearchFeature.useContext()
   const userLocation = useLocationSearchCenter()
   const locationsQuery = useQuery(
     ["search-locations", query, userLocation?.coords],
@@ -172,7 +143,7 @@ export const LocationSearchPicker = ({
   style,
   contentContainerStyle
 }: LocationsSearchProps) => {
-  const { saveLocation } = useContext(LocationsSearchContext)
+  const { saveLocation } = LocationsSearchFeature.useContext()
   return (
     <LocationSearchResultsListView
       style={style}

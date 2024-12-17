@@ -4,11 +4,7 @@ import {
   createTestQueryClient
 } from "@test-helpers/ReactQuery"
 import { captureAlerts } from "@test-helpers/Alerts"
-import {
-  ALERTS,
-  AlphaRegisterProvider,
-  useAlphaRegister
-} from "./AlphaRegister"
+import { ALERTS, AlphaRegisterFeature, useAlphaRegister } from "./AlphaRegister"
 import { AlphaUserMocks } from "@user/alpha/MockData"
 import { UserSessionProvider, useUserSessionQuery } from "@user/Session"
 
@@ -78,9 +74,9 @@ describe("AlphaRegister tests", () => {
       return renderHook(useAlphaRegister, {
         wrapper: ({ children }) => (
           <TestQueryClientProvider client={queryClient}>
-            <AlphaRegisterProvider register={registerUser}>
+            <AlphaRegisterFeature.Provider register={registerUser}>
               {children}
-            </AlphaRegisterProvider>
+            </AlphaRegisterFeature.Provider>
           </TestQueryClientProvider>
         )
       })

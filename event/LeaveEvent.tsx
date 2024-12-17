@@ -1,14 +1,12 @@
-import { PrimaryButton, SecondaryOutlinedButton } from "@components/Buttons"
+import { SecondaryOutlinedButton } from "@components/Buttons"
 import { ClientSideEvent } from "@event/ClientSideEvent"
 import { updateEventDetailsQueryEvent } from "@event/DetailsQuery"
 import { AlertsObject, presentAlert } from "@lib/Alerts"
-import { AppStyles } from "@lib/AppColorStyle"
-import { FontScaleFactors } from "@lib/Fonts"
 import { useFormSubmission } from "@lib/utils/Form"
 import { useQueryClient } from "@tanstack/react-query"
 import { TiFAPI } from "TiFShared/api"
 import { EventID } from "TiFShared/domain-models/Event"
-import { ViewStyle, StyleProp, StyleSheet, TextProps } from "react-native"
+import { ViewStyle, StyleProp, TextProps } from "react-native"
 
 export const leaveEvent = async (
   id: EventID,
