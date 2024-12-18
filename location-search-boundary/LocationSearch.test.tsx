@@ -255,7 +255,7 @@ describe("LocationSearch tests", () => {
       }
 
       const userLocationOptionLabel = async () => {
-        return await screen.findByText("Use current location")
+        return await screen.findByText("Use your location")
       }
 
       const waitToSelectLocationWithName = async (name: string) => {
