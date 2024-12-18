@@ -43,14 +43,22 @@ export const useCoreNavigation = () => {
         })
       }
     },
-    presentProfile: (id: UserID | UserHandle) => {
-      console.log("Profile", id)
+    presentProfile: (
+      id: UserID | UserHandle,
+      method: "navigate" | "replace" = "navigate"
+    ) => {
+      ;(navigation as any)[method]("editEvent", {
+        screen: "userProfile",
+        params: { id, method }
+      })
     },
     pushEventDetails: (
       id: EventID,
       method: "navigate" | "replace" = "navigate"
     ) => {
-      navigation[method]("eventDetails", { id, method })
+      // NB: Typescript doesn't like the subscript for some reason, but navigation should always
+      // have a navigate and replace method.
+      ;(navigation as any)[method]("eventDetails", { id, method })
     },
     pushAttendeesList: (id: EventID) => {
       navigation.navigate("eventAttendeesList", { id })

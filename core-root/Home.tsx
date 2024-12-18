@@ -20,10 +20,7 @@ import { StyleProp, ViewStyle, View, Pressable, StyleSheet } from "react-native"
 import PagerView from "react-native-pager-view"
 import { TiFContext } from "./Context"
 import { useCoreNavigation } from "@components/Navigation"
-import {
-  DEFAULT_EDIT_EVENT_FORM_VALUES,
-  defaultEditFormValues
-} from "@event/EditFormValues"
+import { defaultEditFormValues } from "@event/EditFormValues"
 
 export type HomeProps = {
   style?: StyleProp<ViewStyle>

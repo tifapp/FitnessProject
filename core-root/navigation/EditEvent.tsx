@@ -17,20 +17,18 @@ import {
   LocationsSearchView,
   useLocationsSearch
 } from "@location-search-boundary"
-import { useNavigation } from "@react-navigation/native"
-import { StackScreenProps } from "@react-navigation/stack"
+import { StaticScreenProps, useNavigation } from "@react-navigation/native"
 import { createNativeStackNavigator } from "@react-navigation/native-stack"
 import { EventID } from "TiFShared/domain-models/Event"
 import { useSetAtom } from "jotai"
 import { StyleSheet } from "react-native"
 import { eventDetailsScreens } from "./EventDetails"
+import { profileScreens } from "./Profile"
 
 type EditEventScreenProps = WithAlphaRegistrationProps<
-  StackScreenProps<
-    { editEvent: RouteableEditEventFormValues & { id?: EventID } },
-    "editEvent"
-  >
+  StaticScreenProps<RouteableEditEventFormValues & { id?: EventID }>
 >
+
 const EditEventScreen = withAlphaRegistration(
   ({ session, route }: EditEventScreenProps) => {
     const navigation = useNavigation()
@@ -42,7 +40,9 @@ const EditEventScreen = withAlphaRegistration(
         hostName={session.name}
         hostProfileImageURL={session.profileImageURL}
         onSelectLocationTapped={() => {
-          navigation.navigate("editEventLocationSearch")
+          navigation.navigate("editEvent", {
+            screen: "editEventLocationSearch"
+          })
         }}
         onSuccess={(e) => pushEventDetails(e.id, "replace")}
         style={styles.screen}
@@ -74,7 +74,7 @@ const EditEventFormBackButton = () => (
 )
 
 export const EditEventNavigator = createNativeStackNavigator({
-  screenOptions: BASE_HEADER_SCREEN_OPTIONS,
+  screenOptions: () => BASE_HEADER_SCREEN_OPTIONS,
   screens: {
     editEventForm: {
       options: {
@@ -94,7 +94,8 @@ export const EditEventNavigator = createNativeStackNavigator({
       options: { headerShown: false },
       screen: LocationSearchScreen
     },
-    ...eventDetailsScreens()
+    ...eventDetailsScreens(),
+    ...profileScreens()
   }
 })
 

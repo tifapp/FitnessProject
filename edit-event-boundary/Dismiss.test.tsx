@@ -10,7 +10,7 @@ import {
 import { captureAlerts } from "@test-helpers/Alerts"
 import { Provider } from "jotai"
 import {
-  DEFAULT_EDIT_EVENT_FORM_VALUES,
+  defaultEditFormValues,
   EditEventFormValues
 } from "@event/EditFormValues"
 import { editEventFormValuesAtom } from "./FormAtoms"
@@ -25,7 +25,7 @@ describe("DismissEditEventForm tests", () => {
 
     beforeEach(() => onDismiss.mockReset())
 
-    const TEST_VALUES = { ...DEFAULT_EDIT_EVENT_FORM_VALUES, title: "Blob" }
+    const TEST_VALUES = { ...defaultEditFormValues(), title: "Blob" }
 
     it("should invoke dismiss callback immediately when no value changes to form values", () => {
       renderUseHydrateEditEvent(TEST_VALUES, settings)

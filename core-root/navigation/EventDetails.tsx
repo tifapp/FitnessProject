@@ -1,20 +1,10 @@
-import {
-  BackButtonProps,
-  ChevronBackButton,
-  XMarkBackButton
-} from "@components/Navigation"
+import { ChevronBackButton, XMarkBackButton } from "@components/Navigation"
 import { Headline } from "@components/Text"
 import {
   EventAttendeesListView,
   useEventAttendeesList
 } from "@event-details-boundary/AttendeesList"
-import {
-  StaticParamList,
-  StaticScreenProps,
-  useNavigation,
-  useRoute
-} from "@react-navigation/native"
-import { StackScreenProps } from "@react-navigation/stack"
+import { StaticScreenProps, useNavigation } from "@react-navigation/native"
 import { EventID } from "TiFShared/domain-models/Event"
 import { useEffect } from "react"
 
@@ -29,10 +19,8 @@ export const eventDetailsScreens = () => ({
   }
 })
 
-type AttendeesListScreenProps = StackScreenProps<
-  { eventDetails: { id: EventID } },
-  "eventDetails"
->
+type AttendeesListScreenProps = StaticScreenProps<{ id: EventID }>
+
 const AttendeesListScreen = ({ route }: AttendeesListScreenProps) => {
   const navigation = useNavigation()
   return (
