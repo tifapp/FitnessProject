@@ -31,39 +31,33 @@ export const ExploreEventsBottomSheet = ({
   HeaderComponent,
   EmptyEventsComponent,
   style
-}: ExploreEventsBottomSheetProps) => {
-  const { pushEventDetails } = useCoreNavigation()
-  return (
-    <TiFBottomSheetProvider>
-      <View style={style}>
-        <TiFBottomSheet
-          isPresented
-          overlay="on-screen"
-          sizing={{ snapPoints: SNAP_POINTS }}
-          initialSnapPointIndex={1}
-          canSwipeToDismiss={false}
-          shouldIncludeBackdrop={false}
-        >
-          <BottomSheetFlatList
-            data={events}
-            keyExtractor={(event) => event.id.toString()}
-            renderItem={({ item }: ListRenderItemInfo<ClientSideEvent>) => (
-              <Pressable
-                onPress={() => pushEventDetails(item.id)}
-                style={styles.eventContainer}
-              >
-                <EventCard event={item} style={styles.event} />
-              </Pressable>
-            )}
-            ListEmptyComponent={EmptyEventsComponent}
-            ListHeaderComponent={HeaderComponent}
-            stickyHeaderIndices={STICKY_HEADER_INDICIES}
-          />
-        </TiFBottomSheet>
-      </View>
-    </TiFBottomSheetProvider>
-  )
-}
+}: ExploreEventsBottomSheetProps) => (
+  <TiFBottomSheetProvider>
+    <View style={style}>
+      <TiFBottomSheet
+        isPresented
+        overlay="on-screen"
+        sizing={{ snapPoints: SNAP_POINTS }}
+        initialSnapPointIndex={1}
+        canSwipeToDismiss={false}
+        shouldIncludeBackdrop={false}
+      >
+        <BottomSheetFlatList
+          data={events}
+          keyExtractor={(event) => event.id.toString()}
+          renderItem={({ item }: ListRenderItemInfo<ClientSideEvent>) => (
+            <View style={styles.eventContainer}>
+              <EventCard event={item} style={styles.event} />
+            </View>
+          )}
+          ListEmptyComponent={EmptyEventsComponent}
+          ListHeaderComponent={HeaderComponent}
+          stickyHeaderIndices={STICKY_HEADER_INDICIES}
+        />
+      </TiFBottomSheet>
+    </View>
+  </TiFBottomSheetProvider>
+)
 
 const styles = StyleSheet.create({
   eventContainer: {

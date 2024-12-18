@@ -6,11 +6,17 @@ import {
 } from "@event-details-boundary/AttendeesList"
 import { StaticScreenProps, useNavigation } from "@react-navigation/native"
 import { EventID } from "TiFShared/domain-models/Event"
-import { useEffect } from "react"
 
 export const eventDetailsScreens = () => ({
   eventDetails: {
-    options: { headerTitle: "Event" },
+    // TODO: - Remove this any.
+    options: ({ route }: any) => ({
+      headerLeft:
+        route.params?.method === "navigate"
+          ? ChevronBackButton
+          : XMarkBackButton,
+      headerTitle: "Event"
+    }),
     screen: EventDetailsScreen
   },
   eventAttendeesList: {
@@ -36,13 +42,6 @@ type EventDetailsScreenProps = StaticScreenProps<{
   method?: "navigate" | "replace"
 }>
 
-const EventDetailsScreen = ({ route }: EventDetailsScreenProps) => {
-  const navigation = useNavigation()
-  useEffect(() => {
-    navigation.setOptions({
-      headerLeft:
-        route.params.method === "navigate" ? ChevronBackButton : XMarkBackButton
-    })
-  }, [route.params.method, navigation])
+const EventDetailsScreen = (_: EventDetailsScreenProps) => {
   return <Headline>TODO: I am the event details</Headline>
 }

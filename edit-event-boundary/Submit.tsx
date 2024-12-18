@@ -47,7 +47,7 @@ export const submitEventEdit = async (
 export const ALERTS = {
   submissionError: (eventId?: EventID) => ({
     title: "Oh No!",
-    description: eventId
+    description: !eventId
       ? "It seems that we weren't able to create the event. Please try again."
       : "It seems that we weren't able to update the event. Please try again."
   }),

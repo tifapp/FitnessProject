@@ -20,7 +20,7 @@ const TiFPreview = {
 
 export default TiFPreview
 
-const storage = AlphaUserStorage.ephemeral(AlphaUserMocks.Blob)
+const storage = AlphaUserStorage.ephemeral(AlphaUserMocks.TheDarkLord)
 const localSettings = PersistentSettingsStores.local(
   new SQLiteLocalSettingsStorage(testSQLite)
 )
@@ -29,27 +29,16 @@ const userSettings = PersistentSettingsStores.user(
 )
 
 export const Basic = () => (
-  <EditEventFeature.Provider
-    submit={async () => ({
-      status: "success",
-      event: clientSideEventFromResponse(
-        EventMocks.MockMultipleAttendeeResponse
-      )
-    })}
+  <SettingsProvider
+    localSettingsStore={localSettings}
+    userSettingsStore={userSettings}
   >
-    <SettingsProvider
-      localSettingsStore={localSettings}
-      userSettingsStore={userSettings}
-    >
-      <AlphaUserSessionProvider storage={storage}>
-        <TiFView
-          fetchEvents={async () => [
-            clientSideEventFromResponse(EventMocks.MockMultipleAttendeeResponse)
-          ]}
-          isFontsLoaded={true}
-          style={{ flex: 1 }}
-        />
-      </AlphaUserSessionProvider>
-    </SettingsProvider>
-  </EditEventFeature.Provider>
+    <AlphaUserSessionProvider storage={storage}>
+      <TiFView
+        fetchEvents={eventsByRegion}
+        isFontsLoaded={true}
+        style={{ flex: 1 }}
+      />
+    </AlphaUserSessionProvider>
+  </SettingsProvider>
 )

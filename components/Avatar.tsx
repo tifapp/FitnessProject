@@ -39,17 +39,16 @@ export const AvatarView = ({
 )
 
 const initials = (name: string) => {
-  if (name === "") {
-    return "?"
-  }
   if (name.length === 1) {
     return name.toUpperCase()
   }
-  const splitName = name.split(" ")
+  const splitName = name.split(" ").filter((s) => s.length > 0)
+  if (splitName.length === 0) return "?"
+  const firstName = splitName[0]
   if (splitName.length === 1) {
-    return `${splitName[0][0]}${splitName[0][splitName[0].length - 1]}`.toUpperCase()
+    return `${firstName[0]}${firstName[firstName.length - 1]}`.toUpperCase()
   } else {
-    return `${splitName[0][0]}${splitName[splitName.length - 1][0]}`.toUpperCase()
+    return `${firstName[0]}${splitName[splitName.length - 1][0]}`.toUpperCase()
   }
 }
 

@@ -8,7 +8,11 @@ describe("Avatar tests", () => {
     ["SN", "Sean"],
     ["JM", "Joe K. Morlin"],
     ["?", ""],
-    ["S", "s"]
+    ["?", "        "],
+    ["S", "s"],
+    ["BB", "Blob"],
+    ["BB", "Blob "],
+    ["BB", "Blob   "]
   ])(
     "should display avatar initials as %s",
     (initials: string, name: string) => {
