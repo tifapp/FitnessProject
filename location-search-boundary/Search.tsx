@@ -113,13 +113,16 @@ export const LocationsSearchView = ({
         <LocationSearchBar
           onBackTapped={useNavigation().goBack}
           placeholder="Enter a Location"
-          style={styles.locationSearchBarHeaderSpacing}
+          style={[
+            styles.locationSearchBarHeaderSpacing,
+            { paddingTop: Platform.OS === "android" ? 8 : 24 }
+          ]}
         />
       </View>
       <LocationSearchPicker
         state={state}
         {...props}
-        contentContainerStyle={{ paddingBottom: padding }}
+        contentContainerStyle={{ paddingBottom: padding, paddingTop: 16 }}
       />
     </SafeAreaView>
   )
