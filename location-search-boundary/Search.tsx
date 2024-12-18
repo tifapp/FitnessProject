@@ -168,7 +168,7 @@ export const LocationSearchPicker = ({
                   accessible={false}
                   style={styles.userCoordinatesIcon}
                 />
-                <Headline>Use current location</Headline>
+                <Headline>Use your location</Headline>
               </Animated.View>
             </TouchableOpacity>
           )}

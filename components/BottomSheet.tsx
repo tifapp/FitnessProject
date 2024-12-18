@@ -7,12 +7,12 @@ import {
 import { AppStyles } from "@lib/AppColorStyle"
 import { useLastDefinedValue } from "@lib/utils/UseLastDefinedValue"
 import { ReactNode, useEffect, useRef } from "react"
-import { Platform } from "react-native"
 import {
   ViewStyle,
   Pressable,
   StyleProp,
   StyleSheet,
+  Platform,
   Dimensions
 } from "react-native"
 import Animated, {
@@ -101,7 +101,7 @@ export const TiFBottomSheet = <Item = boolean,>({
         // NB: iOS needs a FullWindowOverlay in order to have the sheet appear above the native
         // stack navigator when presented in a modal.
         overlay === "above-screen" && Platform.OS === "ios"
-          ? FullWindowContainerView
+          ? FullWindowOverlay
           : undefined
       }
       backdropComponent={shouldIncludeBackdrop ? TiFBackdropView : null}
@@ -112,10 +112,6 @@ export const TiFBottomSheet = <Item = boolean,>({
     </BottomSheetModal>
   )
 }
-
-const FullWindowContainerView = ({ children }: { children: ReactNode }) => (
-  <FullWindowOverlay>{children}</FullWindowOverlay>
-)
 
 const TiFBackdropView = ({
   animatedPosition,
