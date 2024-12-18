@@ -4,6 +4,7 @@ import { Ionicon } from "@components/common/Icons"
 import { TextToastView } from "@components/common/Toasts"
 import { AlertsObject, presentAlert } from "@lib/Alerts"
 import { AppStyles } from "@lib/AppColorStyle"
+import { featureContext } from "@lib/FeatureContext"
 import { useFormSubmission } from "@lib/utils/Form"
 import { TiFAPI } from "TiFShared/api"
 import {
@@ -60,26 +61,9 @@ export type UseFriendRequestEnvironment = {
   onSuccess: (status: "friends" | "friend-request-sent") => void
 }
 
-export type FriendRequestContextValues = {
-  sendFriendRequest: (id: UserID) => Promise<SendFriendRequestResult>
-}
-
-const FriendRequestContext = createContext<FriendRequestContextValues>({
+export const FriendRequestFeature = featureContext({
   sendFriendRequest
 })
-
-export type FriendRequestProviderProps = FriendRequestContextValues & {
-  children: JSX.Element
-}
-
-export const FriendRequestProvider = ({
-  children,
-  ...values
-}: FriendRequestProviderProps) => (
-  <FriendRequestContext.Provider value={values}>
-    {children}
-  </FriendRequestContext.Provider>
-)
 
 const REQUESTABLE_RELATION_STATUSES = ["not-friends", "friend-request-received"]
 
@@ -104,7 +88,7 @@ export const useFriendRequest = ({
   user,
   onSuccess
 }: UseFriendRequestEnvironment) => {
-  const { sendFriendRequest } = useContext(FriendRequestContext)
+  const { sendFriendRequest } = FriendRequestFeature.useContext()
   const submission = useFormSubmission(
     (user: FriendRequestUser) => sendFriendRequest(user.id),
     () => {

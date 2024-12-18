@@ -5,7 +5,7 @@ import { updateEventDetailsQueryEvent } from "@event/DetailsQuery"
 import { useFontScale } from "@lib/Fonts"
 import { MenuAction, MenuView } from "@react-native-menu/menu"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { useUserBlocking } from "@user/Blocking"
+import { UserBlockingFeature } from "@user/Blocking"
 import { useIsSignedIn } from "@user/Session"
 import {
   Platform,
@@ -35,7 +35,7 @@ type ToggleBlockMutationArgs = {
 export const useEventActionsMenu = (
   event: Pick<ClientSideEvent, "id" | "userAttendeeStatus" | "host">
 ) => {
-  const { blockUser, unblockUser } = useUserBlocking()
+  const { blockUser, unblockUser } = UserBlockingFeature.useContext()
   const queryClient = useQueryClient()
   const toggleBlockMutation = useMutation(
     async ({ isBlocking, hostId }: ToggleBlockMutationArgs) => {
