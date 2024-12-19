@@ -12,6 +12,7 @@
     }
   },
   "scripts": {
+    "create-story": "node --loader ts-node/esm create-story.ts",
     "pr": "node --loader ts-node/esm ./node_modules/TiFShared/npm-scripts/auto-pr.ts --env .env.infra",
     "start": "node enableStorybook.js false && node checkEnv.js && npx expo start --dev-client --clear",
     "sb_start": "node enableStorybook.js true && sb-rn-get-stories --config-path .storybook/.ondevice && npx expo start --dev-client",
