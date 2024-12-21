@@ -1,32 +1,24 @@
 import { UserSettings } from "TiFShared/domain-models/Settings"
-import { createContext, useCallback, useContext } from "react"
+import { useCallback } from "react"
 import { useSyncExternalStoreWithSelector } from "use-sync-external-store/with-selector"
-import { LocalSettings } from "./LocalSettings"
+import { LocalSettings, SQLiteLocalSettingsStorage } from "./LocalSettings"
 import { AnySettings, SettingsStore, areSettingsEqual } from "./Settings"
+import { featureContext } from "@lib/FeatureContext"
+import { PersistentSettingsStores } from "./PersistentStores"
+import { tiFSQLite } from "@lib/SQLite"
+import { SQLiteUserSettingsStorage } from "./UserSettings"
 
-const SettingsContext = createContext<
-  | {
-      localSettingsStore: SettingsStore<LocalSettings>
-      userSettingsStore: SettingsStore<UserSettings>
-    }
-  | undefined
->(undefined)
+const SettingsStorageFeature = featureContext({
+  localSettingsStore: PersistentSettingsStores.local(
+    new SQLiteLocalSettingsStorage(tiFSQLite)
+  ) as SettingsStore<LocalSettings>,
+  // TODO: - Use UserSettingsSynchronizingStore in beta.
+  userSettingsStore: PersistentSettingsStores.user(
+    new SQLiteUserSettingsStorage(tiFSQLite)
+  ) as SettingsStore<UserSettings>
+})
 
-export type SettingsProviderProps = {
-  localSettingsStore: SettingsStore<LocalSettings>
-  userSettingsStore: SettingsStore<UserSettings>
-  children: JSX.Element
-}
-
-export const SettingsProvider = ({
-  localSettingsStore,
-  userSettingsStore,
-  children
-}: SettingsProviderProps) => (
-  <SettingsContext.Provider value={{ localSettingsStore, userSettingsStore }}>
-    {children}
-  </SettingsContext.Provider>
-)
+export const SettingsProvider = SettingsStorageFeature.Provider
 
 /**
  * Returns the current device settings, along with the store that stores the
@@ -34,7 +26,12 @@ export const SettingsProvider = ({
  */
 export const useLocalSettings = <ScopedSettings extends AnySettings>(
   selector: (userSettings: LocalSettings) => ScopedSettings
-) => useSettingsStore(useSettings().localSettingsStore, selector)
+) => {
+  return useSettingsStore(
+    SettingsStorageFeature.useContext().localSettingsStore,
+    selector
+  )
+}
 
 /**
  * Returns the current user settings, along with the store that stores the
@@ -42,13 +39,18 @@ export const useLocalSettings = <ScopedSettings extends AnySettings>(
  */
 export const useUserSettings = <ScopedSettings extends AnySettings>(
   selector: (userSettings: UserSettings) => ScopedSettings
-) => useSettingsStore(useSettings().userSettingsStore, selector)
+) => {
+  return useSettingsStore(
+    SettingsStorageFeature.useContext().userSettingsStore,
+    selector
+  )
+}
 
 /**
  * Returns a function to update the current local settings.
  */
 export const useUpdateLocalSettings = () => {
-  const localStore = useSettings().localSettingsStore
+  const localStore = SettingsStorageFeature.useContext().localSettingsStore
   return (localSettings: Partial<LocalSettings>) =>
     localStore.update(localSettings)
 }
@@ -57,14 +59,8 @@ export const useUpdateLocalSettings = () => {
  * Returns a function to update the current user settings.
  */
 export const useUpdateUserSettings = () => {
-  const userStore = useSettings().userSettingsStore
+  const userStore = SettingsStorageFeature.useContext().userSettingsStore
   return (userSettings: Partial<UserSettings>) => userStore.update(userSettings)
-}
-
-const useSettings = () => {
-  const context = useContext(SettingsContext)
-  if (!context) throw new Error("No SettingsProvider provided.")
-  return context
 }
 
 const useSettingsStore = <
