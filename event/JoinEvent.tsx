@@ -17,7 +17,7 @@ import {
   requestPermissionsAsync as requestNotificationPermissions
 } from "expo-notifications"
 import React, { useEffect, useState } from "react"
-import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
+import { StyleProp, StyleSheet, View, ViewStyle, TextProps } from "react-native"
 import { IoniconCloseButton } from "@components/common/Icons"
 import { BodyText, Title } from "@components/Text"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
@@ -294,20 +294,31 @@ const useCurrentJoinEventPermission = (
 
 export type JoinEventButtonProps = {
   state: UseJoinEvent
+  Text: (props: TextProps) => JSX.Element
+  maximumFontSizeMultipler?: number
   style?: StyleProp<ViewStyle>
 }
 
-export const JoinEventButton = ({ state, style }: JoinEventButtonProps) => (
+export const JoinEventButton = ({
+  state,
+  Text,
+  maximumFontSizeMultipler,
+  style
+}: JoinEventButtonProps) => (
   <PrimaryButton
     disabled={state.stage !== "idle"}
     onPress={() => {
       if (state.stage !== "idle") return
       state.joinButtonTapped()
     }}
-    maximumFontSizeMultiplier={FontScaleFactors.xxxLarge}
     style={style}
   >
-    Join Now!
+    <Text
+      maxFontSizeMultiplier={maximumFontSizeMultipler}
+      style={styles.joinText}
+    >
+      Join Now!
+    </Text>
   </PrimaryButton>
 )
 
@@ -408,5 +419,8 @@ const styles = StyleSheet.create({
     height: 200,
     backgroundColor: "red",
     marginVertical: 16
+  },
+  joinText: {
+    color: "white"
   }
 })

@@ -48,6 +48,8 @@
       "@settings-boundary": ["./settings-boundary"],
       "@edit-event-boundary": ["./edit-event-boundary"],
       "@edit-event-boundary/*": ["./edit-event-boundary/*"],
+      "@api": ["./api"],
+      "@api/*": ["./api/*"],
       "env": ["./.env"]
     }
   },

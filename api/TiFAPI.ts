@@ -10,7 +10,8 @@ import {
   validateTiFAPIClientCall
 } from "TiFShared/api"
 import { chainMiddleware } from "TiFShared/lib/Middleware"
-import { LaunchArguments, launchArguments } from "./LaunchArguments"
+import { AlphaUserStorage } from "@user/alpha"
+import { LaunchArguments, launchArguments } from "@lib/LaunchArguments"
 
 const userSession = () => Auth.currentSession()
 
@@ -19,14 +20,17 @@ const userSession = () => Auth.currentSession()
  * {@link LaunchArguments} or from the current user session if no launch
  * argument token is provided.
  */
-export const cognitoBearerToken = async (
+export const bearerToken = async (
   launchArgs: LaunchArguments = launchArguments,
+  storage: AlphaUserStorage = AlphaUserStorage.default,
   currentSession: () => Promise<CognitoUserSession> = userSession
 ) => {
   try {
     if (launchArgs.testCognitoUserToken) {
       return launchArgs.testCognitoUserToken.getJwtToken()
     }
+    const alphaUser = await storage.user()
+    if (alphaUser) return alphaUser.token
     return (await currentSession()).getAccessToken().getJwtToken()
   } catch {
     return undefined
@@ -42,7 +46,7 @@ export const cognitoBearerToken = async (
 export const awsTiFAPITransport = (url: URL): APIMiddleware => {
   return chainMiddleware(
     validateTiFAPIClientCall,
-    jwtMiddleware(cognitoBearerToken),
+    jwtMiddleware(bearerToken),
     tifAPITransport(url)
   )
 }

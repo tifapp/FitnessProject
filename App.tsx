@@ -1,4 +1,4 @@
-import "@lib/TiFAPI"
+import "@api"
 import "date-time/DateRangeFormatting"
 import { useAppFonts } from "@lib/Fonts"
 import React from "react"

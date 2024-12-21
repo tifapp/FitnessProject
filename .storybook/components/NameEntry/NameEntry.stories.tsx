@@ -1,4 +1,4 @@
-import { AlphaRegisterView, useAlphaRegister } from "@core-root/NameEntry"
+import { AlphaRegisterView, useAlphaRegister } from "@core-root/AlphaRegister"
 import { uuidString } from "@lib/utils/UUID"
 import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
 import React from "react"
@@ -19,18 +19,7 @@ const TestAlphaRegisterView = () => {
         style={{
           height: "100%"
         }}
-        state={useAlphaRegister({
-          register: async (name) => ({
-            name,
-            id: uuidString(),
-            handle: UserHandle.sillyBitchell,
-            token: "abc123"
-          }),
-          onSuccess: (user) => {
-            console.log("Registered User:")
-            console.log(user)
-          }
-        })}
+        state={useAlphaRegister()}
       />
     </SafeAreaView>
   )
@@ -41,7 +30,7 @@ export const Basic = () => {
     <GestureHandlerRootView>
       <SafeAreaProvider>
         <TestQueryClientProvider>
-          <TestAlphaRegisterView/>
+          <TestAlphaRegisterView />
         </TestQueryClientProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>

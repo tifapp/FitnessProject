@@ -1,4 +1,4 @@
-import "@lib/TiFAPI"
+import "@api"
 import "@date-time/DateRangeFormatting"
 import CustomStorybookUI from "./.ondevice/Storybook"
 

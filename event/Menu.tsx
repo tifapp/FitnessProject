@@ -4,13 +4,15 @@ import { updateEventDetailsQueryEvent } from "@event/DetailsQuery"
 import { useFontScale } from "@lib/Fonts"
 import { MenuAction, MenuView } from "@react-native-menu/menu"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { useUserBlocking } from "@user/Blocking"
 import { useIsSignedIn } from "@user/Session"
 import {
   Platform,
   Share,
   ShareContent,
   StyleProp,
-  ViewStyle
+  ViewStyle,
+  StyleSheet
 } from "react-native"
 import {
   UnblockedUserRelationsStatus,
@@ -18,11 +20,6 @@ import {
 } from "TiFShared/domain-models/User"
 
 export type EventMenuActionsListKey = keyof typeof EVENT_MENU_ACTIONS_LISTS
-
-export type UseEventDetailsMenuActionsEnvironment = {
-  blockHost: (id: UserID) => Promise<void>
-  unblockHost: (id: UserID) => Promise<void>
-}
 
 type ToggleBlockMutationArgs = {
   hostId: UserID
@@ -33,17 +30,17 @@ type ToggleBlockMutationArgs = {
 /**
  * A hook that controls the state of the menu actions.
  */
-export const useEventDetailsMenuActions = (
-  event: Pick<ClientSideEvent, "id" | "userAttendeeStatus" | "host">,
-  env: UseEventDetailsMenuActionsEnvironment
+export const useEventActionsMenu = (
+  event: Pick<ClientSideEvent, "id" | "userAttendeeStatus" | "host">
 ) => {
+  const { blockUser, unblockUser } = useUserBlocking()
   const queryClient = useQueryClient()
   const toggleBlockMutation = useMutation(
     async ({ isBlocking, hostId }: ToggleBlockMutationArgs) => {
       if (isBlocking) {
-        await env.blockHost(hostId)
+        await blockUser(hostId)
       } else {
-        await env.unblockHost(hostId)
+        await unblockUser(hostId)
       }
     },
     {
@@ -66,7 +63,7 @@ export const useEventDetailsMenuActions = (
         ...e,
         host: {
           ...e.host,
-          relationStatus: isBlocking ? "blocked-them" : "not-friends" as const
+          relationStatus: isBlocking ? "blocked-them" : ("not-friends" as const)
         }
       }))
       toggleBlockMutation.mutate({
@@ -78,15 +75,12 @@ export const useEventDetailsMenuActions = (
   }
 }
 
-export type EventDetailsMenuProps = {
+export type EventActionsMenuProps = {
   event: ClientSideEvent
-  state: ReturnType<typeof useEventDetailsMenuActions>
-  eventShareContent: () => Promise<ShareContent>
+  state: ReturnType<typeof useEventActionsMenu>
+  eventShareContent: (event: ClientSideEvent) => Promise<ShareContent>
   onCopyEventTapped: () => void
-  onReportEventTapped: () => void
-  onContactHostTapped: () => void
-  onInviteFriendsTapped: () => void
-  onAssignNewHostTapped: () => void
+  onEditEventTapped: () => void
   style?: StyleProp<ViewStyle>
 }
 
@@ -103,32 +97,27 @@ export type EventDetailsMenuProps = {
  * - Inviting friends (Host, Attendee).
  * - Assiging a new host (Host).
  */
-export const EventDetailsMenuView = ({
+export const EventActionsMenuView = ({
   event,
   state,
   eventShareContent,
   onCopyEventTapped,
-  onReportEventTapped,
-  onContactHostTapped,
-  onInviteFriendsTapped,
-  onAssignNewHostTapped,
+  onEditEventTapped,
   style
-}: EventDetailsMenuProps) => (
+}: EventActionsMenuProps) => (
   <MenuView
     // TODO: - Error UI
     onPressAction={({ nativeEvent }) => {
       const callbacks = {
         "copy-event": onCopyEventTapped,
-        "report-event": onReportEventTapped,
-        "contact-host": onContactHostTapped,
         "toggle-block-host": state.blockHostToggled,
-        "invite-friends": onInviteFriendsTapped,
-        "assign-host": onAssignNewHostTapped,
+        "edit-event": onEditEventTapped,
+        // eslint-disable-next-line @typescript-eslint/naming-convention
         "share-event": async () => {
-          Share.share(await eventShareContent())
+          Share.share(await eventShareContent(event))
         }
-      } as const satisfies Record<EventMenuActionID, () => void>
-      callbacks[nativeEvent.event as EventMenuActionID]()
+      } as const
+      callbacks[nativeEvent.event as keyof typeof callbacks]()
     }}
     actions={formatEventMenuActions(
       event,
@@ -137,7 +126,7 @@ export const EventDetailsMenuView = ({
     shouldOpenOnLongPress={false}
     style={[style, { width: 44 * useFontScale(), height: 44 * useFontScale() }]}
   >
-    <Ionicon name="ellipsis-horizontal" />
+    <Ionicon name="ellipsis-horizontal" style={styles.icon} />
   </MenuView>
 )
 
@@ -172,6 +161,14 @@ type BaseEventMenuAction = Omit<MenuAction, "title" | "image"> & {
 }
 
 export const EVENT_MENU_ACTION = {
+  editEvent: {
+    id: "edit-event",
+    title: "Edit Event",
+    image: Platform.select({
+      ios: "pencil.line",
+      android: "ic_menu_edit"
+    })
+  },
   copyEvent: {
     id: "copy-event",
     title: "Copy Event",
@@ -250,25 +247,25 @@ export const EVENT_MENU_ACTION = {
 
 const EVENT_MENU_ACTIONS_LISTS = {
   hosting: [
-    EVENT_MENU_ACTION.assignHost,
     EVENT_MENU_ACTION.copyEvent,
-    EVENT_MENU_ACTION.inviteFriends,
+    EVENT_MENU_ACTION.editEvent,
     EVENT_MENU_ACTION.shareEvent
   ],
   attending: [
-    EVENT_MENU_ACTION.reportEvent,
     EVENT_MENU_ACTION.toggleBlockHost,
     EVENT_MENU_ACTION.copyEvent,
-    EVENT_MENU_ACTION.contactHost,
-    EVENT_MENU_ACTION.inviteFriends,
     EVENT_MENU_ACTION.shareEvent
   ],
   "not-participating": [
-    EVENT_MENU_ACTION.reportEvent,
     EVENT_MENU_ACTION.toggleBlockHost,
     EVENT_MENU_ACTION.copyEvent,
-    EVENT_MENU_ACTION.contactHost,
     EVENT_MENU_ACTION.shareEvent
   ],
-  "not-signed-in": [EVENT_MENU_ACTION.reportEvent, EVENT_MENU_ACTION.shareEvent]
+  "not-signed-in": [EVENT_MENU_ACTION.shareEvent]
 } as const satisfies Readonly<Record<string, EventMenuAction[]>>
+
+const styles = StyleSheet.create({
+  icon: {
+    alignSelf: "center"
+  }
+})

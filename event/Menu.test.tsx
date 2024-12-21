@@ -10,14 +10,18 @@ import { act, renderHook, waitFor } from "@testing-library/react-native"
 import { EmailAddress } from "@user/privacy"
 import { UserSessionProvider } from "@user/Session"
 import { UnblockedUserRelationsStatus } from "TiFShared/domain-models/User"
-import { UseLoadEventDetailsResult } from "./Details"
+import { UseLoadEventDetailsResult } from "@event-details-boundary/Details"
 import {
   EVENT_MENU_ACTION,
   formatEventMenuActions,
-  useEventDetailsMenuActions
+  useEventActionsMenu
 } from "./Menu"
-import { EventAttendeeMocks, EventMocks } from "./MockData"
-import { renderSuccessfulUseLoadEventDetails } from "./TestHelpers"
+import {
+  EventAttendeeMocks,
+  EventMocks
+} from "@event-details-boundary/MockData"
+import { renderSuccessfulUseLoadEventDetails } from "@event-details-boundary/TestHelpers"
+import { UserBlockingProvider } from "@user/Blocking"
 
 describe("EventDetailsMenu tests", () => {
   describe("FormatEventMenuActions tests", () => {
@@ -25,7 +29,7 @@ describe("EventDetailsMenu tests", () => {
 
     it("should format the contact-host action with the host's name", () => {
       const actions = formatEventMenuActions(
-        { host: EventAttendeeMocks.Alivs } as ClientSideEvent,
+        { host: EventAttendeeMocks.Alivs } as unknown as ClientSideEvent,
         [EVENT_MENU_ACTION.copyEvent, EVENT_MENU_ACTION.contactHost]
       )
       expect(actions).toEqual([
@@ -36,7 +40,7 @@ describe("EventDetailsMenu tests", () => {
 
     it("should format the toggle-block-host with 'Block Hostname' when user is not blocking host", () => {
       const actions = formatEventMenuActions(
-        { host: EventAttendeeMocks.Alivs } as ClientSideEvent,
+        { host: EventAttendeeMocks.Alivs } as unknown as ClientSideEvent,
         [EVENT_MENU_ACTION.toggleBlockHost]
       )
       expect(actions).toEqual([
@@ -55,7 +59,7 @@ describe("EventDetailsMenu tests", () => {
             ...EventAttendeeMocks.Alivs,
             relationStatus: "blocked-them"
           }
-        } as ClientSideEvent,
+        } as unknown as ClientSideEvent,
         [EVENT_MENU_ACTION.toggleBlockHost]
       )
       expect(actions).toEqual([
@@ -201,18 +205,20 @@ describe("EventDetailsMenu tests", () => {
     }
 
     const renderUseEventDetailsMenuActions = (event: ClientSideEvent) => {
-      return renderHook(
-        () => useEventDetailsMenuActions(event, { blockHost, unblockHost }),
-        {
-          wrapper: ({ children }: any) => (
-            <TestQueryClientProvider client={queryClient}>
+      return renderHook(() => useEventActionsMenu(event), {
+        wrapper: ({ children }: any) => (
+          <TestQueryClientProvider client={queryClient}>
+            <UserBlockingProvider
+              blockUser={blockHost}
+              unblockUser={unblockHost}
+            >
               <UserSessionProvider userSession={userSession}>
                 {children}
               </UserSessionProvider>
-            </TestQueryClientProvider>
-          )
-        }
-      )
+            </UserBlockingProvider>
+          </TestQueryClientProvider>
+        )
+      })
     }
   })
 })

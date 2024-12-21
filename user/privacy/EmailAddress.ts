@@ -8,6 +8,7 @@ const RawStringEmailAddressSchema = z.string().email()
  */
 export class EmailAddress implements ContactInfoFormattable {
   static peacock69 = EmailAddress.parse("peacock69@gmail.com")!
+  static alphaUser = EmailAddress.parse("alphauser@test.com")!
 
   readonly formattedContactInfoType = "Email"
   readonly contactInfoTypeIconName = "mail"
