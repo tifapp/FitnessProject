@@ -89,7 +89,7 @@ export const AlphaRegisterView = ({ state, style }: AlphaRegisterProps) => (
 )
 
 export type WithAlphaRegistrationProps<Props> = Props & { session: UserSession }
-    
+
 /**
  * Ensures that a component renders with a user session based on data from an {@link AlphaUser}.
  *

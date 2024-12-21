@@ -28,6 +28,7 @@ import { NetInfoInternetConnectionStatus } from "@lib/InternetConnection"
 import { consoleLogHandler, logger, addLogHandler } from "TiFShared/logging"
 import { dayjs } from "TiFShared/lib/Dayjs"
 import { eventsByRegion } from "@explore-events-boundary"
+import { AlphaUserSessionProvider } from "@user/alpha"
 
 const log = logger("app.root")
 
@@ -59,11 +60,13 @@ export type AppProps = {
 const TiFApp = () => {
   const [isFontsLoaded] = useAppFonts()
   return (
-    <TiFView
-      fetchEvents={eventsByRegion}
-      isFontsLoaded={isFontsLoaded}
-      style={styles.tif}
-    />
+    <AlphaUserSessionProvider>
+      <TiFView
+        fetchEvents={eventsByRegion}
+        isFontsLoaded={isFontsLoaded}
+        style={styles.tif}
+      />
+    </AlphaUserSessionProvider>
   )
 }
 
