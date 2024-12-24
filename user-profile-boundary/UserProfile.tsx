@@ -1,15 +1,12 @@
 import { AvatarView } from "@components/Avatar"
-import { TiFFormScrollView } from "@components/form-components/ScrollView"
-import { Caption, Headline } from "@components/Text"
+import { Caption, Headline, Subtitle } from "@components/Text"
+import { EventCard } from "@event/EventCard"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { AlphaUserStorage } from "@user/alpha"
-import {
-  FriendRequestButton,
-  FriendRequestView,
-  useFriendRequest
-} from "@user/FriendRequest"
+import { FriendRequestButton, useFriendRequest } from "@user/FriendRequest"
 import React, { createContext } from "react"
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
+import { FlatList } from "react-native-gesture-handler"
 import { TiFAPI } from "TiFShared/api"
 import {
   UnblockedUserRelationsStatus,
@@ -17,7 +14,6 @@ import {
   UserProfile
 } from "TiFShared/domain-models/User"
 import {
-  BaseUpcomingEventsView,
   UpcomingEventsResult,
   userUpcomingEvents,
   useUpcomingEvents
@@ -37,13 +33,11 @@ export const userProfile = async (
   api: TiFAPI = TiFAPI.productionInstance,
   storage: AlphaUserStorage = AlphaUserStorage.default
 ): Promise<UserProfileResult> => {
-  if (storage) {
-    const storageData = await storage.user()
-    if (storageData && storageData.id === userID) {
-      return {
-        status: "success",
-        user: { ...storageData, relationStatus: "current-user" }
-      }
+  const storageData = await storage.user()
+  if (storageData && storageData.id === userID) {
+    return {
+      status: "success",
+      user: { ...storageData, relationStatus: "current-user" }
     }
   }
   const resp = await api.getUser({ params: { userId: userID } })
@@ -110,9 +104,7 @@ export const UserProfileProvider = ({
 )
 
 export type UserProfileProps = {
-  userId: UserID
   userInfoState: ReturnType<typeof useUserProfile>
-  friendRequestState: ReturnType<typeof useFriendRequest>
   onRelationStatusChanged: (
     id: UserID,
     status: UnblockedUserRelationsStatus
@@ -122,26 +114,38 @@ export type UserProfileProps = {
 }
 
 export const UserProfileView = ({
-  userId,
   userInfoState,
-  friendRequestState,
   onRelationStatusChanged,
   upcomingEventsState,
   style
 }: UserProfileProps) => {
   return (
-    <TiFFormScrollView style={style}>
-      <FriendRequestView state={friendRequestState}>
-        <UserInfoView
-          state={userInfoState}
-          onRelationStatusChanged={onRelationStatusChanged}
-        />
-      </FriendRequestView>
-      <UpcomingEventsView
-        state={upcomingEventsState}
-        isShown={upcomingEventsState.status === "success"}
+    <View style={style}>
+      <FlatList
+        style={[style, { padding: 16 }]}
+        data={
+          upcomingEventsState.status === "success" &&
+          upcomingEventsState.data.status === "success"
+            ? upcomingEventsState.data.events
+            : undefined
+        }
+        renderItem={({ item, index }) => (
+          <View key={index} style={{ paddingBottom: 16 }}>
+            <EventCard event={item} />
+          </View>
+        )}
+        ListHeaderComponent={
+          <View>
+            <UserInfoView
+              state={userInfoState}
+              onRelationStatusChanged={onRelationStatusChanged}
+            />
+            <Subtitle>{"Upcoming Events"}</Subtitle>
+          </View>
+        }
+        ListEmptyComponent={<View></View>}
       />
-    </TiFFormScrollView>
+    </View>
   )
 }
 
@@ -202,28 +206,6 @@ export const BaseUserInfoView = ({
       <Headline style={styles.username}>{user.name}</Headline>
       <Caption style={styles.handle}>{user.handle.toString()}</Caption>
       <FriendRequestButton state={state} />
-    </View>
-  )
-}
-
-export type UpcomingEventsProps = {
-  state: ReturnType<typeof useUpcomingEvents>
-  isShown: boolean
-  style?: StyleProp<ViewStyle>
-}
-
-export const UpcomingEventsView = ({
-  state,
-  isShown,
-  style
-}: UpcomingEventsProps) => {
-  return (
-    <View style={style}>
-      {isShown && state.data?.status === "success" ? (
-        <BaseUpcomingEventsView events={state.data.events} style={style} />
-      ) : (
-        <View></View>
-      )}
     </View>
   )
 }

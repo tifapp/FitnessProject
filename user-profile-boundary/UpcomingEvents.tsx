@@ -1,11 +1,8 @@
-import { Subtitle } from "@components/Text"
 import {
   ClientSideEvent,
   clientSideEventFromResponse
 } from "@event/ClientSideEvent"
-import { EventCard } from "@event/EventCard"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
-import { StyleProp, View, ViewStyle } from "react-native"
 import { TiFAPI } from "TiFShared/api"
 import { UserID } from "TiFShared/domain-models/User"
 import { userProfileQueryKey } from "./UserProfile"
@@ -46,25 +43,4 @@ export const useUpcomingEvents = ({
     queryFn: async () => await fetchUpcomingEvents(userId)
   })
   return query
-}
-
-export type BaseUpcomingEventsProps = {
-  events: ClientSideEvent[]
-  style?: StyleProp<ViewStyle>
-}
-
-export const BaseUpcomingEventsView = ({
-  events,
-  style
-}: BaseUpcomingEventsProps) => {
-  return (
-    <View style={style}>
-      <Subtitle>{"Upcoming Events"}</Subtitle>
-      {events.map((item, index) => (
-        <View key={index} style={{ paddingBottom: 16 }}>
-          <EventCard event={item} />
-        </View>
-      ))}
-    </View>
-  )
 }

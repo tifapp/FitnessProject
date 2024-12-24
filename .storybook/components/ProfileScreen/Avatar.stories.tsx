@@ -1,6 +1,7 @@
 import { TiFBottomSheetProvider } from "@components/BottomSheet"
 import { AlphaRegisterProvider } from "@core-root/AlphaRegister"
 import { clientSideEventFromResponse } from "@event/ClientSideEvent"
+import { delayData } from "@lib/utils/DelayData"
 import { uuidString } from "@lib/utils/UUID"
 import { NavigationContainer } from "@react-navigation/native"
 import { createStackNavigator } from "@react-navigation/stack"
@@ -10,7 +11,7 @@ import {
 } from "@test-helpers/ReactQuery"
 import { AlphaUserSessionProvider, AlphaUserStorage } from "@user/alpha"
 import { AlphaUserMocks } from "@user/alpha/MockData"
-import { FriendRequestProvider, useFriendRequest } from "@user/FriendRequest"
+import { FriendRequestProvider } from "@user/FriendRequest"
 import { EmailAddress } from "@user/privacy"
 import React from "react"
 import { useUpcomingEvents } from "user-profile-boundary/UpcomingEvents"
@@ -26,7 +27,6 @@ import {
   useUserProfile
 } from "../../../user-profile-boundary/UserProfile"
 import { StoryMeta } from "../../HelperTypes"
-import { delayData } from "@lib/utils/DelayData"
 
 const ProfileMeta: StoryMeta = {
   title: "Profile Screen"
@@ -84,15 +84,6 @@ const ProfileTestScreen = () => {
             }
           }),
           userId: EventAttendeeMocks.Alivs.id
-        })}
-        friendRequestState={useFriendRequest({
-          user: {
-            ...AlphaUserMocks.TheDarkLord,
-            relationStatus: "not-friends"
-          },
-          onSuccess: (e) => {
-            console.log(e)
-          }
         })}
         upcomingEventsState={useUpcomingEvents({
           fetchUpcomingEvents: async () => ({
@@ -162,7 +153,6 @@ const ProfileTestScreen = () => {
           }),
           userId: EventAttendeeMocks.Alivs.id
         })}
-        userId={AlphaUserMocks.TheDarkLord.id}
         onRelationStatusChanged={(e) => console.log(e)}
       />
     </FriendRequestProvider>

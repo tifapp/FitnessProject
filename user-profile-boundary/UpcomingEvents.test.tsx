@@ -28,7 +28,6 @@ describe("fetchUpcomingEvents tests", () => {
         ]
       }
     ]
-    console.log(JSON.stringify(testEvents[0].previewAttendees))
     mockTiFEndpoint("upcomingEvents", 200, { events: testEvents })
     const events = await userUpcomingEvents(
       testUser.id,
