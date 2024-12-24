@@ -24,7 +24,7 @@ import { eventsByRegion, useExploreEvents } from "./ExploreEvents"
 import { ExploreEventsInitialCenter } from "./InitialCenter"
 import {
   ExploreEventsRegion,
-  SAN_FRANCISCO_DEFAULT_REGION,
+  XEROX_ALTO_DEFAULT_REGION,
   createDefaultMapRegion,
   minRegionMeterRadius
 } from "./Region"
@@ -320,9 +320,9 @@ describe("ExploreEvents tests", () => {
       const { result } = renderUseExploreEvents({ center: "user-location" })
 
       await waitFor(() => {
-        expectFetchedExploreRegion(SAN_FRANCISCO_DEFAULT_REGION)
+        expectFetchedExploreRegion(XEROX_ALTO_DEFAULT_REGION)
       })
-      expect(result.current.region).toEqual(SAN_FRANCISCO_DEFAULT_REGION)
+      expect(result.current.region).toEqual(XEROX_ALTO_DEFAULT_REGION)
     })
 
     it("should use sanfrancisco as the default region when user location fetch errors", async () => {
@@ -333,9 +333,9 @@ describe("ExploreEvents tests", () => {
       const { result } = renderUseExploreEvents({ center: "user-location" })
 
       await waitFor(() => {
-        expectFetchedExploreRegion(SAN_FRANCISCO_DEFAULT_REGION)
+        expectFetchedExploreRegion(XEROX_ALTO_DEFAULT_REGION)
       })
-      expect(result.current.region).toEqual(SAN_FRANCISCO_DEFAULT_REGION)
+      expect(result.current.region).toEqual(XEROX_ALTO_DEFAULT_REGION)
     })
 
     it("should maintain current region when new region is not significantly different", async () => {

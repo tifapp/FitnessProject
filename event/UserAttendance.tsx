@@ -2,25 +2,21 @@ import { StyleProp, ViewStyle } from "react-native"
 import {
   JoinEventButton,
   JoinEventPermissionsSheetView,
-  JoinEventRequest,
   joinEvent,
   loadJoinEventPermissions,
   useJoinEvent
 } from "./JoinEvent"
 import { LeaveEventButton, leaveEvent, useLeaveEvent } from "./LeaveEvent"
 import { isAttendingEvent } from "TiFShared/domain-models/Event"
-import { TiFAPI } from "TiFShared/api"
 import { TrueRegionMonitor } from "@arrival-tracking/region-monitoring/MockRegionMonitors"
 import { ClientSideEvent } from "./ClientSideEvent"
 import { BoldFootnote, Headline } from "@components/Text"
 import { featureContext } from "@lib/FeatureContext"
 
 export const EventUserAttendanceFeature = featureContext({
-  // TODO: - Default join handlers and region monitor.
+  // TODO: - Default region monitor.
   monitor: TrueRegionMonitor,
-  joinEvent: (request: JoinEventRequest) => {
-    return joinEvent(request, TiFAPI.productionInstance, [])
-  },
+  joinEvent,
   loadPermissions: loadJoinEventPermissions,
   leaveEvent
 })

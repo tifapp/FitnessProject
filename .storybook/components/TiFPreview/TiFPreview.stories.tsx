@@ -13,6 +13,9 @@ import { testSQLite } from "@test-helpers/SQLite"
 import { SQLiteUserSettingsStorage } from "@settings-storage/UserSettings"
 import { SettingsProvider } from "@settings-storage/Hooks"
 import { EditEventFeature } from "@edit-event-boundary/EditEvent"
+import { repeatElements } from "TiFShared/lib/Array"
+import { uuidString } from "@lib/utils/UUID"
+import { randomIntegerInRange } from "@lib/utils/Random"
 
 const TiFPreview = {
   title: "TiF Preview"
@@ -35,7 +38,11 @@ export const Basic = () => (
   >
     <AlphaUserSessionProvider storage={storage}>
       <TiFView
-        fetchEvents={eventsByRegion}
+        fetchEvents={async () =>
+          repeatElements(10, () =>
+            clientSideEventFromResponse(EventMocks.MockMultipleAttendeeResponse)
+          ).map((e) => ({ ...e, id: randomIntegerInRange(0, 10_000) }))
+        }
         isFontsLoaded={true}
         style={{ flex: 1 }}
       />

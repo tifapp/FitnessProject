@@ -1,21 +1,21 @@
 import { EventCard } from "@event/EventCard"
 import { BottomSheetFlatList } from "@gorhom/bottom-sheet"
 import { ClientSideEvent } from "@event/ClientSideEvent"
-import React, { ReactElement } from "react"
+import React, { ComponentType, ReactElement, forwardRef } from "react"
 import {
   ListRenderItemInfo,
-  Pressable,
+  Platform,
   StyleProp,
   StyleSheet,
   View,
   ViewStyle
 } from "react-native"
 import { TiFBottomSheet, TiFBottomSheetProvider } from "@components/BottomSheet"
-import { useCoreNavigation } from "@components/Navigation"
+import { Subtitle } from "@components/Text"
 
 export type ExploreEventsBottomSheetProps = {
   events: ClientSideEvent[]
-  HeaderComponent: ReactElement
+  HeaderComponent: ComponentType<any>
   EmptyEventsComponent: ReactElement
   style?: StyleProp<ViewStyle>
 }
@@ -52,7 +52,10 @@ export const ExploreEventsBottomSheet = ({
           )}
           ListEmptyComponent={EmptyEventsComponent}
           ListHeaderComponent={HeaderComponent}
-          stickyHeaderIndices={STICKY_HEADER_INDICIES}
+          contentContainerStyle={{
+            paddingBottom: Platform.OS === "ios" ? 16 : 88
+          }}
+          contentInset={{ bottom: 72 }}
         />
       </TiFBottomSheet>
     </View>
@@ -63,6 +66,9 @@ const styles = StyleSheet.create({
   eventContainer: {
     paddingHorizontal: 16,
     paddingVertical: 8
+  },
+  bottomMargin: {
+    paddingBottom: 128
   },
   event: {
     width: "100%"

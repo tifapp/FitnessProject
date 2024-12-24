@@ -6,7 +6,10 @@ import {
 import { PrimaryButton } from "@components/Buttons"
 import { ClientSideEvent } from "@event/ClientSideEvent"
 import { updateEventDetailsQueryEvent } from "@event/DetailsQuery"
-import { RecentLocationsStorage } from "@location/Recents"
+import {
+  RecentLocationsStorage,
+  recentLocationsStorage
+} from "@location/Recents"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import {
   getBackgroundPermissionsAsync as getBackgroundLocationPermissions,
@@ -133,8 +136,10 @@ export type JoinEventSuccess = {
  */
 export const joinEvent = async (
   request: JoinEventRequest,
-  tifAPI: TiFAPI,
-  onSuccessHandlers: ((resp: JoinEventSuccess) => void)[]
+  tifAPI: TiFAPI = TiFAPI.productionInstance,
+  onSuccessHandlers: ((resp: JoinEventSuccess) => void)[] = [
+    saveRecentLocationJoinEventHandler
+  ]
 ): Promise<JoinEventResult> => {
   const shouldIncludeArrivalRegion =
     request.hasArrived && request.location.isInArrivalTrackingPeriod
@@ -168,10 +173,10 @@ export const joinEvent = async (
  */
 export const saveRecentLocationJoinEventHandler = async (
   success: Pick<JoinEventSuccess, "locationIdentifier">,
-  recentLocationsStorage: RecentLocationsStorage
+  storage: RecentLocationsStorage = recentLocationsStorage
 ) => {
   if (!success.locationIdentifier.placemark) return
-  await recentLocationsStorage.save(
+  await storage.save(
     {
       coordinate: success.locationIdentifier.coordinate,
       placemark: success.locationIdentifier.placemark

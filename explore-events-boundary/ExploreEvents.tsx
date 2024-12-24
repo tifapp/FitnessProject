@@ -15,7 +15,7 @@ import {
 import { UseQueryResult, useQuery, useQueryClient } from "@tanstack/react-query"
 import { TiFAPI } from "TiFShared/api"
 import { LocationAccuracy, PermissionResponse } from "expo-location"
-import React, { useState } from "react"
+import React, { forwardRef, useState } from "react"
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 import { ExploreEventsBottomSheet } from "./BottomSheet"
 import {
@@ -25,7 +25,7 @@ import {
 import { ExploreEventsMap } from "./Map"
 import {
   ExploreEventsRegion,
-  SAN_FRANCISCO_DEFAULT_REGION,
+  XEROX_ALTO_DEFAULT_REGION,
   createDefaultMapRegion,
   minRegionMeterRadius
 } from "./Region"
@@ -116,7 +116,7 @@ const useExploreEventsRegion = (initialCenter: ExploreEventsInitialCenter) => {
   const exploreRegion =
     userRegion === "loading"
       ? pannedRegion
-      : (pannedRegion ?? userRegion ?? SAN_FRANCISCO_DEFAULT_REGION)
+      : (pannedRegion ?? userRegion ?? XEROX_ALTO_DEFAULT_REGION)
   return { region: exploreRegion, panToRegion: setPannedRegion }
 }
 
@@ -204,11 +204,7 @@ export const ExploreEventsView = ({
       <ExploreEventsBottomSheet
         events={data.events ?? []}
         HeaderComponent={
-          <Title style={styles.sheetHeaderText}>
-            {data.status !== "loading"
-              ? "Nearby Events"
-              : "Finding Nearby Events..."}
-          </Title>
+          data.status !== "loading" ? DataHeaderView : LoadingHeaderView
         }
         EmptyEventsComponent={
           <View style={styles.emptyEventsContainer}>
@@ -221,6 +217,14 @@ export const ExploreEventsView = ({
     </View>
   )
 }
+
+const LoadingHeaderView = forwardRef(function Header() {
+  return <Title style={styles.sheetHeaderText}>Finding Nearby Events...</Title>
+})
+
+const DataHeaderView = forwardRef(function Header() {
+  return <Title style={styles.sheetHeaderText}>Nearby Events</Title>
+})
 
 type ErrorProps = {
   onRetried: () => void

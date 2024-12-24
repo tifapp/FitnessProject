@@ -69,9 +69,7 @@ export const EventCard = ({
               <View style={[styles.centeredRow, styles.iconSpacing]}>
                 <Ionicon name="location" size={16} />
                 <Footnote>
-                  {event.location.placemark
-                    ? placemarkToAbbreviatedAddress(event.location.placemark)
-                    : "Unknown Location"}
+                  {event.location.placemark?.name ?? "Unknown Location"}
                 </Footnote>
               </View>
             </View>

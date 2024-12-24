@@ -6,7 +6,7 @@ import {
 } from "@gorhom/bottom-sheet"
 import { AppStyles } from "@lib/AppColorStyle"
 import { useLastDefinedValue } from "@lib/utils/UseLastDefinedValue"
-import { ReactNode, useEffect, useRef } from "react"
+import { useEffect, useRef } from "react"
 import {
   ViewStyle,
   Pressable,
