@@ -1,25 +1,18 @@
-import { TiFFormCardView } from "@components/form-components/Card"
-import ProfileImageAndName from "@components/profileImageComponents/ProfileImageAndName"
-import { ClientSideEvent } from "@event/ClientSideEvent"
-import React from "react"
-import { Pressable, StyleProp, StyleSheet, View, ViewStyle } from "react-native"
-import { EventActionsMenuView, useEventActionsMenu } from "./Menu"
-import {
-  BodyText,
-  BoldFootnote,
-  Caption,
-  Footnote,
-  Headline,
-  Subtitle
-} from "@components/Text"
 import { CalendarDayView } from "@components/CalendarDay"
-import { EventUserAttendanceButton } from "./UserAttendance"
 import { Ionicon } from "@components/common/Icons"
-import dayjs from "dayjs"
-import { FixedDateRange } from "TiFShared/domain-models/FixedDateRange"
-import { placemarkToAbbreviatedAddress } from "@lib/AddressFormatting"
+import { TiFFormCardView } from "@components/form-components/Card"
 import { ProfileCircleView } from "@components/profileImageComponents/ProfileCircle"
+import ProfileImageAndName from "@components/profileImageComponents/ProfileImageAndName"
+import { BoldFootnote, Footnote, Subtitle } from "@components/Text"
+import { ClientSideEvent } from "@event/ClientSideEvent"
+import { placemarkToAbbreviatedAddress } from "@lib/AddressFormatting"
 import { FontScaleFactors } from "@lib/Fonts"
+import dayjs from "dayjs"
+import React, { memo } from "react"
+import { Pressable, StyleProp, StyleSheet, View, ViewStyle } from "react-native"
+import { FixedDateRange } from "TiFShared/domain-models/FixedDateRange"
+import { EventActionsMenuView, useEventActionsMenu } from "./Menu"
+import { EventUserAttendanceButton } from "./UserAttendance"
 
 export type EventCardProps = {
   event: ClientSideEvent
@@ -32,7 +25,7 @@ export type EventCardProps = {
   style?: StyleProp<ViewStyle>
 }
 
-export const EventCard = ({
+export const EventCard = memo(function EventCard({
   event,
   onDetailsTapped,
   onAttendeesTapped,
@@ -41,93 +34,95 @@ export const EventCard = ({
   onJoined,
   onLeft,
   style
-}: EventCardProps) => (
-  <TiFFormCardView style={style}>
-    <View style={styles.container}>
-      <View style={styles.centeredRow}>
-        <View style={styles.leftRow}>
-          <ProfileImageAndName
-            name={event.host.name}
-            handle={event.host.handle}
-            imageURL={event.host.profileImageURL}
-            maximumFontSizeMultiplier={FontScaleFactors.xxxLarge}
+}: EventCardProps) {
+  return (
+    <TiFFormCardView style={style}>
+      <View style={styles.container}>
+        <View style={styles.centeredRow}>
+          <View style={styles.leftRow}>
+            <ProfileImageAndName
+              name={event.host.name}
+              handle={event.host.handle}
+              imageURL={event.host.profileImageURL}
+              maximumFontSizeMultiplier={FontScaleFactors.xxxLarge}
+            />
+          </View>
+          <EventActionsMenuView
+            event={event}
+            state={useEventActionsMenu(event)}
+            eventShareContent={async () => ({
+              title: "TODO",
+              message: "We need to figure this out..."
+            })}
+            onCopyEventTapped={() => onCopyEventTapped?.()}
+            onEditEventTapped={() => onEditEventTapped?.()}
+            style={styles.menu}
           />
         </View>
-        <EventActionsMenuView
-          event={event}
-          state={useEventActionsMenu(event)}
-          eventShareContent={async () => ({
-            title: "TODO",
-            message: "We need to figure this out..."
-          })}
-          onCopyEventTapped={() => onCopyEventTapped?.()}
-          onEditEventTapped={() => onEditEventTapped?.()}
-          style={styles.menu}
-        />
-      </View>
-      <Pressable onPress={onDetailsTapped}>
-        <View style={styles.detailsRow}>
-          <View style={styles.infoColumn}>
-            <Subtitle>{event.title}</Subtitle>
-            <View style={[styles.centeredRow, styles.iconSpacing]}>
-              <Ionicon name="calendar" size={16} />
-              <Footnote>
-                {eventCardFormattedDateRange(event.time.dateRange)}
-              </Footnote>
+        <Pressable onPress={onDetailsTapped}>
+          <View style={styles.detailsRow}>
+            <View style={styles.infoColumn}>
+              <Subtitle>{event.title}</Subtitle>
+              <View style={[styles.centeredRow, styles.iconSpacing]}>
+                <Ionicon name="calendar" size={16} />
+                <Footnote>
+                  {eventCardFormattedDateRange(event.time.dateRange)}
+                </Footnote>
+              </View>
+              <View style={[styles.centeredRow, styles.iconSpacing]}>
+                <Ionicon name="location" size={16} />
+                <Footnote>
+                  {event.location.placemark
+                    ? placemarkToAbbreviatedAddress(event.location.placemark)
+                    : "Unknown Location"}
+                </Footnote>
+              </View>
             </View>
-            <View style={[styles.centeredRow, styles.iconSpacing]}>
-              <Ionicon name="location" size={16} />
-              <Footnote>
-                {event.location.placemark
-                  ? placemarkToAbbreviatedAddress(event.location.placemark)
-                  : "Unknown Location"}
-              </Footnote>
-            </View>
-          </View>
-          <CalendarDayView date={event.time.dateRange.startDateTime} />
-        </View>
-      </Pressable>
-      <View style={styles.centeredRow}>
-        <Pressable onPress={onAttendeesTapped} style={styles.leftRow}>
-          <View style={styles.centeredRow}>
-            {event.previewAttendees.slice(0, 3).map((a, index) => (
-              <ProfileCircleView
-                key={a.id}
-                imageURL={a.profileImageURL}
-                name={a.name}
-                maximumFontSizeMultiplier={FontScaleFactors.large}
-                style={[styles.profileCircle, { left: index * -16 }]}
-              />
-            ))}
-            {event.attendeeCount > 3 ? (
-              <BoldFootnote
-                maxFontSizeMultiplier={FontScaleFactors.large}
-                style={styles.attendingText}
-              >
-                + {event.attendeeCount - 3} Attending
-              </BoldFootnote>
-            ) : (
-              <BoldFootnote
-                maxFontSizeMultiplier={FontScaleFactors.large}
-                style={styles.attendingText}
-              >
-                Attending
-              </BoldFootnote>
-            )}
+            <CalendarDayView date={event.time.dateRange.startDateTime} />
           </View>
         </Pressable>
-        <EventUserAttendanceButton
-          event={event}
-          maximumFontSizeMultiplier={FontScaleFactors.large}
-          onJoinSuccess={() => onJoined?.()}
-          onLeaveSuccess={() => onLeft?.()}
-          size="small"
-          style={styles.attendanceButton}
-        />
+        <View style={styles.centeredRow}>
+          <Pressable onPress={onAttendeesTapped} style={styles.leftRow}>
+            <View style={styles.centeredRow}>
+              {event.previewAttendees.slice(0, 3).map((a, index) => (
+                <ProfileCircleView
+                  key={a.id}
+                  imageURL={a.profileImageURL}
+                  name={a.name}
+                  maximumFontSizeMultiplier={FontScaleFactors.large}
+                  style={[styles.profileCircle, { left: index * -16 }]}
+                />
+              ))}
+              {event.attendeeCount > 3 ? (
+                <BoldFootnote
+                  maxFontSizeMultiplier={FontScaleFactors.large}
+                  style={styles.attendingText}
+                >
+                  + {event.attendeeCount - 3} Attending
+                </BoldFootnote>
+              ) : (
+                <BoldFootnote
+                  maxFontSizeMultiplier={FontScaleFactors.large}
+                  style={styles.attendingText}
+                >
+                  Attending
+                </BoldFootnote>
+              )}
+            </View>
+          </Pressable>
+          <EventUserAttendanceButton
+            event={event}
+            maximumFontSizeMultiplier={FontScaleFactors.large}
+            onJoinSuccess={() => onJoined?.()}
+            onLeaveSuccess={() => onLeft?.()}
+            size="small"
+            style={styles.attendanceButton}
+          />
+        </View>
       </View>
-    </View>
-  </TiFFormCardView>
-)
+    </TiFFormCardView>
+  )
+})
 
 export const eventCardFormattedDateRange = (range: FixedDateRange) => {
   const start = dayjs(range.startDateTime).format("dddd, h:mm")

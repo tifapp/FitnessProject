@@ -122,18 +122,15 @@ export const UserProfileView = ({
   return (
     <View style={style}>
       <FlatList
-        style={[style, { padding: 16 }]}
+        style={style}
+        ItemSeparatorComponent={() => <View style={{ padding: 16 }} />}
         data={
           upcomingEventsState.status === "success" &&
           upcomingEventsState.data.status === "success"
             ? upcomingEventsState.data.events
             : undefined
         }
-        renderItem={({ item, index }) => (
-          <View key={index} style={{ paddingBottom: 16 }}>
-            <EventCard event={item} />
-          </View>
-        )}
+        renderItem={({ item }) => <EventCard event={item} />}
         ListHeaderComponent={
           <View>
             <UserInfoView
