@@ -1,15 +1,15 @@
-import { AuthFormView } from "./AuthLayout"
-import { AuthShadedTextField } from "./AuthTextFields"
 import { BodyText } from "@components/Text"
 import { TextToastView } from "@components/common/Toasts"
-import { useFormSubmission } from "@lib/utils/Form"
+import { AlertsObject, presentAlert } from "@lib/Alerts"
 import { AppStyles } from "@lib/AppColorStyle"
+import { useFormSubmission } from "@lib/utils/Form"
 import { useMutation } from "@tanstack/react-query"
+import { PrivacyFormattable } from "@user/privacy"
 import React, { useRef, useState } from "react"
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 import { TouchableOpacity } from "react-native-gesture-handler"
-import { PrivacyFormattable } from "@user/privacy"
-import { AlertsObject, presentAlert } from "@lib/Alerts"
+import { AuthFormView } from "./AuthLayout"
+import { AuthShadedTextField } from "./AuthTextFields"
 
 export type AuthResendVerificationCodeStatus = "success" | "error"
 
@@ -38,14 +38,14 @@ export type UseAuthVerificationCodeFormEnvironment<Data> = {
 /**
  * A hook to manage the form state for a verification code form.
  */
-export const useAuthVerificationCodeForm = <Data,>({
+export const useAuthVerificationCodeForm = <Data, >({
   resendCode,
   submitCode,
   onSuccess
 }: UseAuthVerificationCodeFormEnvironment<Data>) => {
   const [code, setCode] = useState("")
   const attemptedCodesRef = useRef<string[]>([])
-  const resendCodeMutation = useMutation(resendCode)
+  const resendCodeMutation = useMutation({ mutationFn: resendCode })
   const isInvalidCode = !!attemptedCodesRef.current.find((c) => code === c)
   return {
     code,

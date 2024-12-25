@@ -1,19 +1,19 @@
 import { Caption, CaptionTitle } from "@components/Text"
 import { SkeletonView } from "@components/common/Skeleton"
+import { hashCoordinate } from "@lib/CoordinateHashing"
+import {
+    LocationCoordinate2D,
+    coordinateDistance
+} from "TiFShared/domain-models/LocationCoordinate2D"
 import React, { ReactElement } from "react"
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 import { KeyboardAwareFlatList } from "react-native-keyboard-aware-scroll-view"
-import {
-  LocationSearchResultProps,
-  LocationSearchResultView
-} from "./SearchResultView"
-import {
-  LocationCoordinate2D,
-  coordinateDistance
-} from "TiFShared/domain-models/LocationCoordinate2D"
-import { hashCoordinate } from "@lib/CoordinateHashing"
-import { LocationSearchResult, LocationsSearchQueryText } from "./SearchClient"
 import { LocationSearchLoadingResult } from "./LoadingResult"
+import { LocationSearchResult, LocationsSearchQueryText } from "./SearchClient"
+import {
+    LocationSearchResultProps,
+    LocationSearchResultView
+} from "./SearchResultView"
 
 export type LocationSearchResultsListProps = {
   query: LocationsSearchQueryText
@@ -100,7 +100,7 @@ const EmptyResultsView = ({ query, reason, style }: EmptyResultsProps) => {
           again later.
         </Caption>
       )}
-      {reason === "loading" && (
+      {reason === "pending" && (
         <View testID="loading-location-options">
           <SkeletonResult />
           <SkeletonResult />

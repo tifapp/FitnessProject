@@ -1,34 +1,34 @@
 import { EventMocks } from "@event-details-boundary/MockData"
 import { renderUseLoadEventDetails } from "@event-details-boundary/TestHelpers"
 import {
-  mockExpoLocationObject,
-  mockLocationCoordinate2D,
-  mockRegion
+    mockExpoLocationObject,
+    mockLocationCoordinate2D,
+    mockRegion
 } from "@location/MockData"
 import { UserLocationFunctionsProvider } from "@location/UserLocation"
 import { verifyNeverOccurs } from "@test-helpers/ExpectNeverOccurs"
 import { TestInternetConnectionStatus } from "@test-helpers/InternetConnectionStatus"
 import { neverPromise } from "@test-helpers/Promise"
 import {
-  TestQueryClientProvider,
-  createTestQueryClient
+    TestQueryClientProvider,
+    createTestQueryClient
 } from "@test-helpers/ReactQuery"
 import { fakeTimers, timeTravel } from "@test-helpers/Timers"
 import { act, renderHook, waitFor } from "@testing-library/react-native"
 import { TiFAPI } from "TiFShared/api"
-import { EventAttendee, EventID } from "TiFShared/domain-models/Event"
+import { EventsInAreaResponse } from "TiFShared/api/models/Event"
+import { EventID } from "TiFShared/domain-models/Event"
 import { dateRange } from "TiFShared/domain-models/FixedDateRange"
 import { UserHandle } from "TiFShared/domain-models/User"
 import { mockTiFServer } from "TiFShared/test-helpers/mockAPIServer"
 import { eventsByRegion, useExploreEvents } from "./ExploreEvents"
 import { ExploreEventsInitialCenter } from "./InitialCenter"
 import {
-  ExploreEventsRegion,
-  SAN_FRANCISCO_DEFAULT_REGION,
-  createDefaultMapRegion,
-  minRegionMeterRadius
+    ExploreEventsRegion,
+    SAN_FRANCISCO_DEFAULT_REGION,
+    createDefaultMapRegion,
+    minRegionMeterRadius
 } from "./Region"
-import { EventResponse, EventsInAreaResponse } from "TiFShared/api/models/Event"
 
 const TEST_EVENTS = [EventMocks.Multiday, EventMocks.PickupBasketball]
 
@@ -239,7 +239,7 @@ describe("ExploreEvents tests", () => {
 
       const { result } = renderUseExploreEvents({ center: "user-location" })
 
-      await waitFor(() => expect(result.current.data.status).toEqual("loading"))
+      await waitFor(() => expect(result.current.data.status).toEqual("pending"))
 
       await waitFor(() => expect(result.current.region).toEqual(expectedRegion))
 

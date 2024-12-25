@@ -2,8 +2,8 @@ import { captureAlerts } from "@test-helpers/Alerts"
 import { verifyNeverOccurs } from "@test-helpers/ExpectNeverOccurs"
 import { neverPromise } from "@test-helpers/Promise"
 import {
-  TestQueryClientProvider,
-  createTestQueryClient
+    TestQueryClientProvider,
+    createTestQueryClient
 } from "@test-helpers/ReactQuery"
 import { fakeTimers } from "@test-helpers/Timers"
 import { act, renderHook, waitFor } from "@testing-library/react-native"
@@ -31,7 +31,7 @@ describe("BlockListSettings tests", () => {
     it("should display the fetch status when loading the first page of users", async () => {
       nextPage.mockResolvedValueOnce(mockBlockListPage())
       const { result } = renderUseBlockListSettings()
-      expect(result.current.status).toEqual("loading")
+      expect(result.current.status).toEqual("pending")
       await waitFor(() => expect(result.current.status).toEqual("success"))
     })
 
@@ -52,7 +52,7 @@ describe("BlockListSettings tests", () => {
       const { result } = renderUseBlockListSettings()
       await waitFor(() => expect(result.current.status).toEqual("success"))
       act(() => result.current.nextPageRequested?.())
-      await waitFor(() => expect(result.current.status).toEqual("loading"))
+      await waitFor(() => expect(result.current.status).toEqual("pending"))
       resolveNextPage?.(pages[1])
       await waitFor(() => expect(result.current.status).toEqual("success"))
     })

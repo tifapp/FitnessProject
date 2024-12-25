@@ -3,18 +3,16 @@ import { TestInternetConnectionStatus } from "@test-helpers/InternetConnectionSt
 import { fakeTimers } from "@test-helpers/Timers"
 import { act, renderHook, waitFor } from "@testing-library/react-native"
 import { TiFAPI } from "TiFShared/api"
-import { EventResponse } from "TiFShared/api/models/Event"
 import { ColorString } from "TiFShared/domain-models/ColorString"
 import { EventID, EventWhenBlockedByHost } from "TiFShared/domain-models/Event"
 import { dateRange } from "TiFShared/domain-models/FixedDateRange"
 import { UserHandle } from "TiFShared/domain-models/User"
 import { mockTiFEndpoint } from "TiFShared/test-helpers/mockAPIServer"
-import dayjs from "dayjs"
 import {
-  loadEventDetails,
-  useDisplayedEventDetailsLoadingBalls
+    loadEventDetails,
+    useDisplayedEventDetailsLoadingBalls
 } from "./Details"
-import { EventMocks, mockEventLocation } from "./MockData"
+import { EventMocks } from "./MockData"
 import { renderUseLoadEventDetails } from "./TestHelpers"
 
 describe("EventDetailsLoading tests", () => {
@@ -36,7 +34,7 @@ describe("EventDetailsLoading tests", () => {
         event: EventMocks.Multiday
       })
       const { result } = renderUseLoadEvent(1)
-      expect(result.current).toEqual({ status: "loading" })
+      expect(result.current).toEqual({ status: "pending" })
       await waitFor(() => expect(result.current.status).toEqual("success"))
       expect(result.current).toMatchObject({
         event: EventMocks.Multiday,
@@ -49,7 +47,7 @@ describe("EventDetailsLoading tests", () => {
     test("basic error loading flow", async () => {
       loadEvent.mockRejectedValueOnce(new Error())
       const { result } = renderUseLoadEvent(1)
-      expect(result.current).toEqual({ status: "loading" })
+      expect(result.current).toEqual({ status: "pending" })
       await waitFor(() => expect(result.current.status).toEqual("error"))
       expect(loadEvent).toHaveBeenCalledWith(1)
       expect(loadEvent).toHaveBeenCalledTimes(1)
@@ -66,7 +64,7 @@ describe("EventDetailsLoading tests", () => {
         event: blockedEvent
       })
       const { result } = renderUseLoadEvent(1)
-      expect(result.current).toEqual({ status: "loading" })
+      expect(result.current).toEqual({ status: "pending" })
       await waitFor(() => {
         expect(result.current).toEqual({
           status: "blocked",
@@ -80,7 +78,7 @@ describe("EventDetailsLoading tests", () => {
     test("test not-found flow", async () => {
       loadEvent.mockResolvedValueOnce({ status: "not-found" })
       const { result } = renderUseLoadEvent(1)
-      expect(result.current).toEqual({ status: "loading" })
+      expect(result.current).toEqual({ status: "pending" })
       await waitFor(() => {
         expect(result.current).toEqual({ status: "not-found" })
       })
@@ -91,7 +89,7 @@ describe("EventDetailsLoading tests", () => {
     test("test cancelled flow", async () => {
       loadEvent.mockResolvedValueOnce({ status: "cancelled" })
       const { result } = renderUseLoadEvent(1)
-      expect(result.current).toEqual({ status: "loading" })
+      expect(result.current).toEqual({ status: "pending" })
       await waitFor(() =>
         expect(result.current).toEqual({ status: "cancelled" })
       )
@@ -114,11 +112,11 @@ describe("EventDetailsLoading tests", () => {
           throw new Error()
         })
       const { result } = renderUseLoadEvent(1)
-      expect(result.current).toEqual({ status: "loading" })
+      expect(result.current).toEqual({ status: "pending" })
       await waitFor(() => expect(result.current.status).toEqual("success"))
       act(() => (result.current as any).refresh())
       await waitFor(() => {
-        expect((result.current as any).refreshStatus).toEqual("loading")
+        expect((result.current as any).refreshStatus).toEqual("pending")
       })
       expect(result.current).toMatchObject({
         status: "success",
@@ -144,7 +142,7 @@ describe("EventDetailsLoading tests", () => {
         })
         .mockResolvedValueOnce({ status: "not-found" })
       const { result } = renderUseLoadEvent(1)
-      expect(result.current).toEqual({ status: "loading" })
+      expect(result.current).toEqual({ status: "pending" })
       await waitFor(() => expect(result.current.status).toEqual("success"))
       act(() => (result.current as any).refresh())
       await waitFor(() => {
@@ -169,11 +167,11 @@ describe("EventDetailsLoading tests", () => {
           }
         })
       const { result } = renderUseLoadEvent(1)
-      expect(result.current).toEqual({ status: "loading" })
+      expect(result.current).toEqual({ status: "pending" })
       await waitFor(() => expect(result.current.status).toEqual("error"))
       expect((result.current as any).isConnectedToInternet).toEqual(true)
       act(() => (result.current as any).retry())
-      await waitFor(() => expect(result.current.status).toEqual("loading"))
+      await waitFor(() => expect(result.current.status).toEqual("pending"))
       act(() => resolveRetry?.())
       await waitFor(() => expect(result.current.status).toEqual("success"))
       expect(result.current).toMatchObject({

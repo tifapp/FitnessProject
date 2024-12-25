@@ -1,20 +1,18 @@
+import { TiFFormRowButton } from "@components/form-components/Button"
+import { TiFFormNavigationLinkView } from "@components/form-components/NavigationLink"
+import { TiFFormScrollView } from "@components/form-components/ScrollView"
+import { TiFFormCardSectionView } from "@components/form-components/Section"
+import { BodyText, Headline } from "@components/Text"
+import { AlertsObject, presentAlert } from "@lib/Alerts"
+import { AppStyles } from "@lib/AppColorStyle"
 import { useMutation } from "@tanstack/react-query"
 import { ContactInfoTypeFormattable, PrettyFormattable } from "@user/privacy"
 import {
   StyleProp,
+  StyleSheet,
   View,
-  ViewStyle,
-  Alert,
-  AlertButton,
-  StyleSheet
+  ViewStyle
 } from "react-native"
-import { TiFFormScrollView } from "@components/form-components/ScrollView"
-import { TiFFormCardSectionView } from "@components/form-components/Section"
-import { BodyText, Headline } from "@components/Text"
-import { TiFFormNavigationLinkView } from "@components/form-components/NavigationLink"
-import { AppStyles } from "@lib/AppColorStyle"
-import { TiFFormRowButton } from "@components/form-components/Button"
-import { AlertsObject, presentAlert } from "@lib/Alerts"
 
 export const ALERTS = {
   signOutConfirmation: (signOut?: () => void) => ({
@@ -41,13 +39,14 @@ export const useAccountInfoSettings = ({
   signOut,
   onSignOutSuccess
 }: UseAccountInfoSettingsEnvironment) => {
-  const signOutMutation = useMutation(signOut, {
+  const signOutMutation = useMutation({
+    mutationFn: signOut,
     onSuccess: onSignOutSuccess,
     onError: () => presentAlert(ALERTS.signOutError)
   })
   return {
-    shouldDisableActions: signOutMutation.isLoading,
-    signOutStarted: !signOutMutation.isLoading
+    shouldDisableActions: signOutMutation.isPending,
+    signOutStarted: !signOutMutation.isPending
       ? () => {
           presentAlert(
             ALERTS.signOutConfirmation(() => signOutMutation.mutate())

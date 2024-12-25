@@ -1,14 +1,14 @@
 import { Ionicon } from "@components/common/Icons"
+import { AlertsObject, presentAlert } from "@lib/Alerts"
 import { QueryHookOptions } from "@lib/ReactQuery"
 import { sleep } from "@lib/utils/DelayData"
 import { useFormSubmission } from "@lib/utils/Form"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import React, { useRef, useState } from "react"
-import { ActivityIndicator, Alert, StyleProp, ViewStyle } from "react-native"
+import { ActivityIndicator, StyleProp, ViewStyle } from "react-native"
 import { UserHandle, UserHandleError } from "TiFShared/domain-models/User"
 import { AuthFormView } from "../AuthLayout"
 import { AuthShadedTextField } from "../AuthTextFields"
-import { AlertsObject, presentAlert } from "@lib/Alerts"
 
 export const CHANGE_HANDLE_ALERTS = {
   genericError: {
@@ -56,7 +56,7 @@ export const useSignUpChangeUserHandleForm = (
     {
       enabled:
         !!parsedHandle && !parsedHandle.isEqualTo(userCurrentHandle.current),
-      cacheTime: Infinity,
+      gcTime: Infinity,
       staleTime: Infinity
     }
   )
@@ -102,13 +102,13 @@ const useCheckIfHandleTakenQuery = (
   const queryClient = useQueryClient()
   const queryKey = ["check-if-user-handle-taken", handle]
   return {
-    query: useQuery(
+    query: useQuery({
       queryKey,
-      async ({ signal }) => await check(handle, signal),
-      options
-    ),
+      queryFn: async ({ signal }) => await check(handle, signal),
+      ...options
+    }),
     cancel: () => {
-      queryClient.cancelQueries(queryKey)
+      queryClient.cancelQueries({ queryKey })
     }
   }
 }
