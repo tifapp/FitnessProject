@@ -1,12 +1,12 @@
-import React, { ReactNode, createContext, useContext } from "react"
-import { NamedLocation } from "./NamedLocation"
-import { useQuery } from "@tanstack/react-query"
+import { placemarkToFormattedAddress } from "@lib/AddressFormatting"
 import { QueryHookOptions } from "@lib/ReactQuery"
+import { QueryObserverOptions, useQuery } from "@tanstack/react-query"
 import { LocationCoordinate2D } from "TiFShared/domain-models/LocationCoordinate2D"
 import { Placemark } from "TiFShared/domain-models/Placemark"
-import { reverseGeocodeAsync, geocodeAsync } from "expo-location"
-import { placemarkToFormattedAddress } from "@lib/AddressFormatting"
 import { mergeWithPartial } from "TiFShared/lib/Object"
+import { geocodeAsync, reverseGeocodeAsync } from "expo-location"
+import React, { ReactNode, createContext, useContext } from "react"
+import { NamedLocation } from "./NamedLocation"
 
 /**
  * Reverse geocodes the most accurrate location for the given coordinates.
@@ -16,11 +16,11 @@ export const useReverseGeocodeQuery = (
   options: QueryHookOptions<NamedLocation | null> = DEFAULT_GEOCODE_QUERY_OPTIONS
 ) => {
   const { reverseGeocode } = useGeocodingFunctions()
-  return useQuery(
-    ["reverseGeocode", coordinates],
-    async () => await reverseGeocode(coordinates),
-    options
-  )
+  return useQuery({
+    queryKey: ["reverseGeocode", coordinates],
+    queryFn: async () => await reverseGeocode(coordinates),
+    ...options
+  })
 }
 
 /**
@@ -31,17 +31,17 @@ export const useGeocodeQuery = (
   options: QueryHookOptions<NamedLocation | null> = DEFAULT_GEOCODE_QUERY_OPTIONS
 ) => {
   const { geocode } = useGeocodingFunctions()
-  return useQuery(
-    ["geocode", placemark],
-    async () => await geocode(placemark),
-    options
-  )
+  return useQuery({
+    queryKey: ["geocode", placemark],
+    queryFn: async () => await geocode(placemark),
+    ...options
+  })
 }
 
 // NB: Geocoded data rarely ever changes, so we can
 // get away with infinite cache time.
-export const DEFAULT_GEOCODE_QUERY_OPTIONS = {
-  cacheTime: Infinity,
+export const DEFAULT_GEOCODE_QUERY_OPTIONS: Partial<QueryObserverOptions<NamedLocation | null>> = {
+  gcTime: Infinity,
   staleTime: Infinity
 }
 

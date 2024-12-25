@@ -1,19 +1,19 @@
-import { dayjs } from "TiFShared/lib/Dayjs"
-import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
-import { renderHook, waitFor } from "@testing-library/react-native"
+import { EXPO_LOCATION_ERRORS } from "@location/Expo"
 import {
-  formattedTravelEstimateResult,
-  useEventTravelEstimates
-} from "./TravelEstimates"
-import {
-  mockExpoLocationObject,
-  mockLocationCoordinate2D
+    mockExpoLocationObject,
+    mockLocationCoordinate2D
 } from "@location/MockData"
 import { UserLocationFunctionsProvider } from "@location/UserLocation"
-import { EXPO_LOCATION_ERRORS } from "@location/Expo"
 import { setPlatform } from "@test-helpers/Platform"
+import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
+import { renderHook, waitFor } from "@testing-library/react-native"
 import { CodedError } from "expo-modules-core"
 import { LocationCoordinate2D } from "TiFShared/domain-models/LocationCoordinate2D"
+import { dayjs } from "TiFShared/lib/Dayjs"
+import {
+    formattedTravelEstimateResult,
+    useEventTravelEstimates
+} from "./TravelEstimates"
 
 describe("EventTravelEstimates tests", () => {
   describe("UseEventTravelEstimates tests", () => {
@@ -59,7 +59,7 @@ describe("EventTravelEstimates tests", () => {
       loadUserLocation.mockResolvedValueOnce(userLocation)
       loadTravelEstimates.mockResolvedValueOnce(TEST_TRAVEL_ESTIMATES)
       const { result } = renderUseEventTravelEstimates(TEST_COORDINATE)
-      expect(result.current.status).toEqual("loading")
+      expect(result.current.status).toEqual("pending")
       await waitFor(() => {
         expect(result.current).toMatchObject({
           status: "success",
@@ -77,7 +77,7 @@ describe("EventTravelEstimates tests", () => {
     it("should be in an error state when loading the user location fails", async () => {
       loadUserLocation.mockRejectedValueOnce(new Error())
       const { result } = renderUseEventTravelEstimates(TEST_COORDINATE)
-      expect(result.current.status).toEqual("loading")
+      expect(result.current.status).toEqual("pending")
       await waitFor(() => expect(result.current.status).toEqual("error"))
       expect(loadTravelEstimates).not.toHaveBeenCalled()
     })
@@ -95,7 +95,7 @@ describe("EventTravelEstimates tests", () => {
         new CodedError(EXPO_LOCATION_ERRORS.noPermissions, "")
       )
       const { result } = renderUseEventTravelEstimates(TEST_COORDINATE)
-      expect(result.current.status).toEqual("loading")
+      expect(result.current.status).toEqual("pending")
       await waitFor(() => {
         expect(result.current.status).toEqual("not-permissible")
       })
@@ -107,7 +107,7 @@ describe("EventTravelEstimates tests", () => {
         new CodedError(EXPO_LOCATION_ERRORS.servicesDisabled, "")
       )
       const { result } = renderUseEventTravelEstimates(TEST_COORDINATE)
-      expect(result.current.status).toEqual("loading")
+      expect(result.current.status).toEqual("pending")
       await waitFor(() => {
         expect(result.current.status).toEqual("disabled")
       })
@@ -169,7 +169,7 @@ describe("EventTravelEstimates tests", () => {
 
     it("should return undefined when not a success status", () => {
       expect(
-        formattedTravelEstimateResult({ status: "loading" }, "automobile")
+        formattedTravelEstimateResult({ status: "pending" }, "automobile")
       ).toBeUndefined()
       expect(
         formattedTravelEstimateResult({ status: "error" }, "automobile")

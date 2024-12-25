@@ -61,8 +61,8 @@ const queryResultToDataResult = ({
     return { status: "no-results", data: [] }
   } else if (status === "success") {
     return { status, data }
-  } else if (status === "loading") {
-    return { status: "loading", data: undefined }
+  } else if (status === "pending") {
+    return { status: "pending", data: undefined }
   }
   return { status: "error", data: undefined }
 }
@@ -75,10 +75,10 @@ const useLocationSearchResultsQuery = (
     center?: LocationCoordinate2D
   ) => Promise<LocationSearchResult[]>
 ) => {
-  return useQuery(
-    ["search-locations", query, center],
-    async () => await loadSearchResults(query, center)
-  )
+  return useQuery({
+    queryKey: ["search-locations", query, center],
+    queryFn: async () => await loadSearchResults(query, center)
+  })
 }
 
 const useLocationSearchCenter = () => {

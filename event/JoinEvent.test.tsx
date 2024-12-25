@@ -1,6 +1,8 @@
 import { EventArrivals } from "@arrival-tracking"
 import { mockEventRegion } from "@arrival-tracking/MockData"
 import { TrueRegionMonitor } from "@arrival-tracking/region-monitoring/MockRegionMonitors"
+import { EventMocks, mockEventLocation } from "@event-details-boundary/MockData"
+import { renderSuccessfulUseLoadEventDetails } from "@event-details-boundary/TestHelpers"
 import { mockLocationCoordinate2D, mockTiFLocation } from "@location/MockData"
 import { SQLiteRecentLocationsStorage } from "@location/Recents"
 import { captureAlerts } from "@test-helpers/Alerts"
@@ -11,8 +13,7 @@ import {
   createTestQueryClient
 } from "@test-helpers/ReactQuery"
 import { resetTestSQLiteBeforeEach, testSQLite } from "@test-helpers/SQLite"
-import { renderHook, waitFor } from "@testing-library/react-native"
-import { act } from "react-test-renderer"
+import { act, renderHook, waitFor } from "@testing-library/react-native"
 import { TiFAPI, TiFEndpointResponse } from "TiFShared/api"
 import { mockTiFServer } from "TiFShared/test-helpers/mockAPIServer"
 import {
@@ -23,8 +24,6 @@ import {
   saveRecentLocationJoinEventHandler,
   useJoinEvent
 } from "./JoinEvent"
-import { EventMocks, mockEventLocation } from "@event-details-boundary/MockData"
-import { renderSuccessfulUseLoadEventDetails } from "@event-details-boundary/TestHelpers"
 
 describe("JoinEvent tests", () => {
   describe("UseJoinEvent tests", () => {
@@ -71,9 +70,9 @@ describe("JoinEvent tests", () => {
       canRequestPermission: true
     }))
 
-    beforeEach(() => {
+    beforeEach(async () => {
       Object.values(env).forEach((m) => "mockReset" in m && m.mockReset())
-      queryClient.clear()
+      await act(async () => queryClient.clear())
     })
 
     test("join event flow, all permissions requested", async () => {
@@ -89,9 +88,9 @@ describe("JoinEvent tests", () => {
         joinButtonTapped: expect.any(Function)
       })
 
-      act(() => (result.current as any).joinButtonTapped())
-      await waitFor(() => expect(result.current.stage).toEqual("loading"))
-      act(() => resolveJoin?.("success"))
+      await act(async () => (result.current as any).joinButtonTapped())
+      await waitFor(() => expect(result.current.stage).toEqual("pending"))
+      await act(async () => resolveJoin?.("success"))
       await waitFor(() => {
         expect(result.current).toMatchObject({
           stage: "permission",
@@ -103,7 +102,7 @@ describe("JoinEvent tests", () => {
         hasArrived: true
       })
 
-      act(() => (result.current as any).requestButtonTapped())
+      await act(async () => (result.current as any).requestButtonTapped())
       await waitFor(() => {
         expect(result.current).toMatchObject({
           stage: "permission",
@@ -112,7 +111,7 @@ describe("JoinEvent tests", () => {
       })
 
       expect(env.onSuccess).not.toHaveBeenCalled()
-      act(() => (result.current as any).requestButtonTapped())
+      await act(async () => (result.current as any).requestButtonTapped())
       await waitFor(() =>
         expect(result.current).toMatchObject({ stage: "idle" })
       )
@@ -129,7 +128,7 @@ describe("JoinEvent tests", () => {
       env.joinEvent.mockResolvedValueOnce("success")
       const { result } = renderUseJoinEvent()
 
-      act(() => (result.current as any).joinButtonTapped())
+      await act(async () => (result.current as any).joinButtonTapped())
       await waitFor(() => {
         expect(result.current).toMatchObject({
           stage: "permission",
@@ -144,7 +143,7 @@ describe("JoinEvent tests", () => {
       const { result } = renderUseJoinEvent()
 
       expect(env.onSuccess).not.toHaveBeenCalled()
-      act(() => (result.current as any).joinButtonTapped())
+      await act(async () => (result.current as any).joinButtonTapped())
       await waitFor(() => {
         expect(result.current).toMatchObject({ stage: "idle" })
       })
@@ -159,14 +158,14 @@ describe("JoinEvent tests", () => {
       const { result } = renderUseJoinEvent()
 
       expect(env.onSuccess).not.toHaveBeenCalled()
-      act(() => (result.current as any).joinButtonTapped())
+      await act(async () => (result.current as any).joinButtonTapped())
       await waitFor(() => {
         expect(result.current).toMatchObject({ stage: "idle" })
       })
       await waitFor(() => {
         expect(env.onSuccess).toHaveBeenCalledTimes(1)
       })
-      act(() => (result.current as any).joinButtonTapped())
+      await act(async () => (result.current as any).joinButtonTapped())
       await waitFor(() => {
         expect(env.onSuccess).toHaveBeenCalledTimes(2)
       })
@@ -177,7 +176,7 @@ describe("JoinEvent tests", () => {
       env.joinEvent.mockResolvedValueOnce("success")
       const { result } = renderUseJoinEvent()
 
-      act(() => (result.current as any).joinButtonTapped())
+      await act(async () => (result.current as any).joinButtonTapped())
       await waitFor(() => {
         expect(result.current).toMatchObject({
           stage: "permission",
@@ -185,13 +184,13 @@ describe("JoinEvent tests", () => {
         })
       })
 
-      act(() => (result.current as any).dismissButtonTapped())
+      await act(async () => (result.current as any).dismissButtonTapped())
       expect(result.current).toMatchObject({
         stage: "permission",
         permissionKind: "backgroundLocation"
       })
 
-      act(() => (result.current as any).dismissButtonTapped())
+      await act(async () => (result.current as any).dismissButtonTapped())
       expect(result.current).toMatchObject({ stage: "idle" })
     })
 
@@ -222,7 +221,7 @@ describe("JoinEvent tests", () => {
           event: { userAttendeeStatus: "not-participating" }
         })
       })
-      act(() => (joinEventResult.current as any).joinButtonTapped())
+      await act(async () => (joinEventResult.current as any).joinButtonTapped())
       await waitFor(() => {
         expect(eventDetailsResult.current).toMatchObject({
           event: { userAttendeeStatus: "attending" }
@@ -240,7 +239,7 @@ describe("JoinEvent tests", () => {
           event: { userAttendeeStatus: "not-participating" }
         })
       })
-      act(() => (joinEventResult.current as any).joinButtonTapped())
+      await act(async () => (joinEventResult.current as any).joinButtonTapped())
       await verifyNeverOccurs(() => {
         expect(eventDetailsResult.current).toMatchObject({
           event: { userAttendeeStatus: "attending" }
@@ -253,7 +252,7 @@ describe("JoinEvent tests", () => {
       callIndex: number,
       key: keyof typeof JOIN_EVENT_ERROR_ALERTS
     ) => {
-      act(() => (result.current as any).joinButtonTapped())
+      await act(async () => (result.current as any).joinButtonTapped())
       await waitFor(() => {
         expect(alertPresentationSpy).toHaveBeenNthPresentedWith(
           callIndex,

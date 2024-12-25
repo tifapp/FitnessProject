@@ -1,4 +1,19 @@
-import { StyleProp, ViewStyle, View, StyleSheet } from "react-native"
+import {
+  BASE_HEADER_SCREEN_OPTIONS,
+  ChevronBackButton
+} from "@components/Navigation"
+import { Headline } from "@components/Text"
+import { TiFQueryClientProvider } from "@lib/ReactQuery"
+import {
+  NavigationContainer,
+  RouteProp,
+  useRoute
+} from "@react-navigation/native"
+import { StackScreenProps, createStackNavigator } from "@react-navigation/stack"
+import { useQuery } from "@tanstack/react-query"
+import React, { createContext, useContext } from "react"
+import { ActivityIndicator, StyleProp, StyleSheet, View, ViewStyle } from "react-native"
+import { SafeAreaProvider } from "react-native-safe-area-context"
 import {
   EMPTY_PATTERN_EDITOR_PATTERN,
   RudeusEditorPattern,
@@ -6,28 +21,12 @@ import {
   RudeusUser,
   editorPattern
 } from "./Models"
-import { SafeAreaProvider } from "react-native-safe-area-context"
-import { TiFQueryClientProvider } from "@lib/ReactQuery"
-import React, { createContext, useContext } from "react"
-import { useQuery } from "@tanstack/react-query"
-import { ActivityIndicator } from "react-native"
-import {
-  NavigationContainer,
-  RouteProp,
-  useRoute
-} from "@react-navigation/native"
-import { StackScreenProps, createStackNavigator } from "@react-navigation/stack"
-import {
-  BASE_HEADER_SCREEN_OPTIONS,
-  ChevronBackButton
-} from "@components/Navigation"
-import { Headline } from "@components/Text"
-import { RudeusPatternsHeaderView, RudeusPatternsView } from "./Patterns"
-import { RudeusRegisterView, useRudeusRegister } from "./Register"
 import {
   RudeusPatternEditorView,
   useRudeusPatternEditor
 } from "./PatternEditor"
+import { RudeusPatternsHeaderView, RudeusPatternsView } from "./Patterns"
+import { RudeusRegisterView, useRudeusRegister } from "./Register"
 
 type RudeusParamsList = {
   register: undefined
@@ -68,7 +67,10 @@ type RudeusRouterProps = {
 
 const RudeusRouterView = ({ style }: RudeusRouterProps) => {
   const { user } = useRudeusContext()
-  const query = useQuery(["rudeus-user"], user)
+  const query = useQuery({
+    queryKey: ["rudeus-user"], 
+    queryFn: user
+  })
   return (
     <View style={style}>
       {query.isLoading && (
