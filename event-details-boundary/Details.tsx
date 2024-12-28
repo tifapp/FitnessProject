@@ -1,4 +1,4 @@
-import { BodyText, Subtitle, Title } from "@components/Text"
+import { BodyText, Subtitle } from "@components/Text"
 import {
   ClientSideEvent,
   clientSideEventFromResponse
@@ -48,11 +48,11 @@ export const eventDetails = async (
 export const EventDetailsFeature = featureContext({ eventDetails })
 
 export type UseLoadEventDetailsResult =
-  | { status: "loading" | "not-found" | "cancelled" }
+  | { status: "pending" | "not-found" | "cancelled" }
   | { status: "error"; retry: () => void; isConnectedToInternet: boolean }
   | {
       status: "success"
-      refreshStatus: "loading" | "error" | "idle"
+      refreshStatus: "pending" | "error" | "idle"
       event: ClientSideEvent
       refresh: () => void
     }
@@ -81,7 +81,7 @@ const loadEventDetailsResult = (
         query.refetch()
       }
     }
-  } else if (query.status === "loading") {
+  } else if (query.status === "pending") {
     return { status: query.status }
   } else if (query.data.status !== "success") {
     return query.data
@@ -100,7 +100,7 @@ const refreshStatus = (
   query: UseQueryResult<EventDetailsLoadingResult, unknown>
 ) => {
   if (query.isRefetching) {
-    return "loading" as const
+    return "pending" as const
   } else if (query.isRefetchError) {
     return "error" as const
   } else {
@@ -129,7 +129,7 @@ export const EventDetailsView = <
   style
 }: EventDetailsProps<Result>) => (
   <View style={style}>
-    {result.status === "loading" && (
+    {result.status === "pending" && (
       <NoContentView
         renderTitle={(title) => <LoadingTitleView title={title} />}
         possibleMessages={LOADING_MESSAGES}
@@ -164,7 +164,7 @@ export const EventDetailsView = <
 const isExploratoryFailure = (
   status: UseLoadEventDetailsResult["status"]
 ): status is "not-found" | "cancelled" | "blocked" => {
-  return status !== "success" && status !== "error" && status !== "loading"
+  return status !== "success" && status !== "error" && status !== "pending"
 }
 
 const LoadingTitleView = ({ title }: { title: string }) => {

@@ -16,6 +16,7 @@ import {
 import { fakeTimers, timeTravel } from "@test-helpers/Timers"
 import { act, renderHook, waitFor } from "@testing-library/react-native"
 import { TiFAPI } from "TiFShared/api"
+import { EventsInAreaResponse } from "TiFShared/api/models/Event"
 import { EventID } from "TiFShared/domain-models/Event"
 import { dateRange } from "TiFShared/domain-models/FixedDateRange"
 import { UserHandle } from "TiFShared/domain-models/User"
@@ -28,7 +29,6 @@ import {
   createDefaultMapRegion,
   minRegionMeterRadius
 } from "./Region"
-import { EventsInAreaResponse } from "TiFShared/api/models/Event"
 
 const TEST_EVENTS = [EventMocks.Multiday, EventMocks.PickupBasketball]
 
@@ -239,7 +239,7 @@ describe("ExploreEvents tests", () => {
 
       const { result } = renderUseExploreEvents({ center: "user-location" })
 
-      await waitFor(() => expect(result.current.data.status).toEqual("loading"))
+      await waitFor(() => expect(result.current.data.status).toEqual("pending"))
 
       await waitFor(() => expect(result.current.region).toEqual(expectedRegion))
 

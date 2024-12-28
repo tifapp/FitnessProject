@@ -1,23 +1,23 @@
-import {
-  StyleProp,
-  ViewStyle,
-  StyleSheet,
-  View,
-  ActivityIndicator
-} from "react-native"
-import { RudeusPattern } from "./Models"
-import { useQuery } from "@tanstack/react-query"
-import React from "react"
-import { Headline } from "@components/Text"
 import { PrimaryButton } from "@components/Buttons"
-import { TiFFormScrollableLayoutView } from "@components/form-components/ScrollableFormLayout"
+import { Ionicon } from "@components/common/Icons"
 import { TiFFooterView } from "@components/Footer"
-import { SafeAreaView } from "react-native-safe-area-context"
 import { TiFFormCardView } from "@components/form-components/Card"
 import { TiFFormNavigationLinkView } from "@components/form-components/NavigationLink"
-import { Ionicon } from "@components/common/Icons"
-import { RefreshControl } from "react-native"
+import { TiFFormScrollableLayoutView } from "@components/form-components/ScrollableFormLayout"
+import { Headline } from "@components/Text"
 import { useRefreshOnFocus } from "@lib/utils/UseRefreshOnFocus"
+import { useQuery } from "@tanstack/react-query"
+import React from "react"
+import {
+  ActivityIndicator,
+  RefreshControl,
+  StyleProp,
+  StyleSheet,
+  View,
+  ViewStyle
+} from "react-native"
+import { SafeAreaView } from "react-native-safe-area-context"
+import { RudeusPattern } from "./Models"
 
 export type RudeusPatternsHeaderProps = {
   username: string
@@ -49,7 +49,10 @@ export const RudeusPatternsView = ({
   patterns,
   style
 }: RudeusPatternsProps) => {
-  const query = useQuery(["rudeus-patterns"], patterns)
+  const query = useQuery({
+    queryKey: ["rudeus-patterns"], 
+    queryFn: patterns
+  })
   useRefreshOnFocus(query.refetch)
   return (
     <View style={style}>

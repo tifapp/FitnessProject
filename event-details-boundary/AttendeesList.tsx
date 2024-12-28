@@ -1,30 +1,25 @@
+import { TiFFormCardView } from "@components/form-components/Card"
+import { TiFFormSectionView } from "@components/form-components/Section"
+import ProfileImageAndName from "@components/profileImageComponents/ProfileImageAndName"
+import { CaptionTitle, Headline } from "@components/Text"
 import {
   EventDetailsLoadingResult,
   updateEventDetailsQueryEvent
 } from "@event/DetailsQuery"
-import { EventAttendee, EventID } from "TiFShared/domain-models/Event"
-import { EventDetailsView, NoContentView, useLoadEventDetails } from "./Details"
-import {
-  UnblockedUserRelationsStatus,
-  UserID
-} from "TiFShared/domain-models/User"
+import { AppStyles } from "@lib/AppColorStyle"
 import { useQueryClient } from "@tanstack/react-query"
+import { FriendRequestButton, useFriendRequest } from "@user/FriendRequest"
+import dayjs from "dayjs"
+import { memo, useEffect } from "react"
 import {
+  FlatList,
+  Pressable,
+  RefreshControl,
   StyleProp,
-  ViewStyle,
   StyleSheet,
   View,
-  Pressable,
-  FlatList,
-  RefreshControl
+  ViewStyle
 } from "react-native"
-import { TiFFormCardView } from "@components/form-components/Card"
-import ProfileImageAndName from "@components/profileImageComponents/ProfileImageAndName"
-import { memo, useEffect } from "react"
-import { FriendRequestButton, useFriendRequest } from "@user/FriendRequest"
-import { CaptionTitle, Headline } from "@components/Text"
-import { AppStyles } from "@lib/AppColorStyle"
-import dayjs from "dayjs"
 import Animated, {
   interpolateColor,
   useAnimatedStyle,
@@ -32,19 +27,22 @@ import Animated, {
   withRepeat,
   withTiming
 } from "react-native-reanimated"
-import { TiFFormSectionView } from "@components/form-components/Section"
 import { useCoreNavigation } from "@components/Navigation"
+import { EventAttendee, EventID } from "TiFShared/domain-models/Event"
+import {
+  UnblockedUserRelationsStatus,
+  UserID
+} from "TiFShared/domain-models/User"
+import { EventDetailsView, NoContentView, useLoadEventDetails } from "./Details"
 
 export type UseEventAttendeesListEnvironment = {
-  event: (id: EventID) => Promise<EventDetailsLoadingResult>
   eventId: EventID
 }
 
 export const useEventAttendeesList = ({
-  eventId,
-  event
+  eventId
 }: UseEventAttendeesListEnvironment) => {
-  const details = useLoadEventDetails(eventId, event)
+  const details = useLoadEventDetails(eventId)
   const queryClient = useQueryClient()
   if (details.status !== "success") {
     return details
@@ -119,7 +117,7 @@ export const EventAttendeesListView = ({
           ItemSeparatorComponent={() => <View style={styles.itemSeparator} />}
           refreshControl={
             <RefreshControl
-              refreshing={state.refreshStatus === "loading"}
+              refreshing={state.refreshStatus === "pending"}
               onRefresh={state.refresh}
             />
           }

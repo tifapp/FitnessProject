@@ -26,11 +26,11 @@ export const useUserSessionQuery = (
   options?: QueryHookOptions<UserSession>
 ) => {
   const { userSession } = useUserSession()
-  return useQuery(
-    USER_SESSION_QUERY_KEY,
-    async () => await userSession(),
-    options
-  )
+  return useQuery({
+    queryKey: USER_SESSION_QUERY_KEY,
+    queryFn: async () => await userSession(),
+    ...options
+  })
 }
 
 export const setUserSessionQueryData = (

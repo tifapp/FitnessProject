@@ -53,10 +53,10 @@ export const useLocationsSearch = () => {
   const query = useAtomValue(debouncedSearchTextAtom)
   const { searchResults } = LocationsSearchFeature.useContext()
   const userLocation = useLocationSearchCenter()
-  const locationsQuery = useQuery(
-    ["search-locations", query, userLocation?.coords],
-    async () => await searchResults(query, userLocation?.coords)
-  )
+  const locationsQuery = useQuery({
+    queryKey: ["search-locations", query, userLocation?.coords],
+    queryFn: async () => await searchResults(query, userLocation?.coords)
+  })
   return {
     userLocation,
     query,
@@ -75,8 +75,8 @@ const queryResultToDataResult = ({
     return { status: "no-results", data: [] }
   } else if (status === "success") {
     return { status, data }
-  } else if (status === "loading") {
-    return { status: "loading", data: undefined }
+  } else if (status === "pending") {
+    return { status: "pending", data: undefined }
   }
   return { status: "error", data: undefined }
 }

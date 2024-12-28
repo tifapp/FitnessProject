@@ -37,22 +37,21 @@ export const useEventActionsMenu = (
 ) => {
   const { blockUser, unblockUser } = UserBlockingFeature.useContext()
   const queryClient = useQueryClient()
-  const toggleBlockMutation = useMutation(
-    async ({ isBlocking, hostId }: ToggleBlockMutationArgs) => {
+  const toggleBlockMutation = useMutation({
+    mutationFn: async ({ isBlocking, hostId }: ToggleBlockMutationArgs) => {
       if (isBlocking) {
         await blockUser(hostId)
       } else {
         await unblockUser(hostId)
       }
     },
-    {
-      onError: (_, { originalRelations }) => {
-        updateEventDetailsQueryEvent(queryClient, event.id, (e) => ({
-          ...e,
-          host: { ...e.host, relationStatus: originalRelations }
-        }))
-      }
+    onError: (_, { originalRelations }) => {
+      updateEventDetailsQueryEvent(queryClient, event.id, (e) => ({
+        ...e,
+        host: { ...e.host, relationStatus: originalRelations }
+      }))
     }
+  }
   )
   return {
     actionsListKey: useIsSignedIn()

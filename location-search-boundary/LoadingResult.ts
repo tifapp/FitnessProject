@@ -5,7 +5,7 @@ import { LocationSearchResult } from "./SearchClient"
  */
 export type LocationSearchLoadingResult =
   | {
-      status: "loading"
+      status: "pending"
       data: undefined
     }
   | { status: "no-results"; data: [] }

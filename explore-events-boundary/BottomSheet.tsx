@@ -14,7 +14,7 @@ import { TiFBottomSheet, TiFBottomSheetProvider } from "@components/BottomSheet"
 
 export type ExploreEventsBottomSheetProps = {
   events: ClientSideEvent[]
-  HeaderComponent: ComponentType<any>
+  HeaderComponent: JSX.Element
   EmptyEventsComponent: ReactElement
   style?: StyleProp<ViewStyle>
 }

@@ -3,7 +3,10 @@ import {
   EventRegionMonitor,
   useHasArrivedAtRegion
 } from "@arrival-tracking/region-monitoring"
+import { TiFBottomSheet } from "@components/BottomSheet"
 import { PrimaryButton } from "@components/Buttons"
+import { IoniconCloseButton } from "@components/common/Icons"
+import { BodyText, Title } from "@components/Text"
 import { ClientSideEvent } from "@event/ClientSideEvent"
 import { updateEventDetailsQueryEvent } from "@event/DetailsQuery"
 import {
@@ -20,17 +23,14 @@ import {
   requestPermissionsAsync as requestNotificationPermissions
 } from "expo-notifications"
 import React, { useEffect, useState } from "react"
-import { StyleProp, StyleSheet, View, ViewStyle, TextProps } from "react-native"
-import { IoniconCloseButton } from "@components/common/Icons"
-import { BodyText, Title } from "@components/Text"
+import { StyleProp, StyleSheet, TextProps, View, ViewStyle } from "react-native"
+
 import { useSafeAreaInsets } from "react-native-safe-area-context"
-import { FontScaleFactors } from "@lib/Fonts"
-import { BottomSheetView } from "@gorhom/bottom-sheet"
 import { TiFAPI } from "TiFShared/api"
 import { EventLocation } from "TiFShared/domain-models/Event"
 import { EventLocationIdentifier } from "./LocationIdentifier"
 import { AlertsObject, presentAlert } from "@lib/Alerts"
-import { TiFBottomSheet } from "@components/BottomSheet"
+import { BottomSheetView } from "@gorhom/bottom-sheet"
 
 export const JOIN_EVENT_ERROR_ALERTS = {
   "event-has-ended": {
@@ -201,7 +201,7 @@ export type UseJoinEventPermission = {
 
 export type UseJoinEvent =
   | { stage: "idle"; joinButtonTapped: () => void }
-  | { stage: "loading" | "success" }
+  | { stage: "pending" | "success" }
   | ({ stage: "permission" } & UseJoinEventPermission)
 
 /**
@@ -211,7 +211,7 @@ export type UseJoinEvent =
  * 1. User sees join button.
  *   - Represented by `status === "idle"`
  * 2. User presses join button.
- *   - Represented by `status === "loading"`
+ *   - Represented by `status === "pending"`
  * 3. We ask them to turn on notifications, and accept background location.
  *    permissions if joining succeeds.
  *   - Represented by `status === "permission"`
@@ -228,22 +228,20 @@ export const useJoinEvent = (
   const hasArrived = useHasArrivedAtRegion(event.location, monitor)
   const currentPermission = useCurrentJoinEventPermission(loadPermissions)
   const queryClient = useQueryClient()
-  const joinEventMutation = useMutation(
-    async () => await joinEvent({ ...event, hasArrived }),
-    {
-      onSuccess: (status) => {
-        if (status !== "success") {
-          presentAlert(JOIN_EVENT_ERROR_ALERTS[status])
-        } else {
-          updateEventDetailsQueryEvent(queryClient, event.id, (e) => ({
-            ...e,
-            userAttendeeStatus: "attending"
-          }))
-        }
-      },
-      onError: () => presentAlert(JOIN_EVENT_ERROR_ALERTS.generic)
-    }
-  )
+  const joinEventMutation = useMutation({
+    mutationFn: async () => await joinEvent({ ...event, hasArrived }),
+    onSuccess: (status) => {
+      if (status !== "success") {
+        presentAlert(JOIN_EVENT_ERROR_ALERTS[status])
+      } else {
+        updateEventDetailsQueryEvent(queryClient, event.id, (e) => ({
+          ...e,
+          userAttendeeStatus: "attending"
+        }))
+      }
+    },
+    onError: () => presentAlert(JOIN_EVENT_ERROR_ALERTS.generic)
+  })
   const hasJoined =
     joinEventMutation.isSuccess && joinEventMutation.data === "success"
   const isSuccess = hasJoined && currentPermission === "done"
@@ -258,10 +256,10 @@ export const useJoinEvent = (
   if (hasJoined && typeof currentPermission === "object") {
     return { stage: "permission", ...currentPermission }
   } else if (
-    joinEventMutation.isLoading ||
-    (hasJoined && currentPermission === "loading")
+    joinEventMutation.isPending ||
+    (hasJoined && currentPermission === "pending")
   ) {
-    return { stage: "loading" }
+    return { stage: "pending" }
   } else {
     return { stage: "idle", joinButtonTapped: joinEventMutation.mutate }
   }
@@ -271,21 +269,19 @@ const useCurrentJoinEventPermission = (
   loadPermissions: () => Promise<JoinEventPermission[]>
 ) => {
   const [permissionIndex, setPermissionIndex] = useState(0)
-  const { data: availablePermissions } = useQuery(
-    ["join-event-permissions"],
-    loadPermissions,
-    {
-      select: (permissions) => permissions.filter((p) => p.canRequestPermission)
-    }
-  )
-  const permissionRequestMutation = useMutation(
-    async (availablePermissions: JoinEventPermission[]) => {
+  const { data: availablePermissions } = useQuery({
+    queryKey: ["join-event-permissions"],
+    queryFn: loadPermissions,
+    select: (permissions) => permissions.filter((p) => p.canRequestPermission)
+  })
+  const permissionRequestMutation = useMutation({
+    mutationFn: async (availablePermissions: JoinEventPermission[]) => {
       if (permissionIndex >= availablePermissions.length) return
       await availablePermissions[permissionIndex].requestPermission()
     },
-    { onSuccess: () => setPermissionIndex((index) => index + 1) }
-  )
-  if (!availablePermissions) return "loading"
+    onSuccess: () => setPermissionIndex((index) => index + 1)
+  })
+  if (!availablePermissions) return "pending"
   if (permissionIndex >= availablePermissions.length) return "done"
   return {
     permissionKind: availablePermissions[permissionIndex].kind,
