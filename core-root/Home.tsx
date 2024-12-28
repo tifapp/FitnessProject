@@ -21,14 +21,19 @@ import PagerView from "react-native-pager-view"
 import { TiFContext } from "./Context"
 import { useCoreNavigation } from "@components/Navigation"
 import { defaultEditFormValues } from "@event/EditFormValues"
+import { atom, useAtom, useAtomValue, useSetAtom } from "jotai"
 
 export type HomeProps = {
   style?: StyleProp<ViewStyle>
 }
 
+const scrollStateAtom = atom<"idle" | "dragging" | "settling">("idle")
+const pageIndexAtom = atom(0)
+
 export const HomeView = ({ style }: HomeProps) => {
   const pagerRef = useRef<PagerView>(null)
-  const [pageIndex, setPageIndex] = useState(0)
+  const setPageIndex = useSetAtom(pageIndexAtom)
+  const setScrollState = useSetAtom(scrollStateAtom)
   const footerBackgroundOpacity = useSharedValue(0)
   return (
     <View style={style}>
@@ -37,7 +42,6 @@ export const HomeView = ({ style }: HomeProps) => {
           ref={pagerRef}
           orientation="horizontal"
           layoutDirection="ltr"
-          initialPage={pageIndex}
           onPageSelected={(e) => setPageIndex(e.nativeEvent.position)}
           onPageScroll={(e) => {
             if (e.nativeEvent.position > 0) {
@@ -45,6 +49,9 @@ export const HomeView = ({ style }: HomeProps) => {
             } else {
               footerBackgroundOpacity.value = e.nativeEvent.offset
             }
+          }}
+          onPageScrollStateChanged={(e) => {
+            setScrollState(e.nativeEvent.pageScrollState)
           }}
           style={styles.pager}
         >
@@ -65,7 +72,6 @@ export const HomeView = ({ style }: HomeProps) => {
           style={styles.footer}
         >
           <FooterView
-            pageIndex={pageIndex}
             onPageIndexTapped={(index) => pagerRef.current?.setPage(index)}
           />
         </TiFFooterView>
@@ -81,11 +87,10 @@ const TODO = () => (
 )
 
 type FooterProps = {
-  pageIndex: number
   onPageIndexTapped: (index: number) => void
 }
 
-const FooterView = ({ pageIndex, onPageIndexTapped }: FooterProps) => {
+const FooterView = ({ onPageIndexTapped }: FooterProps) => {
   const { presentProfile, presentEditEvent } = useCoreNavigation()
   return (
     <View style={styles.footerContainer}>
@@ -109,16 +114,8 @@ const FooterView = ({ pageIndex, onPageIndexTapped }: FooterProps) => {
       </View>
       <View style={[styles.footerItem, styles.footerBreadcrumbs]}>
         <View style={styles.footerBreadcrumbsContainer}>
-          <PageDotView
-            index={0}
-            selectedIndex={pageIndex}
-            onTapped={onPageIndexTapped}
-          />
-          <PageDotView
-            index={1}
-            selectedIndex={pageIndex}
-            onTapped={onPageIndexTapped}
-          />
+          <PageDotView index={0} onTapped={onPageIndexTapped} />
+          <PageDotView index={1} onTapped={onPageIndexTapped} />
         </View>
       </View>
       <View style={styles.footerItem}>
@@ -145,11 +142,10 @@ const FooterView = ({ pageIndex, onPageIndexTapped }: FooterProps) => {
 
 type PageDotProps = {
   index: number
-  selectedIndex: number
   onTapped: (index: number) => void
 }
 
-const PageDotView = ({ index, selectedIndex, onTapped }: PageDotProps) => (
+const PageDotView = ({ index, onTapped }: PageDotProps) => (
   <Pressable
     onPress={() => onTapped(index)}
     hitSlop={{
@@ -165,7 +161,7 @@ const PageDotView = ({ index, selectedIndex, onTapped }: PageDotProps) => (
         width: 8,
         height: 8,
         backgroundColor:
-          index === selectedIndex
+          index === useAtomValue(pageIndexAtom)
             ? AppStyles.colorOpacity35
             : AppStyles.colorOpacity15
       }}
@@ -174,6 +170,7 @@ const PageDotView = ({ index, selectedIndex, onTapped }: PageDotProps) => (
 )
 
 const ExploreView = () => {
+  const scrollState = useAtomValue(scrollStateAtom)
   const { fetchEvents } = useContext(TiFContext)!
   const { region, data, updateRegion } = useExploreEvents(
     createInitialCenter(),
@@ -181,12 +178,16 @@ const ExploreView = () => {
   )
   return (
     <View style={styles.container}>
-      <ExploreEventsView
-        region={region}
-        data={data}
-        onRegionUpdated={updateRegion}
+      <View
+        pointerEvents={scrollState === "dragging" ? "none" : "auto"}
         style={styles.exploreEvents}
-      />
+      >
+        <ExploreEventsView
+          region={region}
+          data={data}
+          onRegionUpdated={updateRegion}
+        />
+      </View>
       <View style={styles.exploreDragZone} />
     </View>
   )
