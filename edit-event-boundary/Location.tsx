@@ -114,7 +114,10 @@ const LocationView = ({
   return (
     <View style={[styles.locationContainer, { height: mapHeight }]}>
       {mapHeight && (
-        <Animated.View entering={FadeIn.duration(300)}>
+        <Animated.View
+          entering={FadeIn.duration(300)}
+          style={styles.mapDimensions}
+        >
           {location.coordinate ? (
             <MapView
               style={[styles.mapDimensions, { height: mapHeight }]}
@@ -220,7 +223,8 @@ const styles = StyleSheet.create({
   },
   mapDimensions: {
     width: "100%",
-    borderRadius: 12
+    borderRadius: 12,
+    overflow: "hidden"
   },
   locationContainer: {
     height: 300

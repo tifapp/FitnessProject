@@ -273,6 +273,8 @@ const styles = StyleSheet.create({
   exploreDragZone: {
     position: "absolute",
     height: "100%",
-    width: 32
+    width: 32,
+    opacity: 0.00000001, // NB: A small amount of opacity is needed for the drag zone to be properly rendered on Android.
+    backgroundColor: "red"
   }
 })
