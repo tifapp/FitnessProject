@@ -1,7 +1,7 @@
 import { EventCard } from "@event/EventCard"
 import { BottomSheetFlatList } from "@gorhom/bottom-sheet"
 import { ClientSideEvent } from "@event/ClientSideEvent"
-import React, { ComponentType, ReactElement, forwardRef } from "react"
+import React, { ComponentType, ReactElement } from "react"
 import {
   ListRenderItemInfo,
   Platform,
@@ -11,7 +11,6 @@ import {
   ViewStyle
 } from "react-native"
 import { TiFBottomSheet, TiFBottomSheetProvider } from "@components/BottomSheet"
-import { Subtitle } from "@components/Text"
 
 export type ExploreEventsBottomSheetProps = {
   events: ClientSideEvent[]
@@ -21,7 +20,6 @@ export type ExploreEventsBottomSheetProps = {
 }
 
 const SNAP_POINTS = ["25%", "50%", "85%"]
-const STICKY_HEADER_INDICIES = [0]
 
 /**
  * The bottom sheet that displays events in the explore events view.

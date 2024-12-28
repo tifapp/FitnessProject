@@ -180,12 +180,15 @@ const ExploreView = () => {
     { fetchEvents, isSignificantlyDifferentRegions }
   )
   return (
-    <ExploreEventsView
-      region={region}
-      data={data}
-      onRegionUpdated={updateRegion}
-      style={styles.exploreEvents}
-    />
+    <View style={styles.container}>
+      <ExploreEventsView
+        region={region}
+        data={data}
+        onRegionUpdated={updateRegion}
+        style={styles.exploreEvents}
+      />
+      <View style={styles.exploreDragZone} />
+    </View>
   )
 }
 
@@ -266,5 +269,10 @@ const styles = StyleSheet.create({
   },
   exploreEvents: {
     flex: 1
+  },
+  exploreDragZone: {
+    position: "absolute",
+    height: "100%",
+    width: 32
   }
 })
