@@ -112,7 +112,7 @@ const LocationView = ({
   }, [location.coordinate])
   const mapHeight = overlayLayout && Math.max(300, 200 + overlayLayout.height)
   return (
-    <View style={styles.locationContainer}>
+    <View style={[styles.locationContainer, { height: mapHeight }]}>
       {mapHeight && (
         <Animated.View entering={FadeIn.duration(300)}>
           {location.coordinate ? (
