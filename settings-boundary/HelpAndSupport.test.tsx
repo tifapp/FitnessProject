@@ -119,6 +119,7 @@ describe("HelpAndSupportSettings tests", () => {
 
     test("Unsuccessful submit question flow", async () => {
       composeEmail.mockRejectedValue(new Error("Bad error"))
+      isShowingContactSection.mockResolvedValueOnce(true)
       const { result } = renderUseHelpAndSupportSettings()
       await waitFor(() =>
         expect(result.current.isShowingContactSection).toEqual(true)
@@ -133,6 +134,7 @@ describe("HelpAndSupportSettings tests", () => {
 
     const renderSuccessfulEmailCompositionFlow = async () => {
       composeEmail.mockResolvedValue("success")
+      isShowingContactSection.mockResolvedValueOnce(true)
       const { result } = renderUseHelpAndSupportSettings()
       await waitFor(() =>
         expect(result.current.isShowingContactSection).toEqual(true)
@@ -142,6 +144,7 @@ describe("HelpAndSupportSettings tests", () => {
 
     const renderUnsuccessfulEmailCompositionFlow = async () => {
       composeEmail.mockRejectedValue(new Error("Bad error"))
+      isShowingContactSection.mockResolvedValueOnce(true)
       const { result } = renderUseHelpAndSupportSettings()
       await waitFor(() =>
         expect(result.current.isShowingContactSection).toEqual(true)

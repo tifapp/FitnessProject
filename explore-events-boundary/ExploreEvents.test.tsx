@@ -313,9 +313,10 @@ describe("ExploreEvents tests", () => {
       })
     })
 
-    it("should use sanfrancisco as the default region when user denies foreground location permissions", async () => {
+    it("should use the Xerox Alto as the default region when user denies foreground location permissions", async () => {
       mockEndlessFetchEvents()
       requestForegroundPermissions.mockResolvedValueOnce({ granted: false })
+      queryUserCoordinates.mockRejectedValueOnce(new Error())
 
       const { result } = renderUseExploreEvents({ center: "user-location" })
 
@@ -325,7 +326,7 @@ describe("ExploreEvents tests", () => {
       expect(result.current.region).toEqual(XEROX_ALTO_DEFAULT_REGION)
     })
 
-    it("should use sanfrancisco as the default region when user location fetch errors", async () => {
+    it("should use Xerox Alto as the default region when user location fetch errors", async () => {
       mockEndlessFetchEvents()
       requestForegroundPermissions.mockResolvedValueOnce({ granted: true })
       queryUserCoordinates.mockRejectedValueOnce(new Error())
@@ -378,6 +379,9 @@ describe("ExploreEvents tests", () => {
 
     it("should region update region immediately when current region is non-existent", async () => {
       mockEndlessFetchEvents()
+      requestForegroundPermissions.mockResolvedValueOnce({ granted: true })
+      queryUserCoordinates.mockRejectedValueOnce(new Error())
+
       const { result } = renderUseExploreEvents({ center: "user-location" })
 
       const region = mockRegion()
