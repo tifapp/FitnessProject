@@ -204,11 +204,7 @@ export const ExploreEventsView = ({
       <ExploreEventsBottomSheet
         events={data.events ?? []}
         HeaderComponent={
-          <Title style={styles.sheetHeaderText}>
-            {data.status !== "pending"
-              ? "Nearby Events"
-              : "Finding Nearby Events..."}
-          </Title>
+          data.status !== "pending" ? NearbyHeader : FindingHeader
         }
         EmptyEventsComponent={
           <View style={styles.emptyEventsContainer}>
@@ -221,6 +217,13 @@ export const ExploreEventsView = ({
     </View>
   )
 }
+
+const NearbyHeader = () => (
+  <Title style={styles.sheetHeaderText}>Nearby Events</Title>
+)
+const FindingHeader = () => (
+  <Title style={styles.sheetHeaderText}>Finding Nearby Events...</Title>
+)
 
 type ErrorProps = {
   onRetried: () => void

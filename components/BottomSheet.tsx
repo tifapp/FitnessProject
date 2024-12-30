@@ -1,5 +1,6 @@
 import {
   BottomSheetBackdropProps,
+  BottomSheetHandleProps,
   BottomSheetModal,
   BottomSheetModalProvider,
   useBottomSheetModal
@@ -33,6 +34,7 @@ type BaseTiFBottomSheetProps = {
   canSwipeToDismiss?: boolean
   shouldIncludeBackdrop?: boolean
   enableContentPanningGesture?: boolean
+  HandleView?: (props: BottomSheetHandleProps) => JSX.Element
   onDismiss?: () => void
   handleStyle?: StyleProp<ViewStyle> | "hidden"
   style?: StyleProp<ViewStyle>
@@ -60,6 +62,7 @@ export const TiFBottomSheet = <Item = boolean,>({
   enableContentPanningGesture = true,
   shouldIncludeBackdrop = true,
   initialSnapPointIndex = 0,
+  HandleView,
   onDismiss,
   handleStyle,
   children,
@@ -96,6 +99,7 @@ export const TiFBottomSheet = <Item = boolean,>({
       enableContentPanningGesture={enableContentPanningGesture}
       handleStyle={bottomSheetHandleStyle}
       animatedIndex={animatedIndex}
+      handleComponent={HandleView}
       onDismiss={onDismiss}
       containerComponent={
         // NB: iOS needs a FullWindowOverlay in order to have the sheet appear above the native

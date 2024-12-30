@@ -1,7 +1,11 @@
 import { EventCard } from "@event/EventCard"
-import { BottomSheetFlatList } from "@gorhom/bottom-sheet"
+import {
+  BottomSheetFlatList,
+  BottomSheetHandle,
+  BottomSheetHandleProps
+} from "@gorhom/bottom-sheet"
 import { ClientSideEvent } from "@event/ClientSideEvent"
-import React, { ComponentType, ReactElement } from "react"
+import React, { ReactElement, useCallback } from "react"
 import {
   ListRenderItemInfo,
   Platform,
@@ -14,7 +18,7 @@ import { TiFBottomSheet, TiFBottomSheetProvider } from "@components/BottomSheet"
 
 export type ExploreEventsBottomSheetProps = {
   events: ClientSideEvent[]
-  HeaderComponent: JSX.Element
+  HeaderComponent: () => JSX.Element
   EmptyEventsComponent: ReactElement
   style?: StyleProp<ViewStyle>
 }
@@ -37,6 +41,15 @@ export const ExploreEventsBottomSheet = ({
         overlay="on-screen"
         sizing={{ snapPoints: SNAP_POINTS }}
         initialSnapPointIndex={1}
+        HandleView={useCallback(
+          (props: BottomSheetHandleProps) => (
+            <View style={styles.handle}>
+              <BottomSheetHandle {...props} />
+              <HeaderComponent />
+            </View>
+          ),
+          [HeaderComponent]
+        )}
         canSwipeToDismiss={false}
         shouldIncludeBackdrop={false}
       >
@@ -49,11 +62,10 @@ export const ExploreEventsBottomSheet = ({
             </View>
           )}
           ListEmptyComponent={EmptyEventsComponent}
-          ListHeaderComponent={HeaderComponent}
           contentContainerStyle={{
             paddingBottom: Platform.OS === "ios" ? 16 : 88
           }}
-          contentInset={{ bottom: 72 }}
+          contentInset={{ bottom: 96 }}
         />
       </TiFBottomSheet>
     </View>
@@ -65,8 +77,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 8
   },
-  bottomMargin: {
-    paddingBottom: 128
+  handle: {
+    rowGap: 8
   },
   event: {
     width: "100%"
