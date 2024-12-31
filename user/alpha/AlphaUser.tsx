@@ -1,17 +1,17 @@
-import { SecureStore, InMemorySecureStore } from "@lib/SecureStore"
+import { InMemorySecureStore, SecureStore } from "@lib/SecureStore"
 import { UserSession, UserSessionProvider } from "@user/Session"
 import { EmailAddress } from "@user/privacy"
 import { TiFAPI } from "TiFShared/api"
 import {
-  UserID,
   UserHandle,
   UserHandleSchema,
+  UserID,
   UserIDSchema
 } from "TiFShared/domain-models/User"
 import { jwtBody } from "TiFShared/lib/JWT"
+import * as ExpoSecureStore from "expo-secure-store"
 import { useCallback } from "react"
 import { z } from "zod"
-import * as ExpoSecureStore from "expo-secure-store"
 
 /**
  * All the data associated with an Alpha User.

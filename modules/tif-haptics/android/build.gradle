@@ -60,7 +60,7 @@ android {
 
   kotlinOptions {
     jvmTarget = JavaVersion.VERSION_17.majorVersion
-  }
+  } 
 
   namespace "expo.modules.tifhaptics"
   defaultConfig {
