@@ -12,8 +12,8 @@ import {
   UserID,
   UserRelationsStatus
 } from "TiFShared/domain-models/User"
-import { ReactNode, createContext, useContext } from "react"
-import { View, ViewStyle, StyleProp, StyleSheet } from "react-native"
+import { ReactNode } from "react"
+import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 
 export const ALERTS = {
   // eslint-disable-next-line @typescript-eslint/naming-convention

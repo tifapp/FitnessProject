@@ -1,7 +1,7 @@
 import { TiFFormCardView } from "@components/form-components/Card"
 import ProfileImageAndName from "@components/profileImageComponents/ProfileImageAndName"
 import { ClientSideEvent } from "@event/ClientSideEvent"
-import React from "react"
+import React, { memo } from "react"
 import { Pressable, StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 import { EventActionsMenuView, useEventActionsMenu } from "./Menu"
 import { BoldFootnote, Footnote, Subtitle } from "@components/Text"
@@ -10,7 +10,6 @@ import { EventUserAttendanceButton } from "./UserAttendance"
 import { Ionicon } from "@components/common/Icons"
 import dayjs from "dayjs"
 import { FixedDateRange } from "TiFShared/domain-models/FixedDateRange"
-import { placemarkToAbbreviatedAddress } from "@lib/AddressFormatting"
 import { ProfileCircleView } from "@components/profileImageComponents/ProfileCircle"
 import { FontScaleFactors } from "@lib/Fonts"
 import { useCoreNavigation } from "@components/Navigation"
@@ -22,12 +21,7 @@ export type EventCardProps = {
   style?: StyleProp<ViewStyle>
 }
 
-export const EventCard = ({
-  event,
-  onJoined,
-  onLeft,
-  style
-}: EventCardProps) => {
+const _EventCard = ({ event, onJoined, onLeft, style }: EventCardProps) => {
   const { presentProfile, pushEventDetails, pushAttendeesList } =
     useCoreNavigation()
   const previewedAttendees = event.previewAttendees.slice(0, 3)
@@ -137,6 +131,8 @@ export const eventCardFormattedDateRange = (range: FixedDateRange) => {
   const end = dayjs(range.endDateTime).format("h:mm A")
   return `${start}-${end}`
 }
+
+export const EventCard = memo(_EventCard)
 
 const styles = StyleSheet.create({
   container: {
