@@ -1,9 +1,9 @@
+import { mockEventLocation } from "@event-details-boundary/MockData"
 import { mockLocationCoordinate2D } from "@location/MockData"
-import { mockEventArrival, mockEventArrivalRegion } from "./MockData"
+import { EventID, EventUserAttendeeStatus } from "TiFShared/domain-models/Event"
 import { repeatElements } from "TiFShared/lib/Array"
 import { EventArrivals, SyncableTrackableEvent } from "./Arrivals"
-import { EventID, EventUserAttendeeStatus } from "TiFShared/domain-models/Event"
-import { mockEventLocation } from "@event-details-boundary/MockData"
+import { mockEventArrival, mockEventArrivalRegion } from "./MockData"
 import { regionWithArrivalData } from "./TestHelpers"
 
 describe("EventArrivals tests", () => {

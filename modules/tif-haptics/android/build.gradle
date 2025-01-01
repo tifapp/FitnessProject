@@ -85,5 +85,6 @@ repositories {
 
 dependencies {
   implementation project(':expo-modules-core')
+  implementation(project(path: ":TiFNative", configuration: "default"))
   implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${getKotlinVersion()}"
 }

@@ -19,6 +19,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "TiFNative"
-include(":app")
+rootProject.name = "TIFNative"
 include(":TiFNative")
