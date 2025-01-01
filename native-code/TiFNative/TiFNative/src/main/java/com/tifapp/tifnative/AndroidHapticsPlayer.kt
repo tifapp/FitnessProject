@@ -22,12 +22,7 @@ public class AndroidHapticsPlayer(
         HapticsSettings(isHapticFeedbackMuted = false, isHapticSoundEffectsMuted = false)
     private val mutex = Mutex()
     private var mPlayer = MediaPlayer()
-    private val vibrator: Vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-        (context.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager).defaultVibrator
-    } else {
-        @Suppress("DEPRECATION")
-        context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-    }
+    private val vibrator = context.defaultVibrator
 
     override suspend fun playSound(element: HapticPatternElement.AudioCustom) {
         if (settings.isHapticSoundEffectsMuted) {
