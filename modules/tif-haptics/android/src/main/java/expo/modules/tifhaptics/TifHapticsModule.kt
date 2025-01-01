@@ -14,34 +14,21 @@ class TifHapticsModule : Module() {
   private val context: Context
     get() = appContext.reactContext ?: throw Exceptions.ReactContextLost()
 
-  private val mutex = Mutex()
-  private var haptics: TiFHapticsEngine? = null
+  private val haptics = AndroidHapticsPlayer(context)
 
   override fun definition() = ModuleDefinition {
     Name("TifHaptics")
 
-    Constants {
-      mapOf("IS_HAPTICS_SUPPORTED" to context.isHapticsSupportedOnDevice)
+    AsyncFunction("play") Coroutine { event: ExpoObject ->
+      haptics.play(event)
     }
 
-    AsyncFunction("play") Coroutine { event: HapticEvent ->
-      getHapticsEngine().play(event)
+    AsyncFunction("apply") Coroutine { event: ExpoObject -> 
+      haptics.apply(event)
     }
 
-    AsyncFunction("mute") Coroutine { ->
-      getHapticsEngine().mute()
+    Function("deviceSupport") { 
+       mapOf("isFeedbackSupportedOnDevice" to context.isHapticsSupportedOnDevice, "isAudioSupportedOnDevice" to true)
     }
-
-    AsyncFunction("unmute") Coroutine { ->
-      getHapticsEngine().unmute()
-    }
-  }
-
-  private suspend fun getHapticsEngine(): TiFHapticsEngine = mutex.withLock {
-    val currentHaptics = haptics
-    if (currentHaptics != null) return@getHapticsEngine currentHaptics
-    val hapticsEngine = TiFHapticsEngine(context.defaultVibrator)
-    haptics = hapticsEngine
-    hapticsEngine
   }
 }
