@@ -370,7 +370,7 @@ describe("JoinEvent tests", () => {
         joinEvent: {
           expectedRequest: {
             params: {
-              eventId: "1"
+              eventId: "1" as any // TODO: - Why does this have to be a string?
             },
             body:
               bodyExpectation === "no-request-body"

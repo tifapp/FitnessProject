@@ -27,6 +27,7 @@ import Animated, {
   withRepeat,
   withTiming
 } from "react-native-reanimated"
+import { useCoreNavigation } from "@components/Navigation"
 import { EventAttendee, EventID } from "TiFShared/domain-models/Event"
 import {
   UnblockedUserRelationsStatus,
@@ -35,15 +36,13 @@ import {
 import { EventDetailsView, NoContentView, useLoadEventDetails } from "./Details"
 
 export type UseEventAttendeesListEnvironment = {
-  event: (id: EventID) => Promise<EventDetailsLoadingResult>
   eventId: EventID
 }
 
 export const useEventAttendeesList = ({
-  eventId,
-  event
+  eventId
 }: UseEventAttendeesListEnvironment) => {
-  const details = useLoadEventDetails(eventId, event)
+  const details = useLoadEventDetails(eventId)
   const queryClient = useQueryClient()
   if (details.status !== "success") {
     return details
@@ -74,14 +73,12 @@ export const useEventAttendeesList = ({
 export type EventAttendeesListProps = {
   state: ReturnType<typeof useEventAttendeesList>
   onExploreOtherEventsTapped: () => void
-  onProfileTapped: (id: UserID) => void
   style?: StyleProp<ViewStyle>
 }
 
 export const EventAttendeesListView = ({
   state,
   onExploreOtherEventsTapped,
-  onProfileTapped,
   style
 }: EventAttendeesListProps) => (
   <View style={style}>
@@ -97,7 +94,6 @@ export const EventAttendeesListView = ({
           renderItem={({ item }) => (
             <AttendeeItemView
               attendee={item}
-              onProfileTapped={onProfileTapped}
               onRelationStatusChanged={state.relationStatusChanged}
             />
           )}
@@ -106,7 +102,6 @@ export const EventAttendeesListView = ({
               <TiFFormSectionView title="Host">
                 <AttendeeView
                   attendee={state.host}
-                  onProfileTapped={onProfileTapped}
                   onRelationStatusChanged={state.relationStatusChanged}
                   size="large"
                 />
@@ -150,7 +145,6 @@ const NO_ATTENDEES_MESSAGES = [
 type AttendeeProps = {
   attendee: EventAttendee
   size?: "normal" | "large"
-  onProfileTapped: (id: UserID) => void
   onRelationStatusChanged: (
     id: UserID,
     status: UnblockedUserRelationsStatus
@@ -169,19 +163,19 @@ const AttendeeView = ({
   attendee,
   onRelationStatusChanged,
   size = "normal",
-  onProfileTapped,
   style
 }: AttendeeProps & { style?: StyleProp<ViewStyle> }) => {
   const state = useFriendRequest({
     user: attendee,
     onSuccess: (status) => onRelationStatusChanged(attendee.id, status)
   })
+  const { presentProfile } = useCoreNavigation()
   return (
     <View style={style}>
       <View style={styles.attendeeContainer}>
         <View style={styles.attendeeCardRow}>
           <View style={styles.attendeeProfileAndName}>
-            <Pressable onPress={() => onProfileTapped(attendee.id)}>
+            <Pressable onPress={() => presentProfile(attendee.id)}>
               <ProfileImageAndName
                 name={attendee.name}
                 handle={attendee.handle}

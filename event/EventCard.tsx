@@ -1,52 +1,45 @@
-import { CalendarDayView } from "@components/CalendarDay"
-import { Ionicon } from "@components/common/Icons"
 import { TiFFormCardView } from "@components/form-components/Card"
-import { ProfileCircleView } from "@components/profileImageComponents/ProfileCircle"
 import ProfileImageAndName from "@components/profileImageComponents/ProfileImageAndName"
-import { BoldFootnote, Footnote, Subtitle } from "@components/Text"
 import { ClientSideEvent } from "@event/ClientSideEvent"
-import { placemarkToAbbreviatedAddress } from "@lib/AddressFormatting"
-import { FontScaleFactors } from "@lib/Fonts"
-import dayjs from "dayjs"
 import React, { memo } from "react"
 import { Pressable, StyleProp, StyleSheet, View, ViewStyle } from "react-native"
-import { FixedDateRange } from "TiFShared/domain-models/FixedDateRange"
 import { EventActionsMenuView, useEventActionsMenu } from "./Menu"
+import { BoldFootnote, Footnote, Subtitle } from "@components/Text"
+import { CalendarDayView } from "@components/CalendarDay"
 import { EventUserAttendanceButton } from "./UserAttendance"
+import { Ionicon } from "@components/common/Icons"
+import dayjs from "dayjs"
+import { FixedDateRange } from "TiFShared/domain-models/FixedDateRange"
+import { ProfileCircleView } from "@components/profileImageComponents/ProfileCircle"
+import { FontScaleFactors } from "@lib/Fonts"
+import { useCoreNavigation } from "@components/Navigation"
 
 export type EventCardProps = {
   event: ClientSideEvent
-  onDetailsTapped?: () => void
-  onAttendeesTapped?: () => void
-  onEditEventTapped?: () => void
-  onCopyEventTapped?: () => void
   onJoined?: () => void
   onLeft?: () => void
   style?: StyleProp<ViewStyle>
 }
 
-export const EventCard = memo(function EventCard({
-  event,
-  onDetailsTapped,
-  onAttendeesTapped,
-  onEditEventTapped,
-  onCopyEventTapped,
-  onJoined,
-  onLeft,
-  style
-}: EventCardProps) {
+const _EventCard = ({ event, onJoined, onLeft, style }: EventCardProps) => {
+  const { presentProfile, pushEventDetails, pushAttendeesList } =
+    useCoreNavigation()
+  const previewedAttendees = event.previewAttendees.slice(0, 3)
   return (
     <TiFFormCardView style={style}>
       <View style={styles.container}>
         <View style={styles.centeredRow}>
-          <View style={styles.leftRow}>
+          <Pressable
+            onPress={() => presentProfile(event.host.id)}
+            style={styles.leftRow}
+          >
             <ProfileImageAndName
               name={event.host.name}
               handle={event.host.handle}
               imageURL={event.host.profileImageURL}
               maximumFontSizeMultiplier={FontScaleFactors.xxxLarge}
             />
-          </View>
+          </Pressable>
           <EventActionsMenuView
             event={event}
             state={useEventActionsMenu(event)}
@@ -54,12 +47,10 @@ export const EventCard = memo(function EventCard({
               title: "TODO",
               message: "We need to figure this out..."
             })}
-            onCopyEventTapped={() => onCopyEventTapped?.()}
-            onEditEventTapped={() => onEditEventTapped?.()}
             style={styles.menu}
           />
         </View>
-        <Pressable onPress={onDetailsTapped}>
+        <Pressable onPress={() => pushEventDetails(event.id)}>
           <View style={styles.detailsRow}>
             <View style={styles.infoColumn}>
               <Subtitle>{event.title}</Subtitle>
@@ -72,9 +63,7 @@ export const EventCard = memo(function EventCard({
               <View style={[styles.centeredRow, styles.iconSpacing]}>
                 <Ionicon name="location" size={16} />
                 <Footnote>
-                  {event.location.placemark
-                    ? placemarkToAbbreviatedAddress(event.location.placemark)
-                    : "Unknown Location"}
+                  {event.location.placemark?.name ?? "Unknown Location"}
                 </Footnote>
               </View>
             </View>
@@ -82,9 +71,12 @@ export const EventCard = memo(function EventCard({
           </View>
         </Pressable>
         <View style={styles.centeredRow}>
-          <Pressable onPress={onAttendeesTapped} style={styles.leftRow}>
+          <Pressable
+            onPress={() => pushAttendeesList(event.id)}
+            style={styles.leftRow}
+          >
             <View style={styles.centeredRow}>
-              {event.previewAttendees.slice(0, 3).map((a, index) => (
+              {previewedAttendees.slice(0, 3).map((a, index) => (
                 <ProfileCircleView
                   key={a.id}
                   imageURL={a.profileImageURL}
@@ -96,14 +88,22 @@ export const EventCard = memo(function EventCard({
               {event.attendeeCount > 3 ? (
                 <BoldFootnote
                   maxFontSizeMultiplier={FontScaleFactors.large}
-                  style={styles.attendingText}
+                  style={{
+                    left:
+                      previewedAttendees.length *
+                      ATTENDEES_TEXT_SPACING[previewedAttendees.length - 1]
+                  }}
                 >
                   + {event.attendeeCount - 3} Attending
                 </BoldFootnote>
               ) : (
                 <BoldFootnote
                   maxFontSizeMultiplier={FontScaleFactors.large}
-                  style={styles.attendingText}
+                  style={{
+                    left:
+                      previewedAttendees.length *
+                      ATTENDEES_TEXT_SPACING[previewedAttendees.length - 1]
+                  }}
                 >
                   Attending
                 </BoldFootnote>
@@ -122,13 +122,17 @@ export const EventCard = memo(function EventCard({
       </View>
     </TiFFormCardView>
   )
-})
+}
+
+const ATTENDEES_TEXT_SPACING = [4, -4, -8]
 
 export const eventCardFormattedDateRange = (range: FixedDateRange) => {
   const start = dayjs(range.startDateTime).format("dddd, h:mm")
   const end = dayjs(range.endDateTime).format("h:mm A")
   return `${start}-${end}`
 }
+
+export const EventCard = memo(_EventCard)
 
 const styles = StyleSheet.create({
   container: {
@@ -170,7 +174,7 @@ const styles = StyleSheet.create({
   attendanceButton: {
     padding: 12
   },
-  attendingText: {
+  moreAttendeesText: {
     left: -24
   }
 })

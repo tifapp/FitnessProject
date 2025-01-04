@@ -11,7 +11,7 @@ import {
 import { useQueryClient } from "@tanstack/react-query"
 import { setEventDetailsQueryEvent } from "@event/DetailsQuery"
 import { AlertsObject, presentAlert } from "@lib/Alerts"
-import { eventEditAtom, isEditEventFormDirtyAtom } from "./FormValues"
+import { eventEditAtom, isEditEventFormDirtyAtom } from "./FormAtoms"
 import { TiFAPI } from "TiFShared/api"
 
 export type SubmitEventEditResult =
@@ -33,7 +33,7 @@ export const submitEventEdit = async (
   eventId: EventID | undefined,
   edit: EventEdit,
   api: TiFAPI = TiFAPI.productionInstance
-) => {
+): Promise<SubmitEventEditResult> => {
   if (!eventId) {
     const resp = await api.createEvent({ body: edit })
     return { status: "success", event: clientSideEventFromResponse(resp.data) }
@@ -47,7 +47,7 @@ export const submitEventEdit = async (
 export const ALERTS = {
   submissionError: (eventId?: EventID) => ({
     title: "Oh No!",
-    description: eventId
+    description: !eventId
       ? "It seems that we weren't able to create the event. Please try again."
       : "It seems that we weren't able to update the event. Please try again."
   }),

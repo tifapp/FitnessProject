@@ -1,7 +1,8 @@
 import { Auth } from "@aws-amplify/auth"
 import * as ExpoSecureStore from "expo-secure-store"
 import awsExports from "../src/aws-exports"
-import { CognitoSecureStorage, SecureStore } from "./CognitoSecureStorage"
+import { CognitoSecureStorage } from "./CognitoSecureStorage"
+import { SecureStore } from "@lib/SecureStore"
 
 /**
  * Sets up cognito with a secure store.
@@ -33,7 +34,7 @@ export type CognitoErrorCode =
 export class TestCognitoError extends Error {
   code: CognitoErrorCode
 
-  constructor (code: CognitoErrorCode) {
+  constructor(code: CognitoErrorCode) {
     super()
     this.code = code
   }

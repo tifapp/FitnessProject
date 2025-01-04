@@ -1,6 +1,6 @@
 import { PrimaryButton } from "@components/Buttons"
-import { Ionicon } from "@components/common/Icons"
 import { BodyText, Title } from "@components/Text"
+import { Ionicon } from "@components/common/Icons"
 import {
   ClientSideEvent,
   clientSideEventFromResponse
@@ -13,12 +13,10 @@ import {
   useUserCoordinatesQuery
 } from "@location/index"
 import { UseQueryResult, useQuery, useQueryClient } from "@tanstack/react-query"
+import { TiFAPI } from "TiFShared/api"
 import { LocationAccuracy, PermissionResponse } from "expo-location"
 import React, { useState } from "react"
-import { Pressable, StyleProp, StyleSheet, View, ViewStyle } from "react-native"
-import { useSafeAreaInsets } from "react-native-safe-area-context"
-import { TiFAPI } from "TiFShared/api"
-import { LocationCoordinate2D } from "TiFShared/domain-models/LocationCoordinate2D"
+import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 import { ExploreEventsBottomSheet } from "./BottomSheet"
 import {
   ExploreEventsInitialCenter,
@@ -27,11 +25,10 @@ import {
 import { ExploreEventsMap } from "./Map"
 import {
   ExploreEventsRegion,
-  SAN_FRANCISCO_DEFAULT_REGION,
+  XEROX_ALTO_DEFAULT_REGION,
   createDefaultMapRegion,
   minRegionMeterRadius
 } from "./Region"
-import { ExploreEventsSearchBar } from "./SearchBar"
 import { SkeletonEventCard } from "./SkeletonEventCard"
 
 export const eventsByRegion = async (
@@ -119,7 +116,7 @@ const useExploreEventsRegion = (initialCenter: ExploreEventsInitialCenter) => {
   const exploreRegion =
     userRegion === "pending"
       ? pannedRegion
-      : (pannedRegion ?? userRegion ?? SAN_FRANCISCO_DEFAULT_REGION)
+      : (pannedRegion ?? userRegion ?? XEROX_ALTO_DEFAULT_REGION)
   return { region: exploreRegion, panToRegion: setPannedRegion }
 }
 
@@ -174,13 +171,9 @@ const useExploreEventsQuery = (
 }
 
 export type ExploreEventsProps = {
-  searchText?: string
   region?: ExploreEventsRegion
   data: ExploreEventsData
   onRegionUpdated: (region: ExploreEventsRegion) => void
-  onMapLongPress: (coordinate: LocationCoordinate2D) => void
-  onEventTapped: (event: ClientSideEvent) => void
-  onSearchTapped: () => void
   style?: StyleProp<ViewStyle>
 }
 
@@ -188,49 +181,30 @@ export type ExploreEventsProps = {
  * A view which allows users to interactively explore events in any given area.
  */
 export const ExploreEventsView = ({
-  searchText,
   region,
   data,
   onRegionUpdated,
-  onMapLongPress,
-  onEventTapped,
-  onSearchTapped,
   style
 }: ExploreEventsProps) => {
-  const insets = useSafeAreaInsets()
-
   // NB: - Ensure the current events are still on the map when the
   // user pans to a new region
   const mapEventsData = useLastDefinedValue(data.events)
-
   return (
     <View style={[style, styles.container]}>
       {region ? (
         <ExploreEventsMap
           initialRegion={region}
-          onLongPress={onMapLongPress}
           onRegionChanged={onRegionUpdated}
-          onEventSelected={onEventTapped}
           events={mapEventsData ?? []}
           style={styles.map}
         />
       ) : (
         <Water />
       )}
-      <View style={[{ paddingTop: insets.top + 4 }, styles.searchBarContainer]}>
-        <Pressable onPress={onSearchTapped} style={styles.searchBar}>
-          <ExploreEventsSearchBar text={searchText} />
-        </Pressable>
-      </View>
       <ExploreEventsBottomSheet
-        onEventSelected={onEventTapped}
         events={data.events ?? []}
         HeaderComponent={
-          <Title style={styles.sheetHeaderText}>
-            {data.status !== "pending"
-              ? "Nearby Events"
-              : "Finding Nearby Events..."}
-          </Title>
+          data.status !== "pending" ? NearbyHeader : FindingHeader
         }
         EmptyEventsComponent={
           <View style={styles.emptyEventsContainer}>
@@ -243,6 +217,13 @@ export const ExploreEventsView = ({
     </View>
   )
 }
+
+const NearbyHeader = () => (
+  <Title style={styles.sheetHeaderText}>Nearby Events</Title>
+)
+const FindingHeader = () => (
+  <Title style={styles.sheetHeaderText}>Finding Nearby Events...</Title>
+)
 
 type ErrorProps = {
   onRetried: () => void

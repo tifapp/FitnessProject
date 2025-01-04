@@ -7,13 +7,13 @@ import {
   LayoutRectangle,
   ActivityIndicator
 } from "react-native"
-import { EditEventFormLocation, editEventFormValueAtoms } from "./FormValues"
+import { editEventFormValueAtoms } from "./FormAtoms"
 import {
   DEFAULT_GEOCODE_QUERY_OPTIONS,
   useGeocodeQuery,
   useReverseGeocodeQuery
 } from "@location/Geocoding"
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import { TiFFormNavigationLinkView } from "@components/form-components/NavigationLink"
 import { AppStyles } from "@lib/AppColorStyle"
 import MapView, { Marker } from "react-native-maps"
@@ -22,6 +22,8 @@ import { TiFFormCardView } from "@components/form-components/Card"
 import { placemarkToFormattedAddress } from "@lib/AddressFormatting"
 import { FontScaleFactors } from "@lib/Fonts"
 import { AvatarMapMarkerView } from "@components/AvatarMapMarker"
+import { EditEventFormLocation } from "@event/EditFormValues"
+import { LocationCoordinate2D } from "TiFShared/domain-models/LocationCoordinate2D"
 
 export const useEditEventFormLocation = () => {
   const [location, setLocation] = useAtom(editEventFormValueAtoms.location)
@@ -50,6 +52,7 @@ export const useEditEventFormLocation = () => {
 }
 
 export type EditEventFormLocationProps = {
+  hostName: string
   hostProfileImageURL?: string
   location?: EditEventFormLocation
   onSelectLocationTapped: () => void
@@ -57,6 +60,7 @@ export type EditEventFormLocationProps = {
 }
 
 export const EditEventFormLocationView = ({
+  hostName,
   hostProfileImageURL,
   location,
   onSelectLocationTapped,
@@ -75,6 +79,7 @@ export const EditEventFormLocationView = ({
       />
     ) : (
       <LocationView
+        hostName={hostName}
         hostProfileImageURL={hostProfileImageURL}
         location={location}
         onSelectLocationTapped={onSelectLocationTapped}
@@ -84,35 +89,43 @@ export const EditEventFormLocationView = ({
 )
 
 type LocationProps = {
+  hostName: string
   hostProfileImageURL?: string
   location: EditEventFormLocation
   onSelectLocationTapped: () => void
 }
 
 const LocationView = ({
+  hostName,
   hostProfileImageURL,
   location,
   onSelectLocationTapped
 }: LocationProps) => {
+  const mapRef = useRef<MapView>(null)
   const [overlayLayout, setOverlayLayout] = useState<
     LayoutRectangle | undefined
   >(undefined)
+  useEffect(() => {
+    if (location.coordinate) {
+      mapRef.current?.animateToRegion(mapRegion(location.coordinate))
+    }
+  }, [location.coordinate])
   const mapHeight = overlayLayout && Math.max(300, 200 + overlayLayout.height)
   return (
-    <View style={styles.locationContainer}>
+    <View style={[styles.locationContainer, { height: mapHeight }]}>
       {mapHeight && (
-        <Animated.View entering={FadeIn.duration(300)}>
+        <Animated.View
+          entering={FadeIn.duration(300)}
+          style={styles.mapDimensions}
+        >
           {location.coordinate ? (
             <MapView
               style={[styles.mapDimensions, { height: mapHeight }]}
               loadingEnabled
+              ref={mapRef}
               zoomEnabled={false}
               scrollEnabled={false}
-              initialRegion={{
-                ...location.coordinate,
-                latitudeDelta: 0.007,
-                longitudeDelta: 0.007
-              }}
+              initialRegion={mapRegion(location.coordinate)}
               mapPadding={{
                 top: 0,
                 left: 0,
@@ -131,7 +144,10 @@ const LocationView = ({
               ]}
             >
               <Marker coordinate={location.coordinate}>
-                <AvatarMapMarkerView imageURL={hostProfileImageURL} />
+                <AvatarMapMarkerView
+                  name={hostName}
+                  imageURL={hostProfileImageURL}
+                />
               </Marker>
             </MapView>
           ) : (
@@ -185,6 +201,12 @@ const LocationView = ({
   )
 }
 
+const mapRegion = (coordinate: LocationCoordinate2D) => ({
+  ...coordinate,
+  latitudeDelta: 0.07,
+  longitudeDelta: 0.07
+})
+
 const styles = StyleSheet.create({
   locationNavigationLink: {
     width: "100%",
@@ -201,7 +223,8 @@ const styles = StyleSheet.create({
   },
   mapDimensions: {
     width: "100%",
-    borderRadius: 12
+    borderRadius: 12,
+    overflow: "hidden"
   },
   locationContainer: {
     height: 300

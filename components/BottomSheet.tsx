@@ -1,5 +1,6 @@
 import {
   BottomSheetBackdropProps,
+  BottomSheetHandleProps,
   BottomSheetModal,
   BottomSheetModalProvider,
   useBottomSheetModal
@@ -12,6 +13,7 @@ import {
   Pressable,
   StyleProp,
   StyleSheet,
+  Platform,
   Dimensions
 } from "react-native"
 import Animated, {
@@ -21,15 +23,18 @@ import Animated, {
   useAnimatedStyle,
   useSharedValue
 } from "react-native-reanimated"
+import { FullWindowOverlay } from "react-native-screens"
 
 export const TiFBottomSheetProvider = BottomSheetModalProvider
 
 type BaseTiFBottomSheetProps = {
   sizing: TiFBottomSheetSizing
+  overlay?: "on-screen" | "above-screen"
   initialSnapPointIndex?: number
   canSwipeToDismiss?: boolean
   shouldIncludeBackdrop?: boolean
   enableContentPanningGesture?: boolean
+  HandleView?: (props: BottomSheetHandleProps) => JSX.Element
   onDismiss?: () => void
   handleStyle?: StyleProp<ViewStyle> | "hidden"
   style?: StyleProp<ViewStyle>
@@ -52,10 +57,12 @@ export type TiFBottomSheetProps<Item = boolean> = BaseTiFBottomSheetProps &
 
 export const TiFBottomSheet = <Item = boolean,>({
   sizing,
+  overlay = "above-screen",
   canSwipeToDismiss = true,
   enableContentPanningGesture = true,
   shouldIncludeBackdrop = true,
   initialSnapPointIndex = 0,
+  HandleView,
   onDismiss,
   handleStyle,
   children,
@@ -92,7 +99,15 @@ export const TiFBottomSheet = <Item = boolean,>({
       enableContentPanningGesture={enableContentPanningGesture}
       handleStyle={bottomSheetHandleStyle}
       animatedIndex={animatedIndex}
+      handleComponent={HandleView}
       onDismiss={onDismiss}
+      containerComponent={
+        // NB: iOS needs a FullWindowOverlay in order to have the sheet appear above the native
+        // stack navigator when presented in a modal.
+        overlay === "above-screen" && Platform.OS === "ios"
+          ? FullWindowOverlay
+          : undefined
+      }
       backdropComponent={shouldIncludeBackdrop ? TiFBackdropView : null}
       style={style}
       {...sizeProp}

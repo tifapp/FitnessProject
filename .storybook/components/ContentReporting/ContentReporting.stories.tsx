@@ -1,44 +1,9 @@
-import { BASE_HEADER_SCREEN_OPTIONS } from "@components/Navigation"
-import { uuidString } from "@lib/utils/UUID"
-import { NavigationContainer } from "@react-navigation/native"
-import { StackScreenProps, createStackNavigator } from "@react-navigation/stack"
-import {
-  ReportingScreensParamsList,
-  createContentReportingScreens
-} from "@core-root/navigation/ContentReporting"
 import { ComponentMeta, ComponentStory } from "@storybook/react-native"
 import React from "react"
-import { Button } from "react-native"
-type ParamsList = { test: undefined } & ReportingScreensParamsList
-
-const Stack = createStackNavigator<ParamsList>()
-
-const reportingScreens = createContentReportingScreens<ParamsList>(
-  Stack,
-  () => {
-    throw new Error()
-  }
-)
-
-const Screen = ({ navigation }: StackScreenProps<ParamsList, "test">) => (
-  <Button
-    title="Go to report thing"
-    onPress={() =>
-      navigation.navigate("reportContent", {
-        contentType: "event",
-        contentId: uuidString()
-      })
-    }
-  />
-)
+import { ReportFormView } from "@content-reporting-boundary"
 
 const TestScreen = () => (
-  <NavigationContainer>
-    <Stack.Navigator screenOptions={{ ...BASE_HEADER_SCREEN_OPTIONS }}>
-      <Stack.Screen name="test" component={Screen} />
-      {reportingScreens}
-    </Stack.Navigator>
-  </NavigationContainer>
+  <ReportFormView contentType="event" onSubmitted={async () => {}} />
 )
 
 const ContentReportingMeta: ComponentMeta<typeof TestScreen> = {

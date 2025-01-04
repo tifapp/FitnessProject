@@ -1,16 +1,16 @@
-import { ExploreEventsView } from "@explore-events-boundary"
 import { EventMocks } from "@event-details-boundary/MockData"
-import { ComponentMeta, ComponentStory } from "@storybook/react-native"
-import { TiFQueryClientProvider } from "@lib/ReactQuery"
 import {
-  ExploreEventsScreensParamsList,
-  createExploreEventsScreens
-} from "@core-root/navigation/ExploreEvents"
+  ExploreEventsView,
+  createInitialCenter,
+  isSignificantlyDifferentRegions,
+  useExploreEvents
+} from "@explore-events-boundary"
+import { TiFQueryClientProvider } from "@lib/ReactQuery"
+import { ComponentMeta, ComponentStory } from "@storybook/react-native"
+import { AlphaUserSessionProvider, AlphaUserStorage } from "@user/alpha"
 import React from "react"
+import { GestureHandlerRootView } from "react-native-gesture-handler"
 import { MenuProvider } from "react-native-popup-menu"
-import { createStackNavigator } from "@react-navigation/stack"
-import { BASE_HEADER_SCREEN_OPTIONS } from "@components/Navigation"
-import { NavigationContainer } from "@react-navigation/native"
 import { SafeAreaProvider } from "react-native-safe-area-context"
 
 const ExploreEventsMeta: ComponentMeta<typeof ExploreEventsView> = {
@@ -22,23 +22,41 @@ export default ExploreEventsMeta
 
 type ExploreEventsStory = ComponentStory<typeof ExploreEventsView>
 
-const Stack = createStackNavigator<ExploreEventsScreensParamsList>()
-const screens = createExploreEventsScreens(Stack, async () => [
-  EventMocks.Multiday,
-  EventMocks.NoPlacemarkInfo,
-  EventMocks.PickupBasketball
-])
+const fetchEvents = async () => [
+  EventMocks.MockMultipleAttendeeResponse,
+  EventMocks.MockSingleAttendeeResponse
+]
+
+const storage = AlphaUserStorage.ephemeral()
 
 export const Basic: ExploreEventsStory = () => (
-  <MenuProvider>
-    <TiFQueryClientProvider>
-      <SafeAreaProvider>
-        <NavigationContainer onStateChange={console.log}>
-          <Stack.Navigator screenOptions={{ ...BASE_HEADER_SCREEN_OPTIONS }}>
-            {screens}
-          </Stack.Navigator>
-        </NavigationContainer>
-      </SafeAreaProvider>
-    </TiFQueryClientProvider>
-  </MenuProvider>
+  <AlphaUserSessionProvider storage={storage}>
+    <GestureHandlerRootView>
+      <MenuProvider>
+        <TiFQueryClientProvider>
+          <SafeAreaProvider>
+            <Explore />
+          </SafeAreaProvider>
+        </TiFQueryClientProvider>
+      </MenuProvider>
+    </GestureHandlerRootView>
+  </AlphaUserSessionProvider>
 )
+
+const Explore = () => {
+  const { region, data, updateRegion } = useExploreEvents(
+    createInitialCenter(),
+    { fetchEvents, isSignificantlyDifferentRegions }
+  )
+  console.log(data)
+  return (
+    <ExploreEventsView
+      region={region}
+      data={data}
+      onRegionUpdated={updateRegion}
+      onEventTapped={console.log}
+      onMapLongPress={console.log}
+      style={{ height: "100%" }}
+    />
+  )
+}

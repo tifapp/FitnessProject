@@ -1,62 +1,25 @@
-import { ReactNode, createContext, useContext } from "react"
 import { StyleProp, ViewStyle } from "react-native"
 import {
   JoinEventButton,
-  JoinEventPermission,
   JoinEventPermissionsSheetView,
-  JoinEventRequest,
-  JoinEventResult,
   joinEvent,
   loadJoinEventPermissions,
   useJoinEvent
 } from "./JoinEvent"
-import {
-  LeaveEventButton,
-  LeaveEventResult,
-  leaveEvent,
-  useLeaveEvent
-} from "./LeaveEvent"
-import { EventID, isAttendingEvent } from "TiFShared/domain-models/Event"
-import { TiFAPI } from "TiFShared/api"
-import { mergeWithPartial } from "TiFShared/lib/Object"
-import { EventRegionMonitor } from "@arrival-tracking"
+import { LeaveEventButton, leaveEvent, useLeaveEvent } from "./LeaveEvent"
+import { isAttendingEvent } from "TiFShared/domain-models/Event"
 import { TrueRegionMonitor } from "@arrival-tracking/region-monitoring/MockRegionMonitors"
 import { ClientSideEvent } from "./ClientSideEvent"
 import { BoldFootnote, Headline } from "@components/Text"
+import { featureContext } from "@lib/FeatureContext"
 
-export type EventUserAttendanceContextValues = {
-  monitor: EventRegionMonitor
-  joinEvent: (request: JoinEventRequest) => Promise<JoinEventResult>
-  loadPermissions: () => Promise<JoinEventPermission[]>
-  leaveEvent: (eventId: EventID) => Promise<LeaveEventResult>
-}
-
-const AttendanceContext = createContext<EventUserAttendanceContextValues>({
-  // TODO: - Default join handlers and region monitor.
+export const EventUserAttendanceFeature = featureContext({
+  // TODO: - Default region monitor.
   monitor: TrueRegionMonitor,
-  joinEvent: (request) => joinEvent(request, TiFAPI.productionInstance, []),
+  joinEvent,
   loadPermissions: loadJoinEventPermissions,
   leaveEvent
 })
-
-export type EventUserAttendanceProviderProps =
-  Partial<EventUserAttendanceContextValues> & {
-    children: ReactNode
-  }
-
-/**
- * A provider component that provides functions needed for joining and leaving an event.
- */
-export const EventUserAttendanceProvider = ({
-  children,
-  ...values
-}: EventUserAttendanceProviderProps) => (
-  <AttendanceContext.Provider
-    value={mergeWithPartial(useContext(AttendanceContext), values)}
-  >
-    {children}
-  </AttendanceContext.Provider>
-)
 
 export type EventAttendanceButtonProps = {
   event: ClientSideEvent
@@ -82,7 +45,7 @@ export const EventUserAttendanceButton = ({
   style
 }: EventAttendanceButtonProps) => {
   const { monitor, joinEvent, loadPermissions, leaveEvent } =
-    useContext(AttendanceContext)
+    EventUserAttendanceFeature.useContext()
   const joinState = useJoinEvent(event, {
     monitor,
     loadPermissions,

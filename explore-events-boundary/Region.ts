@@ -178,7 +178,7 @@ export const createDefaultMapRegion = (
 /**
  * The default region if none can be retreived from location search or the user's location.
  */
-export const SAN_FRANCISCO_DEFAULT_REGION = createDefaultMapRegion({
-  latitude: 37.773972,
-  longitude: -122.431297
+export const XEROX_ALTO_DEFAULT_REGION = createDefaultMapRegion({
+  latitude: 37.414045,
+  longitude: -122.077044
 })

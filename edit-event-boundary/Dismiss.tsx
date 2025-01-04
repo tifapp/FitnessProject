@@ -1,5 +1,5 @@
 import { useAtomValue } from "jotai"
-import { isEditEventFormDirtyAtom } from "./FormValues"
+import { isEditEventFormDirtyAtom } from "./FormAtoms"
 import { StyleProp, ViewStyle, StyleSheet, View } from "react-native"
 import { TouchableIonicon } from "@components/common/Icons"
 import { AlertsObject, presentAlert } from "@lib/Alerts"
@@ -56,6 +56,6 @@ export const EditEventFormDismissButton = ({
 
 const styles = StyleSheet.create({
   button: {
-    marginLeft: 16
+    marginRight: 24
   }
 })

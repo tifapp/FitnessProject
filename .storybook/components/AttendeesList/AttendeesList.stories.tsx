@@ -1,9 +1,5 @@
 import { BASE_HEADER_SCREEN_OPTIONS } from "@components/Navigation"
-import { BodyText, Subtitle } from "@components/Text"
-import {
-  EventAttendeeMocks,
-  EventMocks
-} from "@event-details-boundary/MockData"
+import { EventMocks } from "@event-details-boundary/MockData"
 import { NavigationContainer } from "@react-navigation/native"
 import { createStackNavigator } from "@react-navigation/stack"
 import React from "react"
@@ -15,10 +11,10 @@ import {
 } from "@event-details-boundary/AttendeesList"
 import { clientSideEventFromResponse } from "@event/ClientSideEvent"
 import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
-import { FriendRequestProvider } from "@user/FriendRequest"
+import { FriendRequestFeature } from "@user/FriendRequest"
 import { RootSiblingParent } from "react-native-root-siblings"
 import { uuidString } from "@lib/utils/UUID"
-import { delayData, sleep } from "@lib/utils/DelayData"
+import { delayData } from "@lib/utils/DelayData"
 import { UserHandle } from "TiFShared/domain-models/User"
 
 const AttendeesListMeta: StoryMeta = {
@@ -51,7 +47,7 @@ export const Basic: AttendeesListStory = () => (
 const AttendeesListTestScreen = () => {
   return (
     <View>
-      <FriendRequestProvider
+      <FriendRequestFeature.Provider
         sendFriendRequest={async () => delayData("friends", 3000)}
       >
         <EventAttendeesListView
@@ -101,10 +97,9 @@ const AttendeesListTestScreen = () => {
             }
           })}
           onExploreOtherEventsTapped={() => console.log("Explore others")}
-          onProfileTapped={(id) => console.log("Tapped", id)}
           style={{ height: "100%" }}
         />
-      </FriendRequestProvider>
+      </FriendRequestFeature.Provider>
     </View>
   )
 }

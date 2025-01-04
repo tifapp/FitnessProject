@@ -1,7 +1,8 @@
 import { StyleProp, ViewStyle, StyleSheet, View } from "react-native"
-import ProfileImage from "./profileImageComponents/ProfileImage"
+import { ProfileCircleView } from "./profileImageComponents/ProfileCircle"
 
 export type AvatarMapMarkerProps = {
+  name: string
   imageURL?: string
   children?: JSX.Element
   style?: StyleProp<ViewStyle>
@@ -13,6 +14,7 @@ export const AVATAR_MARKER_SIZE = 44
  * A map marker component that displays an avatar.
  */
 export const AvatarMapMarkerView = ({
+  name,
   imageURL,
   children,
   style
@@ -22,7 +24,11 @@ export const AvatarMapMarkerView = ({
       <View style={styles.markerContainer}>
         {children}
         <View style={styles.whiteBackground}>
-          <ProfileImage imageURL={imageURL} style={styles.imageBackground} />
+          <ProfileCircleView
+            name={name}
+            imageURL={imageURL}
+            style={styles.imageBackground}
+          />
         </View>
       </View>
     </View>
@@ -55,8 +61,8 @@ const styles = StyleSheet.create({
     overflow: "hidden"
   },
   imageBackground: {
-    width: AVATAR_MARKER_SIZE - 2,
-    height: AVATAR_MARKER_SIZE - 2,
+    width: AVATAR_MARKER_SIZE - 4,
+    height: AVATAR_MARKER_SIZE - 4,
     borderRadius: 128,
     overflow: "hidden"
   },

@@ -1,11 +1,7 @@
 import { PersistentSettingsStores } from "@settings-storage/PersistentStores"
 import { SQLiteUserSettingsStorage } from "@settings-storage/UserSettings"
 import { resetTestSQLiteBeforeEach, testSQLite } from "@test-helpers/SQLite"
-import {
-  DEFAULT_EDIT_EVENT_FORM_VALUES,
-  EditEventFormValues,
-  editEventFormValuesAtom
-} from "./FormValues"
+import { editEventFormValuesAtom } from "./FormAtoms"
 import {
   TEST_EDIT_EVENT_FORM_STORE,
   renderUseHydrateEditEvent
@@ -28,6 +24,10 @@ import { neverPromise } from "@test-helpers/Promise"
 import { mockTiFEndpoint } from "TiFShared/test-helpers/mockAPIServer"
 import { fakeTimers } from "@test-helpers/Timers"
 import { TiFAPI } from "TiFShared/api"
+import {
+  defaultEditFormValues,
+  EditEventFormValues
+} from "@event/EditFormValues"
 
 describe("EditEventSubmit tests", () => {
   describe("SubmitEventEdit tests", () => {
@@ -102,6 +102,7 @@ describe("EditEventSubmit tests", () => {
 
   describe("UseEditEventSubmission tests", () => {
     resetTestSQLiteBeforeEach()
+    fakeTimers()
     const settings = PersistentSettingsStores.user(
       new SQLiteUserSettingsStorage(testSQLite)
     )
@@ -110,13 +111,14 @@ describe("EditEventSubmit tests", () => {
     const queryClient = createTestQueryClient()
 
     beforeEach(() => {
+      jest.setSystemTime(new Date(20_000))
       queryClient.resetQueries()
       onSuccess.mockReset()
       submit.mockReset()
     })
 
     const TEST_VALUES = {
-      ...DEFAULT_EDIT_EVENT_FORM_VALUES,
+      ...defaultEditFormValues(),
       title: "Blob",
       location: { placemark: mockPlacemark(), coordinate: undefined }
     }

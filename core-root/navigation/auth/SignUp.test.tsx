@@ -131,7 +131,9 @@ describe("SignUpNavigation tests", () => {
 
     endSignUpTest()
 
-    expect(isAtEnd()).toEqual(true)
+    await waitFor(() => {
+      expect(isAtEnd()).toEqual(true)
+    })
   })
 
   test("leave sign-up flow warning alert flow", async () => {
@@ -144,7 +146,9 @@ describe("SignUpNavigation tests", () => {
 
     await confirmExit()
 
-    expect(isAtEnd()).toEqual(true)
+    await waitFor(() => {
+      expect(isAtEnd()).toEqual(true)
+    })
   })
 
   const renderSignUpFlow = () => {
@@ -156,14 +160,14 @@ describe("SignUpNavigation tests", () => {
         <NavigationContainer>
           <Stack.Navigator
             initialRouteName="test"
-            screenOptions={{ animationEnabled: false }}
+            screenOptions={{ animation: "none" }}
           >
             <Stack.Screen name="test" component={TestScreen} />
             <Stack.Screen name="signUp">
               {() => (
                 <ModalStack.Navigator
                   initialRouteName="signUpCredentialsForm"
-                  screenOptions={{ animationEnabled: false }}
+                  screenOptions={{ animation: "none" }}
                 >
                   {signUpScreens}
                 </ModalStack.Navigator>

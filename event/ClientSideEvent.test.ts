@@ -1,6 +1,7 @@
 import { fakeTimers } from "@test-helpers/Timers"
 import { EventResponse, EventTimeResponse } from "TiFShared/api/models/Event"
 import { clientSideEventFromResponse } from "./ClientSideEvent"
+import "TiFShared/lib/Date"
 
 describe("ClientSideEvent tests", () => {
   fakeTimers()

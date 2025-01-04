@@ -7,12 +7,10 @@ import {
   Platform
 } from "react-native"
 import {
-  DEFAULT_EDIT_EVENT_FORM_VALUES,
-  EditEventFormValues,
   editEventFormInitialValuesAtom,
   editEventFormValueAtoms,
   editEventFormValuesAtom
-} from "./FormValues"
+} from "./FormAtoms"
 import { EventEditLocation, EventID } from "TiFShared/domain-models/Event"
 import {
   PragmaQuoteView,
@@ -23,7 +21,7 @@ import { useAtom, useAtomValue, useStore } from "jotai"
 import { ShadedTextField } from "@components/TextFields"
 import { useFontScale } from "@lib/Fonts"
 import { AppStyles } from "@lib/AppColorStyle"
-import React, { useCallback, useEffect, useState } from "react"
+import React, { createContext, useCallback, useEffect, useState } from "react"
 import { useScreenBottomPadding } from "@components/Padding"
 import { SafeAreaView } from "react-native-safe-area-context"
 import { useUserSettings } from "@settings-storage/Hooks"
@@ -45,6 +43,7 @@ import { useEffectEvent } from "@lib/utils/UseEffectEvent"
 import {
   EditEventFormSubmitButton,
   SubmitEventEdit,
+  submitEventEdit,
   useEditEventFormSubmission
 } from "./Submit"
 import { ClientSideEvent } from "@event/ClientSideEvent"
@@ -60,11 +59,20 @@ import { formatDateTimeFromBasis } from "@date-time"
 import { EditEventFormLocationView, useEditEventFormLocation } from "./Location"
 import { TiFFormScrollableLayoutView } from "@components/form-components/ScrollableFormLayout"
 import { TiFFooterView } from "@components/Footer"
+import {
+  EditEventFormValues,
+  defaultEditFormValues
+} from "@event/EditFormValues"
+import { featureContext } from "@lib/FeatureContext"
+
+export const EditEventFeature = featureContext({
+  submit: submitEventEdit
+})
 
 export type EditEventProps = {
+  hostName: string
   hostProfileImageURL?: string
   eventId?: EventID
-  submit: SubmitEventEdit
   onSuccess: (event: ClientSideEvent) => void
   onSelectLocationTapped: () => void
   currentDate?: Date
@@ -80,7 +88,7 @@ export const useHydrateEditEvent = (initialValues?: EditEventFormValues) => {
     )
   )
   const initialFormValues = initialValues ?? {
-    ...DEFAULT_EDIT_EVENT_FORM_VALUES,
+    ...defaultEditFormValues(),
     location: settings.eventPresetLocation
       ? formLocation(settings.eventPresetLocation)
       : undefined,
@@ -102,11 +110,11 @@ const formLocation = (location: EventEditLocation) => {
 }
 
 export const EditEventView = ({
+  hostName,
   hostProfileImageURL,
   eventId,
   currentDate = new Date(),
   onSelectLocationTapped,
-  submit,
   onSuccess,
   initialValues,
   style
@@ -114,14 +122,13 @@ export const EditEventView = ({
   useHydrateEditEvent(initialValues)
   return (
     <TiFFormScrollableLayoutView
-      footer={
-        <FooterView eventId={eventId} submit={submit} onSuccess={onSuccess} />
-      }
+      footer={<FooterView eventId={eventId} onSuccess={onSuccess} />}
       style={style}
     >
       <QuoteSectionView eventId={eventId} currentDate={currentDate} />
       <TitleSectionView />
       <LocationSectionView
+        hostName={hostName}
         hostProfileImageURL={hostProfileImageURL}
         onSelectLocationTapped={onSelectLocationTapped}
       />
@@ -170,6 +177,7 @@ const TitleSectionView = () => {
 
 type LocationSectionProps = {
   onSelectLocationTapped: () => void
+  hostName: string
   hostProfileImageURL?: string
 }
 
@@ -393,14 +401,17 @@ const EndTimeView = ({ style }: EndTimeProps) => {
 
 type FooterProps = {
   eventId?: EventID
-  submit: SubmitEventEdit
   onSuccess: (event: ClientSideEvent) => void
 }
 
-const FooterView = ({ eventId, onSuccess, submit }: FooterProps) => (
+const FooterView = ({ eventId, onSuccess }: FooterProps) => (
   <TiFFooterView>
     <EditEventFormSubmitButton
-      state={useEditEventFormSubmission({ eventId, submit, onSuccess })}
+      state={useEditEventFormSubmission({
+        eventId,
+        submit: EditEventFeature.useContext().submit,
+        onSuccess
+      })}
     />
   </TiFFooterView>
 )

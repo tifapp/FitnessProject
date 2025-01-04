@@ -51,6 +51,7 @@ describe("SignUpChangeUserHandle tests", () => {
     })
 
     it("should be in an invalid state when invalid user handle text is entered", () => {
+      checkIfUserHandleTaken.mockResolvedValueOnce(false)
       const { result } = renderUseSignUpChangeUserHandle("bichell_dickle", 200)
 
       act(() => result.current.onHandleTextChanged("bitchell_di:"))
@@ -62,6 +63,7 @@ describe("SignUpChangeUserHandle tests", () => {
 
     it("should be in submitting state when submitted", async () => {
       changeUserHandle.mockImplementationOnce(neverPromise)
+      checkIfUserHandleTaken.mockResolvedValueOnce(false)
       const { result } = renderUseSignUpChangeUserHandle("bichell_dickle", 200)
 
       act(() => result.current.onHandleTextChanged("abc"))
@@ -89,6 +91,7 @@ describe("SignUpChangeUserHandle tests", () => {
 
     it("should present an alert when an error occurs with submitting", async () => {
       changeUserHandle.mockRejectedValueOnce(new Error())
+      checkIfUserHandleTaken.mockResolvedValueOnce(false)
       const { result } = renderUseSignUpChangeUserHandle("bichell_dickle", 200)
 
       act(() => result.current.onHandleTextChanged("abc"))
@@ -98,6 +101,7 @@ describe("SignUpChangeUserHandle tests", () => {
 
     it("should not fully submit new handle when new handle is the same as initial handle", async () => {
       changeUserHandle.mockRejectedValueOnce(new Error())
+      checkIfUserHandleTaken.mockResolvedValueOnce(false)
       const { result } = renderUseSignUpChangeUserHandle("bichell_dickle", 200)
 
       act(() => (result.current.submission as any).submit())
@@ -109,6 +113,7 @@ describe("SignUpChangeUserHandle tests", () => {
       changeUserHandle
         .mockReturnValueOnce(Promise.resolve())
         .mockRejectedValueOnce(new Error())
+      checkIfUserHandleTaken.mockResolvedValueOnce(false)
       const { result } = renderUseSignUpChangeUserHandle("bichell_dickle", 200)
 
       act(() => result.current.onHandleTextChanged("abc"))

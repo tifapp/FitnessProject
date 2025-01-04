@@ -20,6 +20,7 @@ import { TiFDefaultLayoutTransition } from "@lib/Reanimated"
 import { useConst } from "@lib/utils/UseConst"
 import Animated, { ZoomIn, ZoomOut } from "react-native-reanimated"
 import { EventID, EventWhenBlockedByHost } from "TiFShared/domain-models/Event"
+import { featureContext } from "@lib/FeatureContext"
 
 /**
  * Loads the event details from the server.
@@ -27,9 +28,9 @@ import { EventID, EventWhenBlockedByHost } from "TiFShared/domain-models/Event"
  * A `clientReceivedTime` property is added on a successful response which is used for
  * calculating accurate countdown times.
  */
-export const loadEventDetails = async (
+export const eventDetails = async (
   eventId: EventID,
-  tifAPI: TiFAPI
+  tifAPI: TiFAPI = TiFAPI.productionInstance
 ): Promise<EventDetailsLoadingResult> => {
   const resp = await tifAPI.eventDetails({ params: { eventId } })
   if (resp.status === 404) {
@@ -43,6 +44,8 @@ export const loadEventDetails = async (
     }
   }
 }
+
+export const EventDetailsFeature = featureContext({ eventDetails })
 
 export type UseLoadEventDetailsResult =
   | { status: "pending" | "not-found" | "cancelled" }
@@ -59,10 +62,10 @@ export type UseLoadEventDetailsResult =
  * A hook to load an event in the context of the details screen.
  */
 export const useLoadEventDetails = (
-  eventId: EventID,
-  loadEvent: (id: EventID) => Promise<EventDetailsLoadingResult>
+  eventId: EventID
 ): UseLoadEventDetailsResult => {
-  const query = useEventDetailsQuery(eventId, loadEvent)
+  const { eventDetails } = EventDetailsFeature.useContext()
+  const query = useEventDetailsQuery(eventId, eventDetails)
   return loadEventDetailsResult(query, useIsConnectedToInternet())
 }
 

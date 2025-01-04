@@ -1,10 +1,14 @@
 import { EventCard } from "@event/EventCard"
-import { BottomSheetFlatList } from "@gorhom/bottom-sheet"
+import {
+  BottomSheetFlatList,
+  BottomSheetHandle,
+  BottomSheetHandleProps
+} from "@gorhom/bottom-sheet"
 import { ClientSideEvent } from "@event/ClientSideEvent"
-import React, { ReactElement } from "react"
+import React, { ReactElement, useCallback } from "react"
 import {
   ListRenderItemInfo,
-  Pressable,
+  Platform,
   StyleProp,
   StyleSheet,
   View,
@@ -14,21 +18,18 @@ import { TiFBottomSheet, TiFBottomSheetProvider } from "@components/BottomSheet"
 
 export type ExploreEventsBottomSheetProps = {
   events: ClientSideEvent[]
-  onEventSelected: (event: ClientSideEvent) => void
-  HeaderComponent: ReactElement
+  HeaderComponent: () => JSX.Element
   EmptyEventsComponent: ReactElement
   style?: StyleProp<ViewStyle>
 }
 
 const SNAP_POINTS = ["25%", "50%", "85%"]
-const STICKY_HEADER_INDICIES = [0]
 
 /**
  * The bottom sheet that displays events in the explore events view.
  */
 export const ExploreEventsBottomSheet = ({
   events,
-  onEventSelected,
   HeaderComponent,
   EmptyEventsComponent,
   style
@@ -37,8 +38,18 @@ export const ExploreEventsBottomSheet = ({
     <View style={style}>
       <TiFBottomSheet
         isPresented
+        overlay="on-screen"
         sizing={{ snapPoints: SNAP_POINTS }}
         initialSnapPointIndex={1}
+        HandleView={useCallback(
+          (props: BottomSheetHandleProps) => (
+            <View style={styles.handle}>
+              <BottomSheetHandle {...props} />
+              <HeaderComponent />
+            </View>
+          ),
+          [HeaderComponent]
+        )}
         canSwipeToDismiss={false}
         shouldIncludeBackdrop={false}
       >
@@ -46,16 +57,15 @@ export const ExploreEventsBottomSheet = ({
           data={events}
           keyExtractor={(event) => event.id.toString()}
           renderItem={({ item }: ListRenderItemInfo<ClientSideEvent>) => (
-            <Pressable
-              onPress={() => onEventSelected(item)}
-              style={styles.eventContainer}
-            >
+            <View style={styles.eventContainer}>
               <EventCard event={item} style={styles.event} />
-            </Pressable>
+            </View>
           )}
           ListEmptyComponent={EmptyEventsComponent}
-          ListHeaderComponent={HeaderComponent}
-          stickyHeaderIndices={STICKY_HEADER_INDICIES}
+          contentContainerStyle={{
+            paddingBottom: Platform.OS === "ios" ? 16 : 88
+          }}
+          contentInset={{ bottom: 96 }}
         />
       </TiFBottomSheet>
     </View>
@@ -66,6 +76,9 @@ const styles = StyleSheet.create({
   eventContainer: {
     paddingHorizontal: 16,
     paddingVertical: 8
+  },
+  handle: {
+    rowGap: 8
   },
   event: {
     width: "100%"

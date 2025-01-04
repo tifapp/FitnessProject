@@ -21,7 +21,7 @@ import {
   EventMocks
 } from "@event-details-boundary/MockData"
 import { renderSuccessfulUseLoadEventDetails } from "@event-details-boundary/TestHelpers"
-import { UserBlockingProvider } from "@user/Blocking"
+import { UserBlockingFeature } from "@user/Blocking"
 
 describe("EventDetailsMenu tests", () => {
   describe("FormatEventMenuActions tests", () => {
@@ -208,14 +208,14 @@ describe("EventDetailsMenu tests", () => {
       return renderHook(() => useEventActionsMenu(event), {
         wrapper: ({ children }: any) => (
           <TestQueryClientProvider client={queryClient}>
-            <UserBlockingProvider
+            <UserBlockingFeature.Provider
               blockUser={blockHost}
               unblockUser={unblockHost}
             >
               <UserSessionProvider userSession={userSession}>
                 {children}
               </UserSessionProvider>
-            </UserBlockingProvider>
+            </UserBlockingFeature.Provider>
           </TestQueryClientProvider>
         )
       })

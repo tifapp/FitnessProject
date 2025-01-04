@@ -1,10 +1,6 @@
 import { act, renderHook, waitFor } from "@testing-library/react-native"
 import { UserHandle, UserRelationsStatus } from "TiFShared/domain-models/User"
-import {
-  ALERTS,
-  FriendRequestProvider,
-  useFriendRequest
-} from "./FriendRequest"
+import { ALERTS, FriendRequestFeature, useFriendRequest } from "./FriendRequest"
 import { uuidString } from "@lib/utils/UUID"
 import { faker } from "@faker-js/faker"
 import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
@@ -98,9 +94,11 @@ describe("FriendRequest tests", () => {
         },
         {
           wrapper: ({ children }) => (
-            <FriendRequestProvider sendFriendRequest={sendFriendRequest}>
+            <FriendRequestFeature.Provider
+              sendFriendRequest={sendFriendRequest}
+            >
               <TestQueryClientProvider>{children}</TestQueryClientProvider>
-            </FriendRequestProvider>
+            </FriendRequestFeature.Provider>
           )
         }
       )

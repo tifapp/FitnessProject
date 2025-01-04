@@ -1,8 +1,7 @@
+import { featureContext } from "@lib/FeatureContext"
 import { TiFAPI } from "TiFShared/api"
 import { UserID } from "TiFShared/domain-models/User"
-import { mergeWithPartial } from "TiFShared/lib/Object"
 import { logger } from "TiFShared/logging"
-import React, { ReactNode, createContext, useContext } from "react"
 
 const log = logger("tif.user.blocking")
 
@@ -34,27 +33,4 @@ const checkForUserNotFound = (
   }
 }
 
-export type UserBlockingContextValues = {
-  blockUser: (id: UserID) => Promise<void>
-  unblockUser: (id: UserID) => Promise<void>
-}
-
-const BlockingContext = createContext<UserBlockingContextValues>({
-  blockUser,
-  unblockUser
-})
-
-export const useUserBlocking = () => useContext(BlockingContext)
-
-export type UserBlockingProviderProps = Partial<UserBlockingContextValues> & {
-  children: ReactNode
-}
-
-export const UserBlockingProvider = ({
-  children,
-  ...values
-}: UserBlockingProviderProps) => (
-  <BlockingContext.Provider value={mergeWithPartial(useUserBlocking(), values)}>
-    {children}
-  </BlockingContext.Provider>
-)
+export const UserBlockingFeature = featureContext({ blockUser, unblockUser })

@@ -1,4 +1,4 @@
-import { TiFSQLite } from "@lib/SQLite"
+import { TiFSQLite, tiFSQLite } from "@lib/SQLite"
 import { NamedLocation } from "@location/NamedLocation"
 import { LocationCoordinate2D } from "TiFShared/domain-models/LocationCoordinate2D"
 import { Placemark } from "TiFShared/domain-models/Placemark"
@@ -111,6 +111,10 @@ export class SQLiteRecentLocationsStorage implements RecentLocationsStorage {
     })
   }
 }
+
+export const recentLocationsStorage = new SQLiteRecentLocationsStorage(
+  tiFSQLite
+)
 
 type SQLiteLocationPlacemark = LocationCoordinate2D &
   DeepNullable<Required<Placemark>> & {

@@ -10,6 +10,7 @@ import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 export type ExploreEventsMarkerProps = {
   color: string
   attendeeCount: number
+  hostName: string
   imageURL?: string
   style?: StyleProp<ViewStyle>
 }
@@ -17,11 +18,12 @@ export type ExploreEventsMarkerProps = {
 export const ExploreEventsMarkerView = ({
   color,
   attendeeCount,
+  hostName,
   imageURL,
   style
 }: ExploreEventsMarkerProps) => {
   return (
-    <AvatarMapMarkerView imageURL={imageURL} style={style}>
+    <AvatarMapMarkerView name={hostName} imageURL={imageURL} style={style}>
       <View style={[{ backgroundColor: color }, styles.badgeContainer]}>
         <Ionicon
           style={styles.badgeIcon}

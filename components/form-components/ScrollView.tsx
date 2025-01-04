@@ -17,6 +17,7 @@ export const TiFFormScrollView = ({
   <KeyboardAwareScrollView
     style={[style, styles.scroll]}
     contentContainerStyle={styles.contentContainer}
+    enableResetScrollToCoords={false}
     {...props}
   >
     {children}

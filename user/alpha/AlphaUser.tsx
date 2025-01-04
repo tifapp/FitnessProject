@@ -72,8 +72,12 @@ export class AlphaUserStorage {
   /**
    * Returns an in-memory storage instance.
    */
-  static ephemeral() {
-    return new AlphaUserStorage(new InMemorySecureStore())
+  static ephemeral(initialUser?: AlphaUser) {
+    const store = new InMemorySecureStore()
+    if (initialUser) {
+      store.map.set(ALPHA_USER_STORAGE_KEY, initialUser?.token)
+    }
+    return new AlphaUserStorage(store)
   }
 }
 

@@ -9,9 +9,10 @@ import { IoniconCloseButton } from "@components/common/Icons"
 import { BodyText, Title } from "@components/Text"
 import { ClientSideEvent } from "@event/ClientSideEvent"
 import { updateEventDetailsQueryEvent } from "@event/DetailsQuery"
-import { BottomSheetView } from "@gorhom/bottom-sheet"
-import { AlertsObject, presentAlert } from "@lib/Alerts"
-import { RecentLocationsStorage } from "@location/Recents"
+import {
+  RecentLocationsStorage,
+  recentLocationsStorage
+} from "@location/Recents"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import {
   getBackgroundPermissionsAsync as getBackgroundLocationPermissions,
@@ -28,6 +29,8 @@ import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { TiFAPI } from "TiFShared/api"
 import { EventLocation } from "TiFShared/domain-models/Event"
 import { EventLocationIdentifier } from "./LocationIdentifier"
+import { AlertsObject, presentAlert } from "@lib/Alerts"
+import { BottomSheetView } from "@gorhom/bottom-sheet"
 
 export const JOIN_EVENT_ERROR_ALERTS = {
   "event-has-ended": {
@@ -133,8 +136,10 @@ export type JoinEventSuccess = {
  */
 export const joinEvent = async (
   request: JoinEventRequest,
-  tifAPI: TiFAPI,
-  onSuccessHandlers: ((resp: JoinEventSuccess) => void)[]
+  tifAPI: TiFAPI = TiFAPI.productionInstance,
+  onSuccessHandlers: ((resp: JoinEventSuccess) => void)[] = [
+    saveRecentLocationJoinEventHandler
+  ]
 ): Promise<JoinEventResult> => {
   const shouldIncludeArrivalRegion =
     request.hasArrived && request.location.isInArrivalTrackingPeriod
@@ -168,10 +173,10 @@ export const joinEvent = async (
  */
 export const saveRecentLocationJoinEventHandler = async (
   success: Pick<JoinEventSuccess, "locationIdentifier">,
-  recentLocationsStorage: RecentLocationsStorage
+  storage: RecentLocationsStorage = recentLocationsStorage
 ) => {
   if (!success.locationIdentifier.placemark) return
-  await recentLocationsStorage.save(
+  await storage.save(
     {
       coordinate: success.locationIdentifier.coordinate,
       placemark: success.locationIdentifier.placemark
@@ -223,22 +228,20 @@ export const useJoinEvent = (
   const hasArrived = useHasArrivedAtRegion(event.location, monitor)
   const currentPermission = useCurrentJoinEventPermission(loadPermissions)
   const queryClient = useQueryClient()
-  const joinEventMutation = useMutation(
-    {
-      mutationFn: async () => await joinEvent({ ...event, hasArrived }),
-      onSuccess: (status) => {
-        if (status !== "success") {
-          presentAlert(JOIN_EVENT_ERROR_ALERTS[status])
-        } else {
-          updateEventDetailsQueryEvent(queryClient, event.id, (e) => ({
-            ...e,
-            userAttendeeStatus: "attending"
-          }))
-        }
-      },
-      onError: () => presentAlert(JOIN_EVENT_ERROR_ALERTS.generic)
-    }
-  )
+  const joinEventMutation = useMutation({
+    mutationFn: async () => await joinEvent({ ...event, hasArrived }),
+    onSuccess: (status) => {
+      if (status !== "success") {
+        presentAlert(JOIN_EVENT_ERROR_ALERTS[status])
+      } else {
+        updateEventDetailsQueryEvent(queryClient, event.id, (e) => ({
+          ...e,
+          userAttendeeStatus: "attending"
+        }))
+      }
+    },
+    onError: () => presentAlert(JOIN_EVENT_ERROR_ALERTS.generic)
+  })
   const hasJoined =
     joinEventMutation.isSuccess && joinEventMutation.data === "success"
   const isSuccess = hasJoined && currentPermission === "done"
@@ -266,22 +269,18 @@ const useCurrentJoinEventPermission = (
   loadPermissions: () => Promise<JoinEventPermission[]>
 ) => {
   const [permissionIndex, setPermissionIndex] = useState(0)
-  const { data: availablePermissions } = useQuery(
-    {
-      queryKey: ["join-event-permissions"],
-      queryFn: loadPermissions,
-      select: (permissions) => permissions.filter((p) => p.canRequestPermission)
-    }
-  )
-  const permissionRequestMutation = useMutation(
-    {
-      mutationFn: async (availablePermissions: JoinEventPermission[]) => {
-        if (permissionIndex >= availablePermissions.length) return
-        await availablePermissions[permissionIndex].requestPermission()
-      },
-      onSuccess: () => setPermissionIndex((index) => index + 1)
-    }
-  )
+  const { data: availablePermissions } = useQuery({
+    queryKey: ["join-event-permissions"],
+    queryFn: loadPermissions,
+    select: (permissions) => permissions.filter((p) => p.canRequestPermission)
+  })
+  const permissionRequestMutation = useMutation({
+    mutationFn: async (availablePermissions: JoinEventPermission[]) => {
+      if (permissionIndex >= availablePermissions.length) return
+      await availablePermissions[permissionIndex].requestPermission()
+    },
+    onSuccess: () => setPermissionIndex((index) => index + 1)
+  })
   if (!availablePermissions) return "pending"
   if (permissionIndex >= availablePermissions.length) return "done"
   return {

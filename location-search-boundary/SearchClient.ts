@@ -2,7 +2,8 @@ import { Geo, Place } from "@aws-amplify/geo"
 import { NamedLocation } from "@location/NamedLocation"
 import {
   RecentLocationAnnotation,
-  RecentLocationsStorage
+  RecentLocationsStorage,
+  recentLocationsStorage
 } from "@location/Recents"
 import {
   LocationCoordinate2D,
@@ -80,7 +81,10 @@ export class LocationsSearchQueryText {
 export const locationSearch = async (
   query: LocationsSearchQueryText,
   center: LocationCoordinate2D | undefined,
-  storage: Pick<RecentLocationsStorage, "locationsForCoordinates" | "recent">
+  storage: Pick<
+    RecentLocationsStorage,
+    "locationsForCoordinates" | "recent"
+  > = recentLocationsStorage
 ): Promise<LocationSearchResult[]> => {
   if (query.sourceType === "user-recents") {
     return await searchRecentLocations(storage)

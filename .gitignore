@@ -86,3 +86,5 @@ yarn-error.*
 # @end expo-cli
 #
 .gradle
+
+tif-main

@@ -9,7 +9,6 @@ import { act, renderHook, waitFor } from "@testing-library/react-native"
 import { ALERTS, LeaveEventResult, useLeaveEvent } from "./LeaveEvent"
 import { EventMocks } from "@event-details-boundary/MockData"
 import { renderSuccessfulUseLoadEventDetails } from "@event-details-boundary/TestHelpers"
-import { neverPromise } from "@test-helpers/Promise"
 
 describe("LeaveEvent tests", () => {
   const queryClient = createTestQueryClient()
@@ -112,6 +111,9 @@ describe("LeaveEvent tests", () => {
 
       // NB: Ensure we don't get an "import after teardown" error.
       act(() => resolveLeave?.("success"))
+      await waitFor(() => {
+        expect(testEnv.onSuccess).toHaveBeenCalled()
+      })
     })
     it("should not call onSuccess on non-successful Leave Event result", async () => {
       const { result: leaveEventResult } = renderUseLeaveEvent({

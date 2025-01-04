@@ -1,40 +1,39 @@
+import { PrimaryButton } from "@components/Buttons"
 import { TiFFooterView } from "@components/Footer"
+import { AnimatedPagerView } from "@components/Pager"
 import { Headline } from "@components/Text"
-import { AppStyles } from "@lib/AppColorStyle"
-import { useContext, useRef, useState } from "react"
-import { StyleProp, ViewStyle, View, StyleSheet, Pressable } from "react-native"
-import PagerView from "react-native-pager-view"
-import { TiFContext } from "./Context"
+import { PlusIconView } from "@components/common/Icons"
 import {
   ExploreEventsView,
   createInitialCenter,
   isSignificantlyDifferentRegions,
   useExploreEvents
 } from "@explore-events-boundary"
-import { ClientSideEvent } from "@event/ClientSideEvent"
-import { AnimatedPagerView } from "@components/Pager"
 import { useAnimatedStyle, useSharedValue } from "react-native-reanimated"
 import { colorWithOpacity } from "TiFShared/lib/Color"
-import { PrimaryButton } from "@components/Buttons"
-import ProfileImage from "@components/profileImageComponents/ProfileImage"
-import { PlusIconView } from "@components/common/Icons"
 import { FontScaleFactors } from "@lib/Fonts"
+import { ProfileCircleView } from "@components/profileImageComponents/ProfileCircle"
+import { IfAuthenticated } from "@user/Session"
+import { AppStyles } from "@lib/AppColorStyle"
+import { useRef, useState, useContext } from "react"
+import { StyleProp, ViewStyle, View, Pressable, StyleSheet } from "react-native"
+import PagerView from "react-native-pager-view"
+import { TiFContext } from "./Context"
+import { useCoreNavigation } from "@components/Navigation"
+import { defaultEditFormValues } from "@event/EditFormValues"
+import { atom, useAtom, useAtomValue, useSetAtom } from "jotai"
 
 export type HomeProps = {
-  onViewEventTapped: (event: ClientSideEvent) => void
-  onCreateEventTapped: () => void
-  onProfileTapped: () => void
   style?: StyleProp<ViewStyle>
 }
 
-export const HomeView = ({
-  onViewEventTapped,
-  onCreateEventTapped,
-  onProfileTapped,
-  style
-}: HomeProps) => {
+const scrollStateAtom = atom<"idle" | "dragging" | "settling">("idle")
+const pageIndexAtom = atom(0)
+
+export const HomeView = ({ style }: HomeProps) => {
   const pagerRef = useRef<PagerView>(null)
-  const [pageIndex, setPageIndex] = useState(0)
+  const setPageIndex = useSetAtom(pageIndexAtom)
+  const setScrollState = useSetAtom(scrollStateAtom)
   const footerBackgroundOpacity = useSharedValue(0)
   return (
     <View style={style}>
@@ -43,7 +42,6 @@ export const HomeView = ({
           ref={pagerRef}
           orientation="horizontal"
           layoutDirection="ltr"
-          initialPage={pageIndex}
           onPageSelected={(e) => setPageIndex(e.nativeEvent.position)}
           onPageScroll={(e) => {
             if (e.nativeEvent.position > 0) {
@@ -52,13 +50,16 @@ export const HomeView = ({
               footerBackgroundOpacity.value = e.nativeEvent.offset
             }
           }}
+          onPageScrollStateChanged={(e) => {
+            setScrollState(e.nativeEvent.pageScrollState)
+          }}
           style={styles.pager}
         >
           <View key="1" style={styles.screen}>
             <TODO />
           </View>
           <View key="2" style={styles.screen}>
-            <ExploreView onViewEventTapped={onViewEventTapped} />
+            <ExploreView />
           </View>
         </AnimatedPagerView>
         <TiFFooterView
@@ -71,10 +72,7 @@ export const HomeView = ({
           style={styles.footer}
         >
           <FooterView
-            pageIndex={pageIndex}
             onPageIndexTapped={(index) => pagerRef.current?.setPage(index)}
-            onProfileTapped={onProfileTapped}
-            onCreateEventTapped={onCreateEventTapped}
           />
         </TiFFooterView>
       </View>
@@ -89,76 +87,65 @@ const TODO = () => (
 )
 
 type FooterProps = {
-  pageIndex: number
   onPageIndexTapped: (index: number) => void
-  onCreateEventTapped: () => void
-  onProfileTapped: () => void
 }
 
-const FooterView = ({
-  pageIndex,
-  onPageIndexTapped,
-  onProfileTapped,
-  onCreateEventTapped
-}: FooterProps) => (
-  <View style={styles.footerContainer}>
-    <View style={styles.footerItem}>
-      <PrimaryButton
-        onPress={onCreateEventTapped}
-        style={styles.footerCreateEventButton}
-        contentStyle={styles.footerCreateEventButtonContent}
-      >
-        <PlusIconView
-          maxmimumFontScaleFactor={FontScaleFactors.xxxLarge}
-          size={16}
-        />
-        <Headline
-          maxFontSizeMultiplier={FontScaleFactors.xxxLarge}
-          style={styles.footerCreateEventButtonText}
+const FooterView = ({ onPageIndexTapped }: FooterProps) => {
+  const { presentProfile, presentEditEvent } = useCoreNavigation()
+  return (
+    <View style={styles.footerContainer}>
+      <View style={styles.footerItem}>
+        <PrimaryButton
+          onPress={() => presentEditEvent(defaultEditFormValues())}
+          style={styles.footerCreateEventButton}
+          contentStyle={styles.footerCreateEventButtonContent}
         >
-          Event
-        </Headline>
-      </PrimaryButton>
-    </View>
-    <View style={[styles.footerItem, styles.footerBreadcrumbs]}>
-      <View style={styles.footerBreadcrumbsContainer}>
-        <PageDotView
-          index={0}
-          selectedIndex={pageIndex}
-          onTapped={onPageIndexTapped}
-        />
-        <PageDotView
-          index={1}
-          selectedIndex={pageIndex}
-          onTapped={onPageIndexTapped}
+          <PlusIconView
+            maxmimumFontScaleFactor={FontScaleFactors.xxxLarge}
+            size={16}
+          />
+          <Headline
+            maxFontSizeMultiplier={FontScaleFactors.xxxLarge}
+            style={styles.footerCreateEventButtonText}
+          >
+            Event
+          </Headline>
+        </PrimaryButton>
+      </View>
+      <View style={[styles.footerItem, styles.footerBreadcrumbs]}>
+        <View style={styles.footerBreadcrumbsContainer}>
+          <PageDotView index={0} onTapped={onPageIndexTapped} />
+          <PageDotView index={1} onTapped={onPageIndexTapped} />
+        </View>
+      </View>
+      <View style={styles.footerItem}>
+        <IfAuthenticated
+          thenRender={(session) => (
+            <Pressable
+              onPress={() => presentProfile(session.id)}
+              style={styles.footerProfileImageContainer}
+            >
+              <ProfileCircleView
+                name={session.name}
+                imageURL={session.profileImageURL}
+                maximumFontSizeMultiplier={FontScaleFactors.xxxLarge}
+                style={styles.footerProfileImage}
+              />
+              <View style={styles.footerProfileLineIndicator} />
+            </Pressable>
+          )}
         />
       </View>
     </View>
-    <View style={styles.footerItem}>
-      <Pressable
-        onPress={onProfileTapped}
-        style={styles.footerProfileImageContainer}
-      >
-        <ProfileImage
-          imageURL={
-            // TODO: - Fetch this from user profile.
-            "https://pbs.twimg.com/profile_images/531870591515521024/LnwT_zyx_400x400.jpeg"
-          }
-          style={styles.footerProfileImage}
-        />
-        <View style={styles.footerProfileLineIndicator} />
-      </Pressable>
-    </View>
-  </View>
-)
+  )
+}
 
 type PageDotProps = {
   index: number
-  selectedIndex: number
   onTapped: (index: number) => void
 }
 
-const PageDotView = ({ index, selectedIndex, onTapped }: PageDotProps) => (
+const PageDotView = ({ index, onTapped }: PageDotProps) => (
   <Pressable
     onPress={() => onTapped(index)}
     hitSlop={{
@@ -174,7 +161,7 @@ const PageDotView = ({ index, selectedIndex, onTapped }: PageDotProps) => (
         width: 8,
         height: 8,
         backgroundColor:
-          index === selectedIndex
+          index === useAtomValue(pageIndexAtom)
             ? AppStyles.colorOpacity35
             : AppStyles.colorOpacity15
       }}
@@ -182,26 +169,27 @@ const PageDotView = ({ index, selectedIndex, onTapped }: PageDotProps) => (
   </Pressable>
 )
 
-type ExploreProps = {
-  onViewEventTapped: (event: ClientSideEvent) => void
-}
-
-const ExploreView = ({ onViewEventTapped }: ExploreProps) => {
+const ExploreView = () => {
+  const scrollState = useAtomValue(scrollStateAtom)
   const { fetchEvents } = useContext(TiFContext)!
   const { region, data, updateRegion } = useExploreEvents(
     createInitialCenter(),
     { fetchEvents, isSignificantlyDifferentRegions }
   )
   return (
-    <ExploreEventsView
-      region={region}
-      data={data}
-      onRegionUpdated={updateRegion}
-      onEventTapped={onViewEventTapped}
-      onMapLongPress={console.log}
-      onSearchTapped={() => console.log("TODO")}
-      style={styles.exploreEvents}
-    />
+    <View style={styles.container}>
+      <View
+        pointerEvents={scrollState === "dragging" ? "none" : "auto"}
+        style={styles.exploreEvents}
+      >
+        <ExploreEventsView
+          region={region}
+          data={data}
+          onRegionUpdated={updateRegion}
+        />
+      </View>
+      <View style={styles.exploreDragZone} />
+    </View>
   )
 }
 
@@ -282,5 +270,12 @@ const styles = StyleSheet.create({
   },
   exploreEvents: {
     flex: 1
+  },
+  exploreDragZone: {
+    position: "absolute",
+    height: "100%",
+    width: 32,
+    opacity: 0.00000001, // NB: A small amount of opacity is needed for the drag zone to be properly rendered on Android.
+    backgroundColor: "red"
   }
 })
