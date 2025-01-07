@@ -1,9 +1,5 @@
 package com.tifapp.tifnative
 
-import android.media.MediaPlayer
-import android.os.VibrationEffect
-import android.os.Vibrator
-
 //Handles the structure of what each event requires, to be created into a HapticPatternElement
 
 @Suppress ("UNCHECKED_CAST")
@@ -90,24 +86,22 @@ interface HapticsPlayer {
 data class HapticPattern(val events: List<HapticPatternElement>)
 
 @Suppress ("UNCHECKED_CAST")
-fun createReadableEvent (givenEvent: Map<String, Any?>): HapticPatternElement? {
-    val event = givenEvent["Event"] as Map<String, Any?>
-
+fun createReadableEvent (patternElement: Map<String, Any?>): HapticPatternElement? {
+    if (!patternElement.containsKey("Event")) return null
+    val event = patternElement["Event"] as Map<String, Any?>
     val eventType = event["EventType"] as? String
-
     return when (eventType){
         "AudioCustom" -> HapticPatternElement.AudioCustom.fromExpoObject(event)
         "HapticTransient" -> HapticPatternElement.TransientEvent.fromExpoObject(event)
         "HapticContinuous" -> HapticPatternElement.ContinuousEvent.fromExpoObject(event)
         else -> null
     }
-
 }
 
 @Suppress ("UNCHECKED_CAST")
 fun createReadablePattern(givenPattern: Map<String, Any?>): HapticPattern {
-    //Required for all:
     val initialPattern = givenPattern["Pattern"] as List<Map<String, Any?>>
+    println(initialPattern)
     val readablePattern = mutableListOf<HapticPatternElement>()
 
     initialPattern.forEach { patternElement ->

@@ -10,13 +10,16 @@ import android.os.VibrationEffect
 import android.os.Vibrator
 import android.os.VibratorManager
 import android.support.v4.content.ContextCompat.getSystemService
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlin.math.ceil
+import kotlin.math.max
 
 @SuppressLint("InlinedApi")
 @TargetApi(26)
 public class AndroidHapticsPlayer(
-    private val context: Context
+    context: Context
 ) : HapticsPlayer {
     private var settings =
         HapticsSettings(isHapticFeedbackMuted = false, isHapticSoundEffectsMuted = false)
@@ -25,10 +28,10 @@ public class AndroidHapticsPlayer(
     private val vibrator = context.defaultVibrator
 
     override suspend fun playSound(element: HapticPatternElement.AudioCustom) {
-        if (settings.isHapticSoundEffectsMuted) {
-            return
-        }
         mutex.withLock {
+            if (settings.isHapticSoundEffectsMuted) {
+                return
+            }
             mPlayer.reset()
             mPlayer.apply {
                 setDataSource(element.waveformPath)
@@ -41,25 +44,26 @@ public class AndroidHapticsPlayer(
     }
 
     public override suspend fun playEffect(effect: HapticPatternElement) {
-        if (settings.isHapticFeedbackMuted) {
-            return
-        }
         mutex.withLock {
-            when (effect) {
-                is HapticPatternElement.AudioCustom -> playSound(effect)
-                is HapticPatternElement.TransientEvent -> vibrator.vibrate(
-                    VibrationEffect.createOneShot(
-                        effect.time.toLong(),
-                        effect.intensity.toInt()
-                    )
+            if (settings.isHapticFeedbackMuted) {
+                return@playEffect
+            }
+        }
+        when (effect) {
+            is HapticPatternElement.AudioCustom -> playSound(effect)
+            is HapticPatternElement.TransientEvent -> {
+                delay(time(effect.time))
+                vibrator.vibrate(
+                    VibrationEffect.createOneShot(100, intensity(effect.intensity))
                 )
-
-                is HapticPatternElement.ContinuousEvent -> vibrator.vibrate(
+            }
+            is HapticPatternElement.ContinuousEvent -> {
+                delay(time(effect.time))
+                vibrator.vibrate(
                     VibrationEffect.createWaveform(
-                        longArrayOf(
-                            0,
-                            effect.duration.toLong()
-                        ), intArrayOf(effect.intensity.toInt(), effect.intensity.toInt()), -1
+                        longArrayOf(0, time(effect.duration)),
+                        intArrayOf(intensity(effect.intensity), intensity(effect.intensity)),
+                        -1
                     )
                 )
             }
@@ -74,9 +78,9 @@ public class AndroidHapticsPlayer(
     }
 
     suspend fun apply(settings: ExpoObject) {
-        val feedbackMuted = settings["isHapticFeedbackMuted"] as Boolean
-        val soundMuted = settings["isHapticsSoundEffectsMuted"] as Boolean
-        val hapticsSettings = HapticsSettings(feedbackMuted, soundMuted)
+        val feedbackEnabled = settings["isHapticFeedbackEnabled"] as Boolean
+        val soundEnabled = settings["isHapticAudioEnabled"] as Boolean
+        val hapticsSettings = HapticsSettings(!feedbackEnabled, !soundEnabled)
         mutex.withLock {
             this.settings = hapticsSettings
         }
@@ -87,3 +91,6 @@ data class HapticsSettings(
     var isHapticFeedbackMuted: Boolean,
     var isHapticSoundEffectsMuted: Boolean
 )
+
+private fun time(base: Double): Long = (base * 1000).toLong()
+private fun intensity(base: Double): Int = max(1.0, ceil(255 * base)).toInt()

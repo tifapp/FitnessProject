@@ -48,6 +48,70 @@ class CustomHapticsTest {
     }
 
     @Test
+    fun `Read complex AHAPPattern`() = runBlocking {
+        val exampleAhap: Map<String, Any?> =
+            mapOf(
+                "Version" to 1,
+                "Pattern" to listOf(
+                    mapOf(
+                        "Event" to mapOf(
+                            "Time" to 0.0,
+                            "EventType" to "HapticTransient",
+                            "EventParameters" to listOf(
+                                mapOf("ParameterID" to "HapticIntensity", "ParameterValue" to 0.5),
+                                mapOf("ParameterID" to "HapticSharpness", "ParameterValue" to 0.5)
+                            )
+                        )
+                    ),
+                    mapOf(
+                        "Event" to mapOf(
+                            "Time" to 0.5,
+                            "EventType" to "HapticTransient",
+                            "EventParameters" to listOf(
+                                mapOf("ParameterID" to "HapticIntensity", "ParameterValue" to 0.5),
+                                mapOf("ParameterID" to "HapticSharpness", "ParameterValue" to 0.5)
+                            )
+                        )
+                    ),
+                    mapOf(
+                        "Event" to mapOf(
+                            "Time" to 0.0,
+                            "EventType" to "HapticContinuous",
+                            "EventDuration" to 3.0,
+                            "EventParameters" to listOf(
+                                mapOf("ParameterID" to "HapticIntensity", "ParameterValue" to 1.0),
+                                mapOf("ParameterID" to "HapticSharpness", "ParameterValue" to 0.2),
+                                mapOf("ParameterID" to "ReleaseTime", "ParameterValue" to 1.0)
+                            )
+                        )
+                    ),
+                    mapOf(
+                        "ParameterCurve" to mapOf(
+                            "ParameterID" to "AudioBrightnessControl",
+                            "Time" to 0.0,
+                            "ParameterCurveControlPoints" to listOf(
+                                mapOf("ParameterValue" to 1.0, "Time" to 3.0),
+                                mapOf("ParameterValue" to 0.5, "Time" to 4.5),
+                                mapOf("ParameterValue" to 0.1, "Time" to 5.5)
+                            )
+                        )
+                    )
+                )
+            )
+        val testHapticPlayer = TestHapticsPatternPlayer()
+        testHapticPlayer.playPattern(exampleAhap)
+        testHapticPlayer.getEvents()
+        assertEquals(
+            listOf(
+                HapticPatternElement.TransientEvent(0.0, 0.5),
+                HapticPatternElement.ContinuousEvent(0.0, 3.0, intensity=1.0),
+                HapticPatternElement.TransientEvent(0.5, 0.5)
+            ),
+            testHapticPlayer.getEvents()
+        )
+    }
+
+    @Test
     fun `Test for playing audioCustom` (): Unit = runBlocking {
         val exampleAhap: Map<String, Any?> =
             mapOf(
