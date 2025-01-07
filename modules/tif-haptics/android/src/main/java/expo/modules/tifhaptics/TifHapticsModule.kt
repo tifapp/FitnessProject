@@ -1,6 +1,9 @@
 package expo.modules.tifhaptics
 
 import android.content.Context
+import com.tifapp.tifnative.AndroidHapticsPlayer
+import com.tifapp.tifnative.ExpoObject
+import com.tifapp.tifnative.isHapticsSupportedOnDevice
 import expo.modules.kotlin.functions.Coroutine
 import expo.modules.kotlin.exception.Exceptions
 import expo.modules.kotlin.modules.Module
@@ -10,21 +13,23 @@ class TifHapticsModule : Module() {
   private val context: Context
     get() = appContext.reactContext ?: throw Exceptions.ReactContextLost()
 
-  private val haptics = AndroidHapticsPlayer(context)
-
   override fun definition() = ModuleDefinition {
+    val haptics = AndroidHapticsPlayer(context)
     Name("TifHaptics")
 
-    AsyncFunction("play") Coroutine { event: ExpoObject ->
-      haptics.play(event)
+    AsyncFunction("play") Coroutine { pattern: ExpoObject ->
+      haptics.playPattern(pattern)
     }
 
-    AsyncFunction("apply") Coroutine { event: ExpoObject -> 
-      haptics.apply(event)
+    AsyncFunction("apply") Coroutine { settings: ExpoObject ->
+      haptics.apply(settings)
     }
 
-    Function("deviceSupport") { 
-       mapOf("isFeedbackSupportedOnDevice" to context.isHapticsSupportedOnDevice, "isAudioSupportedOnDevice" to true)
+    Function("deviceSupport") {
+      mapOf(
+        "isFeedbackSupportedOnDevice" to context.isHapticsSupportedOnDevice,
+        "isAudioSupportedOnDevice" to true
+      )
     }
   }
 }

@@ -54,14 +54,8 @@ dependencyResolutionManagement {
   }
 }
 
-
-
 apply from: new File(["node", "--print", "require.resolve('expo/package.json')"].execute(null, rootDir).text.trim(), "../scripts/autolinking.gradle");
-
-include(":TiFNative")
-
-// Specify the directory where the module is located relative to this settings file
-project(":TiFNative").projectDir = new File("../native-code/TiFNative")
+includeBuild "../native-code/Android/TiFNative"
 
 useExpoModules()
 

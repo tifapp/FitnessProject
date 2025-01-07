@@ -84,7 +84,7 @@
     "expo-blur": "~13.0.2",
     "expo-calendar": "~13.0.5",
     "expo-clipboard": "~6.0.3",
-    "expo-dev-client": "^4.0.27",
+    "expo-dev-client": "^4.0.29",
     "expo-device": "~6.0.2",
     "expo-document-picker": "~12.0.2",
     "expo-file-system": "~17.0.1",
