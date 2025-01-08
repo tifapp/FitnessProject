@@ -2,10 +2,10 @@ import {
   ClientSideEvent,
   clientSideEventFromResponse
 } from "@event/ClientSideEvent"
-import { useQuery, useQueryClient } from "@tanstack/react-query"
+import { useQuery } from "@tanstack/react-query"
 import { TiFAPI } from "TiFShared/api"
 import { UserID } from "TiFShared/domain-models/User"
-import { userProfileQueryKey } from "./UserProfile"
+import { userProfileQueryKey } from "./QueryKey"
 
 export type UpcomingEventsResult =
   | {
@@ -37,7 +37,6 @@ export const useUpcomingEvents = ({
   fetchUpcomingEvents,
   userId
 }: UseUpcomingEventsEnvironment) => {
-  const queryClient = useQueryClient()
   const query = useQuery({
     queryKey: userProfileQueryKey(userId, ["events"]),
     queryFn: async () => await fetchUpcomingEvents(userId)

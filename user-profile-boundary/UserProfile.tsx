@@ -18,6 +18,7 @@ import {
   userUpcomingEvents,
   useUpcomingEvents
 } from "./UpcomingEvents"
+import { userProfileQueryKey } from "./QueryKey"
 
 export type BasicUser = Omit<UserProfile, "createdDateTime" | "updatedDateTime">
 
@@ -29,26 +30,22 @@ export type UserProfileResult =
   | { status: "blocked-you" | "user-not-found" }
 
 export const userProfile = async (
-  userID: UserID,
+  userId: UserID,
   api: TiFAPI = TiFAPI.productionInstance,
   storage: AlphaUserStorage = AlphaUserStorage.default
 ): Promise<UserProfileResult> => {
   const storageData = await storage.user()
-  if (storageData && storageData.id === userID) {
+  if (storageData && storageData.id === userId) {
     return {
       status: "success",
       user: { ...storageData, relationStatus: "current-user" }
     }
   }
-  const resp = await api.getUser({ params: { userId: userID } })
+  const resp = await api.getUser({ params: { userId } })
   if (resp.status === 200) {
     return { status: "success", user: resp.data as BasicUser }
   }
   return { status: resp.data.error }
-}
-
-export const userProfileQueryKey = (id: UserID, elements: unknown[]) => {
-  return ["userProfile", id, ...elements]
 }
 
 export type UseUserProfileEnvironment = {
@@ -71,7 +68,7 @@ export const useUserProfile = ({
       refresh: () =>
         queryClient.refetchQueries({
           type: "active",
-          queryKey: userProfileQueryKey(userId, [])
+          queryKey: userProfileQueryKey(userId)
         }),
       refreshStatus: query.fetchStatus
     }
