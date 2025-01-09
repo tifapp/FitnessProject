@@ -36,13 +36,9 @@ export const Basic = () => (
     localSettingsStore={localSettings}
     userSettingsStore={userSettings}
   >
-    <AlphaUserSessionProvider storage={storage}>
+    <AlphaUserSessionProvider>
       <TiFView
-        fetchEvents={async () =>
-          repeatElements(10, () =>
-            clientSideEventFromResponse(EventMocks.MockMultipleAttendeeResponse)
-          ).map((e) => ({ ...e, id: randomIntegerInRange(0, 10_000) }))
-        }
+        fetchEvents={eventsByRegion}
         isFontsLoaded={true}
         style={{ flex: 1 }}
       />
