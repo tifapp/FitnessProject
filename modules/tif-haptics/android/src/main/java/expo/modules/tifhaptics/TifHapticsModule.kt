@@ -1,10 +1,9 @@
 package expo.modules.tifhaptics
 
 import android.content.Context
-import android.os.Build
-import android.os.Vibrator
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
+import com.tifapp.tifnative.AndroidHapticsPlayer
+import com.tifapp.tifnative.ExpoObject
+import com.tifapp.tifnative.isHapticsSupportedOnDevice
 import expo.modules.kotlin.functions.Coroutine
 import expo.modules.kotlin.exception.Exceptions
 import expo.modules.kotlin.modules.Module
@@ -14,34 +13,23 @@ class TifHapticsModule : Module() {
   private val context: Context
     get() = appContext.reactContext ?: throw Exceptions.ReactContextLost()
 
-  private val mutex = Mutex()
-  private var haptics: TiFHapticsEngine? = null
-
   override fun definition() = ModuleDefinition {
+    val haptics = AndroidHapticsPlayer(context)
     Name("TifHaptics")
 
-    Constants {
-      mapOf("IS_HAPTICS_SUPPORTED" to context.isHapticsSupportedOnDevice)
+    AsyncFunction("play") Coroutine { pattern: ExpoObject ->
+      haptics.playPattern(pattern)
     }
 
-    AsyncFunction("play") Coroutine { event: HapticEvent ->
-      getHapticsEngine().play(event)
+    AsyncFunction("apply") Coroutine { settings: ExpoObject ->
+      haptics.apply(settings)
     }
 
-    AsyncFunction("mute") Coroutine { ->
-      getHapticsEngine().mute()
+    Function("deviceSupport") {
+      mapOf(
+        "isFeedbackSupportedOnDevice" to context.isHapticsSupportedOnDevice,
+        "isAudioSupportedOnDevice" to true
+      )
     }
-
-    AsyncFunction("unmute") Coroutine { ->
-      getHapticsEngine().unmute()
-    }
-  }
-
-  private suspend fun getHapticsEngine(): TiFHapticsEngine = mutex.withLock {
-    val currentHaptics = haptics
-    if (currentHaptics != null) return@getHapticsEngine currentHaptics
-    val hapticsEngine = TiFHapticsEngine(context.defaultVibrator)
-    haptics = hapticsEngine
-    hapticsEngine
   }
 }
