@@ -22,11 +22,11 @@ import {
 } from "../../../event-details-boundary/MockData"
 import {
   UserInfoView,
-  UserProfileFeature,
   UserProfileView,
   useUserProfile
 } from "../../../user-profile-boundary/UserProfile"
 import { StoryMeta } from "../../HelperTypes"
+import { UserProfileFeature } from "user-profile-boundary/Context"
 
 const ProfileMeta: StoryMeta = {
   title: "Profile Screen"
