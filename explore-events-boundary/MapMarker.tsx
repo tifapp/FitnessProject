@@ -4,7 +4,7 @@ import {
 } from "@components/AvatarMapMarker"
 import { CaptionTitle } from "@components/Text"
 import { Ionicon } from "@components/common/Icons"
-import React from "react"
+import React, { memo } from "react"
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 
 export type ExploreEventsMarkerProps = {
@@ -21,21 +21,14 @@ export const ExploreEventsMarkerView = ({
   hostName,
   imageURL,
   style
-}: ExploreEventsMarkerProps) => {
-  return (
-    <AvatarMapMarkerView name={hostName} imageURL={imageURL} style={style}>
-      <View style={[{ backgroundColor: color }, styles.badgeContainer]}>
-        <Ionicon
-          style={styles.badgeIcon}
-          name="people"
-          color="white"
-          size={12}
-        />
-        <CaptionTitle style={styles.badgeText}>{attendeeCount}</CaptionTitle>
-      </View>
-    </AvatarMapMarkerView>
-  )
-}
+}: ExploreEventsMarkerProps) => (
+  <AvatarMapMarkerView name={hostName} imageURL={imageURL} style={style}>
+    <View style={[{ backgroundColor: color }, styles.badgeContainer]}>
+      <Ionicon style={styles.badgeIcon} name="people" color="white" size={12} />
+      <CaptionTitle style={styles.badgeText}>{attendeeCount}</CaptionTitle>
+    </View>
+  </AvatarMapMarkerView>
+)
 
 const styles = StyleSheet.create({
   badgeContainer: {

@@ -272,8 +272,8 @@ const styles = StyleSheet.create({
   sheetHeaderText: {
     flex: 1,
     backgroundColor: "white",
-    paddingHorizontal: 16,
-    paddingBottom: 8
+    paddingHorizontal: 24,
+    paddingBottom: 16
   },
   water: {
     width: "100%",
