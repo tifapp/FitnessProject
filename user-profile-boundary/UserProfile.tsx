@@ -1,10 +1,11 @@
 import { AvatarView } from "@components/Avatar"
 import { Caption, Headline, Subtitle } from "@components/Text"
 import { EventCard } from "@event/EventCard"
+import { featureContext } from "@lib/FeatureContext"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { AlphaUserStorage } from "@user/alpha"
 import { FriendRequestButton, useFriendRequest } from "@user/FriendRequest"
-import React, { createContext } from "react"
+import React from "react"
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 import { FlatList } from "react-native-gesture-handler"
 import { TiFAPI } from "TiFShared/api"
@@ -13,11 +14,7 @@ import {
   UserID,
   UserProfile
 } from "TiFShared/domain-models/User"
-import {
-  UpcomingEventsResult,
-  userUpcomingEvents,
-  useUpcomingEvents
-} from "./UpcomingEvents"
+import { userUpcomingEvents, useUpcomingEvents } from "./UpcomingEvents"
 
 export type BasicUser = Omit<UserProfile, "createdDateTime" | "updatedDateTime">
 
@@ -52,14 +49,11 @@ export const userProfileQueryKey = (id: UserID, elements: unknown[]) => {
 }
 
 export type UseUserProfileEnvironment = {
-  fetchUserProfile: (userId: UserID) => Promise<UserProfileResult>
   userId: UserID
 }
 
-export const useUserProfile = ({
-  fetchUserProfile,
-  userId
-}: UseUserProfileEnvironment) => {
+export const useUserProfile = ({ userId }: UseUserProfileEnvironment) => {
+  const { fetchUserProfile } = UserProfileFeature.useContext()
   const queryClient = useQueryClient()
   const query = useQuery({
     queryKey: userProfileQueryKey(userId, ["user"]),
@@ -80,28 +74,10 @@ export const useUserProfile = ({
   }
 }
 
-export type UserProfileContextValues = {
-  fetchUserProfile: (id: UserID) => Promise<UserProfileResult>
-  fetchUpcomingEvents: (id: UserID) => Promise<UpcomingEventsResult>
-}
-
-const UserProfileContext = createContext<UserProfileContextValues>({
+export const UserProfileFeature = featureContext({
   fetchUserProfile: userProfile,
   fetchUpcomingEvents: userUpcomingEvents
 })
-
-export type UserProfileProviderProps = UserProfileContextValues & {
-  children: JSX.Element
-}
-
-export const UserProfileProvider = ({
-  children,
-  ...values
-}: UserProfileProviderProps) => (
-  <UserProfileContext.Provider value={values}>
-    {children}
-  </UserProfileContext.Provider>
-)
 
 export type UserProfileProps = {
   userInfoState: ReturnType<typeof useUserProfile>

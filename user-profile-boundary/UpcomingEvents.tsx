@@ -5,7 +5,7 @@ import {
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { TiFAPI } from "TiFShared/api"
 import { UserID } from "TiFShared/domain-models/User"
-import { userProfileQueryKey } from "./UserProfile"
+import { UserProfileFeature, userProfileQueryKey } from "./UserProfile"
 
 export type UpcomingEventsResult =
   | {
@@ -29,14 +29,11 @@ export const userUpcomingEvents = async (
 }
 
 export type UseUpcomingEventsEnvironment = {
-  fetchUpcomingEvents: (userId: UserID) => Promise<UpcomingEventsResult>
   userId: UserID
 }
 
-export const useUpcomingEvents = ({
-  fetchUpcomingEvents,
-  userId
-}: UseUpcomingEventsEnvironment) => {
+export const useUpcomingEvents = ({ userId }: UseUpcomingEventsEnvironment) => {
+  const { fetchUpcomingEvents } = UserProfileFeature.useContext()
   const queryClient = useQueryClient()
   const query = useQuery({
     queryKey: userProfileQueryKey(userId, ["events"]),
