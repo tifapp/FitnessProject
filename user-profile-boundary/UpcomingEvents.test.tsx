@@ -5,6 +5,7 @@ import {
 import { TiFAPI } from "TiFShared/api"
 import { mockTiFEndpoint } from "TiFShared/test-helpers/mockAPIServer"
 import { userUpcomingEvents } from "./UpcomingEvents"
+import { mockPlacemark } from "@location/MockData"
 
 describe("fetchUpcomingEvents tests", () => {
   it("loads upcoming events for current user", async () => {
@@ -18,6 +19,10 @@ describe("fetchUpcomingEvents tests", () => {
       {
         ...EventMocks.MockSingleAttendeeResponse,
         id: 2,
+        location: {
+          ...EventMocks.MockSingleAttendeeResponse.location,
+          placemark: mockPlacemark()
+        },
         previewAttendees: [
           {
             ...testUser,
@@ -31,15 +36,9 @@ describe("fetchUpcomingEvents tests", () => {
     mockTiFEndpoint("upcomingEvents", 200, { events: testEvents })
     const events = await userUpcomingEvents(
       testUser.id,
-      TiFAPI.testUnauthenticatedInstance
+      TiFAPI.testAuthenticatedInstance
     )
-    if (events.status === "success") {
-      console.log(JSON.stringify(events.events[0].previewAttendees))
-    }
-    expect(events).toMatchObject({
-      status: "success",
-      events: testEvents
-    })
+    expect(events).toMatchObject({ status: "success", events: testEvents })
   })
   it("gives an error if error code is 403", async () => {
     const testUser = {
@@ -49,7 +48,7 @@ describe("fetchUpcomingEvents tests", () => {
     mockTiFEndpoint("upcomingEvents", 403, testUser)
     const events = await userUpcomingEvents(
       EventAttendeeMocks.Alivs.id,
-      TiFAPI.testUnauthenticatedInstance
+      TiFAPI.testAuthenticatedInstance
     )
     expect(events.status).toEqual("blocked-you")
   })
