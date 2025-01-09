@@ -14,6 +14,7 @@ import {
   UserID,
   UserProfile
 } from "TiFShared/domain-models/User"
+import { userProfileQueryKey } from "./QueryKey"
 import { userUpcomingEvents, useUpcomingEvents } from "./UpcomingEvents"
 
 export type BasicUser = Omit<UserProfile, "createdDateTime" | "updatedDateTime">
