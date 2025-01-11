@@ -21,7 +21,6 @@ import {
   ClientSideEvent,
   clientSideEventFromResponse
 } from "@event/ClientSideEvent"
-import { useLoadEventDetails } from "@event-details-boundary/Details"
 import { TiFQueryClientProvider } from "@lib/ReactQuery"
 import { dateRange } from "TiFShared/domain-models/FixedDateRange"
 import { dayjs, now } from "TiFShared/lib/Dayjs"
@@ -30,7 +29,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler"
 import { TiFBottomSheetProvider } from "@components/BottomSheet"
 import {
   EventUserAttendanceButton,
-  EventUserAttendanceProvider
+  EventUserAttendanceFeature
 } from "@event/UserAttendance"
 import { loadJoinEventPermissions } from "@event/JoinEvent"
 import { EventActionsMenuView, useEventActionsMenu } from "@event/Menu"
@@ -41,10 +40,11 @@ import { EventCard } from "@event/EventCard"
 import { ScrollView } from "react-native"
 import { AlphaUserSessionProvider, AlphaUserStorage } from "@user/alpha"
 import {
-  AlphaRegisterProvider,
+  AlphaRegisterFeature,
   withAlphaRegistration
 } from "@core-root/AlphaRegister"
 import { AlphaUserMocks } from "@user/alpha/MockData"
+import { EventDetailsFeature, useLoadEventDetails } from "@event/DetailsQuery"
 
 const EventDetailsMeta: StoryMeta = {
   title: "Event Details"
@@ -75,31 +75,40 @@ export const Basic: EventDetailsStory = () => {
 
   return (
     <GestureHandlerRootView>
-      <SafeAreaProvider>
-        <AlphaUserSessionProvider storage={storage}>
-          <AlphaRegisterProvider
-            register={async () => AlphaUserMocks.TheDarkLord}
-          >
-            <UserLocationFunctionsProvider
-              getCurrentLocation={getCurrentPositionAsync}
-              requestBackgroundPermissions={requestBackgroundPermissionsAsync}
-              requestForegroundPermissions={requestForegroundPermissionsAsync}
+      <EventDetailsFeature.Provider
+        eventDetails={async () => ({
+          status: "success",
+          event: clientSideEventFromResponse(
+            EventMocks.MockMultipleAttendeeResponse
+          )
+        })}
+      >
+        <SafeAreaProvider>
+          <AlphaUserSessionProvider storage={storage}>
+            <AlphaRegisterFeature.Provider
+              register={async () => AlphaUserMocks.TheDarkLord}
             >
-              <TiFQueryClientProvider>
-                <TiFBottomSheetProvider>
-                  <NavigationContainer>
-                    <Stack.Navigator
-                      screenOptions={{ ...BASE_HEADER_SCREEN_OPTIONS }}
-                    >
-                      <Stack.Screen name="test" component={Test} />
-                    </Stack.Navigator>
-                  </NavigationContainer>
-                </TiFBottomSheetProvider>
-              </TiFQueryClientProvider>
-            </UserLocationFunctionsProvider>
-          </AlphaRegisterProvider>
-        </AlphaUserSessionProvider>
-      </SafeAreaProvider>
+              <UserLocationFunctionsProvider
+                getCurrentLocation={getCurrentPositionAsync}
+                requestBackgroundPermissions={requestBackgroundPermissionsAsync}
+                requestForegroundPermissions={requestForegroundPermissionsAsync}
+              >
+                <TiFQueryClientProvider>
+                  <TiFBottomSheetProvider>
+                    <NavigationContainer>
+                      <Stack.Navigator
+                        screenOptions={{ ...BASE_HEADER_SCREEN_OPTIONS }}
+                      >
+                        <Stack.Screen name="test" component={Test} />
+                      </Stack.Navigator>
+                    </NavigationContainer>
+                  </TiFBottomSheetProvider>
+                </TiFQueryClientProvider>
+              </UserLocationFunctionsProvider>
+            </AlphaRegisterFeature.Provider>
+          </AlphaUserSessionProvider>
+        </SafeAreaProvider>
+      </EventDetailsFeature.Provider>
     </GestureHandlerRootView>
   )
 }
@@ -114,30 +123,7 @@ const time = {
 } as const
 
 const Test = withAlphaRegistration(() => {
-  const result = useLoadEventDetails(
-    EventMocks.MockMultipleAttendeeResponse.id,
-    async () => ({
-      status: "success",
-      event: clientSideEventFromResponse({
-        ...EventMocks.MockMultipleAttendeeResponse,
-        attendeeCount: 4,
-        userAttendeeStatus: "hosting",
-        previewAttendees: [
-          ...EventMocks.MockMultipleAttendeeResponse.previewAttendees,
-          {
-            ...EventMocks.MockMultipleAttendeeResponse.previewAttendees[0],
-            id: uuidString(),
-            name: "Mario"
-          },
-          {
-            ...EventMocks.MockMultipleAttendeeResponse.previewAttendees[1],
-            id: uuidString(),
-            name: "Luigi"
-          }
-        ]
-      })
-    })
-  )
+  const result = useLoadEventDetails(EventMocks.MockMultipleAttendeeResponse.id)
   if (result.status !== "success") return undefined
   return <Menu event={result.event} />
 })
@@ -150,7 +136,7 @@ const Menu = ({ event }: { event: ClientSideEvent }) => {
         height: "100%"
       }}
     >
-      <EventUserAttendanceProvider
+      <EventUserAttendanceFeature.Provider
         joinEvent={async () => "success"}
         loadPermissions={async () => {
           const perms = await loadJoinEventPermissions()
@@ -159,7 +145,7 @@ const Menu = ({ event }: { event: ClientSideEvent }) => {
         leaveEvent={async () => "success"}
       >
         <EventCard event={event} style={{ paddingHorizontal: 24 }} />
-      </EventUserAttendanceProvider>
+      </EventUserAttendanceFeature.Provider>
     </ScrollView>
   )
 }

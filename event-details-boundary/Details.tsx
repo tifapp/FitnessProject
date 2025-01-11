@@ -1,484 +1,201 @@
-import { BodyText, Subtitle } from "@components/Text"
+import { TiFFormScrollableLayoutView } from "@components/form-components/ScrollableFormLayout"
+import { ClientSideEvent, ClientSideEventTime } from "@event/ClientSideEvent"
 import {
-  ClientSideEvent,
-  clientSideEventFromResponse
-} from "@event/ClientSideEvent"
-import { useIsConnectedToInternet } from "@lib/InternetConnection"
-import { UseQueryResult } from "@tanstack/react-query"
-import React, { useRef, useState } from "react"
-import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
-import { TiFAPI } from "TiFShared/api"
-
-import { PrimaryButton } from "@components/Buttons"
+  StyleProp,
+  ViewStyle,
+  StyleSheet,
+  View,
+  RefreshControl
+} from "react-native"
+import { useEventSecondsToStart } from "./SecondsToStart"
+import { EventCountdownView, eventCountdown } from "./Countdown"
+import { EventUserAttendanceButton } from "@event/UserAttendance"
+import { BodyText, Title } from "@components/Text"
+import { memo } from "react"
+import { TiFFooterView } from "@components/Footer"
 import {
-  EventDetailsLoadingResult,
-  useEventDetailsQuery
-} from "@event/DetailsQuery"
+  TiFFormCardSectionView,
+  TiFFormSectionView
+} from "@components/form-components/Section"
+import { EventAttendeeCardView } from "./AttendeesList"
+import {
+  EventTravelEstimatesView,
+  useEventTravelEstimates
+} from "./TravelEstimates"
+import { TiFFormCardView } from "@components/form-components/Card"
+import { TiFFormNamedIconRowView } from "@components/form-components/NamedIconRow"
 import { AppStyles } from "@lib/AppColorStyle"
-import { useAutocorrectingInterval } from "@lib/AutocorrectingInterval"
-import { TiFDefaultLayoutTransition } from "@lib/Reanimated"
-import { useConst } from "@lib/utils/UseConst"
-import Animated, { ZoomIn, ZoomOut } from "react-native-reanimated"
-import { EventID, EventWhenBlockedByHost } from "TiFShared/domain-models/Event"
-import { featureContext } from "@lib/FeatureContext"
+import { placemarkToFormattedAddress } from "@lib/AddressFormatting"
+import { UseLoadEventDetailsResult } from "@event/DetailsQuery"
+import {
+  EventArrivalBannerView,
+  eventArrivalBannerCountdown,
+  useIsShowingEventArrivalBanner
+} from "./ArrivalBanner"
+import { isAttendingEvent } from "TiFShared/domain-models/Event"
+import { useUserSettings } from "@settings-storage/Hooks"
+import { settingsSelector } from "@settings-storage/Settings"
+import { RegionMonitorContext } from "@arrival-tracking"
+import Animated, { FadeIn, FadeOut } from "react-native-reanimated"
 
-/**
- * Loads the event details from the server.
- *
- * A `clientReceivedTime` property is added on a successful response which is used for
- * calculating accurate countdown times.
- */
-export const eventDetails = async (
-  eventId: EventID,
-  tifAPI: TiFAPI = TiFAPI.productionInstance
-): Promise<EventDetailsLoadingResult> => {
-  const resp = await tifAPI.eventDetails({ params: { eventId } })
-  if (resp.status === 404) {
-    return { status: "not-found" }
-  } else if (resp.status === 403) {
-    return { status: "blocked", event: resp.data }
-  } else {
-    return {
-      status: "success",
-      event: clientSideEventFromResponse(resp.data)
-    }
-  }
-}
-
-export const EventDetailsFeature = featureContext({ eventDetails })
-
-export type UseLoadEventDetailsResult =
-  | { status: "pending" | "not-found" | "cancelled" }
-  | { status: "error"; retry: () => void; isConnectedToInternet: boolean }
-  | {
-      status: "success"
-      refreshStatus: "pending" | "error" | "idle"
-      event: ClientSideEvent
-      refresh: () => void
-    }
-  | { status: "blocked"; event: EventWhenBlockedByHost }
-
-/**
- * A hook to load an event in the context of the details screen.
- */
-export const useLoadEventDetails = (
-  eventId: EventID
-): UseLoadEventDetailsResult => {
-  const { eventDetails } = EventDetailsFeature.useContext()
-  const query = useEventDetailsQuery(eventId, eventDetails)
-  return loadEventDetailsResult(query, useIsConnectedToInternet())
-}
-
-const loadEventDetailsResult = (
-  query: UseQueryResult<EventDetailsLoadingResult, unknown>,
-  isConnectedToInternet: boolean
-) => {
-  if (query.status === "error" && !query.isRefetchError) {
-    return {
-      status: query.status,
-      isConnectedToInternet,
-      retry: () => {
-        query.refetch()
-      }
-    }
-  } else if (query.status === "pending") {
-    return { status: query.status }
-  } else if (query.data.status !== "success") {
-    return query.data
-  } else {
-    return {
-      ...query.data,
-      refresh: () => {
-        query.refetch()
-      },
-      refreshStatus: refreshStatus(query)
-    }
-  }
-}
-
-const refreshStatus = (
-  query: UseQueryResult<EventDetailsLoadingResult, unknown>
-) => {
-  if (query.isRefetching) {
-    return "pending" as const
-  } else if (query.isRefetchError) {
-    return "error" as const
-  } else {
-    return "idle" as const
-  }
-}
-
-export type EventDetailsProps<
-  Result extends UseLoadEventDetailsResult = UseLoadEventDetailsResult
-> = {
-  result: Result
-  onExploreOtherEventsTapped: () => void
-  children: (result: Extract<Result, { status: "success" }>) => JSX.Element
+export type EventDetailsProps = {
+  state: Extract<UseLoadEventDetailsResult, { status: "success" }>
   style?: StyleProp<ViewStyle>
 }
 
-/**
- * The main event details view.
- */
-export const EventDetailsView = <
-  Result extends UseLoadEventDetailsResult = UseLoadEventDetailsResult
->({
-  result,
-  onExploreOtherEventsTapped,
-  children,
-  style
-}: EventDetailsProps<Result>) => (
+const _EventDetailsView = ({ state, style }: EventDetailsProps) => (
   <View style={style}>
-    {result.status === "pending" && (
-      <NoContentView
-        renderTitle={(title) => <LoadingTitleView title={title} />}
-        possibleMessages={LOADING_MESSAGES}
-        style={styles.noContent}
-      />
-    )}
-    {result.status === "error" && (
-      <NoContentView
-        onActionButtonTapped={result.retry}
-        actionButtonTitle="Try Again"
-        possibleMessages={
-          result.isConnectedToInternet
-            ? GENERIC_ERROR_MESSAGES
-            : INTERNET_ERROR_MESSAGES
-        }
-        style={styles.noContent}
-      />
-    )}
-    {isExploratoryFailure(result.status) && (
-      <NoContentView
-        onActionButtonTapped={onExploreOtherEventsTapped}
-        actionButtonTitle="Explore Other Events"
-        possibleMessages={UNSUCCESSFUL_MESSAGE_SET[result.status]}
-        style={styles.noContent}
-      />
-    )}
-    {result.status === "success" &&
-      children(result as Extract<Result, { status: "success" }>)}
+    <TiFFormScrollableLayoutView
+      footer={<FooterView event={state.event} />}
+      style={styles.details}
+      refreshControl={
+        <RefreshControl
+          onRefresh={state.refresh}
+          refreshing={state.refreshStatus === "pending"}
+        />
+      }
+    >
+      <Title>{state.event.title}</Title>
+      <ArrivalSectionView event={state.event} />
+      <HostSectionView event={state.event} />
+      <TimeSectionView event={state.event} />
+      <LocationSectionView event={state.event} />
+      <DescriptionSectionView event={state.event} />
+    </TiFFormScrollableLayoutView>
   </View>
 )
 
-const isExploratoryFailure = (
-  status: UseLoadEventDetailsResult["status"]
-): status is "not-found" | "cancelled" | "blocked" => {
-  return status !== "success" && status !== "error" && status !== "pending"
+export const EventDetailsView = memo(_EventDetailsView)
+
+type SectionProps = {
+  event: ClientSideEvent
 }
 
-const LoadingTitleView = ({ title }: { title: string }) => {
-  const balls = useDisplayedEventDetailsLoadingBalls(700)
+const ArrivalSectionView = ({ event }: SectionProps) => {
+  const {
+    settings: { canShareArrivalStatus }
+  } = useUserSettings(settingsSelector("canShareArrivalStatus"))
+  const { monitor } = RegionMonitorContext.useContext()
+  const { isShowing, close } = useIsShowingEventArrivalBanner(
+    event.location,
+    monitor
+  )
+  const secondsToStart = useEventSecondsToStart(event.time)
   return (
-    <View
-      accessible
-      accessibilityLabel={title}
-      style={styles.loadingTitleTextContainer}
-    >
-      <View style={styles.loadingTitleSpacer} />
-      <Animated.View layout={TiFDefaultLayoutTransition}>
-        <Subtitle style={styles.loadingTitleText}>{title}</Subtitle>
+    isShowing && (
+      <Animated.View entering={FadeIn} exiting={FadeOut}>
+        <TiFFormSectionView>
+          <EventArrivalBannerView
+            hasJoinedEvent={isAttendingEvent(event.userAttendeeStatus)}
+            canShareArrivalStatus={canShareArrivalStatus}
+            countdown={eventArrivalBannerCountdown(
+              secondsToStart,
+              event.time.todayOrTomorrow ?? null
+            )}
+            onClose={close}
+          />
+        </TiFFormSectionView>
       </Animated.View>
-      {balls.map((isShowing, i) => (
-        <Animated.View
-          layout={TiFDefaultLayoutTransition}
-          key={`loading-ball-${i}`}
-        >
-          {isShowing && (
-            <Animated.View
-              entering={ZoomIn.duration(300)}
-              exiting={ZoomOut.duration(300)}
-            >
-              {/* TODO: - Have each ball be some kind of sports ball. */}
-              <View style={styles.loadingBall} />
-            </Animated.View>
-          )}
-        </Animated.View>
-      ))}
-      <View style={styles.loadingTitleSpacer} />
-    </View>
+    )
   )
 }
 
-/**
- * A hook that determines when to display the loading balls for the
- * event details loading animation.
- */
-export const useDisplayedEventDetailsLoadingBalls = (
-  intervalMillis: number
-) => {
-  const [balls, setBalls] = useState([false, false, false])
-  const indexRef = useRef(0)
-  useAutocorrectingInterval(() => {
-    setBalls((balls) => {
-      if (indexRef.current === balls.length) {
-        indexRef.current = 0
-        return [false, false, false]
-      } else {
-        return balls.with(indexRef.current++, true)
+const TimeSectionView = ({ event }: SectionProps) => (
+  <TiFFormCardSectionView title="Date & Time">
+    <TiFFormNamedIconRowView
+      iconName="calendar"
+      iconBackgroundColor={AppStyles.primary}
+      name={event.time.dateRange.ext.formatted()}
+    />
+  </TiFFormCardSectionView>
+)
+
+const HostSectionView = ({ event }: SectionProps) => (
+  <TiFFormSectionView title="Host">
+    <EventAttendeeCardView
+      attendee={event.host}
+      onRelationStatusChanged={() =>
+        console.log("TODO: Sean Organize Query Cache")
       }
-    })
-  }, intervalMillis)
-  return balls
+    />
+  </TiFFormSectionView>
+)
+
+const DescriptionSectionView = ({ event }: SectionProps) => (
+  <TiFFormSectionView title="About">
+    <BodyText>
+      {!!event.description && event.description.length > 0
+        ? event.description
+        : "No Description"}
+    </BodyText>
+  </TiFFormSectionView>
+)
+
+const LocationSectionView = ({ event }: SectionProps) => (
+  <TiFFormSectionView title="Location">
+    <TiFFormCardView>
+      <TiFFormNamedIconRowView
+        iconName="location"
+        iconBackgroundColor={AppStyles.primary}
+        name={event.location.placemark?.name ?? "Unknown Location"}
+        description={
+          event.location.placemark
+            ? (placemarkToFormattedAddress(event.location.placemark) ??
+              "Unknown Address")
+            : "Unknown Address"
+        }
+      />
+    </TiFFormCardView>
+    <EventTravelEstimatesView
+      host={event.host}
+      location={event.location}
+      result={useEventTravelEstimates(event.location.coordinate)}
+    />
+  </TiFFormSectionView>
+)
+
+type FooterProps = {
+  event: ClientSideEvent
 }
 
-const loadingMessage = (message: string) => ({
-  title: "Locating",
-  message
-})
-
-const LOADING_MESSAGES = [
-  loadingMessage("Hang tight."),
-  loadingMessage("Stay put."),
-  loadingMessage("Hang on a sec."),
-  loadingMessage("Bear with us."),
-  loadingMessage("Just a moment.")
-]
-
-const UNSUCCESSFUL_MESSAGE_SET = {
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  "not-found": [
-    {
-      title: "Yikes!",
-      message: "Event not found. Tap here to explore other events in the area."
-    },
-    {
-      title: "Oh no!",
-      message:
-        "We couldn’t find this event. Tap here to explore other events in the area."
-    },
-    {
-      title: "Oh my!",
-      message:
-        "This event could not be located. Tap here to explore other events in the area."
-    },
-    {
-      title: "Oh no!",
-      message:
-        "Unable to locate this event. Tap here to explore other events in the area."
-    },
-    {
-      title: "Yikes!",
-      message:
-        "This event is unavailable. Tap here to explore other events in the area."
-    }
-  ],
-  cancelled: [
-    {
-      title: "Bummer!",
-      message:
-        "This event was canceled. Tap here to explore other events in the area."
-    },
-    {
-      title: "Bummer!",
-      message:
-        "This event is no longer taking place. Tap here to explore other events in the area."
-    },
-    {
-      title: "Sorry!",
-      message:
-        "This event has been canceled. Tap here to explore other events in the area."
-    },
-    {
-      title: "Sorry!",
-      message:
-        "This event is no longer happening. Tap here to explore other events in the area."
-    }
-  ],
-  blocked: [
-    {
-      title: "Uh oh!",
-      message:
-        "You don’t have access to this event. Tap here to explore other events in the area."
-    },
-    {
-      title: "Sorry!",
-      message:
-        "You are restricted from this event. Tap here to explore other events in the area."
-    },
-    {
-      title: "Sorry!",
-      message:
-        "You are not permitted to attend this event. Tap here to explore other events in the area."
-    },
-    {
-      title: "Oh no!",
-      message:
-        "Admission to this event is restricted. Tap here to explore other events in the area."
-    },
-    {
-      title: "Uh oh!",
-      message:
-        "You are not eligible to attend this event. Tap here to explore other events in the area."
-    }
-  ],
-  ended: [
-    {
-      title: "That’s a wrap!",
-      message: "This event has ended. Tap here to plan your next adventure."
-    },
-    {
-      title: "All done!",
-      message: "This event has concluded. Tap here to plan your next adventure."
-    },
-    {
-      title: "All done!",
-      message:
-        "This event has come to an end. Tap here to plan your next adventure."
-    },
-    {
-      title: "That’s a wrap!",
-      message: "This event is over. Tap here to plan your next adventure."
-    },
-    {
-      title: "That’s a wrap!",
-      message: "This event is complete. Tap here to plan your next adventure."
-    }
-  ]
-}
-
-const GENERIC_ERROR_MESSAGES = [
-  {
-    title: "Uh-oh!",
-    message: "Something went wrong. Please try again."
-  },
-  {
-    title: "Uh-oh!",
-    message: "We ran into an issue. Please try again."
-  },
-  {
-    title: "Oh no!",
-    message: "An error has occurred. Please try again."
-  },
-  {
-    title: "Oh no!",
-    message: "This action has failed. Please try again."
-  },
-  {
-    title: "Whoops!",
-    message: "There was a problem. Please try again."
-  }
-]
-
-const INTERNET_ERROR_MESSAGES = [
-  {
-    title: "Whoops!",
-    message:
-      "Poor network connection. Check your internet connection and try again."
-  },
-  {
-    title: "Oh no!",
-    message:
-      "Unstable network detected. Check your internet connection and try again."
-  },
-  {
-    title: "Uh-oh!",
-    message:
-      "Network issues detected. Check your internet connection and try again."
-  },
-  {
-    title: "Oh no!",
-    message:
-      "Network connection is unstable. Check your internet connection and try again."
-  },
-  {
-    title: "Uh oh!",
-    message:
-      "Weak signal detected. Check your internet connection and try again."
-  }
-]
-
-type NoContentProps = {
-  style?: StyleProp<ViewStyle>
-  renderTitle?: (title: string) => JSX.Element
-  possibleMessages: {
-    title: string
-    message: string
-  }[]
-  actionButtonTitle?: string
-  onActionButtonTapped?: () => void
-}
-
-export const NoContentView = ({
-  style,
-  renderTitle,
-  possibleMessages,
-  actionButtonTitle,
-  onActionButtonTapped
-}: NoContentProps) => {
-  const { title, message } = useConst(possibleMessages.ext.randomElement())
-  return (
-    <View style={style}>
-      <View style={styles.noContentContainer}>
-        <View style={styles.noContentPlaceholderIllustration} />
-        {renderTitle ? (
-          renderTitle(title)
-        ) : (
-          <Subtitle style={styles.noContentTitleText}>{title}</Subtitle>
-        )}
-        <BodyText style={styles.noContentMessageText}>{message}</BodyText>
-        {onActionButtonTapped && actionButtonTitle && (
-          <PrimaryButton
-            style={styles.noContentErrorActionButton}
-            onPress={onActionButtonTapped}
-          >
-            {actionButtonTitle}
-          </PrimaryButton>
-        )}
-      </View>
+const FooterView = ({ event }: FooterProps) => (
+  <TiFFooterView>
+    <View style={styles.footer}>
+      <CountdownView time={event.time} />
+      <EventUserAttendanceButton
+        event={event}
+        onJoinSuccess={() => console.log("TODO: Sean Organize Query Cache")}
+        onLeaveSuccess={() => console.log("TODO: Sean Oragnize Query Cache")}
+        style={styles.attendanceButton}
+      />
     </View>
+  </TiFFooterView>
+)
+
+type CountdownProps = {
+  time: ClientSideEventTime
+}
+
+const CountdownView = ({ time }: CountdownProps) => {
+  const secondsToStart = useEventSecondsToStart(time)
+  const countdown = eventCountdown(
+    secondsToStart,
+    time.dateRange,
+    time.todayOrTomorrow ?? null
   )
+  return <EventCountdownView countdown={countdown} />
 }
 
 const styles = StyleSheet.create({
-  noContent: {
-    width: "100%",
-    height: "100%",
-    alignItems: "center",
-    justifyContent: "center"
+  details: {
+    height: "100%"
   },
-  noContentContainer: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    marginHorizontal: 24
+  attendanceButton: {
+    alignSelf: "flex-end"
   },
-  noContentPlaceholderIllustration: {
-    backgroundColor: "red",
-    width: 200,
-    height: 200
-  },
-  noContentTitleText: {
-    marginVertical: 8,
-    textAlign: "center"
-  },
-  noContentMessageText: {
-    opacity: 0.5,
-    textAlign: "center"
-  },
-  noContentErrorActionButton: {
-    marginTop: 16
-  },
-  loadingTitleTextContainer: {
-    width: "100%",
+  footer: {
     display: "flex",
     flexDirection: "row",
-    alignItems: "flex-end",
-    justifyContent: "center",
-    marginVertical: 8
-  },
-  loadingTitleSpacer: {
-    flex: 1
-  },
-  loadingTitleText: {
-    marginHorizontal: 6
-  },
-  loadingBall: {
-    width: 12,
-    height: 12,
-    borderRadius: 32,
-    marginHorizontal: 2,
-    marginBottom: 2,
-    backgroundColor: AppStyles.primaryColor
+    justifyContent: "space-between"
   }
 })

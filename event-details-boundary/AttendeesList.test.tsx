@@ -5,7 +5,7 @@ import { EventID } from "TiFShared/domain-models/Event"
 import { InternetConnectionStatusProvider } from "@lib/InternetConnection"
 import { TestInternetConnectionStatus } from "@test-helpers/InternetConnectionStatus"
 import { EventMocks } from "./MockData"
-import { EventDetailsFeature } from "./Details"
+import { EventDetailsFeature } from "@event/DetailsQuery"
 
 describe("EventAttendeesList tests", () => {
   describe("UseEventAttendeesList tests", () => {
