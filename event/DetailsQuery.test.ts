@@ -1,15 +1,16 @@
+import { EventMocks } from "@event-details-boundary/MockData"
+import { renderUseLoadEventDetails } from "@event-details-boundary/TestHelpers"
 import { uuidString } from "@lib/utils/UUID"
 import { TestInternetConnectionStatus } from "@test-helpers/InternetConnectionStatus"
 import { fakeTimers } from "@test-helpers/Timers"
-import { act, renderHook, waitFor } from "@testing-library/react-native"
 import { TiFAPI } from "TiFShared/api"
 import { ColorString } from "TiFShared/domain-models/ColorString"
 import { EventID, EventWhenBlockedByHost } from "TiFShared/domain-models/Event"
 import { UserHandle } from "TiFShared/domain-models/User"
 import { mockTiFEndpoint } from "TiFShared/test-helpers/mockAPIServer"
-import { eventDetails, useDisplayedEventDetailsLoadingBalls } from "./Details"
-import { EventMocks } from "./MockData"
-import { renderUseLoadEventDetails } from "./TestHelpers"
+import { act } from "react-test-renderer"
+import { eventDetails } from "./DetailsQuery"
+import { waitFor } from "@testing-library/react-native"
 
 describe("EventDetailsLoading tests", () => {
   beforeEach(() => {
@@ -242,36 +243,5 @@ describe("EventDetailsLoading tests", () => {
         }
       })
     })
-  })
-
-  describe("UseDisplayedEventDetailsLoadingBalls tests", () => {
-    fakeTimers()
-
-    test("appearance cycle", async () => {
-      const { result } = renderUseDisplayedEventDetailsLoadingBalls()
-      const assert = async (one: boolean, two: boolean, three: boolean) => {
-        await waitFor(() => expect(result.current).toEqual([one, two, three]))
-      }
-
-      await assert(false, false, false)
-      act(() => jest.advanceTimersByTime(100))
-      await assert(false, false, false)
-      act(() => jest.advanceTimersByTime(400))
-      await assert(true, false, false)
-      act(() => jest.advanceTimersByTime(500))
-      await assert(true, true, false)
-      act(() => jest.advanceTimersByTime(500))
-      await assert(true, true, true)
-      act(() => jest.advanceTimersByTime(500))
-      await assert(false, false, false)
-      act(() => jest.advanceTimersByTime(500))
-      await assert(true, false, false)
-    })
-
-    const renderUseDisplayedEventDetailsLoadingBalls = () => {
-      return renderHook(useDisplayedEventDetailsLoadingBalls, {
-        initialProps: 500
-      })
-    }
   })
 })
