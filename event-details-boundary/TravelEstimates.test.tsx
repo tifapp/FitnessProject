@@ -1,7 +1,7 @@
 import { EXPO_LOCATION_ERRORS } from "@location/Expo"
 import {
-    mockExpoLocationObject,
-    mockLocationCoordinate2D
+  mockExpoLocationObject,
+  mockLocationCoordinate2D
 } from "@location/MockData"
 import { UserLocationFunctionsProvider } from "@location/UserLocation"
 import { setPlatform } from "@test-helpers/Platform"
@@ -11,8 +11,9 @@ import { CodedError } from "expo-modules-core"
 import { LocationCoordinate2D } from "TiFShared/domain-models/LocationCoordinate2D"
 import { dayjs } from "TiFShared/lib/Dayjs"
 import {
-    formattedTravelEstimateResult,
-    useEventTravelEstimates
+  EventTravelEstimatesFeature,
+  formattedTravelEstimateResult,
+  useEventTravelEstimates
 } from "./TravelEstimates"
 
 describe("EventTravelEstimates tests", () => {
@@ -38,18 +39,17 @@ describe("EventTravelEstimates tests", () => {
     const renderUseEventTravelEstimates = (
       coordinate: LocationCoordinate2D
     ) => {
-      return renderHook(
-        () => useEventTravelEstimates(coordinate, loadTravelEstimates),
-        {
-          wrapper: ({ children }) => (
-            <UserLocationFunctionsProvider
-              getCurrentLocation={loadUserLocation}
+      return renderHook(() => useEventTravelEstimates(coordinate), {
+        wrapper: ({ children }) => (
+          <UserLocationFunctionsProvider getCurrentLocation={loadUserLocation}>
+            <EventTravelEstimatesFeature.Provider
+              eventTravelEstimates={loadTravelEstimates}
             >
               <TestQueryClientProvider>{children}</TestQueryClientProvider>
-            </UserLocationFunctionsProvider>
-          )
-        }
-      )
+            </EventTravelEstimatesFeature.Provider>
+          </UserLocationFunctionsProvider>
+        )
+      })
     }
 
     afterEach(() => setPlatform("ios"))

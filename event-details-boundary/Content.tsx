@@ -10,7 +10,7 @@ import { TiFDefaultLayoutTransition } from "@lib/Reanimated"
 import { useConst } from "@lib/utils/UseConst"
 import Animated, { ZoomIn, ZoomOut } from "react-native-reanimated"
 
-export type EventDetailsProps<
+export type EventDetailsContentProps<
   Result extends UseLoadEventDetailsResult = UseLoadEventDetailsResult
 > = {
   result: Result
@@ -29,7 +29,7 @@ export const EventDetailsContentView = <
   onExploreOtherEventsTapped,
   children,
   style
-}: EventDetailsProps<Result>) => (
+}: EventDetailsContentProps<Result>) => (
   <View style={style}>
     {result.status === "pending" && (
       <NoContentView

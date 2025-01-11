@@ -157,7 +157,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     borderRadius: 12,
-    backgroundColor: AppStyles.cardColor
+    backgroundColor: "white"
   },
   countdownText: {
     paddingHorizontal: 16,

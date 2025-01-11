@@ -92,15 +92,16 @@ export const EventAttendeesListView = ({
           keyExtractor={(a) => a.id}
           data={state.attendees}
           renderItem={({ item }) => (
-            <AttendeeItemView
+            <EventAttendeeCardView
               attendee={item}
+              style={styles.attendeeListItemContainer}
               onRelationStatusChanged={state.relationStatusChanged}
             />
           )}
           ListHeaderComponent={
             <View style={styles.headerSections}>
               <TiFFormSectionView title="Host">
-                <AttendeeView
+                <EventAttendeeView
                   attendee={state.host}
                   onRelationStatusChanged={state.relationStatusChanged}
                   size="large"
@@ -142,29 +143,40 @@ const NO_ATTENDEES_MESSAGES = [
   }
 ]
 
-type AttendeeProps = {
-  attendee: EventAttendee
+export type EventAttendeeProps = {
+  attendee: Pick<
+    EventAttendee,
+    | "name"
+    | "handle"
+    | "id"
+    | "arrivedDateTime"
+    | "relationStatus"
+    | "profileImageURL"
+  >
   size?: "normal" | "large"
   onRelationStatusChanged: (
     id: UserID,
     status: UnblockedUserRelationsStatus
   ) => void
+  style?: StyleProp<ViewStyle>
 }
 
-const AttendeeItemView = memo(function AttendeeItemView(props: AttendeeProps) {
+export const EventAttendeeCardView = memo(function AttendeeItemView(
+  props: EventAttendeeProps
+) {
   return (
-    <TiFFormCardView style={styles.attendeeListItemContainer}>
-      <AttendeeView {...props} style={styles.atendeeCardContainer} />
+    <TiFFormCardView style={props.style}>
+      <EventAttendeeView {...props} style={styles.atendeeCardContainer} />
     </TiFFormCardView>
   )
 })
 
-const AttendeeView = ({
+export const EventAttendeeView = ({
   attendee,
   onRelationStatusChanged,
   size = "normal",
   style
-}: AttendeeProps & { style?: StyleProp<ViewStyle> }) => {
+}: EventAttendeeProps) => {
   const state = useFriendRequest({
     user: attendee,
     onSuccess: (status) => onRelationStatusChanged(attendee.id, status)
