@@ -137,12 +137,16 @@ const DurationsRowView = ({
           maxFontSizeMultiplier={FontScaleFactors.large}
           style={styles.presetText}
         >
-          {formatEventDurationPreset(duration)}
+          {formatDuration(duration)}
         </BodyText>
       </Pressable>
     ))}
   </View>
 )
+
+const formatDuration = (duration: number) => {
+  return formatEventDurationPreset(duration).replace(" ", "\n")
+}
 
 type SliderKnobProps = {
   durationAtom: PrimitiveAtom<number>
@@ -240,7 +244,7 @@ const SliderKnobView = ({
             style={[styles.selectedText, { width: selectedDimensions?.width }]}
             maxFontSizeMultiplier={FontScaleFactors.large}
           >
-            {formatEventDurationPreset(duration)}
+            {formatDuration(duration)}
           </Headline>
         </View>
       </Animated.View>

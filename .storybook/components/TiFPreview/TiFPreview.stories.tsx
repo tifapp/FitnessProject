@@ -30,6 +30,9 @@ const localSettings = PersistentSettingsStores.local(
 const userSettings = PersistentSettingsStores.user(
   new SQLiteUserSettingsStorage(testSQLite)
 )
+userSettings.update({
+  eventPresetDurations: [3900, 7500, 8400, 12300, 9500, 13700]
+})
 
 export const Basic = () => (
   <SettingsProvider
