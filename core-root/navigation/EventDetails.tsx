@@ -1,9 +1,11 @@
 import { ChevronBackButton, XMarkBackButton } from "@components/Navigation"
-import { Headline } from "@components/Text"
 import {
   EventAttendeesListView,
   useEventAttendeesList
 } from "@event-details-boundary/AttendeesList"
+import { EventDetailsContentView } from "@event-details-boundary/Content"
+import { EventDetailsView } from "@event-details-boundary/Details"
+import { useLoadEventDetails } from "@event/DetailsQuery"
 import { StaticScreenProps, useNavigation } from "@react-navigation/native"
 import { EventID } from "TiFShared/domain-models/Event"
 
@@ -42,6 +44,14 @@ type EventDetailsScreenProps = StaticScreenProps<{
   method?: "navigate" | "replace"
 }>
 
-const EventDetailsScreen = (_: EventDetailsScreenProps) => {
-  return <Headline>TODO: I am the event details</Headline>
+const EventDetailsScreen = ({ route }: EventDetailsScreenProps) => {
+  const navigation = useNavigation()
+  return (
+    <EventDetailsContentView
+      result={useLoadEventDetails(route.params.id)}
+      onExploreOtherEventsTapped={() => navigation.navigate("home")}
+    >
+      {(state) => <EventDetailsView state={state} />}
+    </EventDetailsContentView>
+  )
 }

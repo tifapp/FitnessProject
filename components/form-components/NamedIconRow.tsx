@@ -9,7 +9,7 @@ export type TiFFormNamedIconRowProps = {
   name: string
   maximumFontScaleFactor?: number
   description?: string
-  children: JSX.Element
+  children?: JSX.Element
   style?: StyleProp<ViewStyle>
 }
 
