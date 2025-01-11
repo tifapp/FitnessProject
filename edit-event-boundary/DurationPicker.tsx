@@ -93,7 +93,7 @@ const BackgroundTrailView = ({
     style={[
       styles.backgroundTrail,
       useAnimatedStyle(() => ({
-        width: sliderPosition.value + INNER_TRACK_GAP * 3,
+        width: sliderPosition.value + INNER_TRACK_GAP * 5,
         height: withTiFDefaultSpring(
           height - (isSliding.value ? 0 : INNER_TRACK_GAP * 2)
         ) as number,
@@ -101,10 +101,10 @@ const BackgroundTrailView = ({
         marginLeft: withTiFDefaultSpring(
           !isSliding.value ? INNER_TRACK_GAP : 0
         ),
-        borderBottomLeftRadius: withTiFDefaultSpring(
-          isSliding.value ? INNER_TRACK_GAP * 2 : INNER_TRACK_GAP
-        ),
-        borderTopLeftRadius: withTiFDefaultSpring(
+        // NB: borderBottomLeftRadius and borderTopLeftRadius cause the track to flicker on iOS
+        // when the user long presses the knob, so we can achieve the same effect by using a full
+        // border radius + longer track width combo.
+        borderRadius: withTiFDefaultSpring(
           isSliding.value ? INNER_TRACK_GAP * 2 : INNER_TRACK_GAP
         )
       }))
