@@ -82,4 +82,4 @@ jobs:
           echo "API_URL=${{ secrets.API_ENDPOINT }}" >> .env
 
       - name: Trigger Build on EAS
-        run: eas build --profile preview --platform android --non-interactive --no-wait
+        run: eas build --profile preview --platform all --non-interactive --no-wait

@@ -11,6 +11,7 @@ on:
     branches:
       - master
       - development
+  workflow_dispatch:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -25,7 +26,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Cache node modules
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: node_modules
           key: ${{ runner.os }}-node-${{ env.NODE_VERSION }}-${{ hashFiles('**/package-lock.json') }}
@@ -59,7 +60,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Cache node modules
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: node_modules
           key: ${{ runner.os }}-node-${{ env.NODE_VERSION }}-${{ hashFiles('**/package-lock.json') }}
@@ -84,7 +85,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Cache node modules
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: node_modules
           key: ${{ runner.os }}-node-${{ env.NODE_VERSION }}-${{ hashFiles('**/package-lock.json') }}
@@ -96,3 +97,70 @@ jobs:
 
       - name: Bundle project
         run: npx expo export --platform ios --platform android
+
+  wait-for-review:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.actor != 'roswaaltifbot' && !startsWith(github.event.pull_request.title, 'IGNORE_BUILD')
+    environment:
+      name: eas-build
+      url: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+    steps:
+      - name: Waiting for review
+        run: echo "Waiting for environment review"
+
+  eas-build:
+    if: github.actor != 'roswaaltifbot' && !startsWith(github.event.pull_request.title, 'IGNORE_BUILD')
+    needs: wait-for-review
+    name: Perform EAS Build
+    runs-on: ubuntu-latest
+    env:
+      EXPO_PROJECT_ID: ${{ secrets.EXPO_PROJECT_ID }}
+      EXPO_PROJECT_OWNER: ${{ secrets.EXPO_PROJECT_OWNER }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Cache node modules
+        uses: actions/cache@v3
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ env.NODE_VERSION }}-${{ hashFiles('**/package-lock.json') }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "20.0.0"
+
+      - name: Install Dependencies
+        run: |
+          if [ ! -d "node_modules" ]; then
+            echo "Cache not found, running npm ci."
+            npm ci
+          else
+            echo "Cache restored, skipping npm ci."
+          fi
+
+      - name: Setup Expo and EAS
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_ACCESS_TOKEN }}
+
+      - name: Construct .env
+        run: |
+          echo "MAPS_API_KEY=${{ secrets.MAPS_API_KEY }}" >> .env.infra
+          echo "CHECK_RUN_ID=${{ github.run_id }}" >> .env.infra
+          echo "GITHUB_SHA=${{ github.sha }}" >> .env.infra
+          echo "GITHUB_REPOSITORY=${{ github.repository }}" >> .env.infra
+          echo "RUN_EAS_BUILD_HOOKS=1" >> .env.infra
+          echo "EXPO_PROJECT_ID=${{ secrets.EXPO_PROJECT_ID }}" >> .env.infra
+          echo "EXPO_PROJECT_OWNER=${{ secrets.EXPO_PROJECT_OWNER }}" >> .env.infra
+          echo "SENTRY_DSN=${{ secrets.SENTRY_DSN }}" >> .env
+          echo "MIXPANEL_TOKEN=${{ secrets.MIXPANEL_TOKEN }}" >> .env
+          echo "API_URL=${{ secrets.API_ENDPOINT }}" >> .env
+
+      - name: Trigger Build on EAS
+        run: eas build --profile development --platform all --non-interactive --no-wait
