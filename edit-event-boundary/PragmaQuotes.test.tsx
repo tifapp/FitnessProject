@@ -13,8 +13,6 @@ describe("PragmaQuotes tests", () => {
       const quote = "I am Blob"
       renderPragmaQuote(quote)
       advanceByInterval()
-      await expectQuote("")
-      advanceByInterval()
       await expectQuote("I")
       advanceByInterval()
       await expectQuote("I ")

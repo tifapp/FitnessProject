@@ -13,12 +13,11 @@ export type PragmaQuoteProps = {
   style?: StyleProp<ViewStyle>
 }
 
-export const PragmaQuoteView = ({
-  quote,
-  animationInterval,
-  initialDelay = 300,
-  style
-}: PragmaQuoteProps) => {
+const usePragmaQuote = (
+  quote: () => string,
+  intervalMillis: number,
+  initialDelay: number
+) => {
   const [text, setText] = useState<string | undefined>()
   useEffect(() => {
     const quoteText = quote()
@@ -29,13 +28,23 @@ export const PragmaQuoteView = ({
         const nextText = quoteText.substring(0, index++)
         setText(nextText)
         if (index > quoteText.length) clearInterval(interval)
-      }, animationInterval)
+      }, intervalMillis)
     }, initialDelay)
     return () => {
       clearTimeout(timeout)
       clearInterval(interval)
     }
-  }, [quote, animationInterval, initialDelay])
+  }, [quote, intervalMillis, initialDelay])
+  return text
+}
+
+export const PragmaQuoteView = ({
+  quote,
+  animationInterval,
+  initialDelay = 300,
+  style
+}: PragmaQuoteProps) => {
+  const text = usePragmaQuote(quote, animationInterval, initialDelay)
   return (
     <View style={style}>
       <View style={styles.row}>
