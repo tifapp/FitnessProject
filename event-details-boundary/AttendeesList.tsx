@@ -3,8 +3,8 @@ import { TiFFormSectionView } from "@components/form-components/Section"
 import ProfileImageAndName from "@components/profileImageComponents/ProfileImageAndName"
 import { CaptionTitle, Headline } from "@components/Text"
 import {
-  EventDetailsLoadingResult,
-  updateEventDetailsQueryEvent
+  updateEventDetailsQueryEvent,
+  useLoadEventDetails
 } from "@event/DetailsQuery"
 import { AppStyles } from "@lib/AppColorStyle"
 import { useQueryClient } from "@tanstack/react-query"
@@ -33,7 +33,7 @@ import {
   UnblockedUserRelationsStatus,
   UserID
 } from "TiFShared/domain-models/User"
-import { EventDetailsView, NoContentView, useLoadEventDetails } from "./Details"
+import { EventDetailsView, NoContentView } from "./Details"
 
 export type UseEventAttendeesListEnvironment = {
   eventId: EventID
