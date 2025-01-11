@@ -4,7 +4,7 @@ import { FontScaleFactors, useFontScale } from "@lib/Fonts"
 import { withTiFDefaultSpring } from "@lib/Reanimated"
 import { useEffectEvent } from "@lib/utils/UseEffectEvent"
 import { PrimitiveAtom, useAtom, useSetAtom } from "jotai"
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import {
   StyleProp,
   StyleSheet,
@@ -168,10 +168,19 @@ const SliderKnobView = ({
     }
   })
   const previousTranslation = useSharedValue(0)
-  useEffect(
-    () => animateToPosition(selectedDimensions),
-    [selectedDimensions, animateToPosition]
-  )
+  const didAppear = useRef(false)
+  useEffect(() => {
+    let timeout: NodeJS.Timeout
+    if (!didAppear.current) {
+      timeout = setTimeout(() => {
+        animateToPosition(selectedDimensions)
+      }, 300)
+      didAppear.current = true
+    } else {
+      animateToPosition(selectedDimensions)
+    }
+    return () => clearTimeout(timeout)
+  }, [selectedDimensions, animateToPosition])
   const panGestureEndBound = endBound(pickerState)
   const panGesture = Gesture.Pan()
     .onUpdate((event) => {
