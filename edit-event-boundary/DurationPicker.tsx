@@ -4,7 +4,7 @@ import { FontScaleFactors, useFontScale } from "@lib/Fonts"
 import { withTiFDefaultSpring } from "@lib/Reanimated"
 import { useEffectEvent } from "@lib/utils/UseEffectEvent"
 import { PrimitiveAtom, useAtom, useSetAtom } from "jotai"
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import {
   StyleProp,
   StyleSheet,
@@ -93,7 +93,7 @@ const BackgroundTrailView = ({
     style={[
       styles.backgroundTrail,
       useAnimatedStyle(() => ({
-        width: sliderPosition.value + INNER_TRACK_GAP * 3,
+        width: sliderPosition.value + INNER_TRACK_GAP * 5,
         height: withTiFDefaultSpring(
           height - (isSliding.value ? 0 : INNER_TRACK_GAP * 2)
         ) as number,
@@ -101,10 +101,10 @@ const BackgroundTrailView = ({
         marginLeft: withTiFDefaultSpring(
           !isSliding.value ? INNER_TRACK_GAP : 0
         ),
-        borderBottomLeftRadius: withTiFDefaultSpring(
-          isSliding.value ? INNER_TRACK_GAP * 2 : INNER_TRACK_GAP
-        ),
-        borderTopLeftRadius: withTiFDefaultSpring(
+        // NB: borderBottomLeftRadius and borderTopLeftRadius cause the track to flicker on iOS
+        // when the user long presses the knob, so we can achieve the same effect by using a full
+        // border radius + longer track width combo.
+        borderRadius: withTiFDefaultSpring(
           isSliding.value ? INNER_TRACK_GAP * 2 : INNER_TRACK_GAP
         )
       }))
@@ -137,12 +137,16 @@ const DurationsRowView = ({
           maxFontSizeMultiplier={FontScaleFactors.large}
           style={styles.presetText}
         >
-          {formatEventDurationPreset(duration)}
+          {formatDuration(duration)}
         </BodyText>
       </Pressable>
     ))}
   </View>
 )
+
+const formatDuration = (duration: number) => {
+  return formatEventDurationPreset(duration).replace(" ", "\n")
+}
 
 type SliderKnobProps = {
   durationAtom: PrimitiveAtom<number>
@@ -168,10 +172,19 @@ const SliderKnobView = ({
     }
   })
   const previousTranslation = useSharedValue(0)
-  useEffect(
-    () => animateToPosition(selectedDimensions),
-    [selectedDimensions, animateToPosition]
-  )
+  const didAppear = useRef(false)
+  useEffect(() => {
+    let timeout: NodeJS.Timeout
+    if (!didAppear.current) {
+      timeout = setTimeout(() => {
+        animateToPosition(selectedDimensions)
+      }, 300)
+      didAppear.current = true
+    } else {
+      animateToPosition(selectedDimensions)
+    }
+    return () => clearTimeout(timeout)
+  }, [selectedDimensions, animateToPosition])
   const panGestureEndBound = endBound(pickerState)
   const panGesture = Gesture.Pan()
     .onUpdate((event) => {
@@ -231,7 +244,7 @@ const SliderKnobView = ({
             style={[styles.selectedText, { width: selectedDimensions?.width }]}
             maxFontSizeMultiplier={FontScaleFactors.large}
           >
-            {formatEventDurationPreset(duration)}
+            {formatDuration(duration)}
           </Headline>
         </View>
       </Animated.View>
