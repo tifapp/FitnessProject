@@ -33,7 +33,7 @@ import {
   UnblockedUserRelationsStatus,
   UserID
 } from "TiFShared/domain-models/User"
-import { EventDetailsView, NoContentView } from "./Details"
+import { EventDetailsContentView, NoContentView } from "./Content"
 
 export type UseEventAttendeesListEnvironment = {
   eventId: EventID
@@ -82,7 +82,7 @@ export const EventAttendeesListView = ({
   style
 }: EventAttendeesListProps) => (
   <View style={style}>
-    <EventDetailsView
+    <EventDetailsContentView
       result={state}
       onExploreOtherEventsTapped={onExploreOtherEventsTapped}
       style={styles.list}
@@ -123,7 +123,7 @@ export const EventAttendeesListView = ({
           }
         />
       )}
-    </EventDetailsView>
+    </EventDetailsContentView>
   </View>
 )
 

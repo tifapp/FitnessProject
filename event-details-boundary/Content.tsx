@@ -22,7 +22,7 @@ export type EventDetailsProps<
 /**
  * The main event details view.
  */
-export const EventDetailsView = <
+export const EventDetailsContentView = <
   Result extends UseLoadEventDetailsResult = UseLoadEventDetailsResult
 >({
   result,
