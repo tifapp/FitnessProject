@@ -56,9 +56,9 @@ export const minRegionMeterRadius = (region: ExploreEventsRegion) => {
     region,
     {
       latitude:
-        region.latitude + (isMinLatitude ? region.latitudeDelta / 2 : 0),
+        region.latitude + (isMinLatitude ? 0 : region.latitudeDelta / 2),
       longitude:
-        region.longitude + (!isMinLatitude ? region.longitudeDelta / 2 : 0)
+        region.longitude + (isMinLatitude ? region.longitudeDelta / 2 : 0)
     },
     "meters"
   )
