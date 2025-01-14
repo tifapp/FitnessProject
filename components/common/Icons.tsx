@@ -1,19 +1,15 @@
-import {
-  Ionicons,
-  MaterialCommunityIcons,
-  MaterialIcons
-} from "@expo/vector-icons"
+import { Ionicons } from "@expo/vector-icons"
+import { AppStyles } from "@lib/AppColorStyle"
 import { useFontScale } from "@lib/Fonts"
 import React, { ComponentProps } from "react"
 import {
   StyleProp,
   StyleSheet,
-  TouchableOpacityProps,
   TouchableOpacity,
+  TouchableOpacityProps,
+  View,
   ViewProps,
-  ViewStyle,
-  Platform,
-  View
+  ViewStyle
 } from "react-native"
 
 /**
@@ -27,51 +23,7 @@ export type IconProps<IconName extends string> = {
   color?: string
 } & ViewProps
 
-export type MaterialIconName = ComponentProps<typeof MaterialIcons>["name"]
-
-/**
- * A Material icon component that automatically adjusts with the user's font settings.
- */
-export const MaterialIcon = ({
-  name,
-  size = 24,
-  style,
-  color,
-  maximumFontScaleFactor,
-  ...props
-}: IconProps<MaterialIconName>) => (
-  <MaterialIcons
-    name={name}
-    size={size * useFontScale({ maximumScaleFactor: maximumFontScaleFactor })}
-    color={color}
-    style={style}
-    {...props}
-  />
-)
-
-export type MaterialCommunityIconName = ComponentProps<
-  typeof MaterialCommunityIcons
->["name"]
-
-/**
- * A Material Community icon component that automatically adjusts with the user's font settings.
- */
-export const MaterialCommunityIcon = ({
-  name,
-  size = 24,
-  style,
-  color,
-  maximumFontScaleFactor,
-  ...props
-}: IconProps<MaterialCommunityIconName>) => (
-  <MaterialCommunityIcons
-    name={name}
-    size={size * useFontScale({ maximumScaleFactor: maximumFontScaleFactor })}
-    color={color}
-    style={style}
-    {...props}
-  />
-)
+export const DEFAULT_ICON_SIZE = 24
 
 export type IoniconName = ComponentProps<typeof Ionicons>["name"]
 
@@ -80,7 +32,7 @@ export type IoniconName = ComponentProps<typeof Ionicons>["name"]
  */
 export const Ionicon = ({
   name,
-  size = 24,
+  size = DEFAULT_ICON_SIZE,
   style,
   color,
   maximumFontScaleFactor,
@@ -90,7 +42,13 @@ export const Ionicon = ({
     name={name}
     size={size * useFontScale({ maximumScaleFactor: maximumFontScaleFactor })}
     color={color}
-    style={style}
+    style={[
+      style,
+      {
+        height:
+          size * useFontScale({ maximumScaleFactor: maximumFontScaleFactor })
+      }
+    ]}
     {...props}
   />
 )
@@ -102,10 +60,22 @@ export type IoniconButtonProps = {
 /**
  * An ionicon with no background that behaves like {@link TouchableOpacity}.
  */
-export const TouchableIonicon = ({ icon, ...props }: IoniconButtonProps) => (
+export const TouchableIonicon = ({
+  icon,
+  style,
+  ...props
+}: IoniconButtonProps) => (
   <TouchableOpacity
     {...props}
     hitSlop={{ left: 16, right: 16, top: 16, bottom: 16 }}
+    style={[
+      style,
+      {
+        height:
+          (icon.size ?? DEFAULT_ICON_SIZE) *
+          useFontScale({ maximumScaleFactor: icon.maximumFontScaleFactor })
+      }
+    ]}
   >
     <Ionicon {...icon} />
   </TouchableOpacity>
@@ -115,38 +85,169 @@ export type CircularIoniconProps = {
   backgroundColor: string
   name: IoniconName
   style?: StyleProp<ViewStyle>
-} & IconProps<IoniconName>
+  size?: number
+} & Omit<IconProps<IoniconName>, "size">
 
 /**
  * An ionicon with a circular colored background.
  */
 export const CircularIonicon = ({
   backgroundColor,
+  maximumFontScaleFactor,
   name,
   style,
+  size = DEFAULT_ICON_SIZE,
   ...props
-}: CircularIoniconProps) => {
-  const borderStyle = { backgroundColor, borderRadius: 32 }
-  // NB: iOS needs to put the border in a container view in order to get the border radius, but this
-  // breaks android which we apply the border style directly to the icon on android...
-  return (
-    <View style={[style, Platform.OS === "ios" ? borderStyle : undefined]}>
+}: CircularIoniconProps) => (
+  <View style={style}>
+    <View style={circularStyles.iconContainer}>
+      <View
+        style={[
+          circularStyles.iconBackground,
+          {
+            backgroundColor,
+            width:
+              size *
+              useFontScale({
+                maximumScaleFactor: maximumFontScaleFactor
+              }) *
+              1.5,
+            height:
+              size *
+              useFontScale({
+                maximumScaleFactor: maximumFontScaleFactor
+              }) *
+              1.5
+          }
+        ]}
+      />
       <Ionicon
         {...props}
         name={name}
-        size={16}
-        style={[
-          styles.iconStyle,
-          Platform.OS === "android" ? borderStyle : undefined
-        ]}
+        size={(size * 1.5) / 2}
+        color="white"
+        style={circularStyles.icon}
       />
+    </View>
+  </View>
+)
+
+const circularStyles = StyleSheet.create({
+  iconContainer: {
+    position: "relative",
+    justifyContent: "center",
+    alignItems: "center"
+  },
+  icon: {
+    position: "absolute",
+    alignSelf: "center"
+  },
+  iconBackground: {
+    borderRadius: 128
+  }
+})
+
+export type RoundedIoniconProps = Omit<CircularIoniconProps, "size"> & {
+  borderRadius: number
+  size?: number
+}
+
+/**
+ * An ionicon wrapped in a rounded square with a border radius.
+ */
+export const RoundedIonicon = ({
+  backgroundColor,
+  borderRadius,
+  name,
+  size = DEFAULT_ICON_SIZE,
+  maximumFontScaleFactor,
+  style,
+  ...props
+}: RoundedIoniconProps) => {
+  const fontScale = useFontScale({
+    maximumScaleFactor: maximumFontScaleFactor
+  })
+  return (
+    <View style={{ borderRadius, backgroundColor }}>
+      <View style={{ padding: size * fontScale * (1 / 3) }}>
+        <Ionicon
+          {...props}
+          name={name}
+          size={size * fontScale}
+          maximumFontScaleFactor={maximumFontScaleFactor}
+          color={props.color}
+        />
+      </View>
+    </View>
+  )
+}
+
+export type IoniconCloseButtonProps = Omit<IconProps<"close">, "name"> &
+  TouchableOpacityProps
+
+/**
+ * A close button that uses the "close" Ionicon.
+ */
+export const IoniconCloseButton = ({
+  onPress,
+  size = 20,
+  ...props
+}: IoniconCloseButtonProps) => (
+  <TouchableOpacity {...props} onPress={onPress}>
+    <RoundedIonicon
+      {...props}
+      name="close"
+      size={size}
+      borderRadius={32}
+      backgroundColor={AppStyles.cardColor}
+    />
+  </TouchableOpacity>
+)
+
+export type PlusIconProps = {
+  size?: number
+  maxmimumFontScaleFactor?: number
+  style?: StyleProp<ViewStyle>
+}
+
+export const PlusIconView = ({
+  size = 24,
+  maxmimumFontScaleFactor,
+  style
+}: PlusIconProps) => {
+  const fontScale = useFontScale({
+    maximumScaleFactor: maxmimumFontScaleFactor
+  })
+  return (
+    <View accessible={false} style={style}>
+      <View style={styles.plusContainer}>
+        <View
+          style={{
+            width: size * fontScale,
+            height: 2 * fontScale,
+            alignSelf: "center",
+            borderRadius: 12,
+            backgroundColor: "white"
+          }}
+        />
+        <View
+          style={{
+            position: "absolute",
+            top: (-size * fontScale) / 2 + fontScale,
+            alignSelf: "center",
+            width: 2 * fontScale,
+            height: size * fontScale,
+            borderRadius: 12,
+            backgroundColor: "white"
+          }}
+        />
+      </View>
     </View>
   )
 }
 
 const styles = StyleSheet.create({
-  iconStyle: {
-    color: "white",
-    padding: 8
+  plusContainer: {
+    position: "relative"
   }
 })

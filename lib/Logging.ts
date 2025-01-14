@@ -1,237 +1,32 @@
-import { ArrayUtils } from "./utils/Array"
-import { Filesystem } from "./Filesystem"
-import { diffDates } from "@date-time"
-import { Native as SentryNative } from "sentry-expo"
+import * as Sentry from "@sentry/react-native"
+import { Migrations, SQLITE_IN_MEMORY_PATH, TiFSQLite } from "./SQLite"
+import { LogHandler, LogLevel } from "TiFShared/logging"
+import { ExpoTiFFileSystem } from "@modules/tif-fs"
+
+const LOGS_DATABASE_INFO = ExpoTiFFileSystem?.logsDatabaseInfo()
+
+export const LOGS_SQLITE_PATH = LOGS_DATABASE_INFO?.path
+
+export const sqliteLogs = new TiFSQLite(
+  LOGS_DATABASE_INFO?.databaseName ?? SQLITE_IN_MEMORY_PATH,
+  Migrations.logs
+)
 
 /**
- * A level to be used when logging.
- *
- * `debug` = important stuff that doesn't matter in prod
- *
- * `info` = general log message
- *
- * `warn` = a forewarning that a giant alien spider will trample this lostbe- I mean world
- *
- * `error` = for when an error occurs
+ * Compiles the logs on this device for sending in emails.
  */
-export type LogLevel = "debug" | "info" | "warn" | "error"
-
-/**
- * A type that handles log messages and sends them somewhere.
- */
-export type LogHandler = (
-  label: string,
-  level: LogLevel,
-  message: string,
-  metadata?: object
-) => void
-
-const consoleLogHandler: LogHandler = (label, level, message, metadata) => {
-  console[level](formatLogMessage(label, level, message, metadata))
-}
-
-let logHandlers = [consoleLogHandler]
-
-/**
- * Creates a function to log with a given label.
- *
- * Use this instead of `console.log` to log to many different sources at once.
- *
- * ```ts
- * const log = createLogFunction("example")
- * addLogHandler(rotatingLogFileHandler(...))
- *
- * // Logs to both the console and filesystem.
- * log("info", "Message", { key: "value" })
- * ```
- *
- * By default, calling `log` will output formatted logs to the console, use `addLogHandler` to log to more sources.
- *
- * @param label the label which identifies this logger, use this in different modules of the app to identify specific components.
- * @returns a function which handles logging.
- */
-export const createLogFunction = (label: string) => {
-  return (level: LogLevel, message: string, metadata?: object) => {
-    for (const handler of logHandlers) {
-      handler(label, level, message, metadata)
-    }
+export const compileLogs = async () => {
+  if (!ExpoTiFFileSystem) {
+    throw new Error("The native module for ExpoTiFFileSystem must exist.")
   }
-}
-
-/**
- * Adds a log handler that can handle and receive log messages via calls from the function created by `createLogFunction`.
- */
-export const addLogHandler = (handler: LogHandler) => {
-  logHandlers.push(handler)
-}
-
-/**
- * Removes all active log handlers, preserving only the console logger.
- */
-export const resetLogHandlers = () => {
-  logHandlers = [consoleLogHandler]
-}
-
-/**
- * A type for representing a valid name from a log file.
- */
-class LogFilename {
-  readonly date: Date
-
-  private constructor (rawValue: Date) {
-    this.date = rawValue
+  if (!LOGS_SQLITE_PATH) {
+    throw new Error("Unable to find Logs Sqlite Path.")
   }
-
-  pathInDirectory (directoryPath: string) {
-    return `${directoryPath}/${this.date.toISOString()}.log`
-  }
-
-  static fromCurrentDate () {
-    return new LogFilename(new Date())
-  }
-
-  static fromPathString (pathString: string) {
-    const pathSplits = pathString.split("/")
-    const filenameSplits = pathSplits[pathSplits.length - 1].split(".")
-    const fileDateString = `${filenameSplits[0]}.${filenameSplits[1]}`
-    const parsedDate = new Date(fileDateString)
-    if (!Number.isNaN(parsedDate.valueOf())) {
-      return new LogFilename(parsedDate)
-    }
-    return undefined
-  }
-}
-
-/**
- * A configuration for {@link RotatingFileLogs}.
- */
-export type RotatingFileLogsConfig = {
-  /**
-   * The directory to store log files in.
-   */
-  directoryPath: string
-
-  /**
-   * The maximum number of files to keep in rotation.
-   */
-  maxFiles: number
-
-  /**
-   * The interval on which to create a new log file.
-   */
-  rotatingIntervalMillis: number
-
-  /**
-   * A function to format a log message.
-   */
-  format: (
-    label: string,
-    level: LogLevel,
-    message: string,
-    metadata?: object
-  ) => string
-}
-
-/**
- * A class that writes log messages to a rotating log file system which it internally manages.
- *
- * The {@link LogHandler} on this class only queues log messages such that they can be written in
- * batch. To actually write them, call {@link flush}.
- */
-export class RotatingFileLogs {
-  private readonly config: RotatingFileLogsConfig
-  private readonly fs: Filesystem
-  private openLogFilename?: LogFilename
-  private currentDateLogFilename = LogFilename.fromCurrentDate()
-  private queuedLogs = [] as string[]
-
-  constructor (config: RotatingFileLogsConfig, fs: Filesystem) {
-    this.config = config
-    this.fs = fs
-  }
-
-  /**
-   * A log handler which queues log messages but doesn't write them to disk.
-   *
-   * In order to write the logs to disk, call {@link flush}.
-   *
-   * This log handler ignores `"debug"` level logs.
-   */
-  get logHandler (): LogHandler {
-    // NB: We can't just return handleLog directly because then calling addLogHandler will
-    // cause the "this" keyword to refer to the global "this", thus causing chaos...
-    return (label, level, message, metadata) => {
-      this.handleLog(label, level, message, metadata)
-    }
-  }
-
-  private handleLog (
-    label: string,
-    level: LogLevel,
-    message: string,
-    metadata?: object
-  ) {
-    if (level === "debug") return
-    this.queuedLogs.push(this.config.format(label, level, message, metadata))
-  }
-
-  /**
-   * Flushes all queued log messages to disk by joining them together.
-   *
-   * Log messages are queued via interacting with {@link logHandler}.
-   */
-  async flush () {
-    if (this.queuedLogs.length === 0) return
-    const logFilename = await this.loadOpenLogFilename()
-    await this.fs.appendString(
-      logFilename.pathInDirectory(this.config.directoryPath),
-      this.queuedLogs.join("")
-    )
-    this.queuedLogs = []
-  }
-
-  private async loadOpenLogFilename () {
-    if (this.openLogFilename) return this.openLogFilename
-
-    const persistedNames = (await this.loadPersistedLogFilenames()).sort(
-      (name1, name2) => name2.date.getTime() - name1.date.getTime()
-    )
-    if (persistedNames.length === 0) {
-      this.openLogFilename = this.currentDateLogFilename
-      return this.currentDateLogFilename
-    }
-
-    const { milliseconds } = diffDates(
-      this.currentDateLogFilename.date,
-      persistedNames[0].date
-    )
-
-    const logsToPurge = persistedNames.slice(this.config.maxFiles - 1)
-    for (const logFilename of logsToPurge) {
-      await this.fs.deleteFile(
-        logFilename.pathInDirectory(this.config.directoryPath)
-      )
-    }
-
-    if (milliseconds < this.config.rotatingIntervalMillis) {
-      this.openLogFilename = persistedNames[0]
-      return persistedNames[0]
-    }
-
-    this.openLogFilename = this.currentDateLogFilename
-    return this.currentDateLogFilename
-  }
-
-  private async loadPersistedLogFilenames () {
-    try {
-      const paths = await this.fs.listDirectoryContents(
-        this.config.directoryPath
-      )
-      return ArrayUtils.compactMap(paths, LogFilename.fromPathString)
-    } catch {
-      return []
-    }
-  }
+  await ExpoTiFFileSystem.zip(
+    LOGS_SQLITE_PATH,
+    ExpoTiFFileSystem.LOGS_ZIP_ARCHIVE_PATH
+  )
+  return ExpoTiFFileSystem.LOGS_ZIP_ARCHIVE_PATH
 }
 
 /**
@@ -241,18 +36,28 @@ export class RotatingFileLogs {
  */
 export const sentryBreadcrumbLogHandler = (
   handleBreadcrumb: (
-    breadcrumb: SentryNative.Breadcrumb
-  ) => void = SentryNative.addBreadcrumb
+    breadcrumb: Sentry.Breadcrumb
+  ) => void = Sentry.addBreadcrumb
 ): LogHandler => {
   return (label, level, message, metadata) => {
     if (level === "debug") return
     handleBreadcrumb({
       message,
-      level: level === "warn" ? "warning" : level,
+      level: LOG_LEVEL_TO_SENTRY_LEVEL[level],
       ...getSentryBreadcrumbMetadata(label, metadata)
     })
   }
 }
+
+type SentryLevel = NonNullable<Sentry.Breadcrumb["level"]>
+
+const LOG_LEVEL_TO_SENTRY_LEVEL = {
+  warn: "warning",
+  trace: "log",
+  info: "info",
+  error: "error",
+  debug: "debug"
+} as Record<LogLevel, SentryLevel>
 
 const getSentryBreadcrumbMetadata = (label: string, metadata?: object) => {
   if (!metadata) return { category: undefined, data: { label } }
@@ -274,7 +79,7 @@ const getSentryBreadcrumbMetadata = (label: string, metadata?: object) => {
  * The error must be assigned to the `error` field and must be an instance of subclass of {@link Error}.
  */
 export const sentryErrorCapturingLogHandler = (
-  captureError: (error: Error) => void = SentryNative.captureException
+  captureError: (error: Error) => void = Sentry.captureException
 ): LogHandler => {
   // NB: We don't need to care about the label of message since those are handled by the breadcrumb handler
   return (_, level, __, metadata) => {
@@ -286,24 +91,48 @@ export const sentryErrorCapturingLogHandler = (
 }
 
 /**
- * The default formatter for a log message.
+ * A {@link LogHandler} utilizing SQLite.
+ *
+ * @param sqlite The {@link TiFSQLite} instance to use.
+ * @param logLifetimeIntervalSeconds How long in seconds each log message should last for.
  */
-export const formatLogMessage = (
-  label: string,
-  level: LogLevel,
-  message: string,
-  metadata?: object
-) => {
-  const currentDate = new Date()
-  const levelEmoji = emojiForLogLevel(level)
-  const stringifiedMetadata = JSON.stringify(metadata)
-  const metadataStr = stringifiedMetadata ? ` ${stringifiedMetadata}` : ""
-  return `${currentDate.toISOString()} [${label}] (${level.toUpperCase()} ${levelEmoji}) ${message}${metadataStr}\n`
+export const sqliteLogHandler = (
+  sqlite: TiFSQLite,
+  logLifetimeIntervalSeconds: number
+): LogHandler => {
+  return (label, level, message, metadata) => {
+    sqlite.withTransaction<void>(async (db) => {
+      await db.run`
+      DELETE FROM Logs
+      WHERE timestamp <= (unixepoch() - ${logLifetimeIntervalSeconds})
+      `
+      await db.run`
+      INSERT INTO Logs (
+        label,
+        level,
+        message,
+        stringifiedMetadata
+      ) VALUES (
+        ${label},
+        ${level},
+        ${message},
+        ${JSON.stringify(metadata)}
+      )
+      `
+    })
+  }
 }
 
-const emojiForLogLevel = (level: LogLevel) => {
-  if (level === "debug") return "🟢"
-  if (level === "info") return "🔵"
-  if (level === "warn") return "🟡"
-  return "🔴"
+/**
+ * A log message that is stored in SQLite.
+ *
+ * The metadata of the log message is parseable via `JSON.parse`.
+ */
+export type SQLiteLogMessage = {
+  id: number
+  label: string
+  level: LogLevel
+  message: string
+  stringifedMetadata: string
+  timestamp: number
 }

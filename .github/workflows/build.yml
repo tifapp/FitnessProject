@@ -3,6 +3,7 @@ run-name: Setup Project
 
 env:
   TEST_RUNNER_CI: 1
+  NODE_VERSION: "20.0.0"
 
 on:
   pull_request:
@@ -17,6 +18,7 @@ concurrency:
 
 jobs:
   setup_and_lint:
+    if: github.actor != 'roswaaltifbot' && !startsWith(github.event.pull_request.title, 'IGNORE_BUILD')
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -26,23 +28,29 @@ jobs:
         uses: actions/cache@v2
         with:
           path: node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
+          key: ${{ runner.os }}-node-${{ env.NODE_VERSION }}-${{ hashFiles('**/package-lock.json') }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: "18.16.0"
+          node-version: "20.0.0"
 
       - name: Install Dependencies
         run: |
-          npm ci
+          if [ ! -d "node_modules" ]; then
+            echo "Cache not found, running npm ci."
+            npm ci
+          else
+            echo "Cache restored, skipping npm ci."
+          fi
+        env:
+          TIFSHARED_JS: true
 
       - name: Lint
         run: npm run staged-lint
 
   unit_tests:
+    if: github.actor != 'roswaaltifbot' && !startsWith(github.event.pull_request.title, 'IGNORE_BUILD')
     needs: setup_and_lint
     runs-on: ubuntu-latest
     timeout-minutes: 5
@@ -54,17 +62,21 @@ jobs:
         uses: actions/cache@v2
         with:
           path: node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
+          key: ${{ runner.os }}-node-${{ env.NODE_VERSION }}-${{ hashFiles('**/package-lock.json') }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "20.0.0"
 
       - name: Add Env
-        run: echo "API_URL= https://623qsegfb9.execute-api.us-west-2.amazonaws.com/prod/" >> .env
+        run: echo "API_URL=${{ secrets.API_ENDPOINT }}" >> .env
 
       - name: Run tests
         run: npm run test:ci
 
   build:
+    if: github.actor != 'roswaaltifbot' && !startsWith(github.event.pull_request.title, 'IGNORE_BUILD')
     needs: unit_tests
     runs-on: ubuntu-latest
     steps:
@@ -75,18 +87,12 @@ jobs:
         uses: actions/cache@v2
         with:
           path: node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
+          key: ${{ runner.os }}-node-${{ env.NODE_VERSION }}-${{ hashFiles('**/package-lock.json') }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: "18.16.0"
-
-      - name: Install Dependencies
-        run: |
-          npm ci
+          node-version: "20.0.0"
 
       - name: Bundle project
-        run: npx expo export
+        run: npx expo export --platform ios --platform android

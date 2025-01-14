@@ -28,7 +28,7 @@ export type TextFieldProps = {
 /**
  * A generic Text Field component.
  */
-export const TextField = forwardRef(function TextField (
+export const TextField = forwardRef(function TextField(
   { error, style, ...props }: TextFieldProps,
   ref: TextFieldRef
 ) {
@@ -50,7 +50,7 @@ export const TextField = forwardRef(function TextField (
 /**
  * A text field with a filled background.
  */
-export const ShadedTextField = forwardRef(function TextField (
+export const ShadedTextField = forwardRef(function TextField(
   { error, style, ...props }: TextFieldProps,
   ref: TextFieldRef
 ) {
@@ -70,17 +70,15 @@ export const ShadedTextField = forwardRef(function TextField (
 
 const TextFieldErrorView = ({ error }: { error: ReactNode }) => (
   <Animated.View entering={FadeInUp} exiting={FadeOutUp}>
-    {typeof error === "string" || typeof error === "number"
-      ? (
-        <Caption style={styles.errorText}>{error}</Caption>
-      )
-      : (
-        error
-      )}
+    {typeof error === "string" || typeof error === "number" ? (
+      <Caption style={styles.errorText}>{error}</Caption>
+    ) : (
+      error
+    )}
   </Animated.View>
 )
 
-const InternalTextField = forwardRef(function TextField (
+const InternalTextField = forwardRef(function TextField(
   { leftAddon, rightAddon, textStyle, ...props }: TextFieldProps,
   ref: TextFieldRef
 ) {
@@ -108,7 +106,7 @@ export type PasswordTextFieldProps = Omit<
 /**
  * A text field component for password inputs.
  */
-export const PasswordTextField = forwardRef(function Field (
+export const PasswordTextField = forwardRef(function Field(
   { ...props }: PasswordTextFieldProps,
   ref: TextFieldRef
 ) {
@@ -120,7 +118,7 @@ export const PasswordTextField = forwardRef(function Field (
 /**
  * A password text field which is filled with a solic background
  */
-export const ShadedPasswordTextField = forwardRef(function TextField (
+export const ShadedPasswordTextField = forwardRef(function TextField(
   { ...props }: PasswordTextFieldProps,
   ref: TextFieldRef
 ) {
@@ -139,7 +137,7 @@ type InternalPasswordTextFieldProps = {
   iconColor?: string
 } & PasswordTextFieldProps
 
-const InternalPasswordTextField = forwardRef(function TextField (
+const InternalPasswordTextField = forwardRef(function TextField(
   { TextFieldView, iconColor, ...props }: InternalPasswordTextFieldProps,
   ref: TextFieldRef
 ) {
@@ -172,7 +170,7 @@ const InternalPasswordTextField = forwardRef(function TextField (
 
 const styles = StyleSheet.create({
   filledCard: {
-    backgroundColor: AppStyles.eventCardColor,
+    backgroundColor: AppStyles.cardColor,
     borderRadius: 12,
     width: "100%"
   },
@@ -213,7 +211,7 @@ const styles = StyleSheet.create({
     padding: 4
   },
   placeholderText: {
-    color: AppStyles.darkColor,
+    color: AppStyles.primaryColor,
     opacity: 0.5
   }
 })

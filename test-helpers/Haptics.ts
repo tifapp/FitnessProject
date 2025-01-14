@@ -1,28 +1,33 @@
-import { HapticEvent, Haptics } from "@lib/Haptics"
+import { HapticPattern, Haptics, HapticsSettings } from "@modules/tif-haptics"
 
 export class TestHaptics implements Haptics {
-  private _playedEvents = [] as HapticEvent[]
-  private _isMuted = false
+  private _playedEvents = [] as HapticPattern[]
+  private _settings = {
+    isHapticFeedbackEnabled: true,
+    isHapticAudioEnabled: true
+  }
 
-  get playedEvents () {
+  get playedEvents() {
     return this._playedEvents
   }
 
-  get isMuted () {
-    return this._isMuted
+  get settings() {
+    return this._settings
   }
 
-  async play (event: HapticEvent) {
-    if (!this._isMuted) {
-      this._playedEvents.push(event)
+  async play(pattern: HapticPattern) {
+    this._playedEvents.push(pattern)
+  }
+
+  async apply(settings: HapticsSettings) {
+    this._settings = settings
+  }
+
+  reset() {
+    this._playedEvents = []
+    this._settings = {
+      isHapticFeedbackEnabled: true,
+      isHapticAudioEnabled: true
     }
-  }
-
-  mute () {
-    this._isMuted = true
-  }
-
-  unmute () {
-    this._isMuted = false
   }
 }

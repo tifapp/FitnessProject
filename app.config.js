@@ -1,18 +1,43 @@
-const dotenv = require("dotenv")
+import dotenv from "dotenv"
+import withTiFNativePod from "./injectTiFNativePod.js"
+import withInjectBundledSoundEffects from "./injectBundledSoundEffects.js"
+import withGradleSecretsPlugin from "./injectGradleSecretsPlugin.js"
 
 dotenv.config({ path: ".env.infra" })
 
-const { MAPS_API, EXPO_PROJECT_ID, EXPO_PROJECT_OWNER } = process.env
+const { EXPO_PROJECT_ID, EXPO_PROJECT_OWNER, EAS_BUILD_TYPE } = process.env
+
+const { bundleIdentifier, icon, splash, name } =
+  EAS_BUILD_TYPE === "development"
+    ? {
+        bundleIdentifier: "com.tif.FitnessAppDevelopment",
+        icon: ".storybook/assets/icon.png",
+        splash: ".storybook/assets/splash.png",
+        name: "FitnessAppDevelopment"
+      }
+    : EAS_BUILD_TYPE === "preview"
+      ? {
+          bundleIdentifier: "com.tif.FitnessAppPreview",
+          icon: "./assets/icon.png",
+          splash: "./assets/splash.png",
+          name: "FitnessAppPreview"
+        }
+      : {
+          bundleIdentifier: "com.tif.FitnessApp",
+          icon: "./assets/icon.png",
+          splash: "./assets/splash.png",
+          name: "FitnessApp"
+        }
 
 const config = {
-  name: "FitnessApp",
+  name,
   slug: "FitnessApp",
   scheme: "tifapp",
   version: "1.0.0",
   orientation: "portrait",
-  icon: "./assets/icon.png",
+  icon,
   splash: {
-    image: "./assets/splash.png",
+    image: splash,
     resizeMode: "contain",
     backgroundColor: "#ffffff"
   },
@@ -25,15 +50,38 @@ const config = {
       projectId: EXPO_PROJECT_ID
     }
   },
-  plugins: ["sentry-expo"],
+  plugins: [
+    [
+      "@sentry/react-native/expo",
+      {
+        url: "https://sentry.io",
+        organization: "tif-a7",
+        project: "react-native"
+      }
+    ],
+    [
+      "expo-font",
+      {
+        fonts: [
+          "./assets/fonts/OpenSans-Bold.ttf",
+          "./assets/fonts/OpenSans-Regular.ttf",
+          "./assets/fonts/OpenSans-SemiBold.ttf",
+          "./assets/fonts/OpenDyslexic3-Bold.ttf",
+          "./assets/fonts/OpenDyslexic3-Regular.ttf"
+        ]
+      }
+    ],
+    "expo-secure-store",
+    "expo-asset"
+  ],
   assetBundlePatterns: ["**/*"],
   ios: {
-    bundleIdentifier: "com.tifapp.FitnessApp",
+    bundleIdentifier,
     infoPlist: {
       NSLocationAlwaysAndWhenInUseUsageDescription:
-        "To inform others of your arrival, tap \"Change to Always Allow.\"",
+        'To inform others of your arrival, tap "Change to Always Allow."',
       NSLocationWhenInUseUsageDescription:
-        "Discover events and receive travel estimates for events by tapping \"Allow Once\" or \"Allow While Using App.\"",
+        'Discover events and receive travel estimates for events by tapping "Allow Once" or "Allow While Using App."',
       UIBackgroundModes: ["location", "fetch"],
       LSApplicationQueriesSchemes: [
         "comgooglemaps",
@@ -58,23 +106,22 @@ const config = {
       ]
     }
   },
-  web: {
-    favicon: "./assets/favicon.png"
-  },
   android: {
+    package: bundleIdentifier,
     config: {
       googleMaps: {
-        apiKey: MAPS_API
+        // eslint-disable-next-line
+        apiKey: "${MAPS_API_KEY}"
       }
     },
     permissions: [
       "ACCESS_BACKGROUND_LOCATION",
       "READ_CALENDAR",
       "WRITE_CALENDAR"
-    ],
-    package: "com.tifapp.FitnessApp",
-    googleServicesFile: "./google-services.json"
+    ]
   }
 }
 
-export default config
+export default withGradleSecretsPlugin(
+  withInjectBundledSoundEffects(withTiFNativePod(config))
+)

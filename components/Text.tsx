@@ -1,34 +1,51 @@
 import { AppStyles } from "@lib/AppColorStyle"
 import React from "react"
 import { StyleSheet, Text, TextProps } from "react-native"
+import Animated from "react-native-reanimated"
 
 /**
  * A text component that represents the standard title of
  * some UI element.
  */
 export const Title = (props: TextProps) => (
-  <Text {...props} style={[props.style, styles.title]} />
+  <Animated.Text {...props} style={[props.style, styles.title]} />
 )
 
 /**
  * A text component for secondary titles on screens.
  */
 export const Subtitle = (props: TextProps) => (
-  <Text {...props} style={[props.style, styles.subtitle]} />
+  <Animated.Text {...props} style={[props.style, styles.subtitle]} />
 )
 
 /**
  * A text component for standard text that the user sees.
  */
 export const BodyText = (props: TextProps) => (
-  <Text {...props} style={[props.style, styles.body]} />
+  <Animated.Text {...props} style={[props.style, styles.body]} />
+)
+
+/**
+ * A text component for small, but relevant details at the bottom
+ * of a particular UI element.
+ */
+export const Footnote = (props: TextProps) => (
+  <Animated.Text {...props} style={[props.style, styles.footnote]} />
+)
+
+/**
+ * A text component for small, but relevant details at the bottom
+ * of a particular UI element.
+ */
+export const BoldFootnote = (props: TextProps) => (
+  <Animated.Text {...props} style={[props.style, styles.boldFootnote]} />
 )
 
 /**
  * A text component for smaller and more subtle details.
  */
 export const Caption = (props: TextProps) => (
-  <Text
+  <Animated.Text
     {...props}
     style={[styles.captionOpacity, props.style, styles.caption]}
   />
@@ -39,7 +56,7 @@ export const Caption = (props: TextProps) => (
  * label a particular section.
  */
 export const CaptionTitle = (props: TextProps) => (
-  <Text {...props} style={[props.style, styles.captionTitle]} />
+  <Animated.Text {...props} style={[props.style, styles.captionTitle]} />
 )
 
 /**
@@ -48,7 +65,7 @@ export const CaptionTitle = (props: TextProps) => (
  * group.
  */
 export const Headline = (props: TextProps) => (
-  <Text {...props} style={[props.style, styles.headline]} />
+  <Animated.Text {...props} style={[props.style, styles.headline]} />
 )
 
 const styles = StyleSheet.create({
@@ -63,6 +80,14 @@ const styles = StyleSheet.create({
   body: {
     fontFamily: "OpenSans",
     fontSize: 16
+  },
+  footnote: {
+    fontFamily: "OpenSans",
+    fontSize: 14
+  },
+  boldFootnote: {
+    fontFamily: "OpenSansBold",
+    fontSize: 14
   },
   caption: {
     fontFamily: "OpenSans",
@@ -80,6 +105,6 @@ const styles = StyleSheet.create({
     fontSize: 16
   },
   color: {
-    color: AppStyles.darkColor
+    color: AppStyles.primaryColor
   }
 })

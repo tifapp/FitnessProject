@@ -1,5 +1,5 @@
-import React, { ReactNode, useMemo } from "react"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
+import React, { ReactNode, useMemo } from "react"
 
 /**
  * Creates a `QueryClient` suitable for testing.
@@ -36,17 +36,13 @@ export const createTestQueryClient = () => {
         retry: false,
         retryDelay: 0,
         // NB: This prevents CI from hanging endlessly.
-        cacheTime: Infinity
+        gcTime: Infinity
       },
       mutations: {
-        cacheTime: Infinity,
-        retry: false
+        gcTime: Infinity,
+        retry: false,
+        retryDelay: 0
       }
-    },
-    logger: {
-      log: console.log,
-      warn: console.warn,
-      error: process.env.NODE_ENV === "test" ? () => {} : console.error
     }
   })
 }

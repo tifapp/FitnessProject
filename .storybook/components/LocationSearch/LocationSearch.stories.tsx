@@ -1,14 +1,14 @@
+import { StoryMeta } from ".storybook/HelperTypes"
 import { BASE_HEADER_SCREEN_OPTIONS } from "@components/Navigation"
 import { TiFQueryClientProvider } from "@lib/ReactQuery"
-import { UserLocationFunctionsProvider } from "@location"
-import { ArrayUtils } from "@lib/utils/Array"
+
 import { delayData } from "@lib/utils/DelayData"
 import {
   LocationSearchPicker,
-  useLocationSearchPicker,
+  useLocationsSearch,
   LocationSearchBar
-} from "@location/search"
-import { mockLocationSearchResult } from "@location/search/MockData"
+} from "@location-search-boundary"
+import { mockLocationSearchResult } from "@location-search-boundary/MockData"
 import {
   NavigationContainer,
   NavigationProp,
@@ -16,14 +16,13 @@ import {
   useNavigation
 } from "@react-navigation/native"
 import { createStackNavigator } from "@react-navigation/stack"
-import { SettingsScreen } from "@screens/SettingsScreen/SettingsScreen"
 import { ComponentMeta, ComponentStory } from "@storybook/react-native"
-import { PermissionStatus, getCurrentPositionAsync } from "expo-location"
+import { repeatElements } from "TiFShared/lib/Array"
 import React from "react"
 import { Button } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 
-const LocationSearchMeta: ComponentMeta<typeof SettingsScreen> = {
+const LocationSearchMeta: StoryMeta = {
   title: "Location Search Screen"
 }
 
@@ -35,35 +34,19 @@ const Stack = createStackNavigator()
 
 export const Basic: LocationSearchStory = () => (
   <TiFQueryClientProvider>
-    <UserLocationFunctionsProvider
-      getCurrentLocation={getCurrentPositionAsync}
-      requestForegroundPermissions={async () => ({
-        expires: Infinity,
-        canAskAgain: true,
-        granted: true,
-        status: PermissionStatus.GRANTED
-      })}
-      requestBackgroundPermissions={async () => ({
-        expires: Infinity,
-        canAskAgain: true,
-        granted: true,
-        status: PermissionStatus.GRANTED
-      })}
-    >
-      <NavigationContainer>
-        <Stack.Navigator screenOptions={{ ...BASE_HEADER_SCREEN_OPTIONS }}>
-          <Stack.Screen name="settings" component={TestScreen} />
-          <Stack.Screen
-            name="search"
-            options={{
-              header: () => <LocationSearchHeader />,
-              headerMode: "screen"
-            }}
-            component={LocationSearchScreen}
-          />
-        </Stack.Navigator>
-      </NavigationContainer>
-    </UserLocationFunctionsProvider>
+    <NavigationContainer>
+      <Stack.Navigator screenOptions={{ ...BASE_HEADER_SCREEN_OPTIONS }}>
+        <Stack.Screen name="settings" component={TestScreen} />
+        <Stack.Screen
+          name="search"
+          options={{
+            header: () => <LocationSearchHeader />,
+            headerMode: "screen"
+          }}
+          component={LocationSearchScreen}
+        />
+      </Stack.Navigator>
+    </NavigationContainer>
   </TiFQueryClientProvider>
 )
 
@@ -80,10 +63,10 @@ const LocationSearchHeader = () => {
 }
 
 const LocationSearchScreen = () => {
-  const picker = useLocationSearchPicker({
+  const picker = useLocationsSearch({
     loadSearchResults: async () => {
       return await delayData(
-        ArrayUtils.repeatElements(15, () => mockLocationSearchResult()),
+        repeatElements(15, () => mockLocationSearchResult()),
         3000
       )
     }

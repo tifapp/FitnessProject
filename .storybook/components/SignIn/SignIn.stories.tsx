@@ -1,27 +1,28 @@
-import { SettingsScreen } from "@screens/SettingsScreen/SettingsScreen"
-import { ComponentMeta, ComponentStory } from "@storybook/react-native"
-import { SafeAreaProvider } from "react-native-safe-area-context"
-import { TiFQueryClientProvider } from "@lib/ReactQuery"
+import { StoryMeta } from ".storybook/HelperTypes"
+import { awsTiFAPITransport } from "@api"
+import { createForgotPasswordEnvironment } from "@auth-boundary/forgot-password"
+import { CognitoSignInAuthenticator } from "@auth-boundary/sign-in"
 import {
-  CognitoSignInAuthenticator,
+  cognitoConfirmSignUpWithAutoSignIn,
+  createSignUpEnvironment
+} from "@auth-boundary/sign-up"
+import { Auth } from "@aws-amplify/auth"
+import { BASE_HEADER_SCREEN_OPTIONS } from "@components/Navigation"
+import { createForgotPasswordScreens } from "@core-root/navigation/auth/ForgotPassword"
+import {
   SignInParamsList,
   createSignInScreens
-} from "@auth/sign-in"
-import { createStackNavigator } from "@react-navigation/stack"
+} from "@core-root/navigation/auth/SignIn"
+import { createSignUpScreens } from "@core-root/navigation/auth/SignUp"
+import { API_URL } from "@env"
+import { TiFQueryClientProvider } from "@lib/ReactQuery"
 import { NavigationContainer } from "@react-navigation/native"
-import { BASE_HEADER_SCREEN_OPTIONS } from "@components/Navigation"
-import {
-  SignUpEnvironment,
-  cognitoConfirmSignUpWithAutoSignIn,
-  createSignUpEnvironment,
-  createSignUpScreens
-} from "@auth/sign-up"
-import { createForgotPasswordEnvironment } from "@auth/forgot-password/Environment"
-import { createForgotPasswordScreens } from "@auth/forgot-password"
-import { Auth } from "@aws-amplify/auth"
-import { TiFAPI, createAWSTiFAPIFetch } from "@api-client"
+import { createStackNavigator } from "@react-navigation/stack"
+import { ComponentStory } from "@storybook/react-native"
+import { SafeAreaProvider } from "react-native-safe-area-context"
+import { TiFAPIClientCreator } from "TiFShared/api/APIClient"
 
-const SignInMeta: ComponentMeta<typeof SettingsScreen> = {
+const SignInMeta: StoryMeta = {
   title: "Sign In"
 }
 
@@ -31,11 +32,7 @@ type SignInStory = ComponentStory<typeof SettingsScreen>
 
 const Stack = createStackNavigator<SignInParamsList>()
 
-const tiFAPI = new TiFAPI(
-  createAWSTiFAPIFetch(
-    new URL("https://623qsegfb9.execute-api.us-west-2.amazonaws.com/staging/")
-  )
-)
+const tiFAPI = TiFAPIClientCreator(awsTiFAPITransport(new URL(API_URL)))
 
 const authenticator = new CognitoSignInAuthenticator()
 const signInScreens = createSignInScreens(Stack, authenticator)

@@ -1,19 +1,23 @@
-import { ColorString } from "./utils/Color"
+import { ColorString } from "TiFShared/domain-models/ColorString"
+
+const blackColor = ColorString.parse("#01160A")!
 
 export namespace AppStyles {
-  export const darkColor = ColorString.primaryDarkColor.toString()
-  export const colorOpacity15 = ColorString.primaryDarkColor
-    .withOpacity(0.15)
-    .toString()
-  export const colorOpacity50 = ColorString.primaryDarkColor
-    .withOpacity(0.5)
-    .toString()
-  export const colorOpacity35 = ColorString.primaryDarkColor
-    .withOpacity(0.35)
-    .toString()
+  export const primaryColor = blackColor.toString()
+  export const colorOpacity15 = blackColor.withOpacity(0.15).toString()
+  export const colorOpacity50 = blackColor.withOpacity(0.5).toString()
+  export const colorOpacity35 = blackColor.withOpacity(0.35).toString()
   export const errorColor = "#EA4335"
   export const highlightedText = "#4285F4"
-  export const eventCardColor = "#F4F4F6"
+  export const cardColor = "#F1F5F3"
   export const eventCardBorder = "rgba(145, 145, 145, 0.2)"
   export const linkColor = "#4287f5"
+  export const primary = blackColor
+  export const blue = ColorString.parse(linkColor)!
+  export const red = ColorString.parse("#FB3640")!
+  export const yellow = ColorString.parse("#F7CD24")!
+  export const green = ColorString.parse("#14B329")!
+  export const purple = ColorString.parse("#A882DD")!
+  export const orange = ColorString.parse("#FB5607")!
+  export const emerald = ColorString.parse("#5BC087")!
 }

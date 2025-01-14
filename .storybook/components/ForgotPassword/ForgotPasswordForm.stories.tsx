@@ -1,18 +1,18 @@
-import { createForgotPasswordEnvironment } from "@auth/forgot-password/Environment"
+import { createForgotPasswordEnvironment } from "@auth-boundary/forgot-password"
 import {
   ForgotPasswordParamsList,
   createForgotPasswordScreens
-} from "@auth/forgot-password/ForgotPasswordNavigation"
+} from "@core-root/navigation/auth/ForgotPassword"
 import { Auth } from "@aws-amplify/auth"
 import { BASE_HEADER_SCREEN_OPTIONS } from "@components/Navigation"
 import { TiFQueryClientProvider } from "@lib/ReactQuery"
 import { NavigationContainer } from "@react-navigation/native"
 import { createStackNavigator } from "@react-navigation/stack"
-import { SettingsScreen } from "@screens/SettingsScreen/SettingsScreen"
 import { ComponentMeta, ComponentStory } from "@storybook/react-native"
 import React from "react"
 import { SafeAreaProvider } from "react-native-safe-area-context"
-const ForgotPasswordMeta: ComponentMeta<typeof SettingsScreen> = {
+import { StoryMeta } from ".storybook/HelperTypes"
+const ForgotPasswordMeta: StoryMeta = {
   title: "Forgot Password"
 }
 

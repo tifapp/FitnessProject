@@ -1,22 +1,26 @@
-import { TiFAPI, createAWSTiFAPIFetch } from "@api-client"
+import { awsTiFAPITransport } from "@api"
+import {
+  cognitoConfirmSignUpWithAutoSignIn,
+  createSignUpEnvironment
+} from "@auth-boundary/sign-up"
 import { Auth } from "@aws-amplify/auth"
 import { BASE_HEADER_SCREEN_OPTIONS } from "@components/Navigation"
+import { API_URL } from "@env"
 import { TiFQueryClientProvider } from "@lib/ReactQuery"
 import { NavigationContainer } from "@react-navigation/native"
 import { StackScreenProps, createStackNavigator } from "@react-navigation/stack"
-import { SettingsScreen } from "@screens/SettingsScreen/SettingsScreen"
-import { ComponentMeta, ComponentStory } from "@storybook/react-native"
 import {
-  createSignUpEnvironment,
-  createSignUpScreens,
   SignUpParamsList,
-  cognitoConfirmSignUpWithAutoSignIn
-} from "@auth/sign-up"
-import { SafeAreaProvider } from "react-native-safe-area-context"
+  createSignUpScreens
+} from "@core-root/navigation/auth/SignUp"
+import { ComponentMeta, ComponentStory } from "@storybook/react-native"
 import { Button } from "react-native"
 import { ScrollView } from "react-native-gesture-handler"
+import { SafeAreaProvider } from "react-native-safe-area-context"
+import { TiFAPI } from "TiFShared/api"
+import { StoryMeta } from ".storybook/HelperTypes"
 
-const SignUpMeta: ComponentMeta<typeof SettingsScreen> = {
+const SignUpMeta: StoryMeta = {
   title: "Sign Up"
 }
 
@@ -28,11 +32,7 @@ type ParamsList = SignUpParamsList & { test: {} }
 
 const Stack = createStackNavigator<ParamsList>()
 
-const tiFAPI = new TiFAPI(
-  createAWSTiFAPIFetch(
-    new URL("https://623qsegfb9.execute-api.us-west-2.amazonaws.com/prod/")
-  )
-)
+const tiFAPI = new TiFAPI(awsTiFAPITransport(new URL(API_URL)))
 
 const screens = createSignUpScreens(
   Stack,

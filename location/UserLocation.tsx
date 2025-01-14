@@ -1,11 +1,15 @@
-import React, { ReactNode, createContext, useContext } from "react"
 import { QueryHookOptions } from "@lib/ReactQuery"
+import { useQuery } from "@tanstack/react-query"
 import {
   LocationObject,
   LocationOptions,
-  PermissionResponse
+  PermissionResponse,
+  getCurrentPositionAsync,
+  requestBackgroundPermissionsAsync,
+  requestForegroundPermissionsAsync
 } from "expo-location"
-import { useQuery } from "@tanstack/react-query"
+import React, { ReactNode, createContext, useContext } from "react"
+import { mergeWithPartial } from "TiFShared/lib/Object"
 
 /**
  * A query hook to load the user's current location from expo.
@@ -21,11 +25,11 @@ export const useUserCoordinatesQuery = (
   options?: QueryHookOptions<LocationObject>
 ) => {
   const { getCurrentLocation } = useUserLocationFunctions()
-  return useQuery(
-    ["user-coordinates", locationOptions],
-    async () => await getCurrentLocation(locationOptions),
-    options
-  )
+  return useQuery({
+    queryKey: ["user-coordinates", { preview: true }],
+    queryFn: async () => await getCurrentLocation(locationOptions),
+    ...options
+  })
 }
 
 /**
@@ -35,11 +39,11 @@ export const useRequestForegroundLocationPermissions = (
   options?: QueryHookOptions<PermissionResponse>
 ) => {
   const { requestForegroundPermissions } = useUserLocationFunctions()
-  return useQuery(
-    ["request-location-foreground-permissions"],
-    async () => await requestForegroundPermissions(),
-    options
-  )
+  return useQuery({
+    queryKey: ["request-location-foreground-permissions"],
+    queryFn: async () => await requestForegroundPermissions(),
+    ...options
+  })
 }
 
 /**
@@ -51,11 +55,11 @@ export const useRequestBackgroundLocationsPermissions = (
   options?: QueryHookOptions<PermissionResponse>
 ) => {
   const { requestBackgroundPermissions } = useUserLocationFunctions()
-  return useQuery(
-    ["request-location-foreground-permissions"],
-    async () => await requestBackgroundPermissions(),
-    options
-  )
+  return useQuery({
+    queryKey: ["request-location-foreground-permissions"],
+    queryFn: async () => await requestBackgroundPermissions(),
+    ...options
+  })
 }
 
 export type UserLocationFunctions = {
@@ -64,9 +68,11 @@ export type UserLocationFunctions = {
   requestBackgroundPermissions: () => Promise<PermissionResponse>
 }
 
-const UserLocationFunctionsContext = createContext<
-  UserLocationFunctions | undefined
->(undefined)
+const UserLocationFunctionsContext = createContext<UserLocationFunctions>({
+  getCurrentLocation: getCurrentPositionAsync,
+  requestBackgroundPermissions: requestBackgroundPermissionsAsync,
+  requestForegroundPermissions: requestForegroundPermissionsAsync
+})
 
 /**
  * The current functions that handle user location based operations.
@@ -74,9 +80,10 @@ const UserLocationFunctionsContext = createContext<
 export const useUserLocationFunctions = () =>
   useContext(UserLocationFunctionsContext)!
 
-export type UserLocationFunctionsProviderProps = UserLocationFunctions & {
-  children: ReactNode
-}
+export type UserLocationFunctionsProviderProps =
+  Partial<UserLocationFunctions> & {
+    children: ReactNode
+  }
 
 /**
  * Provides a context of functions that operate on the user's current location.
@@ -85,7 +92,9 @@ export const UserLocationFunctionsProvider = ({
   children,
   ...props
 }: UserLocationFunctionsProviderProps) => (
-  <UserLocationFunctionsContext.Provider value={props}>
+  <UserLocationFunctionsContext.Provider
+    value={mergeWithPartial(useContext(UserLocationFunctionsContext), props)}
+  >
     {children}
   </UserLocationFunctionsContext.Provider>
 )

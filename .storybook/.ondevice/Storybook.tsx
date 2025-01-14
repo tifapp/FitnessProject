@@ -1,13 +1,15 @@
 import React, { useState } from "react"
-import { Text, TouchableOpacity, View } from "react-native"
 
-// Import your stories
-import { setupCognito } from "@auth/CognitoHelpers"
-import { InMemorySecureStore } from "@auth/CognitoSecureStorage"
-import { FlatList } from "react-native-gesture-handler"
+import { FlatList, Text, TouchableOpacity, View } from "react-native"
 import { useAppFonts } from "../../lib/Fonts"
+
+// Import your
+import { setupCognito } from "@auth-boundary/CognitoHelpers"
+import NameEntryMeta, {
+  Basic as NameEntryBasic
+} from "../components/NameEntry/NameEntry.stories"
 import AttendeesListMeta, {
-  Basic as AttendeesListScreenBasic
+  Basic as AttendeesListBasic
 } from "../components/AttendeesList/AttendeesList.stories"
 import ButtonsMeta, {
   Basic as ButtonsBasic
@@ -21,6 +23,9 @@ import ContentReportingMeta, {
 import ContentTextMeta, {
   Basic as ContentTextBasic
 } from "../components/ContentText/ContextText.stories"
+import EventDetailsMeta, {
+  Basic as EventDetailsBasic
+} from "../components/EventDetails/EventDetails.stories"
 import ExploreEventsMeta, {
   Basic as ExploreEventsBasic
 } from "../components/Explore/Explore.stories"
@@ -30,9 +35,38 @@ import ForgotPasswordMeta, {
 import LocationSearchMeta, {
   Basic as LocationSearchBasic
 } from "../components/LocationSearch/LocationSearch.stories"
+import ProfileMeta, {
+  Basic as ProfileScreenBasic
+} from "../components/ProfileScreen/Avatar.stories"
+import RegionMonitoringMeta, {
+  Basic as RegionMonitoringBasic
+} from "../components/RegionMonitoring/RegionMonitoring.stories"
 import SearchBarMeta, {
   Default as SearchBarBasic
 } from "../components/SearchBar/SearchBar.stories"
+import EventSettingsDurationMeta, {
+  Basic as EventSettingsDurationBasic
+} from "../components/SettingsScreen/EventSettingsDurations.stories"
+
+import { sqliteLogHandler, sqliteLogs } from "@lib/Logging"
+import { InMemorySecureStore } from "@lib/SecureStore"
+import { dayjs } from "TiFShared/lib/Dayjs"
+import { addLogHandler, consoleLogHandler } from "TiFShared/logging"
+import EditEventDurationsMeta, {
+  Basic as EditEventDurationsBasic
+} from "../components/EditEvent/DurationPicker.stories"
+import EditEventPragmaQuotesMeta, {
+  Basic as EditEventPragmaQuotesBasic
+} from "../components/EditEvent/PragmaQuote.stories"
+import HapticsMeta, {
+  Basic as HapticsBasic
+} from "../components/Haptics/Haptics.stories"
+import RudeusEditorMeta, {
+  Basic as RudeusEditorBasic
+} from "../components/RudeusEditor/RudeusEditor.stories"
+import EventSettingsMeta, {
+  Basic as EventSettingsBasic
+} from "../components/SettingsScreen/EventSettingsScreen.stories"
 import SettingsMeta, {
   Basic as SettingsScreenBasic
 } from "../components/SettingsScreen/SettingsScreen.stories"
@@ -45,14 +79,25 @@ import SignUpMeta, {
 import TextFieldMeta, {
   Basic as TextFieldBasic
 } from "../components/TextField/TextField.stories"
+import TiFPreviewMeta, {
+  Basic as TiFPreviewBasic
+} from "../components/TiFPreview/TiFPreview.stories"
 import VerifcationCodeMeta, {
   Basic as VerifcationCodeBasic
 } from "../components/VerificationCode/VerifyCode.stories"
 
 setupCognito(new InMemorySecureStore())
+addLogHandler(consoleLogHandler())
+addLogHandler(
+  sqliteLogHandler(sqliteLogs, dayjs.duration(2, "weeks").asSeconds())
+)
 
 // Create an array of stories
 const stories = [
+  {
+    name: NameEntryMeta.title,
+    component: NameEntryBasic
+  },
   {
     name: ContentReportingMeta.title,
     component: DefaultReportingFlow,
@@ -69,14 +114,19 @@ const stories = [
     args: ContentTextMeta.args
   },
   {
-    name: AttendeesListMeta.title,
-    component: AttendeesListScreenBasic,
-    args: AttendeesListMeta.args
-  },
-  {
     name: ExploreEventsMeta.title,
     component: ExploreEventsBasic,
     args: ExploreEventsMeta.args
+  },
+  {
+    name: EventSettingsMeta.title,
+    component: EventSettingsBasic,
+    args: EventSettingsMeta.args
+  },
+  {
+    name: EventSettingsDurationMeta.title,
+    component: EventSettingsDurationBasic,
+    args: EventSettingsDurationMeta.args
   },
   {
     name: TextFieldMeta.title,
@@ -97,6 +147,11 @@ const stories = [
     name: ForgotPasswordMeta.title,
     component: ForgotPasswordBasic,
     args: ForgotPasswordMeta.args
+  },
+  {
+    name: ProfileMeta.title,
+    component: ProfileScreenBasic,
+    args: ProfileMeta.args
   },
   {
     name: SignUpMeta.title,
@@ -122,15 +177,62 @@ const stories = [
     name: ButtonsMeta.title,
     component: ButtonsBasic,
     args: ButtonsMeta.args
+  },
+  {
+    name: EventDetailsMeta.title,
+    component: EventDetailsBasic,
+    args: EventDetailsMeta.args
+  },
+  {
+    name: RegionMonitoringMeta.title,
+    component: RegionMonitoringBasic,
+    args: RegionMonitoringMeta.args
+  },
+  {
+    name: AttendeesListMeta.title,
+    component: AttendeesListBasic,
+    args: AttendeesListMeta.args
+  },
+  {
+    name: EditEventDurationsMeta.title,
+    component: EditEventDurationsBasic,
+    args: {}
+  },
+  {
+    name: EditEventPragmaQuotesMeta.title,
+    component: EditEventPragmaQuotesBasic,
+    args: {}
+  },
+  {
+    name: HapticsMeta.title,
+    component: HapticsBasic,
+    args: {}
+  },
+  {
+    name: RudeusEditorMeta.title,
+    component: RudeusEditorBasic,
+    args: {}
+  },
+  {
+    name: TiFPreviewMeta.title,
+    component: TiFPreviewBasic,
+    args: {}
   }
   // Add more stories here...
 ]
 
 const CustomStorybookUI = () => {
-  const [isFontsLoaded] = useAppFonts()
+  const [isFontsLoaded, error] = useAppFonts()
   const [selectedStory, setSelectedStory] = useState(-1)
 
-  if (!isFontsLoaded) return null
+  console.log(error)
+  if (!isFontsLoaded)
+    return (
+      <Text style={{ marginTop: 128 }}>
+        The fonts did not load. You are trapped here forever!
+        {JSON.stringify(error)}
+      </Text>
+    )
 
   // Render the selected story
   if (selectedStory !== -1) {
@@ -140,7 +242,7 @@ const CustomStorybookUI = () => {
         <StoryComponent {...args} />
         <Text
           onPress={() => setSelectedStory(-1)}
-          style={{ position: "absolute", bottom: 10, left: 10 }}
+          style={{ position: "absolute", bottom: 30, left: 10 }}
         >
           Close
         </Text>
