@@ -1,7 +1,7 @@
 const fs = require("fs")
 const path = require("path")
 
-const COMPONENTS_DIR = path.resolve(__dirname, "./storybook/components")
+const COMPONENTS_DIR = path.resolve(__dirname, ".storybook/components")
 const STORYBOOK_FILE = path.resolve(
   __dirname,
   ".storybook/.ondevice/Storybook.tsx"
