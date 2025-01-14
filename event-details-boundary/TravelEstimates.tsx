@@ -1,9 +1,11 @@
 import { AvatarMapMarkerView } from "@components/AvatarMapMarker"
 import { BodyText, Caption, CaptionTitle, Headline } from "@components/Text"
 import { Ionicon, RoundedIonicon } from "@components/common/Icons"
+import { ClientSideEvent } from "@event/ClientSideEvent"
 import { openEventLocationInMaps } from "@event/LocationIdentifier"
 import { AppStyles } from "@lib/AppColorStyle"
 import { compactFormatDistance } from "@lib/DistanceFormatting"
+import { featureContext } from "@lib/FeatureContext"
 import { FontScaleFactors, useFontScale } from "@lib/Fonts"
 import { QueryHookOptions } from "@lib/ReactQuery"
 import { TiFDefaultLayoutTransition } from "@lib/Reanimated"
@@ -34,6 +36,10 @@ import {
 } from "react-native"
 import MapView, { Marker } from "react-native-maps"
 import Animated, { FadeIn } from "react-native-reanimated"
+
+export const EventTravelEstimatesFeature = featureContext({
+  eventTravelEstimates
+})
 
 export type UseEventTravelEstimatesResult =
   | {
@@ -96,8 +102,7 @@ const compactFormatTravelEstimateDuration = (duration: duration.Duration) => {
  * `{ status: "unsupported" }`
  */
 export const useEventTravelEstimates = (
-  coordinate: LocationCoordinate2D,
-  loadTravelEstimates: typeof eventTravelEstimates
+  coordinate: LocationCoordinate2D
 ): UseEventTravelEstimatesResult => {
   const isSupported = Platform.OS !== "android"
   const userLocationQuery = useUserCoordinatesQuery(
@@ -107,7 +112,6 @@ export const useEventTravelEstimates = (
   const etaResults = useEventTravelEstimatesQuery(
     userLocationQuery.data?.coords!,
     coordinate,
-    loadTravelEstimates,
     { enabled: !!userLocationQuery.data && isSupported }
   )
   if (!isSupported) {
@@ -136,20 +140,20 @@ const resultForCodedError = (
 const useEventTravelEstimatesQuery = (
   userCoordinate: LocationCoordinate2D,
   eventCoordinate: LocationCoordinate2D,
-  loadTravelEstimates: typeof eventTravelEstimates,
   options?: QueryHookOptions<EventTravelEstimates>
 ) => {
+  const { eventTravelEstimates } = EventTravelEstimatesFeature.useContext()
   return useQuery({
     queryKey: ["event-travel-estimates", eventCoordinate, userCoordinate],
     queryFn: async ({ signal }) => {
-      return await loadTravelEstimates(userCoordinate, eventCoordinate, signal)
+      return await eventTravelEstimates(userCoordinate, eventCoordinate, signal)
     },
     ...options
   })
 }
 
 export type EventTravelEstimatesProps = {
-  host: EventAttendee
+  host: ClientSideEvent["host"]
   location: EventLocation
   result: UseEventTravelEstimatesResult
   style?: StyleProp<ViewStyle>
@@ -397,7 +401,8 @@ const TRAVEL_KEYS_INFO = {
 const styles = StyleSheet.create({
   mapContainer: {
     position: "relative",
-    marginHorizontal: 24
+    borderRadius: 12,
+    overflow: "hidden"
   },
   mapDimensions: {
     width: "100%",

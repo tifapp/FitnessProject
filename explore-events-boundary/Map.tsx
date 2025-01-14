@@ -1,6 +1,6 @@
 import { ExploreEventsMarkerView } from "./MapMarker"
 import { ClientSideEvent } from "@event/ClientSideEvent"
-import React from "react"
+import React, { memo } from "react"
 import { StyleProp, ViewStyle } from "react-native"
 import MapView, { Marker } from "react-native-maps"
 import { ExploreEventsRegion } from "./Region"
@@ -21,7 +21,7 @@ export const ExploreEventsMap = ({
   onRegionChanged,
   style
 }: ExploreEventsMapProps) => {
-  const { pushEventDetails, presentEditEvent } = useCoreNavigation()
+  const { presentEditEvent } = useCoreNavigation()
   return (
     <MapView
       style={style}
@@ -53,19 +53,31 @@ export const ExploreEventsMap = ({
       ]}
     >
       {events.map((event) => (
-        <Marker
-          key={event.id}
-          coordinate={event.location.coordinate}
-          onPress={() => pushEventDetails(event.id)}
-        >
-          <ExploreEventsMarkerView
-            color={AppStyles.primaryColor}
-            hostName={event.host.name}
-            imageURL={event.host.profileImageURL}
-            attendeeCount={event.attendeeCount}
-          />
-        </Marker>
+        <MarkerView key={event.id} event={event} />
       ))}
     </MapView>
   )
 }
+
+type MarkerProps = {
+  event: ClientSideEvent
+}
+
+const MarkerView = memo(function MarkerView({ event }: MarkerProps) {
+  const { pushEventDetails } = useCoreNavigation()
+  return (
+    <Marker
+      key={event.id}
+      tracksViewChanges={false}
+      coordinate={event.location.coordinate}
+      onPress={() => pushEventDetails(event.id)}
+    >
+      <ExploreEventsMarkerView
+        color={AppStyles.primaryColor}
+        hostName={event.host.name}
+        imageURL={event.host.profileImageURL}
+        attendeeCount={event.attendeeCount}
+      />
+    </Marker>
+  )
+})

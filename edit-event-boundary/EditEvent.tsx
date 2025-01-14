@@ -21,7 +21,7 @@ import { useAtom, useAtomValue, useStore } from "jotai"
 import { ShadedTextField } from "@components/TextFields"
 import { useFontScale } from "@lib/Fonts"
 import { AppStyles } from "@lib/AppColorStyle"
-import React, { createContext, useCallback, useEffect, useState } from "react"
+import React, { useCallback, useEffect, useState } from "react"
 import { useScreenBottomPadding } from "@components/Padding"
 import { SafeAreaView } from "react-native-safe-area-context"
 import { useUserSettings } from "@settings-storage/Hooks"
@@ -42,7 +42,6 @@ import { settingsSelector } from "@settings-storage/Settings"
 import { useEffectEvent } from "@lib/utils/UseEffectEvent"
 import {
   EditEventFormSubmitButton,
-  SubmitEventEdit,
   submitEventEdit,
   useEditEventFormSubmission
 } from "./Submit"

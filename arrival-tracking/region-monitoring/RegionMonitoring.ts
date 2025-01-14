@@ -1,6 +1,10 @@
 /* eslint-disable func-call-spacing */
 import { EventRegion } from "TiFShared/domain-models/Event"
 import { useCallback, useSyncExternalStore } from "react"
+import { featureContext } from "@lib/FeatureContext"
+import { LocationCoordinate2D } from "TiFShared/domain-models/LocationCoordinate2D"
+import { watchPositionAsync, LocationAccuracy } from "expo-location"
+import { ForegroundEventRegionMonitor } from "./ForegroundRegionMonitor"
 
 export type EventRegionMonitorUnsubscribe = () => void
 
@@ -22,6 +26,21 @@ export interface EventRegionMonitor {
 
   hasArrivedAtRegion(region: EventRegion): boolean
 }
+
+// TODO: - Live Context
+
+const watchLocation = async (
+  callback: (coordinate: LocationCoordinate2D) => void
+) => {
+  return await watchPositionAsync(
+    { accuracy: LocationAccuracy.Highest },
+    (location) => callback(location.coords)
+  )
+}
+
+export const RegionMonitorContext = featureContext({
+  monitor: new ForegroundEventRegionMonitor(watchLocation)
+})
 
 export const useHasArrivedAtRegion = (
   region: EventRegion,

@@ -57,15 +57,14 @@ export const ExploreEventsBottomSheet = ({
           data={events}
           keyExtractor={(event) => event.id.toString()}
           renderItem={({ item }: ListRenderItemInfo<ClientSideEvent>) => (
-            <View style={styles.eventContainer}>
-              <EventCard event={item} style={styles.event} />
-            </View>
+            <EventCard event={item} style={styles.event} />
           )}
           ListEmptyComponent={EmptyEventsComponent}
+          ItemSeparatorComponent={() => <View style={styles.separator} />}
           contentContainerStyle={{
-            paddingBottom: Platform.OS === "ios" ? 16 : 88
+            paddingBottom: Platform.OS === "ios" ? 16 : 104
           }}
-          contentInset={{ bottom: 96 }}
+          contentInset={{ bottom: 104 }}
         />
       </TiFBottomSheet>
     </View>
@@ -73,14 +72,14 @@ export const ExploreEventsBottomSheet = ({
 )
 
 const styles = StyleSheet.create({
-  eventContainer: {
-    paddingHorizontal: 16,
-    paddingVertical: 8
+  separator: {
+    height: 16
   },
   handle: {
     rowGap: 8
   },
   event: {
-    width: "100%"
+    width: "100%",
+    paddingHorizontal: 24
   }
 })

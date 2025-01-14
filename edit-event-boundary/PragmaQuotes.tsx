@@ -4,29 +4,47 @@ import { dayjs } from "TiFShared/lib/Dayjs"
 import { Image } from "expo-image"
 import { useEffect, useState } from "react"
 import { ViewStyle, StyleProp, View, StyleSheet } from "react-native"
+import Animated, { FadeIn } from "react-native-reanimated"
 
 export type PragmaQuoteProps = {
   quote: () => string
   animationInterval: number
+  initialDelay?: number
   style?: StyleProp<ViewStyle>
+}
+
+const usePragmaQuote = (
+  quote: () => string,
+  intervalMillis: number,
+  initialDelay: number
+) => {
+  const [text, setText] = useState<string | undefined>()
+  useEffect(() => {
+    const quoteText = quote()
+    let index = 0
+    let interval: NodeJS.Timeout
+    const timeout = setTimeout(() => {
+      interval = setInterval(() => {
+        const nextText = quoteText.substring(0, index++)
+        setText(nextText)
+        if (index > quoteText.length) clearInterval(interval)
+      }, intervalMillis)
+    }, initialDelay)
+    return () => {
+      clearTimeout(timeout)
+      clearInterval(interval)
+    }
+  }, [quote, intervalMillis, initialDelay])
+  return text
 }
 
 export const PragmaQuoteView = ({
   quote,
   animationInterval,
+  initialDelay = 300,
   style
 }: PragmaQuoteProps) => {
-  const [text, setText] = useState("")
-  useEffect(() => {
-    const quoteText = quote()
-    let index = 0
-    const interval = setInterval(() => {
-      const nextText = quoteText.substring(0, index++)
-      setText(nextText)
-      if (index > quoteText.length) clearInterval(interval)
-    }, animationInterval)
-    return () => clearInterval(interval)
-  }, [quote, animationInterval])
+  const text = usePragmaQuote(quote, animationInterval, initialDelay)
   return (
     <View style={style}>
       <View style={styles.row}>
@@ -38,7 +56,11 @@ export const PragmaQuoteView = ({
             style={styles.pragmaImage}
           />
         </View>
-        <Subtitle style={styles.quote}>{text}</Subtitle>
+        {text && (
+          <Animated.View entering={FadeIn} style={styles.quote}>
+            <Subtitle style={styles.quote}>{text}</Subtitle>
+          </Animated.View>
+        )}
       </View>
     </View>
   )

@@ -12,7 +12,6 @@ describe("PragmaQuotes tests", () => {
     it("should incrementally render the quote", async () => {
       const quote = "I am Blob"
       renderPragmaQuote(quote)
-      await expectQuote("")
       advanceByInterval()
       await expectQuote("I")
       advanceByInterval()
@@ -57,6 +56,7 @@ describe("PragmaQuotes tests", () => {
       return render(
         <PragmaQuoteView
           quote={() => quote}
+          initialDelay={TEST_ANIMATION_INTERVAL}
           animationInterval={TEST_ANIMATION_INTERVAL}
         />
       )
