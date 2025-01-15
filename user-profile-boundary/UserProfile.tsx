@@ -1,5 +1,6 @@
 import { AvatarView } from "@components/Avatar"
 import { Caption, Headline, Subtitle } from "@components/Text"
+import { EventCard } from "@event/EventCard"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { FriendRequestButton, useFriendRequest } from "@user/FriendRequest"
 import React from "react"
@@ -66,7 +67,7 @@ export const UserProfileView = ({
             ? upcomingEventsState.data.events
             : undefined
         }
-        renderItem={({ item }) => <Headline>{"Idk"}</Headline>}
+        renderItem={({ item }) => <EventCard event={item}></EventCard>}
         ListHeaderComponent={
           <View>
             <UserInfoView

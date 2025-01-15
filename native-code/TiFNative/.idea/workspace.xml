@@ -5,7 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="89c52c74-c7bf-49e7-ac87-4cee77beedc9" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/../../android/settings.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/../../android/settings.gradle" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../.storybook/components/TiFPreview/TiFPreview.stories.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../.storybook/components/TiFPreview/TiFPreview.stories.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -15,7 +16,7 @@
   <component name="ClangdSettings">
     <option name="formatViaClangd" value="false" />
   </component>
-  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[DeviceId(pluginId=LocalEmulator, isTemplate=false, identifier=path=C:\Users\ilike\.android\avd\Pixel_3a_API_34.avd)]" />
+  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[DeviceId(pluginId=PhysicalDevice, isTemplate=false, identifier=serial=R5CWC4H2GRK)]" />
   <component name="ExternalProjectsData">
     <projectState path="$PROJECT_DIR$">
       <ProjectState />
@@ -52,9 +53,10 @@
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.cidr.known.project.marker": "true",
     "RunOnceActivity.readMode.enableVisualFormatting": "true",
+    "android.gradle.sync.needed": "true",
     "cf.first.check.clang-format": "false",
     "cidr.known.project.marker": "true",
-    "git-widget-placeholder": "android-custom-haptics",
+    "git-widget-placeholder": "profile-screen-navigation",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "C:/Users/ilike/OneDrive/Documents/CSE115B (VSCode)/FitnessProject",
     "project.structure.last.edited": "Modules",
