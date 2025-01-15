@@ -1,25 +1,24 @@
 const { withXcodeProject, IOSConfig } = require("@expo/config-plugins")
+const { spawnSync } = require("child_process")
 const fs = require("fs")
 const path = require("path")
 
 // @ts-ignore
 const withInjectBundledSoundEffects = (config) => {
   return withXcodeProject(config, (config) => {
-    // Instead of converting files, we'll just reference the mp3 files directly
     const soundFiles = fs.readdirSync("./bundled-sound-effects")
-      .filter(file => file.endsWith(".mp3"))
       .map(file => {
+        const cafFile = file.replace(".mp3", ".caf")
         return {
           source: path.join("bundled-sound-effects", file),
           dest: path.join(
             config.modRequest.platformProjectRoot,
             "FitnessApp",
-            file
+            cafFile
           )
         }
       })
 
-    // Create Resources directory if it doesn't exist
     const resourcesDir = path.join(
       config.modRequest.platformProjectRoot,
       "FitnessApp"
@@ -28,16 +27,32 @@ const withInjectBundledSoundEffects = (config) => {
       fs.mkdirSync(resourcesDir, { recursive: true })
     }
 
-    // Copy files to the iOS project directory
     for (const file of soundFiles) {
-      fs.copyFileSync(file.source, file.dest)
-      console.log(`Copied ${file.source} to ${file.dest}`)
+      try {
+        const result = spawnSync("afconvert", [
+          path.resolve(file.source),
+          file.dest,
+          "-d",
+          "ima4",
+          "-f",
+          "caff",
+          "-v"
+        ])
+
+        if (result.error) {
+          console.error(`Error converting ${file.source}: ${result.error}`)
+          continue
+        }
+
+        console.log(`Converted ${file.source} to ${file.dest}`)
+      } catch (error) {
+        console.error(`Failed to convert ${file.source}: ${error}`)
+        continue
+      }
     }
 
-    // Ensure the Resources group exists
     IOSConfig.XcodeUtils.ensureGroupRecursively(config.modResults, "Resources")
 
-    // Add files to Xcode project
     for (const file of soundFiles) {
       const relativePath = path.relative(
         config.modRequest.platformProjectRoot,
@@ -52,7 +67,7 @@ const withInjectBundledSoundEffects = (config) => {
       })
     }
 
-    console.log("Added sound effects to Xcode project")
+    console.log("Added converted sound effects to Xcode project")
     return config
   })
 }
