@@ -23,7 +23,7 @@ const TiFPreview = {
 
 export default TiFPreview
 
-const storage = AlphaUserStorage.ephemeral(AlphaUserMocks.TheDarkLord)
+const storage = AlphaUserStorage.ephemeral()
 const localSettings = PersistentSettingsStores.local(
   new SQLiteLocalSettingsStorage(testSQLite)
 )
@@ -39,7 +39,7 @@ export const Basic = () => (
     localSettingsStore={localSettings}
     userSettingsStore={userSettings}
   >
-    <AlphaUserSessionProvider>
+    <AlphaUserSessionProvider storage={storage}>
       <TiFView
         fetchEvents={eventsByRegion}
         isFontsLoaded={true}

@@ -60,8 +60,6 @@ declare module "TiFShared/api" {
   }
 }
 
-console.log(API_URL)
-
 TiFAPI.productionInstance = TiFAPIClientCreator(
   awsTiFAPITransport(launchArguments.apiURL ?? new URL(API_URL))
 )
