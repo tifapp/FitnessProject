@@ -2,61 +2,24 @@ import { AvatarView } from "@components/Avatar"
 import { Caption, Headline, Subtitle } from "@components/Text"
 import { EventCard } from "@event/EventCard"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
-import { AlphaUserStorage } from "@user/alpha"
 import { FriendRequestButton, useFriendRequest } from "@user/FriendRequest"
-import React, { createContext } from "react"
+import React from "react"
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 import { FlatList } from "react-native-gesture-handler"
-import { TiFAPI } from "TiFShared/api"
 import {
   UnblockedUserRelationsStatus,
-  UserID,
-  UserProfile
+  UserID
 } from "TiFShared/domain-models/User"
-import {
-  UpcomingEventsResult,
-  userUpcomingEvents,
-  useUpcomingEvents
-} from "./UpcomingEvents"
+import { UserProfileDisplayInfo, UserProfileFeature } from "./Context"
 import { userProfileQueryKey } from "./QueryKey"
-
-export type BasicUser = Omit<UserProfile, "createdDateTime" | "updatedDateTime">
-
-export type UserProfileResult =
-  | {
-      status: "success"
-      user: BasicUser
-    }
-  | { status: "blocked-you" | "user-not-found" }
-
-export const userProfile = async (
-  userId: UserID,
-  api: TiFAPI = TiFAPI.productionInstance,
-  storage: AlphaUserStorage = AlphaUserStorage.default
-): Promise<UserProfileResult> => {
-  const storageData = await storage.user()
-  if (storageData && storageData.id === userId) {
-    return {
-      status: "success",
-      user: { ...storageData, relationStatus: "current-user" }
-    }
-  }
-  const resp = await api.getUser({ params: { userId } })
-  if (resp.status === 200) {
-    return { status: "success", user: resp.data as BasicUser }
-  }
-  return { status: resp.data.error }
-}
+import { useUpcomingEvents } from "./UpcomingEvents"
 
 export type UseUserProfileEnvironment = {
-  fetchUserProfile: (userId: UserID) => Promise<UserProfileResult>
   userId: UserID
 }
 
-export const useUserProfile = ({
-  fetchUserProfile,
-  userId
-}: UseUserProfileEnvironment) => {
+export const useUserProfile = ({ userId }: UseUserProfileEnvironment) => {
+  const { fetchUserProfile } = UserProfileFeature.useContext()
   const queryClient = useQueryClient()
   const query = useQuery({
     queryKey: userProfileQueryKey(userId, ["user"]),
@@ -76,29 +39,6 @@ export const useUserProfile = ({
     return { status: query.status }
   }
 }
-
-export type UserProfileContextValues = {
-  fetchUserProfile: (id: UserID) => Promise<UserProfileResult>
-  fetchUpcomingEvents: (id: UserID) => Promise<UpcomingEventsResult>
-}
-
-const UserProfileContext = createContext<UserProfileContextValues>({
-  fetchUserProfile: userProfile,
-  fetchUpcomingEvents: userUpcomingEvents
-})
-
-export type UserProfileProviderProps = UserProfileContextValues & {
-  children: JSX.Element
-}
-
-export const UserProfileProvider = ({
-  children,
-  ...values
-}: UserProfileProviderProps) => (
-  <UserProfileContext.Provider value={values}>
-    {children}
-  </UserProfileContext.Provider>
-)
 
 export type UserProfileProps = {
   userInfoState: ReturnType<typeof useUserProfile>
@@ -127,7 +67,7 @@ export const UserProfileView = ({
             ? upcomingEventsState.data.events
             : undefined
         }
-        renderItem={({ item }) => <EventCard event={item} />}
+        renderItem={({ item }) => <EventCard event={item}></EventCard>}
         ListHeaderComponent={
           <View>
             <UserInfoView
@@ -173,7 +113,7 @@ export const UserInfoView = ({
 }
 
 export type BaseUserInfoViewProps = {
-  user: BasicUser
+  user: UserProfileDisplayInfo
   onRelationStatusChanged: (
     id: UserID,
     status: UnblockedUserRelationsStatus
@@ -181,7 +121,7 @@ export type BaseUserInfoViewProps = {
   style?: StyleProp<ViewStyle>
 }
 
-export const BaseUserInfoView = ({
+const BaseUserInfoView = ({
   user,
   onRelationStatusChanged,
   style

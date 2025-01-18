@@ -1,21 +1,16 @@
-import React from "react"
 import { TiFView } from "@core-root"
-import { clientSideEventFromResponse } from "@event/ClientSideEvent"
 import { EventMocks } from "@event-details-boundary/MockData"
-import { AlphaUserSessionProvider, AlphaUserStorage } from "@user/alpha"
-import { eventsByRegion } from "@explore-events-boundary"
-import { AlphaUserMocks } from "@user/alpha/MockData"
-import { PersistentSettingsStore } from "@settings-storage/PersistentStore"
-import { PersistentSettingsStores } from "@settings-storage/PersistentStores"
-import { SQLiteLocalSettingsStorage } from "@settings-storage/LocalSettings"
-import { TiFSQLite } from "@lib/SQLite"
-import { testSQLite } from "@test-helpers/SQLite"
-import { SQLiteUserSettingsStorage } from "@settings-storage/UserSettings"
-import { SettingsProvider } from "@settings-storage/Hooks"
-import { EditEventFeature } from "@edit-event-boundary/EditEvent"
-import { repeatElements } from "TiFShared/lib/Array"
-import { uuidString } from "@lib/utils/UUID"
+import { clientSideEventFromResponse } from "@event/ClientSideEvent"
 import { randomIntegerInRange } from "@lib/utils/Random"
+import { SettingsProvider } from "@settings-storage/Hooks"
+import { SQLiteLocalSettingsStorage } from "@settings-storage/LocalSettings"
+import { PersistentSettingsStores } from "@settings-storage/PersistentStores"
+import { SQLiteUserSettingsStorage } from "@settings-storage/UserSettings"
+import { testSQLite } from "@test-helpers/SQLite"
+import { AlphaUserSessionProvider, AlphaUserStorage } from "@user/alpha"
+import React from "react"
+import { repeatElements } from "TiFShared/lib/Array"
+import { UserProfileFeature } from "user-profile-boundary/Context"
 
 const TiFPreview = {
   title: "TiF Preview"
@@ -23,7 +18,7 @@ const TiFPreview = {
 
 export default TiFPreview
 
-const storage = AlphaUserStorage.ephemeral(AlphaUserMocks.TheDarkLord)
+const storage = AlphaUserStorage.ephemeral()
 const localSettings = PersistentSettingsStores.local(
   new SQLiteLocalSettingsStorage(testSQLite)
 )
@@ -39,12 +34,20 @@ export const Basic = () => (
     localSettingsStore={localSettings}
     userSettingsStore={userSettings}
   >
-    <AlphaUserSessionProvider>
-      <TiFView
-        fetchEvents={eventsByRegion}
-        isFontsLoaded={true}
-        style={{ flex: 1 }}
-      />
-    </AlphaUserSessionProvider>
+    <UserProfileFeature.Provider>
+      <AlphaUserSessionProvider storage={storage}>
+        <TiFView
+          fetchEvents={async () =>
+            repeatElements(10, () =>
+              clientSideEventFromResponse(
+                EventMocks.MockMultipleAttendeeResponse
+              )
+            ).map((e) => ({ ...e, id: randomIntegerInRange(0, 10_000) }))
+          }
+          isFontsLoaded={true}
+          style={{ flex: 1 }}
+        />
+      </AlphaUserSessionProvider>
+    </UserProfileFeature.Provider>
   </SettingsProvider>
 )
