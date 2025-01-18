@@ -7,7 +7,7 @@ const STORYBOOK_FILE = path.resolve(
   ".storybook/.ondevice/Storybook.tsx"
 )
 
-const addStoryToStorybook = (storyName: string): void => {
+const addStoryToStorybook = (storyName) => {
   let storybookContent = fs.readFileSync(STORYBOOK_FILE, "utf-8")
   const importStatement = `import ${storyName}Meta, { Basic as ${storyName} } from "../components/${storyName}/${storyName}.stories";`
 
@@ -56,7 +56,7 @@ const addStoryToStorybook = (storyName: string): void => {
   fs.writeFileSync(STORYBOOK_FILE, storybookContent, "utf-8")
 }
 
-const createComponentFolder = (storyName: string): void => {
+const createComponentFolder = (storyName) => {
   const storyFolderPath = path.join(COMPONENTS_DIR, storyName)
   if (!fs.existsSync(storyFolderPath)) {
     fs.mkdirSync(storyFolderPath, { recursive: true })

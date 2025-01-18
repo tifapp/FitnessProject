@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 
+import SunJournalBackgroundMeta, { Basic as SunJournalBackground } from "../components/SunJournalBackground/SunJournalBackground.stories";
+
 import { FlatList, Text, TouchableOpacity, View } from "react-native";
 import { useAppFonts } from "../../lib/Fonts";
 
@@ -94,6 +96,12 @@ addLogHandler(
 
 // Create an array of stories
 const stories = [
+  {
+    name: SunJournalBackgroundMeta.title,
+    component: SunJournalBackground,
+    args: SunJournalBackgroundMeta.args
+  },
+
   {
     name: DragAndDropMeta.title,
     component: DragAndDrop,
