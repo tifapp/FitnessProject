@@ -83,3 +83,5 @@ jobs:
 
       - name: Trigger Build on EAS
         run: eas build --profile preview --platform all --non-interactive --no-wait
+        env:
+          EXPO_ACCESS_TOKEN: ${{ secrets.EXPO_ACCESS_TOKEN }}

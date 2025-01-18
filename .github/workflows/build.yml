@@ -18,6 +18,31 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  check_native_changes:
+    runs-on: ubuntu-latest
+    outputs:
+      native_changes: ${{ steps.check-files.outputs.native_changes }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 2
+
+      - name: Check for native file changes
+        id: check-files
+        run: |
+          git diff --name-only HEAD^ HEAD > changed_files.txt
+          echo "Changed files:"
+          cat changed_files.txt
+          
+          if grep -q -E "android/|ios/|expo-plugins/|app.json|eas.json" changed_files.txt; then
+            echo "native_changes=true" >> $GITHUB_OUTPUT
+            echo "Native files were changed"
+          else
+            echo "native_changes=false" >> $GITHUB_OUTPUT
+            echo "No native files were changed"
+          fi
+
   setup_and_lint:
     if: github.actor != 'roswaaltifbot' && !startsWith(github.event.pull_request.title, 'IGNORE_BUILD')
     runs-on: ubuntu-latest
@@ -99,9 +124,9 @@ jobs:
         run: npx expo export --platform ios --platform android
 
   wait-for-review:
-    needs: build
+    needs: [build, check_native_changes]
     runs-on: ubuntu-latest
-    if: github.actor != 'roswaaltifbot' && !startsWith(github.event.pull_request.title, 'IGNORE_BUILD')
+    if: github.actor != 'roswaaltifbot' && !startsWith(github.event.pull_request.title, 'IGNORE_BUILD') && needs.check_native_changes.outputs.native_changes == 'true'
     environment:
       name: eas-build
       url: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
@@ -110,8 +135,8 @@ jobs:
         run: echo "Waiting for environment review"
 
   eas-build:
-    if: github.actor != 'roswaaltifbot' && !startsWith(github.event.pull_request.title, 'IGNORE_BUILD')
-    needs: wait-for-review
+    needs: [wait-for-review, check_native_changes]
+    if: github.actor != 'roswaaltifbot' && !startsWith(github.event.pull_request.title, 'IGNORE_BUILD') && needs.check_native_changes.outputs.native_changes == 'true'
     name: Perform EAS Build
     runs-on: ubuntu-latest
     env:
@@ -164,3 +189,35 @@ jobs:
 
       - name: Trigger Build on EAS
         run: eas build --profile development --platform all --non-interactive --no-wait
+        env:
+          EXPO_ACCESS_TOKEN: ${{ secrets.EXPO_ACCESS_TOKEN }}
+
+  # New job to handle the build status
+  build-status:
+    needs: [check_native_changes, build]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Check if EAS build is required
+        env:
+          NATIVE_CHANGES: ${{ needs.check_native_changes.outputs.native_changes }}
+        run: |
+          if [ "$NATIVE_CHANGES" == "true" ]; then
+            # If native changes were detected, this job should wait for eas-build
+            if [ "${{ contains(needs.*.result, 'failure') }}" == "true" ]; then
+              echo "Previous steps failed"
+              exit 1
+            fi
+            echo "Native changes detected - EAS build required and must complete"
+            if [ "${{ needs.eas-build.result }}" != "success" ]; then
+              echo "EAS build failed or not completed"
+              exit 1
+            fi
+          else
+            # If no native changes, we only care about the regular build status
+            if [ "${{ needs.build.result }}" != "success" ]; then
+              echo "Build failed"
+              exit 1
+            fi
+            echo "No native changes - skipping EAS build requirement"
+          fi
