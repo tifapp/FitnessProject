@@ -57,24 +57,66 @@ const sendImageToSlack = async (
 ) => {
   const imageBuffer = Buffer.from(imageData.split(",")[1], "base64")
 
-  const formData = new FormData()
-  formData.append("token", process.env.SLACK_APP_ID ?? "")
-  formData.append("channels", channelId)
-  formData.append("initial_comment", message)
-
-  const blob = new Blob([imageBuffer], { type: "image/png" })
-  formData.append("file", blob, "qrcode.png")
-
   try {
-    const response = await fetch("https://slack.com/api/files.upload", {
+    // Step 1: Get the upload URL
+    const getUploadURLResponse = await fetch("https://slack.com/api/files.getUploadURLExternal", {
       method: "POST",
-      body: formData
+      headers: {
+        Authorization: `Bearer ${process.env.SLACK_APP_ID}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        filename: "qrcode.png",
+        length: imageBuffer.length,
+        snippet_type: "png"
+      })
     })
 
-    const responseBody = await response.json()
-    return responseBody
+    const uploadURLData = await getUploadURLResponse.json()
+
+    if (!uploadURLData.ok) {
+      throw new Error(`Failed to get upload URL: ${uploadURLData.error}`)
+    }
+
+    // Step 2: Upload the file to the provided URL
+    const uploadResponse = await fetch(uploadURLData.upload_url, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "image/png"
+      },
+      body: imageBuffer
+    })
+
+    if (!uploadResponse.ok) {
+      throw new Error(`Failed to upload file: ${uploadResponse.statusText}`)
+    }
+
+    // Step 3: Complete the upload
+    const completeUploadResponse = await fetch("https://slack.com/api/files.completeUploadExternal", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${process.env.SLACK_APP_ID}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        files: [{
+          id: uploadURLData.file_id,
+          title: "QR Code",
+          initial_comment: message,
+          channels: channelId
+        }]
+      })
+    })
+
+    const completeUploadData = await completeUploadResponse.json()
+
+    if (!completeUploadData.ok) {
+      throw new Error(`Failed to complete upload: ${completeUploadData.error}`)
+    }
+
+    return completeUploadData
   } catch (error) {
-    console.error(error)
+    console.error("Error uploading file to Slack:", error)
     throw error
   }
 }
@@ -169,9 +211,9 @@ const githubJWT = () => {
     {
       iat: Math.floor(Date.now() / 1000),
       exp: Math.floor(Date.now() / 1000) + 5 * 60,
-      iss: process.env.GITHUB_APP_ID
+      iss: process.env.BUILD_LISTENER_ID
     },
-    process.env.GITHUB_APP_PRIVATE_KEY ?? "",
+    process.env.BUILD_LISTENER_PRIVATE_KEY ?? "",
     { algorithm: "RS256" }
   )
 }
