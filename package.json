@@ -14,8 +14,8 @@
   "scripts": {
     "create-story": "node create-story.js",
     "pr": "node --loader ts-node/esm ./node_modules/TiFShared/npm-scripts/auto-pr.ts --env .env.infra",
-    "start": "node enableStorybook.js false && node checkEnv.js && npx expo start --dev-client --clear",
-    "sb_start": "node enableStorybook.js true && sb-rn-get-stories --config-path .storybook/.ondevice && npx expo start --dev-client",
+    "start": "node enableStorybook.js false && node checkEnv.js && npx expo start --dev-client --clear --reset-cache",
+    "sb_start": "node enableStorybook.js true && sb-rn-get-stories --config-path .storybook/.ondevice && npx expo start --dev-client --reset-cache",
     "sb_watcher": "sb-rn-watcher --config-path .storybook/.ondevice",
     "test": "jest --testPathIgnorePatterns \"<rootDir>/roswaal/\" --testPathPattern --detectOpenHandles",
     "test:ci": "jest --testPathIgnorePatterns \"<rootDir>/roswaal/\" --ci --detectOpenHandles",
