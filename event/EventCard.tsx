@@ -16,12 +16,11 @@ import { useCoreNavigation } from "@components/Navigation"
 
 export type EventCardProps = {
   event: ClientSideEvent
-  onJoined?: () => void
   onLeft?: () => void
   style?: StyleProp<ViewStyle>
 }
 
-const _EventCard = ({ event, onJoined, onLeft, style }: EventCardProps) => {
+const _EventCard = ({ event, onLeft, style }: EventCardProps) => {
   const { presentProfile, pushEventDetails, pushAttendeesList } =
     useCoreNavigation()
   const previewedAttendees = event.previewAttendees.slice(0, 3)
@@ -108,7 +107,7 @@ const _EventCard = ({ event, onJoined, onLeft, style }: EventCardProps) => {
           <EventUserAttendanceButton
             event={event}
             maximumFontSizeMultiplier={FontScaleFactors.large}
-            onJoinSuccess={() => onJoined?.()}
+            onJoinSuccess={() => pushEventDetails(event.id)}
             onLeaveSuccess={() => onLeft?.()}
             size="small"
             style={styles.attendanceButton}
