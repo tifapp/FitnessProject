@@ -26,8 +26,7 @@ import { ExploreEventsInitialCenter } from "./InitialCenter"
 import {
   ExploreEventsRegion,
   XEROX_ALTO_DEFAULT_REGION,
-  createDefaultMapRegion,
-  minRegionMeterRadius
+  createDefaultMapRegion
 } from "./Region"
 
 const TEST_EVENTS = [EventMocks.Multiday, EventMocks.PickupBasketball]
@@ -179,11 +178,16 @@ describe("ExploreEvents tests", () => {
     test("basics", async () => {
       const now = new Date()
       jest.setSystemTime(now)
-      const region = mockRegion()
+      const region = {
+        latitude: 88.1,
+        longitude: 44.1,
+        latitudeDelta: 0.4,
+        longitudeDelta: 0.3
+      }
       setupExploreEndpointHandlerExpectingRegion(
         region.latitude,
         region.longitude,
-        minRegionMeterRadius(region)
+        66716.955
       )
       const events = await eventsByRegion(
         region,
@@ -210,7 +214,10 @@ describe("ExploreEvents tests", () => {
       mockTiFServer({
         exploreEvents: {
           expectedRequest: {
-            body: { userLocation: { latitude, longitude }, radius }
+            body: {
+              userLocation: { latitude, longitude },
+              radius: expect.closeTo(radius)
+            }
           },
           mockResponse: {
             status: 200,
