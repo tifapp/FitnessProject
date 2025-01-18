@@ -3,7 +3,14 @@ import { AppStyles } from "@lib/AppColorStyle"
 import { FontScaleFactors, useFontScale } from "@lib/Fonts"
 import { withTiFDefaultSpring } from "@lib/Reanimated"
 import { useEffectEvent } from "@lib/utils/UseEffectEvent"
-import { PrimitiveAtom, useAtom, useSetAtom } from "jotai"
+import {
+  events,
+  hapticPattern,
+  singleEventPattern,
+  transientEvent,
+  useHaptics
+} from "@modules/tif-haptics"
+import { PrimitiveAtom, useAtom, useAtomValue, useSetAtom } from "jotai"
 import { useEffect, useRef, useState } from "react"
 import {
   StyleProp,
@@ -156,6 +163,52 @@ type SliderKnobProps = {
   height: number
 }
 
+// const durationChangedPattern
+
+const HAPTIC_PATTERNS = [
+  singleEventPattern(
+    transientEvent(0.0, { HapticIntensity: 0.4, HapticSharpness: 0.5 })
+  ),
+  singleEventPattern(
+    transientEvent(0.0, { HapticIntensity: 0.5, HapticSharpness: 0.6 })
+  ),
+  singleEventPattern(
+    transientEvent(0.0, { HapticIntensity: 0.6, HapticSharpness: 0.7 })
+  ),
+  singleEventPattern(
+    transientEvent(0.0, { HapticIntensity: 0.7, HapticSharpness: 0.8 })
+  ),
+  singleEventPattern(
+    transientEvent(0.0, { HapticIntensity: 0.8, HapticSharpness: 0.9 })
+  ),
+  singleEventPattern(
+    transientEvent(0.0, { HapticIntensity: 0.9, HapticSharpness: 1.0 })
+  )
+]
+
+const useSliderKnob = (
+  durationAtom: PrimitiveAtom<number>,
+  isSliding: SharedValue<boolean>,
+  sliderPosition: SharedValue<number>,
+  stateEntries: EditEventDurationPickerStateEntries
+) => {
+  const haptics = useHaptics()
+  const [duration, setDuration] = useAtom(durationAtom)
+  const animateToPosition = useEffectEvent((dimensions?: LayoutRectangle) => {
+    if (!isSliding.value) {
+      sliderPosition.value = withTiFDefaultSpring(dimensions?.x ?? 0)
+    }
+  })
+  return {
+    duration,
+    animateToPosition,
+    setDuration: (duration: number) => {
+      haptics.play(HAPTIC_PATTERNS[durationIndex(stateEntries, duration)])
+      setDuration(duration)
+    }
+  }
+}
+
 const SliderKnobView = ({
   durationAtom,
   sliderPosition,
@@ -163,14 +216,14 @@ const SliderKnobView = ({
   pickerState,
   height
 }: SliderKnobProps) => {
-  const [duration, setDuration] = useAtom(durationAtom)
   const stateEntries = pickerStateEntries(pickerState)
+  const { duration, animateToPosition, setDuration } = useSliderKnob(
+    durationAtom,
+    isSliding,
+    sliderPosition,
+    stateEntries
+  )
   const selectedDimensions = layoutForDuration(stateEntries, duration)
-  const animateToPosition = useEffectEvent((dimensions?: LayoutRectangle) => {
-    if (!isSliding.value) {
-      sliderPosition.value = withTiFDefaultSpring(dimensions?.x ?? 0)
-    }
-  })
   const previousTranslation = useSharedValue(0)
   const didAppear = useRef(false)
   useEffect(() => {
@@ -340,16 +393,24 @@ export const durationAtPosition = (
   return entries[index][0]
 }
 
+const durationIndex = (
+  entries: EditEventDurationPickerStateEntries,
+  duration: number
+) => {
+  "worklet"
+  return entries.findIndex(([d, _], i, entries) => {
+    if (i === entries.length - 1) return duration >= d
+    if (i === 0) return duration < entries[i + 1][0]
+    return duration >= d && duration < entries[i + 1][0]
+  })
+}
+
 export const layoutForDuration = (
   entries: EditEventDurationPickerStateEntries,
   duration: number
 ) => {
   "worklet"
-  const index = entries.findIndex(([d, _], i, entries) => {
-    if (i === entries.length - 1) return duration >= d
-    if (i === 0) return duration < entries[i + 1][0]
-    return duration >= d && duration < entries[i + 1][0]
-  })
+  const index = durationIndex(entries, duration)
   if (!entries[index]) return undefined
   if (index === entries.length - 1) return entries[index][1]
   return {
