@@ -31,6 +31,7 @@ const { bundleIdentifier, icon, splash, name } =
         }
 
 const config = {
+  owner: "tifapp",
   name,
   slug: "FitnessApp",
   scheme: "tifapp",

@@ -184,7 +184,7 @@
     "better-sqlite3": "^9.4.1",
     "detox": "^20.19.3",
     "dotenv": "^16.4.3",
-    "eas-cli": "^14.4.0",
+    "eas-cli": "^14.4.1",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^8.6.0",
     "eslint-config-standard": "^17.0.0",
