@@ -41,16 +41,16 @@ const isMinRadiusDifferenceAboveThreshold = (
   r2: ExploreEventsRegion,
   thresholdMeters: number
 ) => {
-  const radiusDiff = minRegionMeterRadius(r1) - minRegionMeterRadius(r2)
+  const radiusDiff = maxRegionMeterRadius(r1) - maxRegionMeterRadius(r2)
   return Math.abs(radiusDiff) > thresholdMeters
 }
 
 /**
- * Computes the minimum radius in meters of a region.
+ * Computes the maximum radius in meters of a region.
  *
- * The minimum radius is computed based on the minimum of the latitude and longitude delta.
+ * The minimum radius is computed based on the maximum of the latitude and longitude delta.
  */
-export const minRegionMeterRadius = (region: ExploreEventsRegion) => {
+export const maxRegionMeterRadius = (region: ExploreEventsRegion) => {
   const isMinLatitude = region.latitudeDelta < region.longitudeDelta
   return coordinateDistance(
     region,

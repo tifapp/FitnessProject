@@ -1,5 +1,5 @@
 import {
-  minRegionMeterRadius,
+  maxRegionMeterRadius,
   regionRect,
   containsRegionRect,
   containsRegion,
@@ -7,10 +7,10 @@ import {
 } from "./Region"
 
 describe("Region tests", () => {
-  describe("minRegionMeterRadius tests", () => {
+  describe("maxRegionMeterRadius tests", () => {
     it("uses the latitude delta meter length when latitude delta more then longitude delta", () => {
       expect(
-        minRegionMeterRadius({
+        maxRegionMeterRadius({
           latitude: 88.1,
           longitude: 44.1,
           latitudeDelta: 0.4,
@@ -21,7 +21,7 @@ describe("Region tests", () => {
 
     it("uses the longitude delta meter length when longitude delta more then latitude delta", () => {
       expect(
-        minRegionMeterRadius({
+        maxRegionMeterRadius({
           latitude: 88.1,
           longitude: 44.1,
           latitudeDelta: 0.7,
