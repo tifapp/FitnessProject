@@ -14,10 +14,6 @@ import DraggableViewMeta, {
   Basic as DraggableView
 } from "../components/DraggableView/DraggableView.stories"
 
-import TestStoryMeta, {
-  Basic as TestStory
-} from "../components/TestStory/TestStory.stories"
-
 import MapSnippetMeta, {
   Basic as MapSnippet
 } from "../components/MapSnippet/MapSnippet.stories"
