@@ -6,8 +6,8 @@ import {
   createStaticNavigation
 } from "@react-navigation/native"
 import { createNativeStackNavigator } from "@react-navigation/native-stack"
-import { eventDetailsScreens } from "./EventDetails"
 import { StyleSheet } from "react-native"
+import { eventDetailsScreens } from "./EventDetails"
 import { ModalStack } from "./ModalStack"
 
 const HomeScreen = withAlphaRegistration(() => (
@@ -17,6 +17,14 @@ const HomeScreen = withAlphaRegistration(() => (
 const Stack = createNativeStackNavigator({
   screenOptions: BASE_HEADER_SCREEN_OPTIONS,
   screens: {
+    intro: {
+      options: { headerShown: false },
+      screen: HomeScreen
+    },
+    journaling: {
+      options: { headerShown: false },
+      screen: HomeScreen
+    },
     home: {
       options: { headerShown: false },
       screen: HomeScreen

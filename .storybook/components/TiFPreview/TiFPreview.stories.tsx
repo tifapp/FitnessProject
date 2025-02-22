@@ -31,17 +31,21 @@ userSettings.update({
   eventPresetDurations: [3900, 7500, 8400, 12300, 9500, 13700]
 })
 
-export const Basic = () => (
-  <SettingsProvider
-    localSettingsStore={localSettings}
-    userSettingsStore={userSettings}
-  >
-    <AlphaUserSessionProvider storage={storage}>
-      <TiFView
-        fetchEvents={eventsByRegion}
-        isFontsLoaded={true}
-        style={{ flex: 1 }}
-      />
-    </AlphaUserSessionProvider>
-  </SettingsProvider>
-)
+export const Basic = () => {
+  storage
+  
+  return (
+    <SettingsProvider
+      localSettingsStore={localSettings}
+      userSettingsStore={userSettings}
+    >
+      <AlphaUserSessionProvider storage={storage}>
+        <TiFView
+          fetchEvents={eventsByRegion}
+          isFontsLoaded={true}
+          style={{ flex: 1 }}
+        />
+      </AlphaUserSessionProvider>
+    </SettingsProvider>
+  )
+}
