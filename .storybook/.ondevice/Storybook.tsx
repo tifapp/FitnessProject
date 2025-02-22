@@ -1,5 +1,9 @@
 import React, { useState } from "react"
 
+import PragmaDesignMeta, {
+  Basic as PragmaDesign
+} from "../components/PragmaDesign/PragmaDesign.stories"
+
 import CollisionContextMeta, {
   Basic as CollisionContext
 } from "../components/CollisionContext/CollisionContext.stories"
@@ -117,6 +121,12 @@ addLogHandler(
 
 // Create an array of stories
 const stories = [
+  {
+    name: PragmaDesignMeta.title,
+    component: PragmaDesign,
+    args: PragmaDesignMeta.args
+  },
+
   {
     name: DragAndDropMeta.title,
     component: DragAndDrop
