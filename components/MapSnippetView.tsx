@@ -35,7 +35,7 @@ export type ExpandableMapSnippetProps = {
   onExpansionChanged: (isExpanded: boolean) => void
   onMarkerPressed?: () => void
   region: Region
-  overlay?: ReactNode
+  overlay?: ReactNode | ((isExpanding: boolean) => ReactNode)
   marker?: ReactNode
   style?: StyleProp<ViewStyle>
   collapsedMapProps?: MapViewProps
@@ -68,29 +68,29 @@ export const ExpandableMapSnippetView = forwardRef(function Snippet(
     LayoutRectangle | undefined
   >()
   const progress = useSharedValue(0)
-  const isExpanding = useSharedValue(false)
-  useEffect(() => {
-    isExpanding.value = isExpanded
-  }, [isExpanding, isExpanded])
+  const isExpandingShared = useSharedValue(false)
+  const [isExpanding, setIsExpanding] = useState(false)
+  isExpandingShared.value = isExpanding
+  useEffect(() => setIsExpanding(isExpanded), [isExpanded])
   const expand = useCallback(() => {
     if (!snippetRef.current) return
     snippetRef.current.measure((_, __, width, height, pageX, pageY) => {
       setSnippetLayout({ x: pageX, y: pageY, width, height })
-      isExpanding.value = true
+      setIsExpanding(true)
       progress.value = 0
       onExpansionChanged(true)
       progress.value = withTiFDefaultSpring(1)
     })
-  }, [progress, isExpanding, onExpansionChanged])
+  }, [progress, onExpansionChanged])
   const collapse = useCallback(() => {
-    isExpanding.value = false
+    setIsExpanding(false)
     progress.value = withTiFDefaultSpring(0, (finished) => {
       "worklet"
       if (finished) {
         runOnJS(onExpansionChanged)(false)
       }
     })
-  }, [progress, isExpanding, onExpansionChanged])
+  }, [progress, onExpansionChanged])
   return (
     <View style={style}>
       <View style={styles.container}>
@@ -99,7 +99,12 @@ export const ExpandableMapSnippetView = forwardRef(function Snippet(
             <MapView
               {...collapsedMapProps}
               ref={ref}
-              style={[{ height: Math.max(300, 200 + overlayLayout.height) }]}
+              style={[
+                {
+                  height: Math.max(300, 200 + overlayLayout.height),
+                  opacity: isExpanded ? 0 : 1
+                }
+              ]}
               loadingEnabled
               zoomEnabled={false}
               scrollEnabled={false}
@@ -131,7 +136,7 @@ export const ExpandableMapSnippetView = forwardRef(function Snippet(
               style={styles.overlay}
               onLayout={(event) => setOverlayLayout(event.nativeEvent.layout)}
             >
-              {overlay}
+              {overlay instanceof Function ? overlay(isExpanding) : overlay}
             </View>
           </View>
         </View>
@@ -141,6 +146,7 @@ export const ExpandableMapSnippetView = forwardRef(function Snippet(
             region={region}
             onCollapsed={collapse}
             isExpanding={isExpanding}
+            isExpandingShared={isExpandingShared}
             progress={progress}
             overlay={overlay}
             marker={marker}
@@ -157,10 +163,11 @@ export const ExpandableMapSnippetView = forwardRef(function Snippet(
 
 type ExpandedMapProps = {
   region: Region
-  overlay?: ReactNode
+  overlay?: ReactNode | ((isExpanding: boolean) => ReactNode)
   marker?: ReactNode
   progress: SharedValue<number>
-  isExpanding: SharedValue<boolean>
+  isExpanding: boolean
+  isExpandingShared: SharedValue<boolean>
   mapLayout: LayoutRectangle
   overlayLayout: LayoutRectangle
   isVisible: boolean
@@ -181,6 +188,7 @@ const ExpandedMapView = ({
   marker,
   progress,
   isExpanding,
+  isExpandingShared,
   onMarkerPressed,
   expandedMapProps
 }: ExpandedMapProps) => {
@@ -194,16 +202,18 @@ const ExpandedMapView = ({
     const mapHeightAdder = Platform.OS === "android" ? safeAreaInsets.top : 0
     return {
       position: "absolute",
-      top: withTiFDefaultSpring(isExpanding.value ? 0 : y),
-      left: withTiFDefaultSpring(isExpanding.value ? 0 : x),
+      top: withTiFDefaultSpring(isExpandingShared.value ? 0 : y),
+      left: withTiFDefaultSpring(isExpandingShared.value ? 0 : x),
       width: withTiFDefaultSpring(
-        isExpanding.value ? windowDimensions.width : width
+        isExpandingShared.value ? windowDimensions.width : width
       ),
       height: withTiFDefaultSpring(
-        isExpanding.value ? windowDimensions.height + mapHeightAdder : height
+        isExpandingShared.value
+          ? windowDimensions.height + mapHeightAdder
+          : height
       )
     }
-  }, [mapLayout])
+  }, [mapLayout, isExpanding])
   const bottomPadding = useScreenBottomPadding({
     safeAreaScreens: 8,
     nonSafeAreaScreens: 24
@@ -212,16 +222,16 @@ const ExpandedMapView = ({
     position: "absolute",
     height: "100%",
     top: withTiFDefaultSpring(
-      isExpanding.value
+      isExpandingShared.value
         ? safeAreaInsets.top + (Platform.OS === "android" ? 8 : 0)
         : 8
     ),
-    right: withTiFDefaultSpring(isExpanding.value ? 24 : 8)
+    right: withTiFDefaultSpring(isExpandingShared.value ? 24 : 8)
   }))
   const overlayStyle = useAnimatedStyle(() => ({
-    paddingHorizontal: withTiFDefaultSpring(isExpanding.value ? 24 : 16),
+    paddingHorizontal: withTiFDefaultSpring(isExpandingShared.value ? 24 : 16),
     bottom: withTiFDefaultSpring(
-      isExpanding.value ? safeAreaInsets.bottom + bottomPadding : 16
+      isExpandingShared.value ? safeAreaInsets.bottom + bottomPadding : 16
     )
   }))
   return (
@@ -250,7 +260,9 @@ const ExpandedMapView = ({
           <Animated.View
             style={[styles.fullscreenOverlayContainer, overlayStyle]}
           >
-            <View style={styles.fullscreenOverlay}>{overlay}</View>
+            <View style={styles.fullscreenOverlay}>
+              {overlay instanceof Function ? overlay(isExpanding) : overlay}
+            </View>
           </Animated.View>
           <Animated.View style={animatedCollapseButtonStyle}>
             <TouchableIonicon
@@ -303,8 +315,6 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: 16,
     marginHorizontal: 16,
-    borderRadius: 12,
-    backgroundColor: "white",
     width: "100%",
     overflow: "hidden"
   },
@@ -315,8 +325,6 @@ const styles = StyleSheet.create({
     bottom: 0
   },
   fullscreenOverlay: {
-    borderRadius: 12,
-    backgroundColor: "white",
     width: "100%",
     overflow: "hidden"
   }

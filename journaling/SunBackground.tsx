@@ -16,8 +16,8 @@ import {
   withTiming
 } from "react-native-reanimated"
 import { EdgeInsets } from "react-native-safe-area-context"
-import { Cloud, MovingCloudsDrawing } from "./Clouds"
 import { FixedDateRange } from "TiFShared/domain-models/FixedDateRange"
+import { Cloud, MovingCloudsDrawing } from "./Clouds"
 
 export type SunBackgroundColor = string
 
@@ -47,7 +47,8 @@ export namespace Sky {
     sunset: ["#0C52BA", "#EC54B6", "#F7482E"] as SkyGradient,
     morning: ["#17D0F9", "#24B7FB", "#319EFD"] as SkyGradient,
     afternoon: ["#438AEF", "#266DCD", "#0A50AB"] as SkyGradient,
-    midDay: ["#3FADFB", "#6CACFF", "#3183FD"] as SkyGradient
+    midDay: ["#3FADFB", "#6CACFF", "#3183FD"] as SkyGradient,
+    night: ["#0A1D4C", "#1A2B5C", "#0E1A3B"] as SkyGradient
   }
 
   export const gradientAtTime = (
@@ -55,16 +56,17 @@ export namespace Sky {
     dayRange: SunBackgroundDayRange
   ) => {
     const sunEventTime = SUN_EVENT_TIME_MINUTES / dayRange.diff.minutes
-    if (t <= sunEventTime) {
+    if (t < 0 || t > 1) return gradients.night
+    if (t <= 0.2) {
       return gradients.sunrise
-    } else if (t >= 1 - sunEventTime) {
-      return gradients.sunset
-    } else if (t <= 0.3) {
+    } else if (t <= 0.4) {
       return gradients.morning
-    } else if (t <= 0.7) {
+    } else if (t <= 0.6) {
       return gradients.midDay
-    } else {
+    } else if (t <= 0.8) {
       return gradients.afternoon
+    } else {
+      return gradients.sunset
     }
   }
 
@@ -165,29 +167,103 @@ export type SunProps = {
   edgeInsets: EdgeInsets
 }
 
+export namespace Moon {
+  export const gradients = {
+    base: ["#FFFFFF", "#F4F4F4", "#E8E8E8", "#DADADA"] as SunGradient,
+    glow: ["rgba(56, 76, 112, 0.4)", "rgba(44, 59, 89, 0.2)", "rgba(30, 42, 66, 0.1)", "rgba(19, 29, 53, 0)"] as SunGradient,
+    ring: ["rgba(190, 210, 255, 0.3)", "rgba(150, 180, 255, 0.2)", "rgba(100, 140, 255, 0.1)", "rgba(80, 120, 255, 0)"] as SunGradient
+  }
+}
+
 export const SunDrawing = ({ background, size, edgeInsets }: SunProps) => {
   const sunX = size.width * 0.5
   const sunY = Sun.absoluteYPosition(background.time, size, edgeInsets)
   const ringRadius = useSharedValue(FADE_RING_RADIUS)
   const ringOpacity = useSharedValue(0)
+  const moonGlowRadius = useSharedValue(FADE_RING_RADIUS)
+
+  const isNight = background.time < 0 || background.time > 1
+
   useEffect(() => {
-    ringRadius.value = withRepeat(
-      withTiming(FADE_RING_TARGET_RADIUS, {
-        duration: 3500,
-        easing: Easing.linear
-      }),
-      -1,
-      false
+    if (isNight) {
+      moonGlowRadius.value = 110
+    } else {
+      ringRadius.value = withRepeat(
+        withTiming(FADE_RING_TARGET_RADIUS, {
+          duration: 3500,
+          easing: Easing.linear
+        }),
+        -1,
+        false
+      )
+      ringOpacity.value = withRepeat(
+        withSequence(
+          withTiming(1.0, { duration: 1000, easing: Easing.linear }),
+          withTiming(0, { duration: 2500, easing: Easing.linear })
+        ),
+        -1,
+        true
+      )
+    }
+  }, [ringRadius, ringOpacity, moonGlowRadius, isNight])
+
+  if (isNight) {
+    return (
+      <Group>
+        {/* Animated moonlight ring */}
+        <Circle cx={sunX} cy={sunY} r={moonGlowRadius}>
+          <RadialGradient
+            c={{ x: sunX, y: sunY }}
+            r={FADE_RING_TARGET_RADIUS + 20}
+            colors={Moon.gradients.ring}
+            positions={[0.4, 0.6, 0.8, 1]}
+          />
+        </Circle>
+
+        {/* Static moon glow */}
+        <Circle cx={sunX} cy={sunY} r={OUTER_RING_RADIUS + 16}>
+          <RadialGradient
+            c={{ x: sunX, y: sunY }}
+            r={OUTER_RING_RADIUS + 16}
+            colors={Moon.gradients.glow}
+            positions={[0.3, 0.5, 0.7, 1]}
+          />
+        </Circle>
+
+        {/* Main moon body */}
+        <Circle cx={sunX} cy={sunY} r={CORE_RADIUS}>
+          <RadialGradient
+            c={{ x: sunX, y: sunY }}
+            r={CORE_RADIUS}
+            colors={Moon.gradients.base}
+            positions={[0.4, 0.6, 0.8, 1]}
+          />
+        </Circle>
+
+        {/* Crater details */}
+        <Circle
+          cx={sunX - 15}
+          cy={sunY - 10}
+          r={8}
+          color="#E0E0E0"
+        />
+        <Circle
+          cx={sunX + 10}
+          cy={sunY + 15}
+          r={12}
+          color="#EBEBEB"
+        />
+        <Circle
+          cx={sunX + 18}
+          cy={sunY - 12}
+          r={6}
+          color="#E5E5E5"
+        />
+      </Group>
     )
-    ringOpacity.value = withRepeat(
-      withSequence(
-        withTiming(1.0, { duration: 1000, easing: Easing.linear }),
-        withTiming(0, { duration: 2500, easing: Easing.linear })
-      ),
-      -1,
-      true
-    )
-  }, [ringRadius, ringOpacity])
+  }
+
+  // Original sun rendering
   const gradient = Sun.gradientAtTime(background.time, background.dayRange)
   return (
     <Group>

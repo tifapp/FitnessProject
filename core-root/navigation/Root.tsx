@@ -1,3 +1,4 @@
+import { TiFBottomSheetProvider } from "@components/BottomSheet"
 import { BASE_HEADER_SCREEN_OPTIONS } from "@components/Navigation"
 import { withAlphaRegistration } from "@core-root/AlphaRegister"
 import { HomeView } from "@core-root/Home"
@@ -8,10 +9,13 @@ import {
 import { createNativeStackNavigator } from "@react-navigation/native-stack"
 import { StyleSheet } from "react-native"
 import { eventDetailsScreens } from "./EventDetails"
+import { helpAndSupportScreens } from "./Feedback"
 import { ModalStack } from "./ModalStack"
 
 const HomeScreen = withAlphaRegistration(() => (
-  <HomeView style={styles.screen} />
+  <TiFBottomSheetProvider>
+    <HomeView style={styles.screen} />
+  </TiFBottomSheetProvider>
 ))
 
 const Stack = createNativeStackNavigator({
@@ -29,7 +33,8 @@ const Stack = createNativeStackNavigator({
       options: { headerShown: false },
       screen: HomeScreen
     },
-    ...eventDetailsScreens()
+    ...eventDetailsScreens(),
+    ...helpAndSupportScreens()
   },
   groups: {
     modals: {

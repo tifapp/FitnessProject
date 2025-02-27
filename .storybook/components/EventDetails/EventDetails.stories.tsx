@@ -34,7 +34,7 @@ import {
 import { loadJoinEventPermissions } from "@event/JoinEvent"
 import { EventActionsMenuView, useEventActionsMenu } from "@event/Menu"
 import { UserSessionProvider } from "@user/Session"
-import { uuidString } from "@lib/utils/UUID"
+import { uuidString } from "TiFShared/lib/UUID"
 import { EmailAddress } from "@user/privacy"
 import { EventCard } from "@event/EventCard"
 import { ScrollView } from "react-native"

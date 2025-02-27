@@ -1,5 +1,5 @@
 import { faker } from "@faker-js/faker"
-import { uuidString } from "@lib/utils/UUID"
+import { uuidString } from "TiFShared/lib/UUID"
 import { BlockListPage, BlockListUser } from "TiFShared/domain-models/BlockList"
 import { UserHandle } from "TiFShared/domain-models/User"
 import { repeatElements } from "TiFShared/lib/Array"

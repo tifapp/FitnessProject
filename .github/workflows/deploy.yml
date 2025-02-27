@@ -31,7 +31,7 @@ jobs:
           pr_body: "See commit history for details"
 
   eas-build:
-    name: Perform EAS Build
+    name: Request EAS Build
     runs-on: ubuntu-latest
     env:
       EXPO_PROJECT_ID: ${{ secrets.EXPO_PROJECT_ID }}
@@ -82,4 +82,4 @@ jobs:
           echo "API_URL=${{ secrets.API_ENDPOINT }}" >> .env
 
       - name: Trigger Build on EAS
-        run: eas build --profile preview --platform android --non-interactive --no-wait
+        run: eas build --profile preview --platform all --non-interactive --no-wait

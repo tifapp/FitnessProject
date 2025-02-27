@@ -28,7 +28,8 @@ import { NetInfoInternetConnectionStatus } from "@lib/InternetConnection"
 import { consoleLogHandler, logger, addLogHandler } from "TiFShared/logging"
 import { dayjs } from "TiFShared/lib/Dayjs"
 import { eventsByRegion } from "@explore-events-boundary"
-import { AlphaUserSessionProvider } from "@user/alpha"
+import { AlphaUserSessionProvider, AlphaUserStorage } from "@user/alpha"
+import { LiveEventsStore } from "@event/LiveEvents"
 
 const log = logger("app.root")
 
@@ -51,6 +52,7 @@ export const setupApp = () => {
   addPushTokenListener(registerForPushNotifications)
   setupInternetReconnectionRefreshes(NetInfoInternetConnectionStatus.shared)
   setupFocusRefreshes()
+  LiveEventsStore.default.observeUserChanges(AlphaUserStorage.default)
 }
 
 export type AppProps = {

@@ -1,4 +1,9 @@
-import { NavigationProp, useNavigation } from "@react-navigation/native"
+import {
+  EditEventFormValues,
+  toRouteableEditFormValues
+} from "@event/EditFormValues"
+import { useNavigation } from "@react-navigation/native"
+import { NativeStackHeaderLeftProps } from "@react-navigation/native-stack"
 import { type NavigationState } from "@react-navigation/routers"
 import {
   StackNavigationProp,
@@ -6,14 +11,10 @@ import {
 } from "@react-navigation/stack"
 import React, { useEffect, useRef } from "react"
 import { StyleProp, StyleSheet, ViewStyle } from "react-native"
-import { TouchableIonicon } from "./common/Icons"
 import { EventID } from "TiFShared/domain-models/Event"
 import { UserHandle, UserID } from "TiFShared/domain-models/User"
-import {
-  EditEventFormValues,
-  toRouteableEditFormValues
-} from "@event/EditFormValues"
-import { NativeStackHeaderLeftProps } from "@react-navigation/native-stack"
+import { TouchableIonicon } from "./common/Icons"
+import { useBottomSheetModal } from "@gorhom/bottom-sheet"
 
 /**
  * A helper type that's useful for making reusable navigation flows.
@@ -33,10 +34,34 @@ export type UseNavigationReturn = Omit<
 }
 
 /**
+ * Returns the main navigator in the current navigation context in the app.
+ *
+ * Use this instead hook of `useNavigation`, as this hook will ensure to dismiss any bottom sheet
+ * modals when navigating.
+ */
+export const useTiFNavigation = (): UseNavigationReturn => {
+  const { dismissAll } = useBottomSheetModal()
+  const navigation = useNavigation<UseNavigationReturn>()
+  const navigate: UseNavigationReturn["navigate"] = (
+    ...args: Parameters<UseNavigationReturn["navigate"]>
+  ) => {
+    dismissAll()
+    navigation.navigate(...args)
+  }
+  const replace: UseNavigationReturn["replace"] = (
+    ...args: Parameters<UseNavigationReturn["replace"]>
+  ) => {
+    dismissAll()
+    navigation.navigate(...args)
+  }
+  return { ...navigation, navigate, replace }
+}
+
+/**
  * Returns an object of functions to navigate to essential app screens.
  */
 export const useCoreNavigation = () => {
-  const navigation = useNavigation<UseNavigationReturn>()
+  const navigation = useTiFNavigation()
   return {
     presentEditEvent: (edit: EditEventFormValues, id?: EventID) => {
       const formValues = toRouteableEditFormValues(edit)
@@ -104,7 +129,7 @@ export type BackButtonProps = NativeStackHeaderLeftProps & {
 export const useBackButton = (
   Button?: (props: BackButtonProps) => JSX.Element
 ) => {
-  const navigation = useNavigation<UseNavigationReturn>()
+  const navigation = useTiFNavigation()
   const DefaultButton = useDefaultBackButtonView()
   const HeaderButton = Button ?? DefaultButton
   useEffect(() => {
@@ -116,7 +141,7 @@ export const useBackButton = (
 
 const useDefaultBackButtonView = () => {
   const indexRef = useRef(-1)
-  const state = useNavigation().getState()
+  const state = useTiFNavigation().getState()
   indexRef.current =
     indexRef.current === -1 && state?.index !== undefined
       ? state.index
@@ -132,7 +157,7 @@ export const ChevronBackButton = ({
   navigation,
   style = styles.backButtonPadding
 }: BackButtonProps) => {
-  const currentNavigation = useNavigation()
+  const currentNavigation = useTiFNavigation()
   return (
     <TouchableIonicon
       icon={{ name: "chevron-back" }}
@@ -147,7 +172,7 @@ export const XMarkBackButton = ({
   navigation,
   style = styles.backButtonPadding
 }: BackButtonProps) => {
-  const currentNavigation = useNavigation()
+  const currentNavigation = useTiFNavigation()
   return (
     <TouchableIonicon
       icon={{ name: "close" }}

@@ -6,12 +6,18 @@ import { AppStyles } from "@lib/AppColorStyle"
 import {
   EmailCompositionResult,
   EmailTemplate,
+  presentEmailComposer,
   TIF_SUPPORT_EMAIL
 } from "@lib/EmailComposition"
+import { featureContext } from "@lib/FeatureContext"
+import { compileLogs } from "@lib/Logging"
+import { UserInfoEmailFileFeature } from "@lib/UserInfoEmailFile"
 import { useOpenWeblink } from "@modules/tif-weblinks"
 import { useQuery } from "@tanstack/react-query"
+import { isAvailableAsync } from "expo-mail-composer"
 import React from "react"
-import { StyleProp, ViewStyle } from "react-native"
+import { Platform, StyleProp, ViewStyle } from "react-native"
+import { UserID } from "TiFShared/domain-models/User"
 
 export const COMPILING_LOGS_INFO_URL = "https://logs.com"
 
@@ -30,51 +36,55 @@ const email = (
 })
 
 const emailSection = (name: string) => {
-  return `<strong>${name}</strong><br><br><br>` as EmailSection
+  return Platform.OS === "android"
+    ? (`<strong>${name}</strong><br><br><br><br><br><br>` as EmailSection)
+    : (`<strong>${name}</strong><br><br><br>` as EmailSection)
 }
 
 export const HELP_AND_SUPPORT_EMAILS = {
-  feedbackSubmitted: email(
-    "App Feedback",
-    [],
-    emailSection(
-      "📝 1. Select one or more feedback topics below and provide the necessary details. (Required)"
+  feedbackSubmitted: (tempUserIDURI?: string) =>
+    email(
+      "App Feedback",
+      tempUserIDURI ? [tempUserIDURI] : [],
+      emailSection(
+        "📝 Select one or more feedback topics below and provide the necessary details. (Required)"
+      ),
+      emailSection("a. App functionality (How could the app help you?)"),
+      emailSection(
+        "b. Creative synergy (Are the features of the app helping you progress?)"
+      ),
+      emailSection("c. Other feedback (Any other general feedback you have)"),
+      emailSection(
+        "📸 Provide any supplementary information or files related to the feedback above. (Optional)"
+      )
     ),
-    emailSection("a. App functionality (How could the app help you?)"),
-    emailSection(
-      "b. Creative synergy (Are the features of the app helping you progress?)"
-    ),
-    emailSection("c. Other feedback (Any other general feedback you have)"),
-    emailSection(
-      "📸 2. Provide any supplementary information or files related to the feedback above. (Optional)"
-    )
-  ),
-  bugReported: (compileLogsURI?: string) => {
+  bugReported: (attachments?: string[]) => {
     return email(
       "App Bug Report",
-      compileLogsURI ? [compileLogsURI] : [],
+      attachments || [],
       emailSection(
-        "🐞 1. Briefly describe the bug and the issues it is causing in the app. (Required)"
+        "🐞 Briefly describe the bug and the issues it is causing in the app. (Required)"
       ),
       emailSection(
         "a. Specify the steps that it took for you to get to the bug. (Required)"
       ),
       emailSection("b. What did you expect to happen? (Required)"),
       emailSection(
-        "📸 2. Provide any supplementary information or screenshots related to the feedback above. (Optional)"
+        "📸 Provide any supplementary information or screenshots related to the feedback above. (Optional)"
       )
     )
   },
-  questionSubmitted: email(
-    "App Question",
-    [],
-    emailSection(
-      "❓ 1. List your question(s) and provide all relevant details. (Required)"
-    ),
-    emailSection(
-      "📸 2. Provide any supplementary information or screenshots related to these question(s). (Optional)"
+  questionSubmitted: (tempUserIDURI?: string) =>
+    email(
+      "App Question",
+      tempUserIDURI ? [tempUserIDURI] : [],
+      emailSection(
+        "❓ List your question(s) and provide all relevant details. (Required)"
+      ),
+      emailSection(
+        "📸 Provide any supplementary information or screenshots related to these question(s). (Optional)"
+      )
     )
-  )
 }
 
 export const HELP_AND_SUPPORT_ALERTS = {
@@ -112,7 +122,7 @@ export const HELP_AND_SUPPORT_ALERTS = {
       }
     ]
   }),
-  compileLogError: (confirmLogsCompileError?: () => void) => ({
+  compileLogError: (confirmLogsCompileError?: () => Promise<void>) => ({
     title: "Oops!",
     description:
       "We're sorry, we had an error compiling logs. Sending bug report without logs.",
@@ -172,28 +182,38 @@ export const HelpAndSupportView = ({ style, state }: EventSettingsProps) => (
   </TiFFormScrollView>
 )
 
+export const HelpAndSupportFeature = featureContext({
+  isMailComposerAvailable: isAvailableAsync,
+  compileLogs,
+  composeEmail: presentEmailComposer
+})
+
 export type UseHelpAndSupportSettingsEnvironment = {
-  isMailComposerAvailable: () => Promise<boolean>
-  compileLogs: () => Promise<string>
-  composeEmail: (email: EmailTemplate) => Promise<EmailCompositionResult>
+  userID: UserID
 }
 
 export const useHelpAndSupportSettings = (
   env: UseHelpAndSupportSettingsEnvironment
 ) => {
+  const { isMailComposerAvailable, compileLogs, composeEmail } =
+    HelpAndSupportFeature.useContext()
+  const { createTempIDFile, deleteTempIDFile } =
+    UserInfoEmailFileFeature.useContext()
   const { data: isShowingContactSection } = useQuery({
     queryKey: ["isMailComposerAvailable"],
-    queryFn: async () => await env.isMailComposerAvailable(),
+    queryFn: async () => await isMailComposerAvailable(),
     initialData: true
   })
   const open = useOpenWeblink()
-
   return {
     isShowingContactSection,
-    feedbackSubmitted: () => {
-      tryComposeEmail(
-        env.composeEmail,
-        HELP_AND_SUPPORT_EMAILS.feedbackSubmitted,
+    feedbackSubmitted: async () => {
+      await tryComposeEmail(
+        composeEmail,
+        HELP_AND_SUPPORT_EMAILS.feedbackSubmitted(
+          await createTempIDFile(env.userID)
+        ),
+        deleteTempIDFile,
         "submitFeedback"
       )
     },
@@ -203,26 +223,44 @@ export const useHelpAndSupportSettings = (
           async () => {
             try {
               await tryComposeBugReportEmail(
-                env.composeEmail,
-                await env.compileLogs()
+                composeEmail,
+                env.userID,
+                deleteTempIDFile,
+                [await createTempIDFile(env.userID), await compileLogs()]
               )
             } catch {
               presentAlert(
-                HELP_AND_SUPPORT_ALERTS.compileLogError(() => {
-                  tryComposeBugReportEmail(env.composeEmail)
+                HELP_AND_SUPPORT_ALERTS.compileLogError(async () => {
+                  await tryComposeBugReportEmail(
+                    composeEmail,
+                    env.userID,
+                    deleteTempIDFile,
+                    [await createTempIDFile(env.userID)]
+                  )
                 })
               )
             }
+            await deleteTempIDFile()
           },
-          async () => await tryComposeBugReportEmail(env.composeEmail),
+          async () => {
+            await tryComposeBugReportEmail(
+              composeEmail,
+              env.userID,
+              deleteTempIDFile,
+              [await createTempIDFile(env.userID)]
+            )
+          },
           () => open(COMPILING_LOGS_INFO_URL)
         )
       )
     },
-    questionSubmitted: () => {
-      tryComposeEmail(
-        env.composeEmail,
-        HELP_AND_SUPPORT_EMAILS.questionSubmitted,
+    questionSubmitted: async () => {
+      await tryComposeEmail(
+        composeEmail,
+        HELP_AND_SUPPORT_EMAILS.questionSubmitted(
+          await createTempIDFile(env.userID)
+        ),
+        deleteTempIDFile,
         "submitQuestion"
       )
     }
@@ -231,11 +269,16 @@ export const useHelpAndSupportSettings = (
 
 const tryComposeBugReportEmail = async (
   composeEmail: (email: EmailTemplate) => Promise<EmailCompositionResult>,
-  uri?: string
+  userID: UserID,
+  deleteTempIDFile: () => Promise<void>,
+  attachments?: (string | undefined)[]
 ) => {
   await tryComposeEmail(
     composeEmail,
-    HELP_AND_SUPPORT_EMAILS.bugReported(uri),
+    HELP_AND_SUPPORT_EMAILS.bugReported(
+      attachments ? (attachments.filter(Boolean) as string[]) : undefined
+    ),
+    deleteTempIDFile,
     "reportBug"
   )
 }
@@ -243,6 +286,7 @@ const tryComposeBugReportEmail = async (
 const tryComposeEmail = async (
   composeEmail: (email: EmailTemplate) => Promise<EmailCompositionResult>,
   emailTemplate: EmailTemplate,
+  deleteTempIDFile: () => Promise<void>,
   alertsKey: keyof typeof HELP_AND_SUPPORT_EMAIL_SUCCESS_ALERTS
 ) => {
   try {
@@ -253,13 +297,14 @@ const tryComposeEmail = async (
   } catch {
     presentAlert(HELP_AND_SUPPORT_EMAIL_ERROR_ALERTS[alertsKey])
   }
+  await deleteTempIDFile()
 }
 
 type PresetSectionProps = {
   state: ReturnType<typeof useHelpAndSupportSettings>
 }
 
-export const HelpSectionView = ({ state }: PresetSectionProps) => {
+const HelpSectionView = ({ state }: PresetSectionProps) => {
   const open = useOpenWeblink()
   return (
     <>

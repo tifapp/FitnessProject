@@ -1,4 +1,4 @@
-import { useBackButton } from "@components/Navigation"
+import { useBackButton, useTiFNavigation } from "@components/Navigation"
 import {
   EventAttendeesListView,
   useEventAttendeesList
@@ -6,7 +6,7 @@ import {
 import { EventDetailsContentView } from "@event-details-boundary/Content"
 import { EventDetailsView } from "@event-details-boundary/Details"
 import { useLoadEventDetails } from "@event/DetailsQuery"
-import { StaticScreenProps, useNavigation } from "@react-navigation/native"
+import { StaticScreenProps } from "@react-navigation/native"
 import { EventID } from "TiFShared/domain-models/Event"
 
 export const eventDetailsScreens = () => ({
@@ -23,7 +23,7 @@ export const eventDetailsScreens = () => ({
 type AttendeesListScreenProps = StaticScreenProps<{ id: EventID }>
 
 const AttendeesListScreen = ({ route }: AttendeesListScreenProps) => {
-  const navigation = useNavigation()
+  const navigation = useTiFNavigation()
   useBackButton()
   return (
     <EventAttendeesListView
@@ -36,7 +36,7 @@ const AttendeesListScreen = ({ route }: AttendeesListScreenProps) => {
 type EventDetailsScreenProps = StaticScreenProps<{ id: EventID }>
 
 const EventDetailsScreen = ({ route }: EventDetailsScreenProps) => {
-  const navigation = useNavigation()
+  const navigation = useTiFNavigation()
   useBackButton()
   return (
     <EventDetailsContentView

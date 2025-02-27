@@ -6,7 +6,7 @@ import {
   SharedValue,
   useSharedValue
 } from "react-native-reanimated"
-import { uuidString } from "../../../lib/utils/UUID"
+import { uuidString } from "TiFShared/lib/UUID"
 import { Measurements, Target } from "../HoverContext/types"
 import { areArraysEqual } from "../HoverContext/utils"
 import { CollisionContext } from "./CollisionContext"

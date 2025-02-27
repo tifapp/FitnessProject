@@ -1,4 +1,3 @@
-// withTiFNativePod.js
 const { withDangerousMod } = require("@expo/config-plugins")
 const fs = require("fs")
 const path = require("path")
@@ -16,15 +15,20 @@ function withTiFNativePod(config) {
       let podfileContent = fs.readFileSync(podfilePath, "utf8")
 
       if (!podfileContent.includes("pod 'TiFNative'")) {
-        const targetString = "target 'FitnessApp' do"
-        const podToInject =
-          "  pod 'TiFNative', :path => '../native-code/iOS/TiFNative'\n"
-        podfileContent = podfileContent.replace(
-          targetString,
-          `${targetString}\n${podToInject}`
-        )
+        const requireStatement = "require_relative '../node_modules/react-native/scripts/react_native_pods'\n"
+        const pathOverride = "pod 'TiFNative', :path => '../native-code/iOS/TiFNative'\n"
+
+        if (podfileContent.includes(requireStatement)) {
+          podfileContent = podfileContent.replace(
+            requireStatement,
+            `${requireStatement}\n${pathOverride}`
+          )
+        } else {
+          podfileContent = `${requireStatement}\n${pathOverride}\n${podfileContent}`
+        }
+
         fs.writeFileSync(podfilePath, podfileContent, "utf8")
-        console.log("Injected TiFNative pod into Podfile.")
+        console.log("Injected TiFNative pod path override into Podfile.")
       } else {
         console.log("TiFNative pod is already in the Podfile.")
       }

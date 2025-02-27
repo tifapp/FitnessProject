@@ -26,12 +26,12 @@ import { LocationSearchResultsListView } from "./SearchResultsList"
 import { debouncedSearchTextAtom } from "./SearchTextAtoms"
 import { useAtomValue } from "jotai"
 import { useScreenBottomPadding } from "@components/Padding"
-import { useNavigation } from "@react-navigation/native"
 import { LocationSearchBar } from "./SearchBar"
 import { SafeAreaView } from "react-native-safe-area-context"
 import { logger } from "TiFShared/logging"
 import { recentLocationsStorage } from "@location/Recents"
 import { featureContext } from "@lib/FeatureContext"
+import { useTiFNavigation } from "@components/Navigation"
 
 const log = logger("location.search")
 
@@ -111,7 +111,7 @@ export const LocationsSearchView = ({
     <SafeAreaView edges={safeAreaEdges}>
       <View onLayout={(e) => setHeaderLayout(e.nativeEvent.layout)}>
         <LocationSearchBar
-          onBackTapped={useNavigation().goBack}
+          onBackTapped={useTiFNavigation().goBack}
           placeholder="Enter a Location"
           style={[
             styles.locationSearchBarHeaderSpacing,

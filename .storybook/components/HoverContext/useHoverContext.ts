@@ -1,8 +1,8 @@
-import { uuidString } from "@lib/utils/UUID"
 import { useContext, useEffect, useRef } from "react"
 import { LayoutChangeEvent } from "react-native"
 import { PanGesture } from "react-native-gesture-handler"
 import { useSharedValue } from "react-native-reanimated"
+import { uuidString } from "TiFShared/lib/UUID"
 import { HoverContext } from "./HoverContext"
 import { Measurements, Target } from "./types"
 

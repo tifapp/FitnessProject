@@ -1,4 +1,5 @@
 import { DraggableCollidingTarget } from ".storybook/components/CollisionContext/DraggableCollidingTarget"
+import { TimeOfDayView } from ".storybook/components/SunJournalBackground/SunJournalBackground.stories"
 import { Headline } from "@components/Text"
 import { StyleProp, StyleSheet, Text, View, ViewStyle } from "react-native"
 
@@ -7,31 +8,39 @@ export type HomeProps = {
 }
 
 export const Page1 = () => (
-  <View style={styles.todo}>
-    <DraggableCollidingTarget
-      style={[
-        styles.target,
-        styles.draggable,
-        {
-          top: "25%",
-          left: "50%"
-        }
-      ]}
-      activeStyle={styles.targetHovered}
-      collidingStyle={styles.targetSelecting}
-    >
-      <Text>Drag me!</Text>
-    </DraggableCollidingTarget>
-    <Headline>Drag Around</Headline>
-  </View>
+  <>
+    <TimeOfDayView />
+    <View style={styles.todo}>
+      <TimeOfDayView />
+      <DraggableCollidingTarget
+        style={[
+          styles.target,
+          styles.draggable,
+          {
+            top: "25%",
+            left: "50%"
+          }
+        ]}
+        activeStyle={styles.targetHovered}
+        collidingStyle={styles.targetSelecting}
+      >
+        <Text>Drag me!</Text>
+      </DraggableCollidingTarget>
+      <Headline>Drag Around</Headline>
+    </View>
+  </>
 )
 
 const styles = StyleSheet.create({
   todo: {
     flex: 1,
+    display: "flex",
     height: "100%",
+    width: "100%",
     alignItems: "center",
-    justifyContent: "center"
+    justifyContent: "center",
+    backgroundColor: "pink",
+    position: "absolute"
   },
   container: {
     flex: 1,

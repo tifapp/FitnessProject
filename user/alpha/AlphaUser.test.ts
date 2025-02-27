@@ -2,6 +2,7 @@ import { TiFAPI } from "TiFShared/api"
 import { mockTiFEndpoint } from "TiFShared/test-helpers/mockAPIServer"
 import { AlphaUserStorage, registerAlphaUser } from "./AlphaUser"
 import { AlphaUserMocks } from "./MockData"
+import { waitFor } from "@testing-library/react-native"
 
 describe("AlphaUser tests", () => {
   describe("RegisterAlphaUser tests", () => {
@@ -54,6 +55,22 @@ describe("AlphaUser tests", () => {
       await storage.store(AlphaUserMocks.Blob.token)
       await storage.store(AlphaUserMocks.TheDarkLord.token)
       expect(await storage.user()).toEqual(AlphaUserMocks.TheDarkLord)
+    })
+
+    it("should alert the subscriber whenever the user token changes", async () => {
+      const subscriber = jest.fn()
+      storage.subscribe(subscriber)
+      await storage.store(AlphaUserMocks.Blob.token)
+      expect(subscriber).toHaveBeenCalledWith(AlphaUserMocks.Blob)
+    })
+
+    it("should load the currently stored user for the initial subscription value", async () => {
+      await storage.store(AlphaUserMocks.Blob.token)
+      const subscriber = jest.fn()
+      storage.subscribe(subscriber)
+      await waitFor(() => {
+        expect(subscriber).toHaveBeenCalledWith(AlphaUserMocks.Blob)
+      })
     })
   })
 })

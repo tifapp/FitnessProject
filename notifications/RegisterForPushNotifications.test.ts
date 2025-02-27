@@ -1,4 +1,4 @@
-import { uuidString } from "@lib/utils/UUID"
+import { uuidString } from "TiFShared/lib/UUID"
 import { TiFAPI } from "TiFShared/api"
 import { mockTiFServer } from "TiFShared/test-helpers/mockAPIServer"
 import { registerForPushNotifications } from "./RegisterForPushNotifications"

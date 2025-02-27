@@ -1,4 +1,4 @@
-import { useCoreNavigation } from "@components/Navigation"
+import { useCoreNavigation, useTiFNavigation } from "@components/Navigation"
 import {
   withAlphaRegistration,
   WithAlphaRegistrationProps
@@ -14,7 +14,7 @@ import {
   LocationsSearchView,
   useLocationsSearch
 } from "@location-search-boundary"
-import { StaticScreenProps, useNavigation } from "@react-navigation/native"
+import { StaticScreenProps } from "@react-navigation/native"
 import { EventID } from "TiFShared/domain-models/Event"
 import { useSetAtom } from "jotai"
 import { StyleSheet } from "react-native"
@@ -25,7 +25,7 @@ type EditEventScreenProps = WithAlphaRegistrationProps<
 
 const EditEventScreen = withAlphaRegistration(
   ({ session, route }: EditEventScreenProps) => {
-    const navigation = useNavigation()
+    const navigation = useTiFNavigation()
     const { pushEventDetails } = useCoreNavigation()
     return (
       <EditEventView
@@ -45,7 +45,7 @@ const EditEventScreen = withAlphaRegistration(
 
 const LocationSearchScreen = () => {
   const setLocation = useSetAtom(editEventFormValueAtoms.location)
-  const navigation = useNavigation()
+  const navigation = useTiFNavigation()
   return (
     <LocationsSearchView
       state={useLocationsSearch()}
@@ -62,7 +62,7 @@ const LocationSearchScreen = () => {
 }
 
 const EditEventFormBackButton = () => (
-  <EditEventFormDismissButton onDismiss={useNavigation().goBack} />
+  <EditEventFormDismissButton onDismiss={useTiFNavigation().goBack} />
 )
 
 export const editEventScreens = () => ({

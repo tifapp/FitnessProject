@@ -1,3 +1,4 @@
+import { TiFBottomSheetProvider } from "@components/BottomSheet"
 import { PrimaryButton } from "@components/Buttons"
 import { PlusIconView } from "@components/common/Icons"
 import { TiFFooterView } from "@components/Footer"
@@ -22,6 +23,7 @@ import PagerView from "react-native-pager-view"
 import { useAnimatedStyle, useSharedValue } from "react-native-reanimated"
 import { colorWithOpacity } from "TiFShared/lib/Color"
 import { TiFContext } from "./Context"
+import { HomeLiveEventsView } from "./HomeLiveEvents"
 import { Page1 } from "./Page1"
 
 export type HomeProps = {
@@ -37,47 +39,50 @@ export const HomeView = ({ style }: HomeProps) => {
   const setScrollState = useSetAtom(scrollStateAtom)
   const footerBackgroundOpacity = useSharedValue(0)
   return (
-    <View style={style}>
-      <View style={styles.container}>
-        <AnimatedPagerView
-          ref={pagerRef}
-          orientation="horizontal"
-          layoutDirection="ltr"
-          onPageSelected={(e) => setPageIndex(e.nativeEvent.position)}
-          onPageScroll={(e) => {
-            if (e.nativeEvent.position > 0) {
-              footerBackgroundOpacity.value = 1
-            } else {
-              footerBackgroundOpacity.value = e.nativeEvent.offset
-            }
-          }}
-          onPageScrollStateChanged={(e) => {
-            setScrollState(e.nativeEvent.pageScrollState)
-          }}
-          style={styles.pager}
-        >
-          <View key="1" style={styles.screen}>
-            <Page1 />
-          </View>
-          <View key="2" style={styles.screen}>
-            <ExploreView />
-          </View>
-        </AnimatedPagerView>
-        <TiFFooterView
-          backgroundStyle={useAnimatedStyle(() => ({
-            backgroundColor: colorWithOpacity(
-              AppStyles.cardColor,
-              footerBackgroundOpacity.value
-            )
-          }))}
-          style={styles.footer}
-        >
-          <FooterView
-            onPageIndexTapped={(index) => pagerRef.current?.setPage(index)}
-          />
-        </TiFFooterView>
+    <TiFBottomSheetProvider>
+      <View style={style}>
+        <View style={styles.container}>
+          <AnimatedPagerView
+            ref={pagerRef}
+            orientation="horizontal"
+            layoutDirection="ltr"
+            onPageSelected={(e) => setPageIndex(e.nativeEvent.position)}
+            onPageScroll={(e) => {
+              if (e.nativeEvent.position > 0) {
+                footerBackgroundOpacity.value = 1
+              } else {
+                footerBackgroundOpacity.value = e.nativeEvent.offset
+              }
+            }}
+            onPageScrollStateChanged={(e) => {
+              setScrollState(e.nativeEvent.pageScrollState)
+            }}
+            style={styles.pager}
+          >
+            <View key="1" style={styles.screen}>
+              <Page1 />
+            </View>
+            <View key="2" style={styles.screen}>
+              <ExploreView />
+            </View>
+          </AnimatedPagerView>
+          <TiFFooterView
+            backgroundStyle={useAnimatedStyle(() => ({
+              backgroundColor: colorWithOpacity(
+                AppStyles.cardColor,
+                footerBackgroundOpacity.value
+              )
+            }))}
+            style={styles.footer}
+          >
+            <FooterView
+              onPageIndexTapped={(index) => pagerRef.current?.setPage(index)}
+            />
+          </TiFFooterView>
+        </View>
+        <HomeLiveEventsView />
       </View>
-    </View>
+    </TiFBottomSheetProvider>
   )
 }
 
@@ -167,7 +172,7 @@ const PageDotView = ({ index, onTapped }: PageDotProps) => (
 const ExploreView = () => {
   const scrollState = useAtomValue(scrollStateAtom)
   const { fetchEvents } = useContext(TiFContext)!
-  const { region, data, updateRegion } = useExploreEvents(
+  const { region, data, updateRegion, ongoingEvents } = useExploreEvents(
     createInitialCenter(),
     { fetchEvents, isSignificantlyDifferentRegions }
   )
@@ -179,6 +184,7 @@ const ExploreView = () => {
       >
         <ExploreEventsView
           region={region}
+          ongoingEvents={ongoingEvents}
           data={data}
           onRegionUpdated={updateRegion}
         />

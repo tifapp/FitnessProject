@@ -1,5 +1,5 @@
-import React, { useEffect } from "react"
 import { Circle, Group, SkSize } from "@shopify/react-native-skia"
+import React, { useEffect } from "react"
 import {
   useDerivedValue,
   useSharedValue,
@@ -7,7 +7,7 @@ import {
   withSequence,
   withTiming
 } from "react-native-reanimated"
-import { uuidString } from "@lib/utils/UUID"
+import { uuidString } from "TiFShared/lib/UUID"
 
 export type Cloud = {
   id: string

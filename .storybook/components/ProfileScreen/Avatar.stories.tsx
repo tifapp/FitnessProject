@@ -1,7 +1,7 @@
 import { TiFBottomSheetProvider } from "@components/BottomSheet"
 import { clientSideEventFromResponse } from "@event/ClientSideEvent"
 import { delayData } from "@lib/utils/DelayData"
-import { uuidString } from "@lib/utils/UUID"
+import { uuidString } from "TiFShared/lib/UUID"
 import { NavigationContainer } from "@react-navigation/native"
 import { createStackNavigator } from "@react-navigation/stack"
 import {

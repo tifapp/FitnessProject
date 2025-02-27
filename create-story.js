@@ -105,7 +105,7 @@ const createComponentFolder = (storyName) => {
   const storiesFileContent = `import React from "react";
 import { StyleSheet } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
 import { StoryMeta } from "storybook/HelperTypes";
 import { ${storyName} } from "./${storyName}";
 
@@ -116,11 +116,13 @@ export const ${storyName}Meta: StoryMeta = {
 export default ${storyName}Meta;
 
 export const Basic = () => (
-  <GestureHandlerRootView style={styles.container}>
-    <SafeAreaView style={styles.safeArea}>
-      <${storyName} />
-    </SafeAreaView>
-  </GestureHandlerRootView>
+  <SafeAreaProvider>
+    <GestureHandlerRootView style={styles.container}>
+      <SafeAreaView style={styles.safeArea}>
+        <${storyName} />
+      </SafeAreaView>
+    </GestureHandlerRootView>
+  </SafeAreaProvider>
 );
 
 const styles = StyleSheet.create({

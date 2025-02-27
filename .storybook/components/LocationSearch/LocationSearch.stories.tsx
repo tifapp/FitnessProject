@@ -4,9 +4,9 @@ import { TiFQueryClientProvider } from "@lib/ReactQuery"
 
 import { delayData } from "@lib/utils/DelayData"
 import {
+  LocationSearchBar,
   LocationSearchPicker,
-  useLocationsSearch,
-  LocationSearchBar
+  useLocationsSearch
 } from "@location-search-boundary"
 import { mockLocationSearchResult } from "@location-search-boundary/MockData"
 import {
@@ -16,7 +16,7 @@ import {
   useNavigation
 } from "@react-navigation/native"
 import { createStackNavigator } from "@react-navigation/stack"
-import { ComponentMeta, ComponentStory } from "@storybook/react-native"
+import { ComponentStory } from "@storybook/react-native"
 import { repeatElements } from "TiFShared/lib/Array"
 import React from "react"
 import { Button } from "react-native"

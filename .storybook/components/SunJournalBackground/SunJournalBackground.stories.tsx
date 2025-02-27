@@ -1,20 +1,12 @@
-import React, { useEffect, useMemo, useState } from "react"
-import { View, Text } from "react-native"
-import { StoryMeta } from "storybook/HelperTypes"
+import { cloud } from "@journaling/Clouds"
+import { SunBackgroundDrawing } from "@journaling/SunBackground"
 import { Canvas, SkSize } from "@shopify/react-native-skia"
-import { SunBackground, SunBackgroundDrawing } from "@journaling/SunBackground"
-import {
-  useDerivedValue,
-  useSharedValue,
-  withRepeat,
-  withSequence,
-  withTiming
-} from "react-native-reanimated"
+import React, { useMemo, useState } from "react"
 import {
   SafeAreaProvider,
   useSafeAreaInsets
 } from "react-native-safe-area-context"
-import { cloud } from "@journaling/Clouds"
+import { StoryMeta } from "storybook/HelperTypes"
 import { dateRange } from "TiFShared/domain-models/FixedDateRange"
 
 export const SunJournalBackgroundMeta: StoryMeta = {
@@ -25,7 +17,7 @@ export default SunJournalBackgroundMeta
 
 export const Basic = () => (
   <SafeAreaProvider>
-    <CanvasView />
+    <TimeOfDayView />
   </SafeAreaProvider>
 )
 
@@ -71,19 +63,30 @@ const SUNRISE_DATE = new Date("2025-02-12T06:30:00")
 const SUNSET_DATE = new Date("2025-02-12T16:30:00")
 const DAY_RANGE = dateRange(SUNRISE_DATE, SUNSET_DATE)!
 
-const CanvasView = () => {
+const getDayFraction = () => {
+  const now = new Date();
+  const hours = now.getHours();
+  const minutes = now.getMinutes();
+  
+  // Convert current time to decimal hours (e.g., 9:30 = 9.5)
+  const currentTime = hours + (minutes / 60);
+  
+  // Define sunrise (6am) and sunset (6pm) in decimal hours
+  const sunrise = 6;
+  const sunset = 18;
+  
+  // Calculate the fraction
+  let fraction = (currentTime - sunrise) / (sunset - sunrise);
+  
+  return fraction;
+}
+
+export const TimeOfDayView = () => {
   const [size, setSize] = useState<SkSize>({ width: 0, height: 0 })
   const insets = useSafeAreaInsets()
-  const [time, setTime] = useState(0.5)
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setTime((x) => (x >= 1 ? 0 : x + 0.1))
-    }, 2000)
-    return () => clearInterval(interval)
-  }, [])
   const background = useMemo(
-    () => ({ time, dayRange: DAY_RANGE, clouds: CLOUDS }),
-    [time]
+    () => ({ time: getDayFraction(), dayRange: DAY_RANGE, clouds: CLOUDS }),
+    []
   )
   return (
     <Canvas style={{ flex: 1 }} onLayout={(e) => setSize(e.nativeEvent.layout)}>
