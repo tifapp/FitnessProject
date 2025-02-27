@@ -1,5 +1,7 @@
 import {
+  QueryCache,
   QueryClient,
+  QueryClientConfig,
   QueryClientProvider,
   UseMutationOptions,
   UseQueryOptions,
@@ -27,6 +29,20 @@ export type MutationHookOptions<
   Error = unknown,
   Context = unknown
 > = Omit<UseMutationOptions<Data, Error, Args, Context>, "mutationFn">
+
+export const DEFAULT_QUERY_CLIENT_CONFIG: QueryClientConfig = {
+  queryCache: new QueryCache({
+    onError: (error, query) => {
+      console.error("Query error:", error)
+    },
+    onSuccess: (data, query) => {
+      console.log("Query success:", data)
+    },
+    onSettled: (data, error, query) => {
+      console.log("Query settled:", data, error)
+    }
+  }) // Add logging logic
+}
 
 /**
  * The singleton query client to use for the app.

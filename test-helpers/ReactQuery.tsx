@@ -1,3 +1,4 @@
+import { DEFAULT_QUERY_CLIENT_CONFIG } from "@lib/ReactQuery"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import React, { ReactNode, useMemo } from "react"
 

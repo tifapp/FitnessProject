@@ -18,8 +18,20 @@ export type Particle = {
    * The unique ID of this particle.
    */
   id: ParticleID
+
+  /**
+   * The position of this particle.
+   */
   position: SkPoint
+
+  /**
+   * The speed of this particle.
+   */
   speed: SkPoint
+
+  /**
+   * The time this particle was created at.
+   */
   birthTime: number
 
   /**
@@ -43,14 +55,20 @@ export type Particle = {
    */
   rotationAngle: SkPoint
 
-  /// How fast this particle is spinning.
+  /**
+   * How fast this particle is spinning.
+   */
   angularSpeed: SkPoint
 
-  /// The colors to use for rendering this particle over time.
+  /**
+   * The colors to use for rendering this particle over time.
+   */
   colors: SkColor[]
 
-  /// The current color to use for rendering this particle right now. This is recomputed
-  /// every time its system's `update()` method is called.
+  /**
+   * The current color to use for rendering this particle right now. This is recomputed
+   * every time its system's `update()` method is called.
+   */
   currentColor: SkColor
 }
 
