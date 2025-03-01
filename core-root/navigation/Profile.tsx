@@ -1,10 +1,10 @@
 import { TouchableIonicon } from "@components/common/Icons"
-import { useBackButton } from "@components/Navigation"
+import { useBackButton, useTiFNavigation } from "@components/Navigation"
 import {
   withAlphaRegistration,
   WithAlphaRegistrationProps
 } from "@core-root/AlphaRegister"
-import { StaticScreenProps, useNavigation } from "@react-navigation/native"
+import { StaticScreenProps } from "@react-navigation/native"
 import React, { useEffect } from "react"
 import { StyleSheet } from "react-native"
 import { UserHandle, UserID } from "TiFShared/domain-models/User"
@@ -31,7 +31,7 @@ type ProfileScreenProps = WithAlphaRegistrationProps<
 
 const ProfileScreen = withAlphaRegistration(
   ({ session, route }: ProfileScreenProps) => {
-    const navigation = useNavigation()
+    const navigation = useTiFNavigation()
     useBackButton()
 
     useEffect(() => {

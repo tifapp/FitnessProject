@@ -1,6 +1,6 @@
 import { EventMocks } from "@event-details-boundary/MockData"
 import { renderUseLoadEventDetails } from "@event-details-boundary/TestHelpers"
-import { uuidString } from "@lib/utils/UUID"
+import { uuidString } from "TiFShared/lib/UUID"
 import { TestInternetConnectionStatus } from "@test-helpers/InternetConnectionStatus"
 import { fakeTimers } from "@test-helpers/Timers"
 import { TiFAPI } from "TiFShared/api"

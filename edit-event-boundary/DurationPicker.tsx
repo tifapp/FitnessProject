@@ -203,7 +203,10 @@ const useSliderKnob = (
     duration,
     animateToPosition,
     setDuration: (duration: number) => {
-      haptics.play(HAPTIC_PATTERNS[durationIndex(stateEntries, duration)])
+      haptics.playIfSupported(
+        HAPTIC_PATTERNS[durationIndex(stateEntries, duration)],
+        ["isFeedbackSupportedOnDevice"]
+      )
       setDuration(duration)
     }
   }

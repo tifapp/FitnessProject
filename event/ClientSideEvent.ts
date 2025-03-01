@@ -1,4 +1,5 @@
 import { EventResponse } from "TiFShared/api/models/Event"
+import { dayjs, now } from "TiFShared/lib/Dayjs"
 import { Reassign } from "TiFShared/lib/Types/HelperTypes"
 
 /**
@@ -10,6 +11,26 @@ import { Reassign } from "TiFShared/lib/Types/HelperTypes"
  */
 export type ClientSideEventTime = EventResponse["time"] & {
   clientReceivedTime: Date
+}
+
+/**
+ * Returns the amount of seconds before an event starts based off its client received time.
+ */
+export const eventSecondsToStart = ({
+  secondsToStart,
+  clientReceivedTime
+}: Pick<ClientSideEventTime, "secondsToStart" | "clientReceivedTime">) => {
+  const offset = now().diff(dayjs(clientReceivedTime))
+  return secondsToStart - Math.round(offset / 1000)
+}
+
+/**
+ * Whether or not the time of an event has indicated that it has started.
+ */
+export const hasEventTimeStarted = (
+  time: Pick<ClientSideEventTime, "secondsToStart" | "clientReceivedTime">
+) => {
+  return eventSecondsToStart(time) <= 0
 }
 
 /**
@@ -64,3 +85,25 @@ export const clientSideEventFromResponse = (response: EventResponse) => ({
   ...response,
   time: { ...response.time, clientReceivedTime: new Date() }
 })
+
+/**
+ * Returns true for whether or not this event has ended.
+ */
+export const hasEventEnded = (e: ClientSideEvent) => {
+  if (e.endedDateTime) return true
+  return -eventSecondsToStart(e.time) >= e.time.dateRange.diff.seconds
+}
+
+/**
+ * Returns true if an event is ongoing.
+ */
+export const isEventOngoing = (e: ClientSideEvent) => {
+  return hasEventTimeStarted(e.time) && !hasEventEnded(e)
+}
+
+/**
+ * Returns true if an event has the possibility of starting in the future.
+ */
+export const canEventStartInTheFuture = (e: ClientSideEvent) => {
+  return !hasEventTimeStarted(e.time) && !hasEventEnded(e)
+}

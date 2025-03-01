@@ -430,7 +430,30 @@ const HapticsContext = createContext<HapticsContextValues>({
 /**
  * The current {@link Haptics} implementation provided by {@link HapticsProvider}.
  */
-export const useHaptics = () => useContext(HapticsContext)
+export const useHaptics = () => {
+  const haptics = useContext(HapticsContext)
+  return {
+    ...haptics,
+    /**
+     * Plays the specified {@link HapticPattern} if the device supports all the required
+     * capabilities specifed by `requiredCapabilities`.
+     *
+     * @param pattern The pattern to play.
+     * @param requiredCapabilities The required hardware capabilties that the device must support.
+     */
+    playIfSupported: (
+      pattern: HapticPattern,
+      requiredCapabilities: (keyof HapticsCompatibility)[] = [
+        "isAudioSupportedOnDevice",
+        "isFeedbackSupportedOnDevice"
+      ]
+    ) => {
+      if (requiredCapabilities.every((key) => haptics[key])) {
+        haptics.play(pattern)
+      }
+    }
+  }
+}
 
 export type HapticsProviderProps = {
   haptics: Haptics

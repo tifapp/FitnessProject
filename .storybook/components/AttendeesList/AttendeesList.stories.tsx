@@ -13,9 +13,9 @@ import { clientSideEventFromResponse } from "@event/ClientSideEvent"
 import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
 import { FriendRequestFeature } from "@user/FriendRequest"
 import { RootSiblingParent } from "react-native-root-siblings"
-import { uuidString } from "@lib/utils/UUID"
 import { delayData } from "@lib/utils/DelayData"
 import { UserHandle } from "TiFShared/domain-models/User"
+import { uuidString } from "TiFShared/lib/UUID"
 
 const AttendeesListMeta: StoryMeta = {
   title: "Attendees List Screen"

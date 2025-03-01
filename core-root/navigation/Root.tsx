@@ -10,9 +10,12 @@ import { StyleSheet } from "react-native"
 import { eventDetailsScreens } from "./EventDetails"
 import { helpAndSupportScreens } from "./Feedback"
 import { ModalStack } from "./ModalStack"
+import { TiFBottomSheetProvider } from "@components/BottomSheet"
 
 const HomeScreen = withAlphaRegistration(() => (
-  <HomeView style={styles.screen} />
+  <TiFBottomSheetProvider>
+    <HomeView style={styles.screen} />
+  </TiFBottomSheetProvider>
 ))
 
 const Stack = createNativeStackNavigator({

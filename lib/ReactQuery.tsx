@@ -28,7 +28,10 @@ export type MutationHookOptions<
   Context = unknown
 > = Omit<UseMutationOptions<Data, Error, Args, Context>, "mutationFn">
 
-const tiFQueryClient = new QueryClient()
+/**
+ * The singleton query client to use for the app.
+ */
+export const tiFQueryClient = new QueryClient()
 
 export type TiFQueryClientProviderProps = {
   children: ReactNode

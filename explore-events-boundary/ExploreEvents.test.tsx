@@ -28,6 +28,8 @@ import {
   XEROX_ALTO_DEFAULT_REGION,
   createDefaultMapRegion
 } from "./Region"
+import { LiveEventsFeature, LiveEventsStore } from "@event/LiveEvents"
+import { AlphaUserMocks } from "@user/alpha/MockData"
 
 const TEST_EVENTS = [EventMocks.Multiday, EventMocks.PickupBasketball]
 
@@ -255,6 +257,31 @@ describe("ExploreEvents tests", () => {
       expectFetchedExploreRegion(expectedRegion)
     })
 
+    it("should place ongoing events in a separate field", async () => {
+      const userLocation = mockExpoLocationObject()
+      requestForegroundPermissions.mockResolvedValueOnce({ granted: true })
+      queryUserCoordinates.mockReturnValueOnce(userLocation)
+      fetchEvents.mockResolvedValueOnce(TEST_EVENTS)
+
+      const store = new LiveEventsStore(
+        queryClient,
+        jest.fn().mockResolvedValueOnce({
+          ongoing: [TEST_EVENTS[1]],
+          startingSoon: []
+        })
+      )
+      store.beginObserving(AlphaUserMocks.TheDarkLord.id)
+
+      const { result } = renderUseExploreEvents(
+        { center: "user-location" },
+        store
+      )
+
+      await waitFor(() => expect(result.current.data.status).toEqual("success"))
+      expect(result.current.data.events).toEqual([TEST_EVENTS[0]])
+      expect(result.current.ongoingEvents).toEqual([TEST_EVENTS[1]])
+    })
+
     test("retrying after unsuccessfully exploring events", async () => {
       fetchEvents
         .mockRejectedValueOnce(new Error())
@@ -473,7 +500,10 @@ describe("ExploreEvents tests", () => {
     const isSignificantlyDifferentRegions = jest.fn()
     const fetchEvents = jest.fn()
 
-    const renderUseExploreEvents = (center: ExploreEventsInitialCenter) => {
+    const renderUseExploreEvents = (
+      center: ExploreEventsInitialCenter,
+      store: LiveEventsStore = new LiveEventsStore(queryClient, jest.fn())
+    ) => {
       return renderHook(
         () =>
           useExploreEvents(center, {
@@ -483,12 +513,14 @@ describe("ExploreEvents tests", () => {
         {
           wrapper: ({ children }) => (
             <TestQueryClientProvider client={queryClient}>
-              <UserLocationFunctionsProvider
-                getCurrentLocation={queryUserCoordinates}
-                requestForegroundPermissions={requestForegroundPermissions}
-              >
-                {children}
-              </UserLocationFunctionsProvider>
+              <LiveEventsFeature.Provider store={store}>
+                <UserLocationFunctionsProvider
+                  getCurrentLocation={queryUserCoordinates}
+                  requestForegroundPermissions={requestForegroundPermissions}
+                >
+                  {children}
+                </UserLocationFunctionsProvider>
+              </LiveEventsFeature.Provider>
             </TestQueryClientProvider>
           )
         }

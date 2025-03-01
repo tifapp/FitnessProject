@@ -147,6 +147,7 @@ const LocationSectionView = ({ event }: SectionProps) => (
       />
     </TiFFormCardView>
     <EventTravelEstimatesView
+      eventTitle={event.title}
       host={event.host}
       location={event.location}
       result={useEventTravelEstimates(event.location.coordinate)}

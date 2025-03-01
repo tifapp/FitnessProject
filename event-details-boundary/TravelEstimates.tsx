@@ -1,10 +1,20 @@
 import { AvatarMapMarkerView } from "@components/AvatarMapMarker"
 import { ExpandableMapSnippetView } from "@components/MapSnippetView"
 import { useCoreNavigation } from "@components/Navigation"
-import { BodyText, Caption, CaptionTitle, Headline } from "@components/Text"
+import {
+  BodyText,
+  Caption,
+  CaptionTitle,
+  Footnote,
+  Headline
+} from "@components/Text"
 import { Ionicon, RoundedIonicon } from "@components/common/Icons"
+import { TiFFormLabelView } from "@components/form-components/Label"
+import { TiFFormNamedIconRowView } from "@components/form-components/NamedIconRow"
+import { TiFFormRowItemView } from "@components/form-components/RowItem"
 import { ClientSideEvent } from "@event/ClientSideEvent"
 import { openEventLocationInMaps } from "@event/LocationIdentifier"
+import { placemarkToFormattedAddress } from "@lib/AddressFormatting"
 import { AppStyles } from "@lib/AppColorStyle"
 import { compactFormatDistance } from "@lib/DistanceFormatting"
 import { featureContext } from "@lib/FeatureContext"
@@ -35,7 +45,7 @@ import {
   View,
   ViewStyle
 } from "react-native"
-import Animated, { FadeIn } from "react-native-reanimated"
+import Animated, { FadeIn, FadeOut } from "react-native-reanimated"
 
 export const EventTravelEstimatesFeature = featureContext({
   eventTravelEstimates
@@ -153,6 +163,7 @@ const useEventTravelEstimatesQuery = (
 }
 
 export type EventTravelEstimatesProps = {
+  eventTitle: string
   host: ClientSideEvent["host"]
   location: EventLocation
   result: UseEventTravelEstimatesResult
@@ -167,6 +178,7 @@ export type EventTravelEstimatesProps = {
  * the displayed icon.
  */
 export const EventTravelEstimatesView = ({
+  eventTitle,
   host,
   location,
   result,
@@ -174,6 +186,9 @@ export const EventTravelEstimatesView = ({
 }: EventTravelEstimatesProps) => {
   const [isExpanded, setIsExpanded] = useState(false)
   const { presentProfile } = useCoreNavigation()
+  const address = location.placemark
+    ? placemarkToFormattedAddress(location.placemark)
+    : "Unknown Address"
   return (
     <View style={[style]}>
       {result.status === "disabled" && (
@@ -205,36 +220,48 @@ export const EventTravelEstimatesView = ({
             latitudeDelta: 0.007,
             longitudeDelta: 0.007
           }}
-          overlay={
-            <View style={styles.overlay}>
-              <Headline
-                maxFontSizeMultiplier={FontScaleFactors.xxxLarge}
-                style={styles.directionsText}
-              >
-                Get Directions
-              </Headline>
-              <View style={styles.travelTypesContainer}>
-                <TravelTypeButton
-                  travelKey="walking"
-                  location={location}
-                  result={result}
-                  style={styles.travelTypeButton}
-                />
-                <TravelTypeButton
-                  travelKey="automobile"
-                  location={location}
-                  result={result}
-                  style={styles.travelTypeButton}
-                />
-                <TravelTypeButton
-                  travelKey="publicTransportation"
-                  location={location}
-                  result={result}
-                  style={styles.travelTypeButton}
-                />
+          overlay={(isExpanding) => (
+            <View style={{ rowGap: 16 }}>
+              {isExpanding && (
+                <View style={styles.viewingOverlay}>
+                  <TiFFormNamedIconRowView
+                    iconName="location"
+                    iconBackgroundColor={AppStyles.primary}
+                    name={`Viewing ${eventTitle}`}
+                    description={address}
+                  />
+                </View>
+              )}
+              <View style={styles.overlay}>
+                <Headline
+                  maxFontSizeMultiplier={FontScaleFactors.xxxLarge}
+                  style={styles.directionsText}
+                >
+                  Get Directions
+                </Headline>
+                <View style={styles.travelTypesContainer}>
+                  <TravelTypeButton
+                    travelKey="walking"
+                    location={location}
+                    result={result}
+                    style={styles.travelTypeButton}
+                  />
+                  <TravelTypeButton
+                    travelKey="automobile"
+                    location={location}
+                    result={result}
+                    style={styles.travelTypeButton}
+                  />
+                  <TravelTypeButton
+                    travelKey="publicTransportation"
+                    location={location}
+                    result={result}
+                    style={styles.travelTypeButton}
+                  />
+                </View>
               </View>
             </View>
-          }
+          )}
           collapsedMapProps={{
             customMapStyle: [
               {
@@ -392,9 +419,16 @@ const styles = StyleSheet.create({
     width: "100%",
     borderRadius: 12
   },
+  viewingOverlay: {
+    width: "100%",
+    backgroundColor: "white",
+    borderRadius: 12
+  },
   overlay: {
     width: "100%",
-    padding: 16
+    backgroundColor: "white",
+    padding: 16,
+    borderRadius: 12
   },
   directionsText: {
     textAlign: "center"
@@ -445,5 +479,8 @@ const styles = StyleSheet.create({
   },
   settingsButton: {
     color: AppStyles.linkColor
+  },
+  addressText: {
+    opacity: 0.5
   }
 })

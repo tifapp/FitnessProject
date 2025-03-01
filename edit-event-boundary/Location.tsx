@@ -22,6 +22,7 @@ import { AvatarMapMarkerView } from "@components/AvatarMapMarker"
 import { EditEventFormLocation } from "@event/EditFormValues"
 import { LocationCoordinate2D } from "TiFShared/domain-models/LocationCoordinate2D"
 import { ExpandableMapSnippetView } from "@components/MapSnippetView"
+import { TiFFormCardView } from "@components/form-components/Card"
 
 export const useEditEventFormLocation = () => {
   const [location, setLocation] = useAtom(editEventFormValueAtoms.location)
@@ -210,13 +211,13 @@ const styles = StyleSheet.create({
   },
   overlayContainer: {
     borderRadius: 12,
+    backgroundColor: "white",
     overflow: "hidden"
   },
   overlay: {
     position: "absolute",
     bottom: 16,
     marginHorizontal: 16,
-    borderRadius: 12,
     backgroundColor: "white",
     width: "100%",
     padding: 4

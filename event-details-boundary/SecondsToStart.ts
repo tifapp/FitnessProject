@@ -1,18 +1,11 @@
 import { useAutocorrectingInterval } from "@lib/AutocorrectingInterval"
-import { ClientSideEvent } from "@event/ClientSideEvent"
-import { dayjs, now } from "TiFShared/lib/Dayjs"
+import { ClientSideEvent, eventSecondsToStart } from "@event/ClientSideEvent"
 import { useState } from "react"
 
 export type UseEventSecondsToStartProps = Pick<
   ClientSideEvent["time"],
   "secondsToStart" | "clientReceivedTime"
 >
-
-const eventSecondsToStart = (props: UseEventSecondsToStartProps) => {
-  const offset = now().diff(dayjs(props.clientReceivedTime))
-  return props.secondsToStart - Math.round(offset / 1000)
-}
-
 /**
  * Returns the number of seconds until the event starts at every second.
  *

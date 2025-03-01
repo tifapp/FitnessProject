@@ -1,5 +1,5 @@
 import { ClientSideEvent } from "@event/ClientSideEvent"
-import { uuidString } from "@lib/utils/UUID"
+import { uuidString } from "TiFShared/lib/UUID"
 import { setPlatform } from "@test-helpers/Platform"
 import {
   TestQueryClientProvider,

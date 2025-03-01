@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import { createSignUpEnvironment } from "@auth-boundary/sign-up"
-import { uuidString } from "@lib/utils/UUID"
+import { uuidString } from "TiFShared/lib/UUID"
 import {
   NavigationContainer,
   NavigatorScreenParams,

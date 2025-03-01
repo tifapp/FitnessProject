@@ -21,7 +21,7 @@ import { Provider, createStore } from "jotai"
 import React from "react"
 import { mockRudeusServer } from "./TestHelpers"
 import { setPlatform } from "@test-helpers/Platform"
-import { uuidString } from "@lib/utils/UUID"
+import { uuidString } from "TiFShared/lib/UUID"
 
 describe("PatternEditor tests", () => {
   describe("UseRudeusPatternEditor tests", () => {

@@ -4,7 +4,9 @@ import {
   APISchema,
   apiTransport,
   endpointSchema,
-  jwtMiddleware
+  jwtMiddleware,
+  requestIdMiddleware,
+  requestLoggingMiddleware
 } from "TiFShared/api"
 import { validateAPIClientCall } from "TiFShared/api/APIValidation"
 import { chainMiddleware } from "TiFShared/lib/Middleware"
@@ -47,6 +49,8 @@ export const RudeusAPISchema = {
 export const RudeusAPI = (tokenStorage: RudeusUserStorage, baseURL?: URL) => {
   const middleware = chainMiddleware(
     validateAPIClientCall("Rudeus", log),
+    requestIdMiddleware(),
+    requestLoggingMiddleware("rudeus"),
     jwtMiddleware(async () => await tokenStorage.token()),
     apiTransport("Rudeus", new URL(baseURL ?? RUDEUS_API_URL), log)
   )

@@ -14,7 +14,7 @@ import { useFontScale } from "@lib/Fonts"
 import { Store } from "@lib/Jotai"
 import { TiFDefaultLayoutTransition } from "@lib/Reanimated"
 import { useFormSubmission } from "@lib/utils/Form"
-import { uuidString } from "@lib/utils/UUID"
+import { uuidString } from "TiFShared/lib/UUID"
 import {
   HapticPatternElement,
   transientEvent,

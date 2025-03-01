@@ -6,6 +6,7 @@ import {
   TiFAPI,
   TiFAPIClientCreator,
   jwtMiddleware,
+  requestIdMiddleware,
   requestLoggingMiddleware,
   tifAPITransport,
   validateTiFAPIClientCall
@@ -50,6 +51,7 @@ export const awsTiFAPITransport = (
   jwt: () => Promise<string | undefined> = bearerToken
 ): APIMiddleware => {
   return chainMiddleware(
+    requestIdMiddleware(),
     validateTiFAPIClientCall,
     requestLoggingMiddleware("tif"),
     jwtMiddleware(jwt),
