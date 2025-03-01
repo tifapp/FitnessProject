@@ -116,12 +116,7 @@ export const awsLocationSearch = async (
     countries: ["USA"],
     maxResults: 10,
     biasPosition: center ? [center.longitude, center.latitude] : undefined
-  }).catch((error) =>
-    log.error("AWS location search query error: ", {
-      error,
-      message: error.message
-    })
-  )
+  })
   return results.ext.compactMap((place: Place) => {
     if (!place.geometry) return undefined
     return {
