@@ -56,15 +56,58 @@ const addStoryToStorybook = (storyName) => {
   fs.writeFileSync(STORYBOOK_FILE, storybookContent, "utf-8")
 }
 
+const createComponentFile = (storyName, folderPath) => {
+  const componentContent = `import React from "react";
+import { View, Text, StyleSheet } from "react-native";
+
+export const ${storyName} = () => {
+  return (
+    <View style={styles.container}>
+      <Text style={styles.text}>${storyName} Component</Text>
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    padding: 16,
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  text: {
+    fontSize: 16,
+    fontWeight: '500',
+  },
+});
+`
+
+  const componentFilePath = path.join(folderPath, `${storyName}.tsx`)
+  fs.writeFileSync(componentFilePath, componentContent, "utf-8")
+}
+
 const createComponentFolder = (storyName) => {
   const storyFolderPath = path.join(COMPONENTS_DIR, storyName)
   if (!fs.existsSync(storyFolderPath)) {
     fs.mkdirSync(storyFolderPath, { recursive: true })
   }
 
+  // Create the component file first
+  createComponentFile(storyName, storyFolderPath)
+
   const storiesFileContent = `import React from "react";
-import { View, Text } from "react-native";
+import { StyleSheet } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
 import { StoryMeta } from "storybook/HelperTypes";
+import { ${storyName} } from "./${storyName}";
 
 export const ${storyName}Meta: StoryMeta = {
   title: "${storyName}",
@@ -73,10 +116,24 @@ export const ${storyName}Meta: StoryMeta = {
 export default ${storyName}Meta;
 
 export const Basic = () => (
-  <View>
-    <Text>${storyName}</Text>
-  </View>
+  <SafeAreaProvider>
+    <GestureHandlerRootView style={styles.container}>
+      <SafeAreaView style={styles.safeArea}>
+        <${storyName} />
+      </SafeAreaView>
+    </GestureHandlerRootView>
+  </SafeAreaProvider>
 );
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  safeArea: {
+    flex: 1,
+    padding: 16,
+  },
+});
 `
 
   const storiesFilePath = path.join(storyFolderPath, `${storyName}.stories.tsx`)
