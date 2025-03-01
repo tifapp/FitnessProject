@@ -4,20 +4,12 @@ import MapSnippetMeta, {
   Basic as MapSnippet
 } from "../components/MapSnippet/MapSnippet.stories"
 
-import {
-  FlatList,
-  SafeAreaView,
-  Text,
-  TouchableOpacity,
-  View
-} from "react-native"
+import { FlatList, SafeAreaView, Text, TouchableOpacity } from "react-native"
 import { useAppFonts } from "../../lib/Fonts"
+import awsconfig from "../../src/aws-exports"
 
 // Import your
 import { setupCognito } from "@auth-boundary/CognitoHelpers"
-import NameEntryMeta, {
-  Basic as NameEntryBasic
-} from "../components/NameEntry/NameEntry.stories"
 import AttendeesListMeta, {
   Basic as AttendeesListBasic
 } from "../components/AttendeesList/AttendeesList.stories"
@@ -45,6 +37,9 @@ import ForgotPasswordMeta, {
 import LocationSearchMeta, {
   Basic as LocationSearchBasic
 } from "../components/LocationSearch/LocationSearch.stories"
+import NameEntryMeta, {
+  Basic as NameEntryBasic
+} from "../components/NameEntry/NameEntry.stories"
 import ProfileMeta, {
   Basic as ProfileScreenBasic
 } from "../components/ProfileScreen/Avatar.stories"
@@ -58,6 +53,7 @@ import EventSettingsDurationMeta, {
   Basic as EventSettingsDurationBasic
 } from "../components/SettingsScreen/EventSettingsDurations.stories"
 
+import { Geo } from "@aws-amplify/geo"
 import { sqliteLogHandler, sqliteLogs } from "@lib/Logging"
 import { InMemorySecureStore } from "@lib/SecureStore"
 import { dayjs } from "TiFShared/lib/Dayjs"
@@ -96,6 +92,7 @@ import VerifcationCodeMeta, {
   Basic as VerifcationCodeBasic
 } from "../components/VerificationCode/VerifyCode.stories"
 
+Geo.configure(awsconfig)
 setupCognito(new InMemorySecureStore())
 addLogHandler(consoleLogHandler())
 addLogHandler(

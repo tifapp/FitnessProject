@@ -1,5 +1,6 @@
 import { BUILD_TYPE } from "@env"
 import { registerRootComponent } from "expo"
+import "react-native-get-random-values"
 import "TiFShared"
 
 console.log(BUILD_TYPE)
