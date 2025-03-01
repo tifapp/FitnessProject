@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { Alert, Button, SafeAreaView, StyleSheet, Text, View } from 'react-native';
-import EnhancedVirtualizedOrbit from './VirtualizedOrbit';
+import VirtualizedOrbit from './VirtualizedOrbit';
 
 // Generate a dataset with clearly numbered sequential items
 const generateSequentialDataset = (count: number, startIndex: number = 0) => {
@@ -111,7 +111,7 @@ const EnhancedOrbitDemo = () => {
         </Text>
       </View>
       
-      <EnhancedVirtualizedOrbit
+      <VirtualizedOrbit
         data={data}
         renderItem={renderOrbitItem}
         keyExtractor={(item) => item.id}

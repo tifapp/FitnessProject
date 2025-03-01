@@ -1,21 +1,17 @@
-import Slider from '@react-native-community/slider';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   Dimensions,
   GestureResponderEvent,
   PanResponder,
   PanResponderGestureState,
   PanResponderInstance,
-  ScrollView,
   StyleSheet,
   Text,
-  TouchableOpacity,
   View
 } from 'react-native';
-import Svg, { Path } from 'react-native-svg';
 import { HSLToHex } from './colorUtils';
+import OrbitRing from './OrbitRing';
 
-// Type definitions
 interface OrbitItem {
   id: number;
   angle: number;
@@ -42,51 +38,72 @@ interface Point {
   y: number;
 }
 
-interface RingPaths {
-  frontPathD: string;
-  backPathD: string;
-}
-
-// New props for virtualization
-interface VirtualizedOrbitProps {
-  data?: any[]; // Virtual dataset
-  renderItem?: (item: any, position: PositionData, itemState: OrbitItem) => React.ReactNode;
-  keyExtractor?: (item: any, index: number) => string;
+interface VirtualizedOrbitProps<T extends { id: string; label: string; }> {
+  data: T[];
+  keyExtractor: (item: T, index: number) => string;
+  renderItem?: (item: T, position: PositionData, itemState: OrbitItem) => React.ReactNode;
   onEndReached?: () => void;
   onEndReachedThreshold?: number;
   initialIndex?: number;
   windowSize?: number;
-  onItemSwapped?: (oldItem: any, newItem: any, position: PositionData) => void;
+  onItemSwapped?: (oldItem: T, newItem: T, position: PositionData) => void;
   debug?: boolean;
+  
+  // New configurable props (previously state variables)
+  tiltAngle?: number;
+  orbitRadius?: number;
+  centralShapeSize?: number;
+  numberOfItems?: number;
+  autoRotateSpeed?: number;
+  
+  // Position and size props
+  positionX?: number;
+  positionY?: number;
+  componentHeight?: number;
+  componentWidth?: number;
+  itemSize?: number;
+  scrollSensitivity?: number;
+  
+  // Ring styling
+  frontRingColor?: string;
+  backRingColor?: string;
+  ringStrokeWidth?: number;
+  ringDashPattern?: string;
 }
 
-const VirtualizedOrbit: React.FC<VirtualizedOrbitProps> = ({
-  data = [],
-  renderItem,
-  keyExtractor = (_, index) => `item-${index}`,
+const VirtualizedOrbit = <T extends { id: string; label: string; },>({
+  data,
+  keyExtractor,
   onEndReached,
   onEndReachedThreshold = 0.5,
   initialIndex = 0,
   windowSize = 50,
   onItemSwapped,
-  debug = false
-}) => {
-  // Original configuration parameters
-  const [tiltAngle, setTiltAngle] = useState<number>(45);
-  const [orbitRadius, setOrbitRadius] = useState<number>(200);
-  const [centralShapeSize, setCentralShapeSize] = useState<number>(180);
-  const [numberOfItems, setNumberOfItems] = useState<number>(12);
-  const [autoRotateSpeed, setAutoRotateSpeed] = useState<number>(0);
-  const [showControls, setShowControls] = useState<boolean>(true);
+  debug = false,
   
-  // Position and size controls
-  const [positionX, setPositionX] = useState<number>(Dimensions.get('window').width / 2);
-  const [positionY, setPositionY] = useState<number>(200);
-  const [componentHeight, setComponentHeight] = useState<number>(400);
-  const [componentWidth, setComponentWidth] = useState<number>(Dimensions.get('window').width - 32);
+  // Props with default values
+  tiltAngle = 45,
+  orbitRadius = 200,
+  centralShapeSize = 180,
+  numberOfItems = 12,
+  autoRotateSpeed = 0,
   
+  // Position and size props with defaults
+  positionX = Dimensions.get('window').width / 2,
+  positionY = 200,
+  componentHeight = 400,
+  componentWidth = Dimensions.get('window').width - 32,
+  itemSize = 40,
+  scrollSensitivity = 0.003,
+  
+  // Ring styling props
+  frontRingColor = "rgba(180, 180, 220, 0.7)",
+  backRingColor = "rgba(180, 180, 220, 0.3)",
+  ringStrokeWidth = 2,
+  ringDashPattern = "5,3"
+}: VirtualizedOrbitProps<T>) => {  
   // Core state
-  const [orbitItems, setOrbitItems] = useState<OrbitItem[]>([]);
+  const [currentOrbitItems, setCurrentOrbitItems] = useState<OrbitItem[]>([]);
   const [rotation, setRotation] = useState<number>(0);
   
   // Virtualization state
@@ -97,16 +114,7 @@ const VirtualizedOrbit: React.FC<VirtualizedOrbitProps> = ({
   const rotationThresholdRef = useRef<number>(0);
   const [swapCount, setSwapCount] = useState<number>(0);
   const [visibleItemsCount, setVisibleItemsCount] = useState<number>(0);
-  
-  // Debug state
-  const [debugInfo, setDebugInfo] = useState<{[key: string]: any}>({});
-  
-  // Fixed configuration
-  const screenWidth = Dimensions.get('window').width;
-  const centerX = positionX;
-  const centerY = positionY;
-  const itemSize = 40;
-  const scrollSensitivity = 0.003;
+
   const tiltRadian = (tiltAngle * Math.PI) / 180;
   
   // Initialize orbit items - only run this when necessary
@@ -128,20 +136,9 @@ const VirtualizedOrbit: React.FC<VirtualizedOrbitProps> = ({
       };
     });
     
-    setOrbitItems(items);
+    setCurrentOrbitItems(items);
     visibleIndicesRef.current = new Set(); // Reset visible indices
-    
-    // Update debug info
-    if (debug) {
-      setDebugInfo(prev => ({
-        ...prev,
-        itemsInitialized: true,
-        initTime: new Date().toLocaleTimeString(),
-        numberOfItems,
-        virtualStartIndex
-      }));
-    }
-  }, [numberOfItems, virtualStartIndex, data.length]); // Reduced dependencies
+  }, [numberOfItems, virtualStartIndex, data.length, itemSize]); // Dependencies include the new props
   
   // Auto-rotation effect
   useEffect(() => {
@@ -156,15 +153,15 @@ const VirtualizedOrbit: React.FC<VirtualizedOrbitProps> = ({
   
   // Apply tilt transformation to coordinates
   const applyTilt = (x: number, y: number): Point => {
-    const xOrigin = x - centerX;
-    const yOrigin = y - centerY;
+    const xOrigin = x - positionX;
+    const yOrigin = y - positionY;
     
     const xRotated = xOrigin * Math.cos(tiltRadian) - yOrigin * Math.sin(tiltRadian);
     const yRotated = xOrigin * Math.sin(tiltRadian) + yOrigin * Math.cos(tiltRadian);
     
     return {
-      x: xRotated + centerX,
-      y: yRotated + centerY
+      x: xRotated + positionX,
+      y: yRotated + positionY
     };
   };
   
@@ -172,8 +169,8 @@ const VirtualizedOrbit: React.FC<VirtualizedOrbitProps> = ({
   const calculatePosition = (item: OrbitItem): PositionData => {
     const angle = item.angle + rotation;
     
-    const baseX = centerX + Math.cos(angle) * orbitRadius;
-    const baseY = centerY + Math.sin(angle) * orbitRadius * 0.4;
+    const baseX = positionX + Math.cos(angle) * orbitRadius;
+    const baseY = positionY + Math.sin(angle) * orbitRadius * 0.4;
     
     const { x, y } = applyTilt(baseX, baseY);
     
@@ -185,49 +182,6 @@ const VirtualizedOrbit: React.FC<VirtualizedOrbitProps> = ({
     
     return { x, y, scale, opacity, zIndex, elevation, z };
   };
-  
-  // Generate the path for the connecting ring
-  const generateRingPath = useMemo(() => {
-    const frontPoints: Point[] = [];
-    const backPoints: Point[] = [];
-    
-    const numPoints = 100;
-    for (let i = 0; i < numPoints; i++) {
-      const angle = (i / numPoints) * 2 * Math.PI + rotation;
-      
-      const baseX = centerX + Math.cos(angle) * orbitRadius;
-      const baseY = centerY + Math.sin(angle) * orbitRadius * 0.4;
-      
-      const { x, y } = applyTilt(baseX, baseY);
-      
-      const z = Math.sin(angle);
-      
-      if (z >= 0) {
-        frontPoints.push({ x, y });
-      } else {
-        backPoints.push({ x, y });
-      }
-    }
-    
-    let frontPathD = '';
-    let backPathD = '';
-    
-    if (frontPoints.length > 0) {
-      frontPathD = `M ${frontPoints[0].x} ${frontPoints[0].y} `;
-      frontPoints.forEach((point, i) => {
-        if (i > 0) frontPathD += `L ${point.x} ${point.y} `;
-      });
-    }
-    
-    if (backPoints.length > 0) {
-      backPathD = `M ${backPoints[0].x} ${backPoints[0].y} `;
-      backPoints.forEach((point, i) => {
-        if (i > 0) backPathD += `L ${point.x} ${point.y} `;
-      });
-    }
-    
-    return { frontPathD, backPathD };
-  }, [rotation, orbitRadius, tiltRadian, centerX, centerY]);
   
   // Enhanced virtualization handler - more aggressive with swapping
   useEffect(() => {
@@ -246,7 +200,7 @@ const VirtualizedOrbit: React.FC<VirtualizedOrbitProps> = ({
     let itemsToReplace: number[] = [];
     let visibleCount = 0;
     
-    orbitItems.forEach(item => {
+    currentOrbitItems.forEach(item => {
       const position = calculatePosition(item);
       const { z, opacity } = position;
       
@@ -275,10 +229,7 @@ const VirtualizedOrbit: React.FC<VirtualizedOrbitProps> = ({
       const advanceBy = Math.min(itemsToReplace.length, Math.floor(numberOfItems / 4));
       const newStartIndex = (virtualStartIndex + advanceBy) % Math.max(1, data.length);
       
-      // Update orbit items with new virtual data
-      const itemsBeforeSwap = [...orbitItems];
-      
-      setOrbitItems(prev => {
+      setCurrentOrbitItems(prev => {
         const newItems = prev.map(item => {
           if (itemsToReplace.includes(item.id)) {
             const newVirtualIndex = (item.virtualIndex! + numberOfItems) % Math.max(1, data.length);
@@ -313,18 +264,6 @@ const VirtualizedOrbit: React.FC<VirtualizedOrbitProps> = ({
       // Update virtual start index
       setVirtualStartIndex(newStartIndex);
       
-      // Debug info
-      if (debug) {
-        setDebugInfo(prev => ({
-          ...prev,
-          lastSwap: new Date().toLocaleTimeString(),
-          swapCount: swapCount + itemsToReplace.length,
-          itemsReplaced: itemsToReplace.length,
-          virtualWindow: `${newStartIndex}-${newStartIndex + numberOfItems}`,
-          rotationValue: rotation.toFixed(2)
-        }));
-      }
-      
       // Check if we need to fetch more data
       if (onEndReached && 
           newStartIndex + windowSize >= data.length * onEndReachedThreshold && 
@@ -350,45 +289,6 @@ const VirtualizedOrbit: React.FC<VirtualizedOrbitProps> = ({
     })
   ).current;
   
-  // Reset to default values
-  const handleReset = () => {
-    setTiltAngle(45);
-    setOrbitRadius(200);
-    setCentralShapeSize(180);
-    setNumberOfItems(12);
-    setAutoRotateSpeed(0);
-    setRotation(0);
-    setPositionX(Dimensions.get('window').width / 2);
-    setPositionY(200);
-    setComponentHeight(400);
-    setComponentWidth(Dimensions.get('window').width - 32);
-    setVirtualStartIndex(initialIndex);
-    setSwapCount(0);
-    visibleIndicesRef.current = new Set();
-    lastSwapTimeRef.current = 0;
-    rotationThresholdRef.current = 0;
-    
-    if (debug) {
-      setDebugInfo(prev => ({
-        ...prev,
-        reset: new Date().toLocaleTimeString()
-      }));
-    }
-  };
-  
-  // Toggle controls visibility
-  const toggleControls = () => {
-    setShowControls(prev => !prev);
-  };
-  
-  // Memoize position calculations to reduce render work
-  const positionCalculations = useMemo(() => {
-    return orbitItems.map(item => ({
-      item,
-      position: calculatePosition(item)
-    }));
-  }, [orbitItems, rotation, tiltAngle, orbitRadius, centerX, centerY]);
-  
   return (
     <View style={styles.container}>
       {/* Orbital Component */}
@@ -402,28 +302,18 @@ const VirtualizedOrbit: React.FC<VirtualizedOrbitProps> = ({
         ]}
         {...panResponder.panHandlers}
       >
-        {/* SVG for rings */}
-        <Svg style={[StyleSheet.absoluteFill, { zIndex: 1 }]}>
-          {/* Back half of ring (behind center) */}
-          <Path
-            d={generateRingPath.backPathD}
-            fill="none"
-            stroke="rgba(180, 180, 220, 0.3)"
-            strokeWidth="2"
-            strokeDasharray="5,3"
-          />
-        </Svg>
-        
-        <Svg style={[StyleSheet.absoluteFill, { zIndex: 55 }]}>
-          {/* Front half of ring (in front of center) */}
-          <Path
-            d={generateRingPath.frontPathD}
-            fill="none"
-            stroke="rgba(180, 180, 220, 0.7)"
-            strokeWidth="2"
-            strokeDasharray="5,3"
-          />
-        </Svg>
+        {/* Ring Component */}
+        <OrbitRing
+          rotation={rotation}
+          orbitRadius={orbitRadius}
+          tiltAngle={tiltAngle}
+          positionX={positionX}
+          positionY={positionY}
+          frontStroke={frontRingColor}
+          backStroke={backRingColor}
+          strokeWidth={ringStrokeWidth}
+          strokeDasharray={ringDashPattern}
+        />
         
         {/* Central shape */}
         <View 
@@ -432,8 +322,8 @@ const VirtualizedOrbit: React.FC<VirtualizedOrbitProps> = ({
             {
               width: centralShapeSize,
               height: centralShapeSize,
-              left: centerX - centralShapeSize / 2,
-              top: centerY - centralShapeSize / 2,
+              left: positionX - centralShapeSize / 2,
+              top: positionY - centralShapeSize / 2,
               borderRadius: centralShapeSize / 2,
               zIndex: 50,
               elevation: 6,
@@ -453,7 +343,9 @@ const VirtualizedOrbit: React.FC<VirtualizedOrbitProps> = ({
         </View>
         
         {/* Orbit items - with virtualization */}
-        {positionCalculations.map(({ item, position }) => {
+        {currentOrbitItems.map((item) => {
+          const position = calculatePosition(item)
+
           const { x, y, scale, opacity, zIndex, elevation } = position;
           
           // Skip rendering completely invisible items for performance
@@ -483,11 +375,7 @@ const VirtualizedOrbit: React.FC<VirtualizedOrbitProps> = ({
                 }
               ]}
             >
-              {renderItem ? (
-                renderItem(item.data, position, item)
-              ) : (
-                <Text style={styles.itemText}>{item.label}</Text>
-              )}
+              <Text style={styles.itemText}>{item.label}</Text>
             </View>
           );
         })}
@@ -495,16 +383,6 @@ const VirtualizedOrbit: React.FC<VirtualizedOrbitProps> = ({
         <Text style={styles.instructionText}>
           Drag up/down to rotate and navigate
         </Text>
-        
-        {/* Toggle Controls Button */}
-        <TouchableOpacity 
-          style={styles.toggleButton}
-          onPress={toggleControls}
-        >
-          <Text style={styles.toggleButtonText}>
-            {showControls ? 'Hide Controls' : 'Show Controls'}
-          </Text>
-        </TouchableOpacity>
         
         {/* Debug Overlay */}
         {debug && (
@@ -516,200 +394,6 @@ const VirtualizedOrbit: React.FC<VirtualizedOrbitProps> = ({
           </View>
         )}
       </View>
-      
-      {/* Controls Panel */}
-      {showControls && (
-        <View style={styles.controlsPanel}>
-          <View style={styles.controlsHeader}>
-            <Text style={styles.controlsTitle}>Orbital Controls</Text>
-            <TouchableOpacity 
-              style={styles.resetButton}
-              onPress={handleReset}
-            >
-              <Text style={styles.resetButtonText}>Reset</Text>
-            </TouchableOpacity>
-          </View>
-          
-          <ScrollView 
-            style={styles.controlsScroll}
-            showsVerticalScrollIndicator={true}
-          >
-            <View style={styles.controlsGrid}>
-              {/* Auto-rotation Speed Control - Featured at top for easier testing */}
-              <View style={styles.controlItem}>
-                <Text style={styles.controlLabel}>
-                  Auto-rotation Speed: {autoRotateSpeed === 0 ? 'Off' : autoRotateSpeed}
-                </Text>
-                <Slider
-                  style={styles.slider}
-                  minimumValue={0}
-                  maximumValue={10}
-                  value={autoRotateSpeed}
-                  onValueChange={value => setAutoRotateSpeed(Math.round(value))}
-                  minimumTrackTintColor="#1FB2F5"
-                  maximumTrackTintColor="#d3d3d3"
-                  thumbTintColor="#1FB2F5"
-                />
-              </View>
-              
-              {/* Virtualization controls */}
-              {data.length > 0 && (
-                <View style={styles.controlItem}>
-                  <Text style={styles.controlLabel}>
-                    Virtual Window: {virtualStartIndex}/{data.length}
-                  </Text>
-                  <Slider
-                    style={styles.slider}
-                    minimumValue={0}
-                    maximumValue={Math.max(0, data.length - numberOfItems)}
-                    value={virtualStartIndex}
-                    onValueChange={value => setVirtualStartIndex(Math.round(value))}
-                    minimumTrackTintColor="#1FB2F5"
-                    maximumTrackTintColor="#d3d3d3"
-                    thumbTintColor="#1FB2F5"
-                  />
-                </View>
-              )}
-              
-              {/* Number of Items Control */}
-              <View style={styles.controlItem}>
-                <Text style={styles.controlLabel}>
-                  Visible Items: {numberOfItems}
-                </Text>
-                <Slider
-                  style={styles.slider}
-                  minimumValue={3}
-                  maximumValue={24}
-                  value={numberOfItems}
-                  onValueChange={value => setNumberOfItems(Math.round(value))}
-                  minimumTrackTintColor="#1FB2F5"
-                  maximumTrackTintColor="#d3d3d3"
-                  thumbTintColor="#1FB2F5"
-                />
-              </View>
-              
-              {/* Tilt Angle Control */}
-              <View style={styles.controlItem}>
-                <Text style={styles.controlLabel}>
-                  Tilt Angle: {tiltAngle}°
-                </Text>
-                <Slider
-                  style={styles.slider}
-                  minimumValue={0}
-                  maximumValue={360}
-                  value={tiltAngle}
-                  onValueChange={value => setTiltAngle(Math.round(value))}
-                  minimumTrackTintColor="#1FB2F5"
-                  maximumTrackTintColor="#d3d3d3"
-                  thumbTintColor="#1FB2F5"
-                />
-              </View>
-              
-              {/* Orbit Radius Control */}
-              <View style={styles.controlItem}>
-                <Text style={styles.controlLabel}>
-                  Orbit Size: {orbitRadius}px
-                </Text>
-                <Slider
-                  style={styles.slider}
-                  minimumValue={100}
-                  maximumValue={300}
-                  value={orbitRadius}
-                  onValueChange={value => setOrbitRadius(Math.round(value))}
-                  minimumTrackTintColor="#1FB2F5"
-                  maximumTrackTintColor="#d3d3d3"
-                  thumbTintColor="#1FB2F5"
-                />
-              </View>
-              
-              {/* Central Shape Size Control */}
-              <View style={styles.controlItem}>
-                <Text style={styles.controlLabel}>
-                  Center Size: {centralShapeSize}px
-                </Text>
-                <Slider
-                  style={styles.slider}
-                  minimumValue={60}
-                  maximumValue={240}
-                  value={centralShapeSize}
-                  onValueChange={value => setCentralShapeSize(Math.round(value))}
-                  minimumTrackTintColor="#1FB2F5"
-                  maximumTrackTintColor="#d3d3d3"
-                  thumbTintColor="#1FB2F5"
-                />
-              </View>
-              
-              {/* Position X Control */}
-              <View style={styles.controlItem}>
-                <Text style={styles.controlLabel}>
-                  Center X: {Math.round(positionX)}px
-                </Text>
-                <Slider
-                  style={styles.slider}
-                  minimumValue={0}
-                  maximumValue={screenWidth}
-                  value={positionX}
-                  onValueChange={value => setPositionX(value)}
-                  minimumTrackTintColor="#1FB2F5"
-                  maximumTrackTintColor="#d3d3d3"
-                  thumbTintColor="#1FB2F5"
-                />
-              </View>
-              
-              {/* Position Y Control */}
-              <View style={styles.controlItem}>
-                <Text style={styles.controlLabel}>
-                  Center Y: {Math.round(positionY)}px
-                </Text>
-                <Slider
-                  style={styles.slider}
-                  minimumValue={50}
-                  maximumValue={600}
-                  value={positionY}
-                  onValueChange={value => setPositionY(value)}
-                  minimumTrackTintColor="#1FB2F5"
-                  maximumTrackTintColor="#d3d3d3"
-                  thumbTintColor="#1FB2F5"
-                />
-              </View>
-              
-              {/* Component Height Control */}
-              <View style={styles.controlItem}>
-                <Text style={styles.controlLabel}>
-                  Height: {componentHeight}px
-                </Text>
-                <Slider
-                  style={styles.slider}
-                  minimumValue={200}
-                  maximumValue={800}
-                  value={componentHeight}
-                  onValueChange={value => setComponentHeight(Math.round(value))}
-                  minimumTrackTintColor="#1FB2F5"
-                  maximumTrackTintColor="#d3d3d3"
-                  thumbTintColor="#1FB2F5"
-                />
-              </View>
-              
-              {/* Component Width Control */}
-              <View style={styles.controlItem}>
-                <Text style={styles.controlLabel}>
-                  Width: {componentWidth}px
-                </Text>
-                <Slider
-                  style={styles.slider}
-                  minimumValue={100}
-                  maximumValue={screenWidth}
-                  value={componentWidth}
-                  onValueChange={value => setComponentWidth(Math.round(value))}
-                  minimumTrackTintColor="#1FB2F5"
-                  maximumTrackTintColor="#d3d3d3"
-                  thumbTintColor="#1FB2F5"
-                />
-              </View>
-            </View>
-          </ScrollView>
-        </View>
-      )}
     </View>
   );
 };
@@ -720,66 +404,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#f0f0f0',
     padding: 16,
-  },
-  controlsPanel: {
-    position: 'absolute',
-    bottom: 20,
-    left: 20,
-    right: 20,
-    backgroundColor: 'rgba(255, 255, 255, 0.95)',
-    borderRadius: 8,
-    padding: 16,
-    maxHeight: '60%',
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-    zIndex: 1000,
-  },
-  controlsHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  controlsTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-  },
-  resetButton: {
-    backgroundColor: '#f0f0f0',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 4,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  resetButtonText: {
-    fontSize: 14,
-  },
-  controlsScroll: {
-    maxHeight: '100%',
-    width: '100%',
-  },
-  controlsGrid: {
-    width: '100%',
-    paddingBottom: 20,
-  },
-  controlItem: {
-    marginBottom: 16,
-  },
-  controlLabel: {
-    marginBottom: 8,
-    fontSize: 14,
-    fontWeight: '500',
-  },
-  slider: {
-    width: '100%',
-    height: 40,
   },
   orbitalContainer: {
     position: 'relative',
@@ -838,20 +462,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: '#666',
     fontSize: 14,
-  },
-  toggleButton: {
-    position: 'absolute',
-    top: 10,
-    right: 10,
-    backgroundColor: 'rgba(27, 127, 204, 0.7)',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 4,
-  },
-  toggleButtonText: {
-    color: '#ffffff',
-    fontSize: 12,
-    fontWeight: '500',
   },
   debugOverlay: {
     position: 'absolute',
