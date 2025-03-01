@@ -1,4 +1,7 @@
-import { FormSubmissionPrimaryButton, PrimaryButton } from "@components/Buttons"
+import {
+  FormSubmissionSecondaryButton,
+  PrimaryButton
+} from "@components/Buttons"
 import { TiFFooterView } from "@components/Footer"
 import { Caption } from "@components/Text"
 import { ShadedTextField } from "@components/TextFields"
@@ -182,12 +185,12 @@ export const RudeusPatternEditorView = ({
             <PrimaryButton onPress={state.played} style={styles.playButton}>
               Play
             </PrimaryButton>
-            <FormSubmissionPrimaryButton
+            <FormSubmissionSecondaryButton
               submission={state.submission}
               style={styles.playButton}
             >
               Share
-            </FormSubmissionPrimaryButton>
+            </FormSubmissionSecondaryButton>
           </View>
         </TiFFooterView>
       }
