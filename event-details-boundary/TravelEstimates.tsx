@@ -3,6 +3,7 @@ import { ExpandableMapSnippetView } from "@components/MapSnippetView"
 import { useCoreNavigation } from "@components/Navigation"
 import {
   BodyText,
+  BoldFootnote,
   Caption,
   CaptionTitle,
   Footnote,
@@ -227,8 +228,13 @@ export const EventTravelEstimatesView = ({
                   <TiFFormNamedIconRowView
                     iconName="location"
                     iconBackgroundColor={AppStyles.primary}
-                    name={`Viewing ${eventTitle}`}
-                    description={address}
+                    name={<Footnote style={{ opacity: 0.5 }}>Viewing</Footnote>}
+                    description={
+                      <View>
+                        <Headline>{eventTitle}</Headline>
+                        <Footnote>{address}</Footnote>
+                      </View>
+                    }
                   />
                 </View>
               )}
