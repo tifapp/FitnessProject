@@ -1,10 +1,16 @@
+import { useTiFNavigation } from "@components/Navigation"
+import { useScreenBottomPadding } from "@components/Padding"
 import { Headline } from "@components/Text"
 import { CircularIonicon } from "@components/common/Icons"
 import { AppStyles } from "@lib/AppColorStyle"
+import { featureContext } from "@lib/FeatureContext"
 import { NamedLocation } from "@location/NamedLocation"
+import { recentLocationsStorage } from "@location/Recents"
 import { useUserCoordinatesQuery } from "@location/UserLocation"
 import { UseQueryResult, useQuery } from "@tanstack/react-query"
+import { logger } from "TiFShared/logging"
 import { LocationAccuracy, LocationObject } from "expo-location"
+import { useAtomValue } from "jotai"
 import React, { useState } from "react"
 import {
   LayoutRectangle,
@@ -16,7 +22,9 @@ import {
   ViewStyle
 } from "react-native"
 import Animated, { FadeIn } from "react-native-reanimated"
+import { SafeAreaView } from "react-native-safe-area-context"
 import { LocationSearchLoadingResult } from "./LoadingResult"
+import { LocationSearchBar } from "./SearchBar"
 import { LocationSearchResult, locationSearch } from "./SearchClient"
 import {
   LocationSearchResultProps,
@@ -24,14 +32,6 @@ import {
 } from "./SearchResultView"
 import { LocationSearchResultsListView } from "./SearchResultsList"
 import { debouncedSearchTextAtom } from "./SearchTextAtoms"
-import { useAtomValue } from "jotai"
-import { useScreenBottomPadding } from "@components/Padding"
-import { LocationSearchBar } from "./SearchBar"
-import { SafeAreaView } from "react-native-safe-area-context"
-import { logger } from "TiFShared/logging"
-import { recentLocationsStorage } from "@location/Recents"
-import { featureContext } from "@lib/FeatureContext"
-import { useTiFNavigation } from "@components/Navigation"
 
 const log = logger("location.search")
 
@@ -64,9 +64,15 @@ export const useLocationsSearch = () => {
   }
 }
 
+/**
+ * Converts the result of searching the results into an object with a status and data.
+ *
+ */
+
 const queryResultToDataResult = ({
   status,
-  data
+  data,
+  error
 }: UseQueryResult<
   LocationSearchResult[],
   unknown
@@ -105,7 +111,7 @@ export const LocationsSearchView = ({
     Platform.OS === "android" ? undefined : (["bottom"] as const)
   const padding = useScreenBottomPadding({
     safeAreaScreens: (headerLayout?.height ?? 0) + 24,
-    nonSafeAreaScreens: 24
+    nonSafeAreaScreens: 96
   })
   return (
     <SafeAreaView edges={safeAreaEdges}>

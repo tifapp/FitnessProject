@@ -1,5 +1,10 @@
+import { UseLoadEventDetailsResult } from "@event-details-boundary/Details"
+import {
+  EventAttendeeMocks,
+  EventMocks
+} from "@event-details-boundary/MockData"
+import { renderSuccessfulUseLoadEventDetails } from "@event-details-boundary/TestHelpers"
 import { ClientSideEvent } from "@event/ClientSideEvent"
-import { uuidString } from "TiFShared/lib/UUID"
 import { setPlatform } from "@test-helpers/Platform"
 import {
   TestQueryClientProvider,
@@ -7,21 +12,16 @@ import {
 } from "@test-helpers/ReactQuery"
 import { fakeTimers } from "@test-helpers/Timers"
 import { act, renderHook, waitFor } from "@testing-library/react-native"
+import { UserBlockingFeature } from "@user/Blocking"
 import { EmailAddress } from "@user/privacy"
 import { UserSessionProvider } from "@user/Session"
 import { UnblockedUserRelationsStatus } from "TiFShared/domain-models/User"
-import { UseLoadEventDetailsResult } from "@event-details-boundary/Details"
+import { uuidString } from "TiFShared/lib/UUID"
 import {
   EVENT_MENU_ACTION,
   formatEventMenuActions,
   useEventActionsMenu
 } from "./Menu"
-import {
-  EventAttendeeMocks,
-  EventMocks
-} from "@event-details-boundary/MockData"
-import { renderSuccessfulUseLoadEventDetails } from "@event-details-boundary/TestHelpers"
-import { UserBlockingFeature } from "@user/Blocking"
 
 describe("EventDetailsMenu tests", () => {
   describe("FormatEventMenuActions tests", () => {

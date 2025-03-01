@@ -1,4 +1,4 @@
-import { Geo, Place } from "@aws-amplify/geo"
+import { Geo, Place, SearchByTextOptions } from "@aws-amplify/geo"
 import { NamedLocation } from "@location/NamedLocation"
 import {
   RecentLocationAnnotation,
@@ -9,7 +9,9 @@ import {
   LocationCoordinate2D,
   areCoordinatesEqual
 } from "TiFShared/domain-models/LocationCoordinate2D"
+import { logger } from "TiFShared/logging"
 
+const log = logger("location.searchClient")
 /**
  * An result that is displayed by the location search.
  */
@@ -98,6 +100,9 @@ export const locationSearch = async (
   }
 }
 
+const geoSearchByText = (text: string, options?: SearchByTextOptions) =>
+  Geo.searchByText(text, options)
+
 /**
  * Returns a list of {@link NamedLocation}s from AWS Geo using the specified
  * query and center coordinate.
@@ -105,9 +110,10 @@ export const locationSearch = async (
 export const awsLocationSearch = async (
   query: LocationsSearchQueryText,
   center: LocationCoordinate2D | undefined,
-  awsSearch: typeof Geo.searchByText = Geo.searchByText
+  awsSearch: typeof geoSearchByText = geoSearchByText
 ): Promise<NamedLocation[]> => {
   const results = await awsSearch(query.toString(), {
+    countries: ["USA"],
     maxResults: 10,
     biasPosition: center ? [center.longitude, center.latitude] : undefined
   })
