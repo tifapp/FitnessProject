@@ -1,4 +1,4 @@
-import { PrimaryButton } from "@components/Buttons"
+import { FormSubmissionPrimaryButton } from "@components/Buttons"
 import { TiFFooterView } from "@components/Footer"
 import { BodyText, Subtitle } from "@components/Text"
 import { ShadedTextField } from "@components/TextFields"
@@ -10,7 +10,7 @@ import { useState } from "react"
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 import { RudeusUser } from "./Models"
 import { RudeusAPI } from "./RudeusAPI"
-import { RudeusUserStorage } from "./UserStorage"
+import { RudeusUserStorage } from "./UserTokenStorage"
 
 export const registerUser = async (
   name: string,
@@ -68,17 +68,12 @@ export const RudeusRegisterView = ({ state, style }: RudeusRegisterProps) => (
     <TiFFormScrollableLayoutView
       footer={
         <TiFFooterView>
-          <PrimaryButton
-            disabled={state.submission.status !== "submittable"}
-            onPress={() => {
-              if (state.submission.status === "submittable") {
-                state.submission.submit()
-              }
-            }}
+          <FormSubmissionPrimaryButton
+            submission={state.submission}
             style={styles.button}
           >
             Register
-          </PrimaryButton>
+          </FormSubmissionPrimaryButton>
         </TiFFooterView>
       }
       style={styles.layout}
