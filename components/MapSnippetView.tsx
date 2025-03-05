@@ -1,39 +1,40 @@
+import { Portal } from "@gorhom/portal"
+import { withTiFDefaultSpring } from "@lib/Reanimated"
 import React, {
-  useRef,
-  useState,
-  useCallback,
-  ReactNode,
   forwardRef,
   LegacyRef,
-  useEffect
+  ReactNode,
+  useCallback,
+  useEffect,
+  useRef,
+  useState
 } from "react"
 import {
+  LayoutRectangle,
   Platform,
-  View,
-  useWindowDimensions,
-  StyleSheet,
   StyleProp,
-  ViewStyle,
-  LayoutRectangle
+  StyleSheet,
+  useWindowDimensions,
+  View,
+  ViewStyle
 } from "react-native"
 import MapView, { MapViewProps, Marker, Region } from "react-native-maps"
 import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
   runOnJS,
-  SharedValue
+  SharedValue,
+  useAnimatedStyle,
+  useSharedValue
 } from "react-native-reanimated"
-import { Portal } from "@gorhom/portal"
-import { withTiFDefaultSpring } from "@lib/Reanimated"
-import { TouchableIonicon } from "./common/Icons"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
-import { useScreenBottomPadding } from "./Padding"
 import { FullWindowOverlay } from "react-native-screens"
+import { TouchableIonicon } from "./common/Icons"
+import { useScreenBottomPadding } from "./Padding"
 
 export type ExpandableMapSnippetProps = {
   isExpanded: boolean
   onExpansionChanged: (isExpanded: boolean) => void
   onMarkerPressed?: () => void
+  onMapLongPress?: () => void
   region: Region
   overlay?: ReactNode | ((isExpanding: boolean) => ReactNode)
   marker?: ReactNode
@@ -55,6 +56,7 @@ export const ExpandableMapSnippetView = forwardRef(function Snippet(
     marker,
     style,
     onMarkerPressed,
+    onMapLongPress,
     collapsedMapProps,
     expandedMapProps
   }: ExpandableMapSnippetProps,

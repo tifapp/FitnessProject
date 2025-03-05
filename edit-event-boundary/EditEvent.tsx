@@ -1,68 +1,68 @@
-import {
-  StyleProp,
-  ViewStyle,
-  View,
-  StyleSheet,
-  TouchableOpacity,
-  Platform
-} from "react-native"
-import {
-  editEventFormInitialValuesAtom,
-  editEventFormValueAtoms,
-  editEventFormValuesAtom
-} from "./FormAtoms"
-import { EventEditLocation, EventID } from "TiFShared/domain-models/Event"
-import {
-  PragmaQuoteView,
-  createEventQuote,
-  editEventQuote
-} from "./PragmaQuotes"
-import { useAtom, useAtomValue, useStore } from "jotai"
-import { ShadedTextField } from "@components/TextFields"
-import { useFontScale } from "@lib/Fonts"
-import { AppStyles } from "@lib/AppColorStyle"
-import React, { useCallback, useEffect, useState } from "react"
+import { TiFBottomSheet } from "@components/BottomSheet"
+import { TiFFooterView } from "@components/Footer"
 import { useScreenBottomPadding } from "@components/Padding"
-import { SafeAreaView } from "react-native-safe-area-context"
-import { useUserSettings } from "@settings-storage/Hooks"
-import { EditEventDurationPickerView } from "./DurationPicker"
+import { BodyText, Headline } from "@components/Text"
+import { ShadedTextField } from "@components/TextFields"
 import {
   Ionicon,
   IoniconCloseButton,
   TouchableIonicon
 } from "@components/common/Icons"
-import { dayjs } from "TiFShared/lib/Dayjs"
-import { BodyText, Headline } from "@components/Text"
+import { TiFFormCardView } from "@components/form-components/Card"
+import { TiFFormNamedToggleView } from "@components/form-components/NamedToggle"
+import { TiFFormScrollableLayoutView } from "@components/form-components/ScrollableFormLayout"
 import {
   TiFFormCardSectionView,
   TiFFormSectionView
 } from "@components/form-components/Section"
-import { TiFFormNamedToggleView } from "@components/form-components/NamedToggle"
-import { settingsSelector } from "@settings-storage/Settings"
+import { formatDateTimeFromBasis } from "@date-time"
+import { ClientSideEvent } from "@event/ClientSideEvent"
+import {
+  EditEventFormValues,
+  defaultEditFormValues
+} from "@event/EditFormValues"
+import { BottomSheetView } from "@gorhom/bottom-sheet"
+import { AppStyles } from "@lib/AppColorStyle"
+import { featureContext } from "@lib/FeatureContext"
+import { useFontScale } from "@lib/Fonts"
+import { useConst } from "@lib/utils/UseConst"
 import { useEffectEvent } from "@lib/utils/UseEffectEvent"
+import { DurationPickerView } from "@modules/tif-duration-picker"
+import RNDateTimePicker, {
+  DateTimePickerAndroid as RNDateTimePickerAndroid
+} from "@react-native-community/datetimepicker"
+import { useUserSettings } from "@settings-storage/Hooks"
+import { settingsSelector } from "@settings-storage/Settings"
+import { EventEditLocation, EventID } from "TiFShared/domain-models/Event"
+import { dayjs } from "TiFShared/lib/Dayjs"
+import { useAtom, useAtomValue, useStore } from "jotai"
+import React, { useCallback, useEffect, useState } from "react"
+import {
+  Platform,
+  StyleProp,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+  ViewStyle
+} from "react-native"
+import { SafeAreaView } from "react-native-safe-area-context"
+import { EditEventDurationPickerView } from "./DurationPicker"
+import {
+  editEventFormInitialValuesAtom,
+  editEventFormValueAtoms,
+  editEventFormValuesAtom
+} from "./FormAtoms"
+import { EditEventFormLocationView, useEditEventFormLocation } from "./Location"
+import {
+  PragmaQuoteView,
+  createEventQuote,
+  editEventQuote
+} from "./PragmaQuotes"
 import {
   EditEventFormSubmitButton,
   submitEventEdit,
   useEditEventFormSubmission
 } from "./Submit"
-import { ClientSideEvent } from "@event/ClientSideEvent"
-import { BottomSheetView } from "@gorhom/bottom-sheet"
-import { DurationPickerView } from "@modules/tif-duration-picker"
-import RNDateTimePicker, {
-  DateTimePickerAndroid as RNDateTimePickerAndroid
-} from "@react-native-community/datetimepicker"
-import { TiFBottomSheet } from "@components/BottomSheet"
-import { useConst } from "@lib/utils/UseConst"
-import { TiFFormCardView } from "@components/form-components/Card"
-import { formatDateTimeFromBasis } from "@date-time"
-import { EditEventFormLocationView, useEditEventFormLocation } from "./Location"
-import { TiFFormScrollableLayoutView } from "@components/form-components/ScrollableFormLayout"
-import { TiFFooterView } from "@components/Footer"
-import {
-  EditEventFormValues,
-  defaultEditFormValues
-} from "@event/EditFormValues"
-import { featureContext } from "@lib/FeatureContext"
 
 export const EditEventFeature = featureContext({
   submit: submitEventEdit
@@ -73,6 +73,7 @@ export type EditEventProps = {
   hostProfileImageURL?: string
   eventId?: EventID
   onSuccess: (event: ClientSideEvent) => void
+  onMapLongPress: () => void
   onSelectLocationTapped: () => void
   currentDate?: Date
   initialValues?: EditEventFormValues
@@ -114,6 +115,7 @@ export const EditEventView = ({
   eventId,
   currentDate = new Date(),
   onSelectLocationTapped,
+  onMapLongPress,
   onSuccess,
   initialValues,
   style
@@ -130,6 +132,7 @@ export const EditEventView = ({
         hostName={hostName}
         hostProfileImageURL={hostProfileImageURL}
         onSelectLocationTapped={onSelectLocationTapped}
+        onMapLongPress={onMapLongPress}
       />
       <StartDateSectionView />
       <DurationSectionView />
@@ -176,6 +179,7 @@ const TitleSectionView = () => {
 
 type LocationSectionProps = {
   onSelectLocationTapped: () => void
+  onMapLongPress: () => void
   hostName: string
   hostProfileImageURL?: string
 }

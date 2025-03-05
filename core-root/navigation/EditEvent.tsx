@@ -7,8 +7,8 @@ import { EditEventFormDismissButton } from "@edit-event-boundary/Dismiss"
 import { EditEventView } from "@edit-event-boundary/EditEvent"
 import { editEventFormValueAtoms } from "@edit-event-boundary/FormAtoms"
 import {
-  RouteableEditEventFormValues,
-  fromRouteableEditFormValues
+  fromRouteableEditFormValues,
+  RouteableEditEventFormValues
 } from "@event/EditFormValues"
 import {
   LocationsSearchView,
@@ -36,6 +36,7 @@ const EditEventScreen = withAlphaRegistration(
         onSelectLocationTapped={() => {
           navigation.navigate("modal", { screen: "editEventLocationSearch" })
         }}
+        onMapLongPress={() => console.log("Map long pressed")}
         onSuccess={(e) => pushEventDetails(e.id, "replace")}
         style={styles.screen}
       />

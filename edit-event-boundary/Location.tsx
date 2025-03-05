@@ -1,28 +1,27 @@
-import { useAtom } from "jotai"
-import {
-  ViewStyle,
-  StyleProp,
-  View,
-  StyleSheet,
-  ActivityIndicator
-} from "react-native"
-import { editEventFormValueAtoms } from "./FormAtoms"
+import { AvatarMapMarkerView } from "@components/AvatarMapMarker"
+import { ExpandableMapSnippetView } from "@components/MapSnippetView"
+import { TiFFormNavigationLinkView } from "@components/form-components/NavigationLink"
+import { EditEventFormLocation } from "@event/EditFormValues"
+import { placemarkToFormattedAddress } from "@lib/AddressFormatting"
+import { AppStyles } from "@lib/AppColorStyle"
+import { FontScaleFactors } from "@lib/Fonts"
 import {
   DEFAULT_GEOCODE_QUERY_OPTIONS,
   useGeocodeQuery,
   useReverseGeocodeQuery
 } from "@location/Geocoding"
-import React, { useEffect, useRef, useState } from "react"
-import { TiFFormNavigationLinkView } from "@components/form-components/NavigationLink"
-import { AppStyles } from "@lib/AppColorStyle"
-import MapView from "react-native-maps"
-import { placemarkToFormattedAddress } from "@lib/AddressFormatting"
-import { FontScaleFactors } from "@lib/Fonts"
-import { AvatarMapMarkerView } from "@components/AvatarMapMarker"
-import { EditEventFormLocation } from "@event/EditFormValues"
 import { LocationCoordinate2D } from "TiFShared/domain-models/LocationCoordinate2D"
-import { ExpandableMapSnippetView } from "@components/MapSnippetView"
-import { TiFFormCardView } from "@components/form-components/Card"
+import { useAtom } from "jotai"
+import React, { useEffect, useRef, useState } from "react"
+import {
+  ActivityIndicator,
+  StyleProp,
+  StyleSheet,
+  View,
+  ViewStyle
+} from "react-native"
+import MapView from "react-native-maps"
+import { editEventFormValueAtoms } from "./FormAtoms"
 
 export const useEditEventFormLocation = () => {
   const [location, setLocation] = useAtom(editEventFormValueAtoms.location)
@@ -55,6 +54,7 @@ export type EditEventFormLocationProps = {
   hostProfileImageURL?: string
   location?: EditEventFormLocation
   onSelectLocationTapped: () => void
+  onMapLongPress: () => void
   style?: StyleProp<ViewStyle>
 }
 
@@ -63,6 +63,7 @@ export const EditEventFormLocationView = ({
   hostProfileImageURL,
   location,
   onSelectLocationTapped,
+  onMapLongPress,
   style
 }: EditEventFormLocationProps) => (
   <View style={style}>
@@ -82,6 +83,7 @@ export const EditEventFormLocationView = ({
         hostProfileImageURL={hostProfileImageURL}
         location={location}
         onSelectLocationTapped={onSelectLocationTapped}
+        onMapLongPress={onMapLongPress}
       />
     )}
   </View>
@@ -92,13 +94,15 @@ type LocationProps = {
   hostProfileImageURL?: string
   location: EditEventFormLocation
   onSelectLocationTapped: () => void
+  onMapLongPress: () => void
 }
 
 const LocationView = ({
   hostName,
   hostProfileImageURL,
   location,
-  onSelectLocationTapped
+  onSelectLocationTapped,
+  onMapLongPress
 }: LocationProps) => {
   const mapRef = useRef<MapView>(null)
   useEffect(() => {
@@ -127,7 +131,10 @@ const LocationView = ({
               }
             ]
           }}
-          expandedMapProps={{ showsUserLocation: true }}
+          expandedMapProps={{
+            onLongPress: onMapLongPress,
+            showsUserLocation: true
+          }}
           marker={
             <AvatarMapMarkerView
               name={hostName}
