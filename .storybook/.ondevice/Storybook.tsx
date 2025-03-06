@@ -27,6 +27,7 @@ import SunJournalBackgroundMeta, {
 
 import { FlatList, SafeAreaView, Text, TouchableOpacity } from "react-native"
 import { useAppFonts } from "../../lib/Fonts"
+import awsconfig from "../../src/aws-exports"
 
 import { setupCognito } from "@auth-boundary/CognitoHelpers"
 import AttendeesListMeta, {
@@ -75,6 +76,7 @@ import EventSettingsDurationMeta, {
 import ShieldDefenseMeta, {
   Basic as ShieldDefense
 } from ".storybook/components/ShieldDefense/ShieldDefense.stories"
+import { Geo } from "@aws-amplify/geo"
 import { sqliteLogHandler, sqliteLogs } from "@lib/Logging"
 import { InMemorySecureStore } from "@lib/SecureStore"
 import { dayjs } from "TiFShared/lib/Dayjs"
@@ -113,6 +115,7 @@ import VerifcationCodeMeta, {
   Basic as VerifcationCodeBasic
 } from "../components/VerificationCode/VerifyCode.stories"
 
+Geo.configure(awsconfig)
 setupCognito(new InMemorySecureStore())
 addLogHandler(consoleLogHandler())
 addLogHandler(

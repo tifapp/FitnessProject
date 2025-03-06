@@ -1,18 +1,18 @@
-import { EventEdit, EventID } from "TiFShared/domain-models/Event"
-import { Atom, atom, useAtomValue } from "jotai"
-import React, { useMemo } from "react"
-import { useFormSubmission } from "@lib/utils/Form"
-import { StyleProp, ViewStyle, StyleSheet, View } from "react-native"
-import { PrimaryButton } from "@components/Buttons"
+import { FormSubmissionPrimaryButton } from "@components/Buttons"
 import {
   ClientSideEvent,
   clientSideEventFromResponse
 } from "@event/ClientSideEvent"
-import { useQueryClient } from "@tanstack/react-query"
 import { setEventDetailsQueryEvent } from "@event/DetailsQuery"
 import { AlertsObject, presentAlert } from "@lib/Alerts"
-import { eventEditAtom, isEditEventFormDirtyAtom } from "./FormAtoms"
+import { useFormSubmission } from "@lib/utils/Form"
+import { useQueryClient } from "@tanstack/react-query"
 import { TiFAPI } from "TiFShared/api"
+import { EventEdit, EventID } from "TiFShared/domain-models/Event"
+import { Atom, atom, useAtomValue } from "jotai"
+import React, { useMemo } from "react"
+import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
+import { eventEditAtom, isEditEventFormDirtyAtom } from "./FormAtoms"
 
 export type SubmitEventEditResult =
   | { status: "success"; event: ClientSideEvent }
@@ -133,17 +133,12 @@ export const EditEventFormSubmitButton = ({
   style
 }: EditEventFormSubmitButtonProps) => (
   <View style={style}>
-    <PrimaryButton
-      disabled={state.submission.status !== "submittable"}
-      onPress={() => {
-        if (state.submission.status === "submittable") {
-          state.submission.submit()
-        }
-      }}
+    <FormSubmissionPrimaryButton
+      submission={state.submission}
       style={styles.submitButton}
     >
       {!state.eventId ? "Create Event" : "Update Event"}
-    </PrimaryButton>
+    </FormSubmissionPrimaryButton>
   </View>
 )
 
