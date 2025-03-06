@@ -25,6 +25,7 @@ import {
   SunGradient,
   SunProps
 } from "./SunBackground"
+import { StarrySkyDrawing } from "./StarrySky"
 
 export namespace Moon {
   export const gradients = {
@@ -64,6 +65,7 @@ export const MoonDrawing = ({ background, size, edgeInsets }: SunProps) => {
 
   return (
     <Group>
+      <StarrySkyDrawing width={size.width} height={size.height} numStars={30} />
       {/* Animated moonlight ring */}
       <Circle cx={sunX} cy={sunY} r={moonGlowRadius}>
         <RadialGradient
