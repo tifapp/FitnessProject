@@ -45,6 +45,7 @@ import {
   View,
   ViewStyle
 } from "react-native"
+import { LongPressEvent } from "react-native-maps"
 import { SafeAreaView } from "react-native-safe-area-context"
 import { EditEventDurationPickerView } from "./DurationPicker"
 import {
@@ -73,7 +74,7 @@ export type EditEventProps = {
   hostProfileImageURL?: string
   eventId?: EventID
   onSuccess: (event: ClientSideEvent) => void
-  onMapLongPress: () => void
+  onMapLongPress: (event: LongPressEvent) => void
   onSelectLocationTapped: () => void
   currentDate?: Date
   initialValues?: EditEventFormValues
@@ -179,19 +180,21 @@ const TitleSectionView = () => {
 
 type LocationSectionProps = {
   onSelectLocationTapped: () => void
-  onMapLongPress: () => void
+  onMapLongPress: (event: LongPressEvent) => void
   hostName: string
   hostProfileImageURL?: string
 }
 
-const LocationSectionView = (props: LocationSectionProps) => (
-  <TiFFormSectionView title="Where?">
-    <EditEventFormLocationView
-      location={useEditEventFormLocation()}
-      {...props}
-    />
-  </TiFFormSectionView>
-)
+const LocationSectionView = (props: LocationSectionProps) => {
+  return (
+    <TiFFormSectionView title="Where?">
+      <EditEventFormLocationView
+        location={useEditEventFormLocation()}
+        {...props}
+      />
+    </TiFFormSectionView>
+  )
+}
 
 const StartDateSectionView = () => {
   const [startDate, setStartDate] = useAtom(

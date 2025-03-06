@@ -1,6 +1,7 @@
 import { AvatarMapMarkerView } from "@components/AvatarMapMarker"
 import { ExpandableMapSnippetView } from "@components/MapSnippetView"
 import { TiFFormNavigationLinkView } from "@components/form-components/NavigationLink"
+import { TiFFormRowItemView } from "@components/form-components/RowItem"
 import { EditEventFormLocation } from "@event/EditFormValues"
 import { placemarkToFormattedAddress } from "@lib/AddressFormatting"
 import { AppStyles } from "@lib/AppColorStyle"
@@ -20,7 +21,7 @@ import {
   View,
   ViewStyle
 } from "react-native"
-import MapView from "react-native-maps"
+import MapView, { LongPressEvent } from "react-native-maps"
 import { editEventFormValueAtoms } from "./FormAtoms"
 
 export const useEditEventFormLocation = () => {
@@ -54,7 +55,7 @@ export type EditEventFormLocationProps = {
   hostProfileImageURL?: string
   location?: EditEventFormLocation
   onSelectLocationTapped: () => void
-  onMapLongPress: () => void
+  onMapLongPress: (event: LongPressEvent) => void
   style?: StyleProp<ViewStyle>
 }
 
@@ -94,7 +95,7 @@ type LocationProps = {
   hostProfileImageURL?: string
   location: EditEventFormLocation
   onSelectLocationTapped: () => void
-  onMapLongPress: () => void
+  onMapLongPress: (event: LongPressEvent) => void
 }
 
 const LocationView = ({
@@ -141,39 +142,50 @@ const LocationView = ({
               imageURL={hostProfileImageURL}
             />
           }
-          overlay={
-            <View style={styles.overlayContainer}>
-              {!location.placemark ? (
-                <TiFFormNavigationLinkView
-                  iconName="location"
-                  iconBackgroundColor={AppStyles.primary}
-                  maximumFontScaleFactor={FontScaleFactors.xxxLarge}
-                  style={styles.locationMapNavigationLink}
-                  title={`${location.coordinate.latitude}, ${location.coordinate.longitude}`}
-                  onTapped={() => {
-                    setIsExpanded(false)
-                    onSelectLocationTapped()
-                  }}
-                />
-              ) : (
-                <TiFFormNavigationLinkView
-                  iconName="location"
-                  iconBackgroundColor={AppStyles.primary}
-                  style={styles.locationMapNavigationLink}
-                  title={location.placemark.name ?? "Unknown Location"}
-                  maximumFontScaleFactor={FontScaleFactors.xxxLarge}
-                  description={
-                    placemarkToFormattedAddress(location.placemark) ??
-                    "Unknown Address"
-                  }
-                  onTapped={() => {
-                    setIsExpanded(false)
-                    onSelectLocationTapped()
-                  }}
-                />
-              )}
-            </View>
-          }
+          overlay={(isExpanding) => {
+            return (
+              <View style={styles.overlayContainer}>
+                {isExpanding && (
+                  <TiFFormRowItemView
+                    style={styles.locationMapNavigationLink}
+                    title={
+                      "Tap and hold onto a point in the map to select a new location."
+                    }
+                    maximumFontScaleFactor={FontScaleFactors.xxxLarge}
+                  />
+                )}
+                {!location.placemark ? (
+                  <TiFFormNavigationLinkView
+                    iconName="location"
+                    iconBackgroundColor={AppStyles.primary}
+                    maximumFontScaleFactor={FontScaleFactors.xxxLarge}
+                    style={styles.locationMapNavigationLink}
+                    title={`${location.coordinate.latitude}, ${location.coordinate.longitude}`}
+                    onTapped={() => {
+                      setIsExpanded(false)
+                      onSelectLocationTapped()
+                    }}
+                  />
+                ) : (
+                  <TiFFormNavigationLinkView
+                    iconName="location"
+                    iconBackgroundColor={AppStyles.primary}
+                    style={styles.locationMapNavigationLink}
+                    title={location.placemark.name ?? "Unknown Location"}
+                    maximumFontScaleFactor={FontScaleFactors.xxxLarge}
+                    description={
+                      placemarkToFormattedAddress(location.placemark) ??
+                      "Unknown Address"
+                    }
+                    onTapped={() => {
+                      setIsExpanded(false)
+                      onSelectLocationTapped()
+                    }}
+                  />
+                )}
+              </View>
+            )
+          }}
         />
       ) : (
         <View style={[styles.mapDimensions, styles.loadingMap]}>

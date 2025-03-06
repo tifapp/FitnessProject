@@ -18,7 +18,12 @@ import {
   View,
   ViewStyle
 } from "react-native"
-import MapView, { MapViewProps, Marker, Region } from "react-native-maps"
+import MapView, {
+  LongPressEvent,
+  MapViewProps,
+  Marker,
+  Region
+} from "react-native-maps"
 import Animated, {
   runOnJS,
   SharedValue,
@@ -34,7 +39,7 @@ export type ExpandableMapSnippetProps = {
   isExpanded: boolean
   onExpansionChanged: (isExpanded: boolean) => void
   onMarkerPressed?: () => void
-  onMapLongPress?: () => void
+  onMapLongPress?: (event: LongPressEvent) => void
   region: Region
   overlay?: ReactNode | ((isExpanding: boolean) => ReactNode)
   marker?: ReactNode
@@ -240,6 +245,7 @@ const ExpandedMapView = ({
     <PortalView>
       {isVisible && (
         <Animated.View style={animatedMapStyle}>
+          {/* Expanded Map */}
           <MapView
             {...expandedMapProps}
             style={StyleSheet.absoluteFill}
@@ -259,6 +265,8 @@ const ExpandedMapView = ({
               {marker}
             </Marker>
           </MapView>
+
+          {/* Current Location overlay */}
           <Animated.View
             style={[styles.fullscreenOverlayContainer, overlayStyle]}
           >
@@ -266,6 +274,8 @@ const ExpandedMapView = ({
               {overlay instanceof Function ? overlay(isExpanding) : overlay}
             </View>
           </Animated.View>
+
+          {/* Collapse Button */}
           <Animated.View style={animatedCollapseButtonStyle}>
             <TouchableIonicon
               icon={{ name: "contract" }}
