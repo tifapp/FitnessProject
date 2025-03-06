@@ -131,10 +131,10 @@ export type SunBackgroundProps = {
   edgeInsets: EdgeInsets
 }
 
-const CORE_RADIUS = 48
-const OUTER_RING_RADIUS = 56
-const FADE_RING_RADIUS = 64
-const FADE_RING_TARGET_RADIUS = 80
+export const CORE_RADIUS = 48
+export const OUTER_RING_RADIUS = 56
+export const FADE_RING_RADIUS = 64
+export const FADE_RING_TARGET_RADIUS = 80
 
 export const SunBackgroundDrawing = ({
   edgeInsets,

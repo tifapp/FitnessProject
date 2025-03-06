@@ -1,4 +1,5 @@
 import { cloud } from "@journaling/Clouds"
+import { MoonDrawing } from "@journaling/MoonBackground"
 import { SunBackgroundDrawing } from "@journaling/SunBackground"
 import { Canvas, SkSize } from "@shopify/react-native-skia"
 import React, { useMemo, useState } from "react"
@@ -64,21 +65,21 @@ const SUNSET_DATE = new Date("2025-02-12T16:30:00")
 const DAY_RANGE = dateRange(SUNRISE_DATE, SUNSET_DATE)!
 
 const getDayFraction = () => {
-  const now = new Date();
-  const hours = now.getHours();
-  const minutes = now.getMinutes();
-  
+  const now = new Date()
+  const hours = now.getHours()
+  const minutes = now.getMinutes()
+
   // Convert current time to decimal hours (e.g., 9:30 = 9.5)
-  const currentTime = hours + (minutes / 60);
-  
+  const currentTime = hours + minutes / 60
+
   // Define sunrise (6am) and sunset (6pm) in decimal hours
-  const sunrise = 6;
-  const sunset = 18;
-  
+  const sunrise = 6
+  const sunset = 18
+
   // Calculate the fraction
-  let fraction = (currentTime - sunrise) / (sunset - sunrise);
-  
-  return fraction;
+  let fraction = (currentTime - sunrise) / (sunset - sunrise)
+
+  return fraction
 }
 
 export const TimeOfDayView = () => {
@@ -90,11 +91,12 @@ export const TimeOfDayView = () => {
   )
   return (
     <Canvas style={{ flex: 1 }} onLayout={(e) => setSize(e.nativeEvent.layout)}>
-      <SunBackgroundDrawing
+      {/* <SunBackgroundDrawing
         size={size}
         background={background}
         edgeInsets={insets}
-      />
+      /> */}
+      <MoonDrawing size={size} background={background} edgeInsets={insets} />
     </Canvas>
   )
 }
