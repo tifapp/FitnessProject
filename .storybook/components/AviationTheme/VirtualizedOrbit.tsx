@@ -1,14 +1,12 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   Dimensions,
-  GestureResponderEvent,
-  PanResponder,
-  PanResponderGestureState,
-  PanResponderInstance,
   StyleSheet,
   Text,
   View
 } from 'react-native';
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import { runOnJS, useSharedValue } from 'react-native-reanimated';
 import { HSLToHex } from './colorUtils';
 import OrbitRing from './OrbitRing';
 
@@ -18,9 +16,9 @@ interface OrbitItem {
   color: string;
   size: number;
   label: string;
-  data?: any; // For storing virtual data
-  virtualIndex?: number; // Index in the virtual dataset
-  swappedAt?: number; // Timestamp when this item was last swapped
+  data?: any;
+  virtualIndex?: number;
+  swappedAt?: number;
 }
 
 interface PositionData {
@@ -101,58 +99,34 @@ const VirtualizedOrbit = <T extends { id: string; label: string; },>({
   backRingColor = "rgba(180, 180, 220, 0.3)",
   ringStrokeWidth = 2,
   ringDashPattern = "5,3"
-}: VirtualizedOrbitProps<T>) => {  
-  // Core state
-  const [currentOrbitItems, setCurrentOrbitItems] = useState<OrbitItem[]>([]);
-  const [rotation, setRotation] = useState<number>(0);
-  
-  // Virtualization state
-  const [virtualStartIndex, setVirtualStartIndex] = useState<number>(initialIndex);
-  const lastEndReachedIndex = useRef<number>(-1);
-  const visibleIndicesRef = useRef<Set<number>>(new Set());
-  const lastSwapTimeRef = useRef<number>(0);
-  const rotationThresholdRef = useRef<number>(0);
+}: VirtualizedOrbitProps<T>) => {    
+  // Main state
+  const [orbitItems, setOrbitItems] = useState<OrbitItem[]>([]);
   const [swapCount, setSwapCount] = useState<number>(0);
   const [visibleItemsCount, setVisibleItemsCount] = useState<number>(0);
+  
+  // Use a single ref for virtual window tracking
+  const virtualWindowRef = useRef<{
+    startIndex: number,
+    direction: number,
+    lastSwappedId: number | null,
+    lastEndReachedIndex: number
+  }>({
+    startIndex: initialIndex,
+    direction: 0,
+    lastSwappedId: null,
+    lastEndReachedIndex: -1
+  });
 
   const tiltRadian = (tiltAngle * Math.PI) / 180;
   
-  // Initialize orbit items - only run this when necessary
-  useEffect(() => {
-    // Create base orbit items
-    const items = Array.from({ length: numberOfItems }).map((_, index) => {
-      const virtualIndex = (virtualStartIndex + index) % Math.max(1, data.length);
-      const virtualData = data.length > 0 ? data[virtualIndex] : null;
-      
-      return {
-        id: index,
-        angle: (index * 2 * Math.PI) / numberOfItems,
-        color: HSLToHex(index * (360 / numberOfItems), 70, 50),
-        size: itemSize,
-        label: virtualData?.label || `Item ${virtualIndex + 1}`,
-        data: virtualData,
-        virtualIndex: virtualIndex,
-        swappedAt: Date.now() // Mark all as freshly added
-      };
-    });
-    
-    setCurrentOrbitItems(items);
-    visibleIndicesRef.current = new Set(); // Reset visible indices
-  }, [numberOfItems, virtualStartIndex, data.length, itemSize]); // Dependencies include the new props
-  
-  // Auto-rotation effect
-  useEffect(() => {
-    if (autoRotateSpeed === 0) return;
-    
-    const interval = setInterval(() => {
-      setRotation(prev => prev + (autoRotateSpeed * 0.001));
-    }, 16); // ~60fps
-    
-    return () => clearInterval(interval);
-  }, [autoRotateSpeed]);
+  const rotation = useSharedValue<number>(0);
+  const [rotationJS, setRotationJS] = useState<number>(0);
+  const prevRotationRef = useRef<number>(0);
+  const lastTranslationY = useSharedValue<number>(0);
   
   // Apply tilt transformation to coordinates
-  const applyTilt = (x: number, y: number): Point => {
+  const applyTilt = useCallback((x: number, y: number): Point => {
     const xOrigin = x - positionX;
     const yOrigin = y - positionY;
     
@@ -163,11 +137,11 @@ const VirtualizedOrbit = <T extends { id: string; label: string; },>({
       x: xRotated + positionX,
       y: yRotated + positionY
     };
-  };
+  }, [positionX, positionY, tiltRadian]);
   
   // Calculate position and z-index based on angle
-  const calculatePosition = (item: OrbitItem): PositionData => {
-    const angle = item.angle + rotation;
+  const calculatePosition = useCallback((item: OrbitItem): PositionData => {
+    const angle = item.angle + rotationJS;
     
     const baseX = positionX + Math.cos(angle) * orbitRadius;
     const baseY = positionY + Math.sin(angle) * orbitRadius * 0.4;
@@ -181,219 +155,316 @@ const VirtualizedOrbit = <T extends { id: string; label: string; },>({
     const elevation = z > 0 ? Math.round(z * 5) + 5 : 1;
     
     return { x, y, scale, opacity, zIndex, elevation, z };
-  };
+  }, [orbitRadius, positionX, positionY, rotationJS, applyTilt]);
   
-  // Enhanced virtualization handler - more aggressive with swapping
+  // Get the end index of the virtual window
+  const getEndIndex = useCallback((startIndex: number): number => {
+    return (startIndex + numberOfItems - 1) % Math.max(1, data.length);
+  }, [numberOfItems, data.length]);
+  
+  // Initialize orbit items
   useEffect(() => {
     if (data.length === 0) return;
     
-    // Only check for item swapping if we've rotated enough
-    const rotationDiff = Math.abs(rotation - rotationThresholdRef.current);
-    if (rotationDiff < 0.05) return; // More sensitive swapping threshold
+    const items = Array.from({ length: numberOfItems }).map((_, index) => {
+      const virtualIndex = (initialIndex + index) % data.length;
+      const virtualData = data[virtualIndex];
+      
+      return {
+        id: index,
+        angle: (index * 2 * Math.PI) / numberOfItems,
+        color: HSLToHex(index * (360 / numberOfItems), 70, 50),
+        size: itemSize,
+        label: virtualData?.label || `Item ${virtualIndex + 1}`,
+        data: virtualData,
+        virtualIndex: virtualIndex,
+        swappedAt: 0
+      };
+    });
     
-    // Throttle updates to prevent too many swaps
-    const now = Date.now();
-    if (now - lastSwapTimeRef.current < 200) return; // More frequent swaps possible
+    setOrbitItems(items);
+    virtualWindowRef.current.startIndex = initialIndex;
+  }, [initialIndex, numberOfItems, data, itemSize]);
+
+  // Swap an item with new data - extracted as a pure function
+  const swapItem = useCallback((
+    itemId: number, 
+    direction: number, 
+    currentItems: OrbitItem[]
+  ): OrbitItem[] => {
+    // Find the item in our current items
+    const itemToSwap = currentItems.find(item => item.id === itemId);
+    if (!itemToSwap) return currentItems; // No change if item not found
     
-    // Calculate visibility for all items
-    const newVisibleIndices = new Set<number>();
-    let itemsToReplace: number[] = [];
+    // Get the virtual window start index
+    const { startIndex } = virtualWindowRef.current;
+    
+    // Calculate new virtual index based on direction
+    let newVirtualIndex: number;
+    let newStartIndex: number;
+    
+    if (direction > 0) {
+      // Forward: Get data that's one position after the current end
+      const endIndex = getEndIndex(startIndex);
+      newVirtualIndex = (endIndex + 1) % data.length;
+      newStartIndex = (startIndex + 1) % data.length;
+    } else {
+      // Backward: Get data that's one position before the current start
+      newVirtualIndex = (startIndex - 1 + data.length) % data.length;
+      newStartIndex = newVirtualIndex;
+    }
+    
+    // Get the new data
+    const newData = data[newVirtualIndex];
+    const oldData = itemToSwap.data;
+    
+    // Notify about the swap if callback provided
+    if (onItemSwapped && oldData !== newData) {
+      const position = calculatePosition(itemToSwap);
+      onItemSwapped(oldData, newData, position);
+    }
+    
+    // Update the virtual window start index
+    virtualWindowRef.current.startIndex = newStartIndex;
+    
+    // Check if we need to load more data
+    if (onEndReached) {
+      const thresholdIndex = direction > 0 
+        ? (newVirtualIndex + windowSize) % data.length
+        : newVirtualIndex;
+      
+      const shouldFetchMore = direction > 0
+        ? thresholdIndex >= data.length * onEndReachedThreshold
+        : thresholdIndex <= data.length * (1 - onEndReachedThreshold);
+        
+      if (shouldFetchMore && virtualWindowRef.current.lastEndReachedIndex !== thresholdIndex) {
+        virtualWindowRef.current.lastEndReachedIndex = thresholdIndex;
+        setTimeout(() => onEndReached(), 0);
+      }
+    }
+    
+    // Return the updated items array
+    return currentItems.map(item => {
+      if (item.id === itemId) {
+        return {
+          ...item,
+          label: newData?.label || `Item ${newVirtualIndex + 1}`,
+          data: newData,
+          virtualIndex: newVirtualIndex,
+          swappedAt: Date.now()
+        };
+      }
+      return item;
+    });
+  }, [data, getEndIndex, calculatePosition, onItemSwapped, onEndReached, windowSize, onEndReachedThreshold]);
+
+  // Track rotation and handle item swaps
+  useEffect(() => {
+    if (data.length === 0 || orbitItems.length === 0) return;
+    
+    // Calculate rotation delta and direction
+    const rotationDelta = rotationJS - prevRotationRef.current;
+    const currentDirection = rotationDelta > 0 ? 1 : rotationDelta < 0 ? -1 : 0;
+    prevRotationRef.current = rotationJS;
+    
+    // Update direction in ref
+    if (currentDirection !== 0) {
+      virtualWindowRef.current.direction = currentDirection;
+    }
+    
+    // Skip tiny movements
+    if (Math.abs(rotationDelta) < 0.01) return;
+    
+    // If the direction changed, reset the last swapped item
+    if (virtualWindowRef.current.direction !== 0 && 
+        currentDirection !== 0 && 
+        virtualWindowRef.current.direction !== currentDirection) {
+      virtualWindowRef.current.lastSwappedId = null;
+    }
+    
+    // Find the backmost item (most negative z)
+    let backMostItem: { id: number, z: number } | null = null;
     let visibleCount = 0;
     
-    currentOrbitItems.forEach(item => {
+    orbitItems.forEach(item => {
       const position = calculatePosition(item);
-      const { z, opacity } = position;
       
-      // Check if the item is visible
-      if (opacity > 0.2) {
-        newVisibleIndices.add(item.id);
+      // Count visible items
+      if (position.opacity > 0.2) {
         visibleCount++;
       }
       
-      // More aggressive with swapping - mark items as soon as they start moving back
-      if (z < -0.7) {
-        itemsToReplace.push(item.id);
+      // Track backmost item
+      if (backMostItem === null || position.z < backMostItem.z) {
+        backMostItem = { id: item.id, z: position.z };
       }
     });
     
     setVisibleItemsCount(visibleCount);
     
-    // Only proceed if we have items to replace
-    if (itemsToReplace.length > 0) {
-      // Update our refs
-      visibleIndicesRef.current = newVisibleIndices;
-      lastSwapTimeRef.current = now;
-      rotationThresholdRef.current = rotation;
+    // Determine if we should swap based on the backmost item's z value
+    if (backMostItem) {
+      const threshold = -0.9; // Consistent threshold regardless of direction
+      const isHidden = backMostItem.z < threshold;
       
-      // Advance the virtual window
-      const advanceBy = Math.min(itemsToReplace.length, Math.floor(numberOfItems / 4));
-      const newStartIndex = (virtualStartIndex + advanceBy) % Math.max(1, data.length);
-      
-      setCurrentOrbitItems(prev => {
-        const newItems = prev.map(item => {
-          if (itemsToReplace.includes(item.id)) {
-            const newVirtualIndex = (item.virtualIndex! + numberOfItems) % Math.max(1, data.length);
-            const newData = data[newVirtualIndex];
-            
-            // Find old data for callback
-            const oldData = item.data;
-            const position = calculatePosition(item);
-            
-            // Call the swap callback
-            if (onItemSwapped && oldData !== newData) {
-              onItemSwapped(oldData, newData, position);
-            }
-            
-            return {
-              ...item,
-              label: newData?.label || `Item ${newVirtualIndex + 1}`,
-              data: newData,
-              virtualIndex: newVirtualIndex,
-              swappedAt: Date.now() // Track when the item was swapped
-            };
-          }
-          return item;
-        });
+      // Only swap if threshold met and this item hasn't been swapped recently
+      if (isHidden && backMostItem.id !== virtualWindowRef.current.lastSwappedId) {
+        // Mark this item as the last swapped
+        virtualWindowRef.current.lastSwappedId = backMostItem.id;
         
-        return newItems;
-      });
-      
-      // Increment swap count for debug display
-      setSwapCount(prev => prev + itemsToReplace.length);
-      
-      // Update virtual start index
-      setVirtualStartIndex(newStartIndex);
-      
-      // Check if we need to fetch more data
-      if (onEndReached && 
-          newStartIndex + windowSize >= data.length * onEndReachedThreshold && 
-          lastEndReachedIndex.current !== newStartIndex) {
-        lastEndReachedIndex.current = newStartIndex;
-        onEndReached();
+        // Perform the swap and update the items
+        const updatedItems = swapItem(backMostItem.id, currentDirection, orbitItems);
+        setOrbitItems(updatedItems);
+        
+        // Increment swap count for debugging
+        setSwapCount(prev => prev + 1);
       }
     }
-  }, [rotation, data, numberOfItems, virtualStartIndex, windowSize, onEndReached, onEndReachedThreshold, debug]);
+  }, [rotationJS, calculatePosition, orbitItems, data.length, swapItem]);
   
-  // PanResponder for handling drag gestures
-  const panResponder = useRef<PanResponderInstance>(
-    PanResponder.create({
-      onStartShouldSetPanResponder: (): boolean => true,
-      onMoveShouldSetPanResponder: (): boolean => true,
-      onPanResponderMove: (
-        _: GestureResponderEvent, 
-        gestureState: PanResponderGestureState
-      ): void => {
-        const { dy } = gestureState;
-        setRotation(prevRotation => prevRotation - (dy * scrollSensitivity * 1.5));
-      },
-    })
-  ).current;
+  // Auto-rotation effect
+  useEffect(() => {
+    if (autoRotateSpeed === 0) return;
+    
+    const interval = setInterval(() => {
+      const newRotation = rotation.value + (autoRotateSpeed * 0.001);
+      rotation.value = newRotation;
+      setRotationJS(newRotation);
+    }, 16); // ~60fps
+    
+    return () => clearInterval(interval);
+  }, [autoRotateSpeed, rotation]);
+  
+  // Get the current window range for display
+  const startIndex = virtualWindowRef.current.startIndex;
+  const endIndex = getEndIndex(startIndex);
   
   return (
     <View style={styles.container}>
       {/* Orbital Component */}
-      <View 
-        style={[
-          styles.orbitalContainer,
-          {
-            width: componentWidth,
-            height: componentHeight,
-          }
-        ]}
-        {...panResponder.panHandlers}
-      >
-        {/* Ring Component */}
-        <OrbitRing
-          rotation={rotation}
-          orbitRadius={orbitRadius}
-          tiltAngle={tiltAngle}
-          positionX={positionX}
-          positionY={positionY}
-          frontStroke={frontRingColor}
-          backStroke={backRingColor}
-          strokeWidth={ringStrokeWidth}
-          strokeDasharray={ringDashPattern}
-        />
-        
-        {/* Central shape */}
+      <GestureDetector gesture={
+        Gesture.Pan()
+        .onBegin(() => {
+          lastTranslationY.value = 0;
+        })
+        .onUpdate((e) => {
+          // Calculate delta Y since last update
+          const deltaY = e.translationY - lastTranslationY.value;
+          lastTranslationY.value = e.translationY;
+          
+          // Update rotation based on the gesture Y delta
+          rotation.value -= (deltaY * scrollSensitivity * 1.5);
+          // Also update JS version for our calculations
+          runOnJS(setRotationJS)(rotation.value);
+        })
+      }>
         <View 
           style={[
-            styles.centralShape,
+            styles.orbitalContainer,
             {
-              width: centralShapeSize,
-              height: centralShapeSize,
-              left: positionX - centralShapeSize / 2,
-              top: positionY - centralShapeSize / 2,
-              borderRadius: centralShapeSize / 2,
-              zIndex: 50,
-              elevation: 6,
+              width: componentWidth,
+              height: componentHeight,
             }
           ]}
         >
-          <Text style={styles.centralShapeText}>
-            {data.length > 0 ? 
-              `${Math.min(data.length, virtualStartIndex + 1)}-${Math.min(data.length, virtualStartIndex + numberOfItems)}` : 
-              `${numberOfItems}`}
-          </Text>
-          {swapCount > 0 && (
-            <Text style={styles.swapCountText}>
-              Swaps: {swapCount}
+          {/* Ring Component */}
+          <OrbitRing
+            rotation={rotationJS}
+            orbitRadius={orbitRadius}
+            tiltAngle={tiltAngle}
+            positionX={positionX}
+            positionY={positionY}
+            frontStroke={frontRingColor}
+            backStroke={backRingColor}
+            strokeWidth={ringStrokeWidth}
+            strokeDasharray={ringDashPattern}
+          />
+          
+          {/* Central shape */}
+          <View 
+            style={[
+              styles.centralShape,
+              {
+                width: centralShapeSize,
+                height: centralShapeSize,
+                left: positionX - centralShapeSize / 2,
+                top: positionY - centralShapeSize / 2,
+                borderRadius: centralShapeSize / 2,
+                zIndex: 50,
+                elevation: 6,
+              }
+            ]}
+          >
+            <Text style={styles.centralShapeText}>
+              {data.length > 0 ? 
+                `${Math.min(data.length, startIndex + 1)}-${Math.min(data.length, endIndex + 1)}` : 
+                `${numberOfItems}`}
             </Text>
+            {swapCount > 0 && (
+              <Text style={styles.swapCountText}>
+                Swaps: {swapCount}
+              </Text>
+            )}
+          </View>
+          
+          {/* Orbit items - with virtualization */}
+          {orbitItems.map((item) => {
+            const position = calculatePosition(item)
+
+            const { x, y, scale, opacity, zIndex, elevation } = position;
+            
+            // Skip rendering completely invisible items for performance
+            if (opacity < 0.1) return null;
+            
+            // Calculate highlight status for newly swapped items
+            const isNewlySwapped = item.swappedAt && Date.now() - item.swappedAt < 1000;
+            
+            return (
+              <View
+                key={data.length > 0 && item.data ? keyExtractor(item.data, item.virtualIndex || item.id) : `orbit-item-${item.id}`}
+                style={[
+                  styles.orbitItem,
+                  {
+                    backgroundColor: isNewlySwapped ? '#32CD32' : item.color, // Highlight new swaps
+                    width: item.size * scale,
+                    height: item.size * scale,
+                    left: x - (item.size * scale) / 2,
+                    top: y - (item.size * scale) / 2,
+                    opacity: opacity,
+                    zIndex: zIndex,
+                    elevation: elevation,
+                    transform: [{ scale }],
+                    borderRadius: (item.size * scale) / 2,
+                    borderWidth: isNewlySwapped ? 2 : 0,
+                    borderColor: 'yellow',
+                  }
+                ]}
+              >
+                <Text style={styles.itemText}>{item.label}</Text>
+              </View>
+            );
+          })}
+          
+          <Text style={styles.instructionText}>
+            Drag up/down to rotate and navigate
+          </Text>
+          
+          {/* Debug Overlay */}
+          {debug && (
+            <View style={styles.debugOverlay}>
+              <Text style={styles.debugText}>
+                Window: {startIndex}-{endIndex}/{data.length}
+              </Text>
+              <Text style={styles.debugText}>Visible: {visibleItemsCount}</Text>
+              <Text style={styles.debugText}>Swaps: {swapCount}</Text>
+              <Text style={styles.debugText}>Rotation: {rotationJS.toFixed(2)}</Text>
+              <Text style={styles.debugText}>
+                Direction: {virtualWindowRef.current.direction > 0 ? '▼ Forward' : virtualWindowRef.current.direction < 0 ? '▲ Backward' : 'None'}
+              </Text>
+            </View>
           )}
         </View>
-        
-        {/* Orbit items - with virtualization */}
-        {currentOrbitItems.map((item) => {
-          const position = calculatePosition(item)
-
-          const { x, y, scale, opacity, zIndex, elevation } = position;
-          
-          // Skip rendering completely invisible items for performance
-          if (opacity < 0.1) return null;
-          
-          // Calculate highlight status for newly swapped items
-          const isNewlySwapped = item.swappedAt && Date.now() - item.swappedAt < 1000;
-          
-          return (
-            <View
-              key={data.length > 0 && item.data ? keyExtractor(item.data, item.virtualIndex || item.id) : `orbit-item-${item.id}`}
-              style={[
-                styles.orbitItem,
-                {
-                  backgroundColor: isNewlySwapped ? '#32CD32' : item.color, // Highlight new swaps
-                  width: item.size * scale,
-                  height: item.size * scale,
-                  left: x - (item.size * scale) / 2,
-                  top: y - (item.size * scale) / 2,
-                  opacity: opacity,
-                  zIndex: zIndex,
-                  elevation: elevation,
-                  transform: [{ scale }],
-                  borderRadius: (item.size * scale) / 2,
-                  borderWidth: isNewlySwapped ? 2 : 0,
-                  borderColor: 'yellow',
-                }
-              ]}
-            >
-              <Text style={styles.itemText}>{item.label}</Text>
-            </View>
-          );
-        })}
-        
-        <Text style={styles.instructionText}>
-          Drag up/down to rotate and navigate
-        </Text>
-        
-        {/* Debug Overlay */}
-        {debug && (
-          <View style={styles.debugOverlay}>
-            <Text style={styles.debugText}>Virtual: {virtualStartIndex}/{data.length}</Text>
-            <Text style={styles.debugText}>Visible: {visibleItemsCount}</Text>
-            <Text style={styles.debugText}>Swaps: {swapCount}</Text>
-            <Text style={styles.debugText}>Rotation: {rotation.toFixed(2)}</Text>
-          </View>
-        )}
-      </View>
+      </GestureDetector>
     </View>
   );
 };

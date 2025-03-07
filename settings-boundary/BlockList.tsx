@@ -4,36 +4,36 @@ import { Ionicon } from "@components/common/Icons"
 import { TextToastView } from "@components/common/Toasts"
 import { TiFFormCardView } from "@components/form-components/Card"
 import { TiFFormSectionView } from "@components/form-components/Section"
-import ProfileImageAndName from "@components/profileImageComponents/ProfileImageAndName"
+import ProfilePreview from "@components/profileImageComponents/ProfileImageAndName"
 import { AlertsObject, presentAlert } from "@lib/Alerts"
 import { AppStyles } from "@lib/AppColorStyle"
 import { TiFDefaultLayoutTransition } from "@lib/Reanimated"
 import { useLastDefinedValue } from "@lib/utils/UseLastDefinedValue"
 import {
-  InfiniteData,
-  QueryClient,
-  useInfiniteQuery,
-  useMutation,
-  useQueryClient
+    InfiniteData,
+    QueryClient,
+    useInfiniteQuery,
+    useMutation,
+    useQueryClient
 } from "@tanstack/react-query"
 import {
-  BlockListPage,
-  BlockListUser,
-  removeUsersFromBlockListPages
+    BlockListPage,
+    BlockListUser,
+    removeUsersFromBlockListPages
 } from "TiFShared/domain-models/BlockList"
 import { UserID } from "TiFShared/domain-models/User"
 import { memo, useCallback, useMemo, useState } from "react"
 import {
-  ActivityIndicator,
-  FlatList,
-  Platform,
-  Pressable,
-  RefreshControl,
-  StyleProp,
-  StyleSheet,
-  TouchableOpacity,
-  View,
-  ViewStyle
+    ActivityIndicator,
+    FlatList,
+    Platform,
+    Pressable,
+    RefreshControl,
+    StyleProp,
+    StyleSheet,
+    TouchableOpacity,
+    View,
+    ViewStyle
 } from "react-native"
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated"
 
@@ -286,7 +286,7 @@ const BlockListUserView = memo(function BlockListUserView({
         <View style={styles.userContainer}>
           <View style={styles.profileAndName}>
             <Pressable onPress={() => onProfileTapped(user.id)}>
-              <ProfileImageAndName
+              <ProfilePreview
                 name={user.name}
                 handle={user.handle}
                 imageURL={user.profileImageURL}

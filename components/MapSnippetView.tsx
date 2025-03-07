@@ -1,34 +1,36 @@
+import { Portal } from "@gorhom/portal"
+import { AppStyles } from "@lib/AppColorStyle"
+import { withTiFDefaultSpring } from "@lib/Reanimated"
 import React, {
-  useRef,
-  useState,
-  useCallback,
-  ReactNode,
   forwardRef,
   LegacyRef,
-  useEffect
+  ReactNode,
+  useCallback,
+  useEffect,
+  useRef,
+  useState
 } from "react"
 import {
+  LayoutRectangle,
   Platform,
-  View,
-  useWindowDimensions,
-  StyleSheet,
   StyleProp,
-  ViewStyle,
-  LayoutRectangle
+  StyleSheet,
+  TouchableOpacity,
+  useWindowDimensions,
+  View,
+  ViewStyle
 } from "react-native"
 import MapView, { MapViewProps, Marker, Region } from "react-native-maps"
 import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
   runOnJS,
-  SharedValue
+  SharedValue,
+  useAnimatedStyle,
+  useSharedValue
 } from "react-native-reanimated"
-import { Portal } from "@gorhom/portal"
-import { withTiFDefaultSpring } from "@lib/Reanimated"
-import { TouchableIonicon } from "./common/Icons"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
-import { useScreenBottomPadding } from "./Padding"
 import { FullWindowOverlay } from "react-native-screens"
+import { TouchableIonicon } from "./common/Icons"
+import { useScreenBottomPadding } from "./Padding"
 
 export type ExpandableMapSnippetProps = {
   isExpanded: boolean
@@ -94,43 +96,45 @@ export const ExpandableMapSnippetView = forwardRef(function Snippet(
   return (
     <View style={style}>
       <View style={styles.container}>
+        <TouchableIonicon
+          icon={{ name: "expand" }}
+          onPress={expand}
+          activeOpacity={0.8}
+          style={styles.expandButton}
+        />
         <View ref={snippetRef} style={styles.mapContainer}>
           {overlayLayout && (
-            <MapView
-              {...collapsedMapProps}
-              ref={ref}
-              style={[
-                {
-                  height: Math.max(300, 200 + overlayLayout.height),
-                  opacity: isExpanded ? 0 : 1
-                }
-              ]}
-              loadingEnabled
-              zoomEnabled={false}
-              scrollEnabled={false}
-              mapPadding={{
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: overlayLayout.height + 16
-              }}
-              initialRegion={region}
-            >
-              <Marker
-                coordinate={region}
-                tracksViewChanges={false}
-                onPress={onMarkerPressed}
+            <TouchableOpacity onPress={expand}>
+              <MapView
+                {...collapsedMapProps}
+                ref={ref}
+                style={[
+                  {
+                    height: Math.max(overlay ? 450 : 300, 200 + overlayLayout.height),
+                    opacity: isExpanded ? 0 : 1
+                  }
+                ]}
+                loadingEnabled
+                zoomEnabled={false}
+                scrollEnabled={false}
+                mapPadding={{
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: overlayLayout.height + 24
+                }}
+                initialRegion={region}
               >
-                {marker}
-              </Marker>
-            </MapView>
+                <Marker
+                  coordinate={region}
+                  tracksViewChanges={false}
+                  onPress={onMarkerPressed}
+                >
+                  {marker}
+                </Marker>
+              </MapView>
+            </TouchableOpacity>
           )}
-          <TouchableIonicon
-            icon={{ name: "contract" }}
-            onPress={expand}
-            activeOpacity={0.8}
-            style={styles.expandButton}
-          />
           <View style={styles.overlayContainer}>
             <View
               style={styles.overlay}
@@ -201,7 +205,7 @@ const ExpandedMapView = ({
     const _ = progress.value
     const mapHeightAdder = Platform.OS === "android" ? safeAreaInsets.top : 0
     return {
-      position: "absolute",
+      position: "absolute" as const,
       top: withTiFDefaultSpring(isExpandingShared.value ? 0 : y),
       left: withTiFDefaultSpring(isExpandingShared.value ? 0 : x),
       width: withTiFDefaultSpring(
@@ -211,7 +215,9 @@ const ExpandedMapView = ({
         isExpandingShared.value
           ? windowDimensions.height + mapHeightAdder
           : height
-      )
+      ),
+      borderRadius: withTiFDefaultSpring(isExpandingShared.value ? 0 : 32),
+      borderWidth: withTiFDefaultSpring(isExpandingShared.value ? 0 : 2)
     }
   }, [mapLayout, isExpanding])
   const bottomPadding = useScreenBottomPadding({
@@ -223,8 +229,8 @@ const ExpandedMapView = ({
     height: "100%",
     top: withTiFDefaultSpring(
       isExpandingShared.value
-        ? safeAreaInsets.top + (Platform.OS === "android" ? 8 : 0)
-        : 8
+        ? safeAreaInsets.top + (Platform.OS === "android" ? 32 : 0)
+        : 32
     ),
     right: withTiFDefaultSpring(isExpandingShared.value ? 24 : 8)
   }))
@@ -237,7 +243,7 @@ const ExpandedMapView = ({
   return (
     <PortalView>
       {isVisible && (
-        <Animated.View style={animatedMapStyle}>
+        <Animated.View style={[styles.mapContainer, animatedMapStyle]}>
           <MapView
             {...expandedMapProps}
             style={StyleSheet.absoluteFill}
@@ -279,9 +285,9 @@ const ExpandedMapView = ({
 }
 
 const ZOOM_BUTTON_STYLES = {
-  width: 40,
-  minHeight: 40,
-  borderRadius: 12,
+  width: 32,
+  minHeight: 32,
+  borderRadius: 1000,
   backgroundColor: "white",
   alignItems: "center",
   justifyContent: "center"
@@ -293,8 +299,10 @@ const styles = StyleSheet.create({
   },
   mapContainer: {
     position: "relative",
-    borderRadius: 12,
-    overflow: "hidden"
+    borderRadius: 32,
+    overflow: "hidden",
+    borderWidth: 2,
+    borderColor: AppStyles.primaryBlue.toString()
   },
   snippetContainer: {
     height: 150,
@@ -305,8 +313,9 @@ const styles = StyleSheet.create({
   expandButton: {
     ...ZOOM_BUTTON_STYLES,
     position: "absolute",
-    right: 8,
-    top: 8
+    right: 16,
+    top: 16,
+    zIndex: 50
   },
   overlayContainer: {
     paddingHorizontal: 16
@@ -315,7 +324,8 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: 16,
     marginHorizontal: 16,
-    width: "100%",
+    width: "98%",
+    left: "1%",
     overflow: "hidden"
   },
   fullscreenOverlayContainer: {

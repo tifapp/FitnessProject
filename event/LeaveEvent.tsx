@@ -1,4 +1,4 @@
-import { SecondaryOutlinedButton } from "@components/Buttons"
+import { SecondaryButton } from "@components/Buttons"
 import { ClientSideEvent } from "@event/ClientSideEvent"
 import { updateEventDetailsQueryEvent } from "@event/DetailsQuery"
 import { AlertsObject, presentAlert } from "@lib/Alerts"
@@ -6,7 +6,7 @@ import { useFormSubmission } from "@lib/utils/Form"
 import { useQueryClient } from "@tanstack/react-query"
 import { TiFAPI } from "TiFShared/api"
 import { EventID } from "TiFShared/domain-models/Event"
-import { ViewStyle, StyleProp, TextProps } from "react-native"
+import { StyleProp, TextProps, ViewStyle } from "react-native"
 
 export const leaveEvent = async (
   id: EventID,
@@ -130,12 +130,12 @@ export const LeaveEventButton = ({
   maximumFontSizeMultipler,
   style
 }: LeaveEventButtonProps) => (
-  <SecondaryOutlinedButton
+  <SecondaryButton
     disabled={!state.leaveStarted}
     onPress={() => state.leaveStarted?.()}
     maximumFontSizeMultiplier={maximumFontSizeMultipler}
     style={style}
   >
     <Text maxFontSizeMultiplier={maximumFontSizeMultipler}>Joined</Text>
-  </SecondaryOutlinedButton>
+  </SecondaryButton>
 )

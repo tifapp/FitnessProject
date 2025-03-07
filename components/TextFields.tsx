@@ -1,17 +1,17 @@
+import { AppStyles } from "@lib/AppColorStyle"
 import React, { ReactNode, Ref, forwardRef, useState } from "react"
 import {
-  TextInputProps,
-  StyleSheet,
-  View,
   StyleProp,
-  ViewStyle,
-  TextStyle
+  StyleSheet,
+  TextInputProps,
+  TextStyle,
+  View,
+  ViewStyle
 } from "react-native"
 import { TextInput } from "react-native-gesture-handler"
-import { Caption } from "./Text"
-import { AppStyles } from "@lib/AppColorStyle"
-import { TouchableIonicon } from "./common/Icons"
 import Animated, { FadeInUp, FadeOutUp } from "react-native-reanimated"
+import { TouchableIonicon } from "./common/Icons"
+import { Caption } from "./Text"
 
 export type TextFieldRefValue = TextInput | null
 
@@ -171,7 +171,7 @@ const InternalPasswordTextField = forwardRef(function TextField(
 const styles = StyleSheet.create({
   filledCard: {
     backgroundColor: AppStyles.cardColor,
-    borderRadius: 12,
+    borderRadius: 128,
     width: "100%"
   },
   card: {

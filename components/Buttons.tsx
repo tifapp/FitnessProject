@@ -121,6 +121,35 @@ export const PrimaryButton = <Children extends ReactNode>({
  * The button is 48px tall, and uses 16px horizontal paddings, to get a full screen button override `width` to
  * 100% in the `style` prop.
  */
+export const SecondaryButton = <Children extends ReactNode>({
+  style,
+  contentStyle,
+  disabled,
+  ...props
+}: ButtonProps<Children>) => (
+  <BaseButton
+    style={[
+      styles.defaultSecondaryBackground,
+      styles.container,
+      style,
+      { opacity: disabled ? 0.5 : 1 }
+    ]}
+    disabled={disabled}
+    activeOpacity={0.8}
+    contentStyle={[styles.primaryContent, contentStyle]}
+    {...props}
+  />
+)
+
+/**
+ * An outlined button which should be used as a secondary element to other visual elements in the hierarchy.
+ *
+ * This can be used as a CTA, but not for actions we "for the profitable running of the business" would want
+ * the user to tap such as leaving an event.
+ *
+ * The button is 48px tall, and uses 16px horizontal paddings, to get a full screen button override `width` to
+ * 100% in the `style` prop.
+ */
 export const SecondaryOutlinedButton = <Children extends ReactNode>({
   style,
   disabled,
@@ -164,14 +193,18 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     alignItems: "center",
     justifyContent: "center",
-    borderRadius: 12,
-    padding: 16
+    borderRadius: 128,
+    padding: 16,
+    paddingHorizontal: 24
   },
   primaryContent: {
     color: "white"
   },
   defaultPrimaryBackground: {
     backgroundColor: AppStyles.primaryColor
+  },
+  defaultSecondaryBackground: {
+    backgroundColor: AppStyles.cardColor
   },
   outlinedButton: {
     borderWidth: 1,

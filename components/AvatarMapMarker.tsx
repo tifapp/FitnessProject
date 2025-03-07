@@ -1,4 +1,4 @@
-import { StyleProp, ViewStyle, StyleSheet, View } from "react-native"
+import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 import { ProfileCircleView } from "./profileImageComponents/ProfileCircle"
 
 export type AvatarMapMarkerProps = {
