@@ -159,7 +159,8 @@ const styles = StyleSheet.create({
   card: {
     borderWidth: 2,
     borderRadius: 32,
-    borderColor: AppStyles.cardColor.toString()
+    borderColor: AppStyles.cardColor.toString(),
+    overflow: "hidden"
   },
   container: {
     padding: 16,

@@ -23,6 +23,7 @@ import {
   View,
   ViewStyle
 } from "react-native"
+import DashedLine from "react-native-dashed-line"
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated"
 import { isAttendingEvent } from "TiFShared/domain-models/Event"
 import {
@@ -33,10 +34,7 @@ import {
 import { EventAttendeeCardView } from "./AttendeesList"
 import { EventCountdownView, eventCountdown } from "./Countdown"
 import { useEventSecondsToStart } from "./SecondsToStart"
-import {
-  EventTravelEstimatesView,
-  useEventTravelEstimates
-} from "./TravelEstimates"
+import { EventTravelEstimatesView, useEventTravelEstimates } from "./TravelEstimates"
 
 export type EventDetailsProps = {
   state: Extract<UseLoadEventDetailsResult, { status: "success" }>
@@ -44,7 +42,8 @@ export type EventDetailsProps = {
 }
 
 const _EventDetailsView = ({ state, style }: EventDetailsProps) => (
-  <View style={style}>
+  <View style={[styles.screen, style]}>
+    <DashedLine style={{ position: "absolute", left: -8, top: -8, width: "100%", zIndex: 11 }} dashStyle={{ transform: "rotate(45deg)" }} dashLength={16} dashThickness={16} dashGap={6} dashColor={AppStyles.primaryBlue.toString()} />
     <TiFFormScrollableLayoutView
       footer={<FooterView event={state.event} />}
       style={styles.details}
@@ -55,12 +54,30 @@ const _EventDetailsView = ({ state, style }: EventDetailsProps) => (
         />
       }
     >
-      <Title>{state.event.title}</Title>
+      <DashedLine axis="vertical" style={{ position: "absolute", height: "100%", left: 24 }} dashLength={6} dashThickness={2} dashGap={8} dashColor={AppStyles.colorOpacity15} />
+      <View style={{
+          gap: 16,
+          marginLeft: 16,
+          borderRadius: 32,
+          paddingHorizontal: 16,
+          paddingTop: 24
+      }}>
+        <Title>{state.event.title}</Title>
+        <HostSectionView event={state.event} />
+      </View>
       <ArrivalSectionView event={state.event} />
-      <HostSectionView event={state.event} />
+      <EventTravelEstimatesView
+        eventTitle={state.event.title}
+        host={state.event.host}
+        location={state.event.location}
+        result={useEventTravelEstimates(state.event.location.coordinate)}
+      />
+      <View style={{ paddingLeft: 32, rowGap: 16 }}>
       <LocationSectionView event={state.event} />
       <TimeSectionView event={state.event} />
+      <TimeSectionView event={state.event} />
       <DescriptionSectionView event={state.event} />
+      </View>
     </TiFFormScrollableLayoutView>
   </View>
 )
@@ -103,7 +120,7 @@ const ArrivalSectionView = ({ event }: SectionProps) => {
 const TimeSectionView = ({ event }: SectionProps) => (
   <TiFFormCardSectionView title="Airtime">
     <TiFFormNamedIconRowView
-      iconName="calendar"
+      iconName="calendar-outline"
       iconBackgroundColor={AppStyles.blue}
       name={event.time.dateRange.ext.formatted()}
     />
@@ -111,7 +128,7 @@ const TimeSectionView = ({ event }: SectionProps) => (
 )
 
 const HostSectionView = ({ event }: SectionProps) => (
-  <TiFFormSectionView title="Hosted By">
+  <TiFFormSectionView color="black" title="Hosted By">
     <EventAttendeeCardView
       attendee={event.host}
       onRelationStatusChanged={() =>
@@ -133,15 +150,9 @@ const DescriptionSectionView = ({ event }: SectionProps) => (
 
 const LocationSectionView = ({ event }: SectionProps) => (
   <TiFFormSectionView title="Destination">
-    <EventTravelEstimatesView
-      eventTitle={event.title}
-      host={event.host}
-      location={event.location}
-      result={useEventTravelEstimates(event.location.coordinate)}
-    />
-    <TiFFormCardView style={{ marginTop: 8 }}>
+    <TiFFormCardView>
       <TiFFormNamedIconRowView
-        iconName="location"
+        iconName="location-outline"
         iconBackgroundColor={AppStyles.blue}
         name={event.location.placemark?.name ?? "Unknown Location"}
         description={
@@ -191,6 +202,18 @@ const styles = StyleSheet.create({
   details: {
     height: "100%"
   },
+  border: {
+    height: 2000,
+    width: 100,
+    backgroundColor: "transparent",
+    position: "absolute",
+    left: -100,
+    top: -50,
+    zIndex: 10,
+    borderStyle: "dashed",
+    borderWidth: 2,
+    borderColor: AppStyles.colorOpacity15
+  },
   attendanceButton: {
     alignSelf: "flex-end"
   },
@@ -198,5 +221,9 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "row",
     justifyContent: "space-between"
+  },
+  screen: {
+    // backgroundColor: AppStyles.cardColor
+    overflow: "hidden"
   }
 })

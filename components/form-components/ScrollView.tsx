@@ -26,7 +26,7 @@ export const TiFFormScrollView = ({
 
 const styles = StyleSheet.create({
   contentContainer: {
-    paddingHorizontal: 24,
+    paddingHorizontal: 12,
     rowGap: 32
   },
   scroll: {

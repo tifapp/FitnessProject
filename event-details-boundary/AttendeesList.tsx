@@ -1,5 +1,6 @@
 import { TiFFormCardView } from "@components/form-components/Card"
 import { TiFFormSectionView } from "@components/form-components/Section"
+import { useCoreNavigation } from "@components/Navigation"
 import ProfileImageAndName from "@components/profileImageComponents/ProfileImageAndName"
 import { CaptionTitle, Headline } from "@components/Text"
 import {
@@ -27,7 +28,6 @@ import Animated, {
   withRepeat,
   withTiming
 } from "react-native-reanimated"
-import { useCoreNavigation } from "@components/Navigation"
 import { EventAttendee, EventID } from "TiFShared/domain-models/Event"
 import {
   UnblockedUserRelationsStatus,
@@ -263,7 +263,7 @@ const styles = StyleSheet.create({
     rowGap: 8
   },
   atendeeCardContainer: {
-    padding: 16,
+    paddingHorizontal: 16,
     rowGap: 16
   },
   attendeeCardRow: {

@@ -1,7 +1,8 @@
 import { BodyText, Headline } from "@components/Text"
+import { AppStyles } from "@lib/AppColorStyle"
 import { TiFDefaultLayoutTransition } from "@lib/Reanimated"
 import { ReactNode, createContext, useContext } from "react"
-import { ViewStyle, View, StyleProp, StyleSheet } from "react-native"
+import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated"
 import { TiFFormCardView } from "./Card"
 
@@ -23,6 +24,7 @@ export type TiFFormSectionProps = {
   rightAddon?: JSX.Element
   isDisabled?: boolean
   children?: ReactNode
+  color?: string;
   style?: StyleProp<ViewStyle>
 }
 
@@ -32,7 +34,8 @@ export const TiFFormSectionView = ({
   rightAddon,
   isDisabled = false,
   children,
-  style
+  style,
+  color
 }: TiFFormSectionProps) => (
   <Animated.View
     entering={FadeIn}
@@ -45,7 +48,26 @@ export const TiFFormSectionView = ({
           <View style={styles.textContainer}>
             {title && (
               <View style={styles.titleRow}>
-                <Headline>{title}</Headline>
+                <View
+                  // style={{
+                  //   justifyContent: "center",
+                  //   alignItems: "center",
+                  //   borderRadius: 32,
+                  //   paddingHorizontal: 16,
+                  //   backgroundColor: AppStyles.primaryBlue.toString()
+                  // }}
+                >
+
+<Headline style={{ color: color ?? AppStyles.primaryBlue.toString() }}>
+                  {/* <CircularIonicon
+                    size={24}
+                    name={"calendar"}
+                    backgroundColor={AppStyles.primaryBlue.toString()}
+                  /> */}
+                  {title}
+                </Headline>
+
+                </View>
                 {rightAddon}
               </View>
             )}

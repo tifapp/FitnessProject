@@ -1,4 +1,4 @@
-import { CircularIonicon, IoniconName } from "@components/common/Icons"
+import { IoniconName } from "@components/common/Icons"
 import { ColorString } from "TiFShared/domain-models/ColorString"
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 import { TiFFormLabelView } from "./Label"
@@ -24,12 +24,12 @@ export const TiFFormNamedIconRowView = ({
 }: TiFFormNamedIconRowProps) => (
   <View style={style}>
     <View style={styles.container}>
-      <CircularIonicon
+      {/* <CircularIonicon
         size={24}
         name={iconName}
         maximumFontScaleFactor={maximumFontSizeMultiplier}
         backgroundColor={iconBackgroundColor.toString()}
-      />
+      /> */}
       <TiFFormLabelView
         title={name}
         description={description}
@@ -48,7 +48,7 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "row",
     alignItems: "center",
-    columnGap: 16,
-    padding: 16
+    columnGap: 16
+    // paddingHorizontal: 16
   }
 })

@@ -6,12 +6,19 @@ import {
 import { EventDetailsContentView } from "@event-details-boundary/Content"
 import { EventDetailsView } from "@event-details-boundary/Details"
 import { useLoadEventDetails } from "@event/DetailsQuery"
+import { AppStyles } from "@lib/AppColorStyle"
 import { StaticScreenProps } from "@react-navigation/native"
 import { EventID } from "TiFShared/domain-models/Event"
 
 export const eventDetailsScreens = () => ({
   eventDetails: {
-    options: () => ({ headerTitle: "Event" }),
+    options: () => ({
+    headerTitle: "Event",
+    headerStyle: {
+      backgroundColor: AppStyles.primaryBlue.toString()
+    },
+    headerTintColor: "#fff"
+}),
     screen: EventDetailsScreen
   },
   eventAttendeesList: {

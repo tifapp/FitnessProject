@@ -1,4 +1,3 @@
-import { AppStyles } from "@lib/AppColorStyle"
 import { ReactNode } from "react"
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 
@@ -20,9 +19,9 @@ export const TiFFormCardView = ({
 
 const styles = StyleSheet.create({
   container: {
-    borderWidth: 2,
-    borderColor: AppStyles.cardColor,
-    backgroundColor: "white",
-    overflow: "hidden"
+    // borderWidth: 2,
+    // borderColor: AppStyles.cardColor,
+    // backgroundColor: "white",
+    // overflow: "hidden"
   }
 })
