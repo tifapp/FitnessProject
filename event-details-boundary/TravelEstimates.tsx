@@ -165,6 +165,7 @@ export type EventTravelEstimatesProps = {
   location: EventLocation
   result: UseEventTravelEstimatesResult
   style?: StyleProp<ViewStyle>
+  parallaxFactor?: number
 }
 
 const TravelEstimatesView = ({ location, result }: Pick<EventTravelEstimatesProps, "location" | "result">) => {
@@ -212,7 +213,8 @@ export const EventTravelEstimatesView = ({
   host,
   location,
   result,
-  style
+  style,
+  parallaxFactor
 }: EventTravelEstimatesProps) => {
   const [isExpanded, setIsExpanded] = useState(false)
   const { presentProfile } = useCoreNavigation()
@@ -243,6 +245,7 @@ export const EventTravelEstimatesView = ({
       )}
       <Animated.View layout={TiFDefaultLayoutTransition}>
         <ExpandableMapSnippetView
+          parallaxFactor={parallaxFactor}
           isExpanded={isExpanded}
           onExpansionChanged={setIsExpanded}
           region={{
@@ -438,7 +441,8 @@ const styles = StyleSheet.create({
     borderRadius: 32
   },
   directionsText: {
-    textAlign: "center"
+    textAlign: "center",
+    color: AppStyles.primaryBlue.toString()
   },
   travelTypesContainer: {
     display: "flex",

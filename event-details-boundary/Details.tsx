@@ -66,12 +66,14 @@ const _EventDetailsView = ({ state, style }: EventDetailsProps) => (
         <HostSectionView event={state.event} />
       </View>
       <ArrivalSectionView event={state.event} />
+
       <EventTravelEstimatesView
-        eventTitle={state.event.title}
-        host={state.event.host}
-        location={state.event.location}
-        result={useEventTravelEstimates(state.event.location.coordinate)}
-      />
+          eventTitle={state.event.title}
+          host={state.event.host}
+          location={state.event.location}
+          result={useEventTravelEstimates(state.event.location.coordinate)}
+          parallaxFactor={1}
+        />
       <View style={{ paddingLeft: 32, rowGap: 16 }}>
       <LocationSectionView event={state.event} />
       <TimeSectionView event={state.event} />
