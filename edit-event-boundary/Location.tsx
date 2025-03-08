@@ -1,7 +1,8 @@
 import { AvatarMapMarkerView } from "@components/AvatarMapMarker"
 import { ExpandableMapSnippetView } from "@components/MapSnippetView"
+import { Caption, Footnote } from "@components/Text"
+import { Ionicon } from "@components/common/Icons"
 import { TiFFormNavigationLinkView } from "@components/form-components/NavigationLink"
-import { TiFFormRowItemView } from "@components/form-components/RowItem"
 import { EditEventFormLocation } from "@event/EditFormValues"
 import { placemarkToFormattedAddress } from "@lib/AddressFormatting"
 import { AppStyles } from "@lib/AppColorStyle"
@@ -144,44 +145,76 @@ const LocationView = ({
           }
           overlay={(isExpanding) => {
             return (
-              <View style={styles.overlayContainer}>
+              <View style={{ rowGap: 16 }}>
                 {isExpanding && (
-                  <TiFFormRowItemView
-                    style={styles.locationMapNavigationLink}
-                    title={
-                      "Tap and hold anywhere on the map to select a new location."
-                    }
-                    maximumFontScaleFactor={FontScaleFactors.xxxLarge}
-                  />
+                  <View
+                    style={[
+                      styles.overlayContainer,
+                      {
+                        padding: 16,
+                        flex: 1,
+                        alignItems: "center",
+                        columnGap: 16,
+                        flexDirection: "row"
+                      }
+                    ]}
+                  >
+                    <Ionicon
+                      name="pin-sharp"
+                      size={24}
+                      style={{ marginLeft: 8 }}
+                      color="black"
+                    />
+                    <Footnote style={{ flex: 1 }}>
+                      {
+                        "Tap and hold anywhere on the map to select a new location."
+                      }
+                    </Footnote>
+                  </View>
                 )}
                 {!location.placemark ? (
-                  <TiFFormNavigationLinkView
-                    iconName="location"
-                    iconBackgroundColor={AppStyles.primary}
-                    maximumFontScaleFactor={FontScaleFactors.xxxLarge}
-                    style={styles.locationMapNavigationLink}
-                    title={`${location.coordinate.latitude}, ${location.coordinate.longitude}`}
-                    onTapped={() => {
-                      setIsExpanded(false)
-                      onSelectLocationTapped()
-                    }}
-                  />
+                  <View style={styles.overlayContainer}>
+                    <Caption style={{ paddingHorizontal: 16, paddingTop: 16 }}>
+                      {"Current Location"}
+                    </Caption>
+                    <TiFFormNavigationLinkView
+                      iconName="location"
+                      iconBackgroundColor={AppStyles.primary}
+                      maximumFontScaleFactor={FontScaleFactors.xxxLarge}
+                      style={styles.locationMapNavigationLink}
+                      title={`${location.coordinate.latitude}, ${location.coordinate.longitude}`}
+                      onTapped={() => {
+                        setIsExpanded(false)
+                        onSelectLocationTapped()
+                      }}
+                    />
+                  </View>
                 ) : (
-                  <TiFFormNavigationLinkView
-                    iconName="location"
-                    iconBackgroundColor={AppStyles.primary}
-                    style={styles.locationMapNavigationLink}
-                    title={location.placemark.name ?? "Unknown Location"}
-                    maximumFontScaleFactor={FontScaleFactors.xxxLarge}
-                    description={
-                      placemarkToFormattedAddress(location.placemark) ??
-                      "Unknown Address"
-                    }
-                    onTapped={() => {
-                      setIsExpanded(false)
-                      onSelectLocationTapped()
-                    }}
-                  />
+                  <View style={styles.overlayContainer}>
+                    <Caption
+                      style={{
+                        paddingHorizontal: 16,
+                        paddingTop: 16
+                      }}
+                    >
+                      {"Current Location"}
+                    </Caption>
+                    <TiFFormNavigationLinkView
+                      iconName="location"
+                      iconBackgroundColor={AppStyles.primary}
+                      style={styles.locationMapNavigationLink}
+                      title={location.placemark.name ?? "Unknown Location"}
+                      maximumFontScaleFactor={FontScaleFactors.xxxLarge}
+                      description={
+                        placemarkToFormattedAddress(location.placemark) ??
+                        "Unknown Address"
+                      }
+                      onTapped={() => {
+                        setIsExpanded(false)
+                        onSelectLocationTapped()
+                      }}
+                    />
+                  </View>
                 )}
               </View>
             )
