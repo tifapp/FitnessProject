@@ -149,7 +149,7 @@ const LocationView = ({
                   <TiFFormRowItemView
                     style={styles.locationMapNavigationLink}
                     title={
-                      "Tap and hold onto a point in the map to select a new location."
+                      "Tap and hold anywhere on the map to select a new location."
                     }
                     maximumFontScaleFactor={FontScaleFactors.xxxLarge}
                   />
