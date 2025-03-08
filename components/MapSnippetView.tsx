@@ -245,7 +245,6 @@ const ExpandedMapView = ({
     <PortalView>
       {isVisible && (
         <Animated.View style={animatedMapStyle}>
-          {/* Expanded Map */}
           <MapView
             {...expandedMapProps}
             style={StyleSheet.absoluteFill}
@@ -265,8 +264,6 @@ const ExpandedMapView = ({
               {marker}
             </Marker>
           </MapView>
-
-          {/* Current Location overlay */}
           <Animated.View
             style={[styles.fullscreenOverlayContainer, overlayStyle]}
           >
@@ -274,8 +271,6 @@ const ExpandedMapView = ({
               {overlay instanceof Function ? overlay(isExpanding) : overlay}
             </View>
           </Animated.View>
-
-          {/* Collapse Button */}
           <Animated.View style={animatedCollapseButtonStyle}>
             <TouchableIonicon
               icon={{ name: "contract" }}

@@ -145,27 +145,16 @@ const LocationView = ({
           }
           overlay={(isExpanding) => {
             return (
-              <View style={{ rowGap: 16 }}>
+              <View style={styles.container}>
                 {isExpanding && (
-                  <View
-                    style={[
-                      styles.overlayContainer,
-                      {
-                        padding: 16,
-                        flex: 1,
-                        alignItems: "center",
-                        columnGap: 16,
-                        flexDirection: "row"
-                      }
-                    ]}
-                  >
+                  <View style={styles.instructionContainer}>
                     <Ionicon
                       name="pin-sharp"
                       size={24}
-                      style={{ marginLeft: 8 }}
+                      style={styles.instructionIcon}
                       color="black"
                     />
-                    <Footnote style={{ flex: 1 }}>
+                    <Footnote style={styles.instructionText}>
                       {
                         "Tap and hold anywhere on the map to select a new location."
                       }
@@ -174,7 +163,7 @@ const LocationView = ({
                 )}
                 {!location.placemark ? (
                   <View style={styles.overlayContainer}>
-                    <Caption style={{ paddingHorizontal: 16, paddingTop: 16 }}>
+                    <Caption style={styles.currentLocation}>
                       {"Current Location"}
                     </Caption>
                     <TiFFormNavigationLinkView
@@ -191,12 +180,7 @@ const LocationView = ({
                   </View>
                 ) : (
                   <View style={styles.overlayContainer}>
-                    <Caption
-                      style={{
-                        paddingHorizontal: 16,
-                        paddingTop: 16
-                      }}
-                    >
+                    <Caption style={styles.currentLocation}>
                       {"Current Location"}
                     </Caption>
                     <TiFFormNavigationLinkView
@@ -236,6 +220,29 @@ const mapRegion = (coordinate: LocationCoordinate2D) => ({
 })
 
 const styles = StyleSheet.create({
+  container: {
+    rowGap: 16
+  },
+  currentLocation: {
+    paddingHorizontal: 16,
+    paddingTop: 16
+  },
+  instructionContainer: {
+    borderRadius: 12,
+    backgroundColor: "white",
+    overflow: "hidden",
+    padding: 16,
+    flex: 1,
+    alignItems: "center",
+    columnGap: 16,
+    flexDirection: "row"
+  },
+  instructionIcon: {
+    marginLeft: 8
+  },
+  instructionText: {
+    flex: 1
+  },
   locationNavigationLink: {
     width: "100%",
     borderStyle: "dashed",
