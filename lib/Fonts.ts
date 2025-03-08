@@ -11,7 +11,7 @@ export const useAppFonts = () => {
   return useFonts({
     OpenSansSemiBold: require("../assets/fonts/OpenSans-SemiBold.ttf"),
     OpenSans: require("../assets/fonts/OpenSans-Regular.ttf"),
-    OpenSansBold: require("../assets/fonts/OpenSans-Bold.ttf"),
+    OpenSansBold: require("../assets/fonts/RobotoSlab-SemiBold.ttf"),
     OpenDyslexic3: require("../assets/fonts/OpenDyslexic3-Regular.ttf"),
     OpenDyslexic3Bold: require("../assets/fonts/OpenDyslexic3-Bold.ttf")
   })
