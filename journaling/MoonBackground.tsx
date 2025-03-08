@@ -1,31 +1,19 @@
 import {
   Circle,
   Group,
-  LinearGradient,
   RadialGradient,
-  Rect,
-  SkSize,
-  vec
+  SkSize
 } from "@shopify/react-native-skia"
 import { useEffect } from "react"
 import {
   Easing,
   useSharedValue,
   withRepeat,
-  withSequence,
   withTiming
 } from "react-native-reanimated"
-import { EdgeInsets } from "react-native-safe-area-context"
-import {
-  CORE_RADIUS,
-  FADE_RING_RADIUS,
-  FADE_RING_TARGET_RADIUS,
-  OUTER_RING_RADIUS,
-  Sun,
-  SunGradient,
-  SunProps
-} from "./SunBackground"
+import { Sun, SunGradient, SunProps } from "./SunBackground"
 import { StarrySkyDrawing } from "./StarrySky"
+import { EdgeInsets } from "react-native-safe-area-context"
 
 export namespace Moon {
   export const gradients = {
@@ -45,7 +33,22 @@ export namespace Moon {
   }
 }
 
-export const MoonDrawing = ({ background, size, edgeInsets }: SunProps) => {
+export type MoonProps = {
+  background: SunProps["background"]
+  size: SkSize
+  edgeInsets: EdgeInsets
+}
+
+const CORE_RADIUS = 48
+const OUTER_RING_RADIUS = 56
+const FADE_RING_RADIUS = 64
+const FADE_RING_TARGET_RADIUS = 80
+
+export const MoonBackgroundDrawing = ({
+  background,
+  size,
+  edgeInsets
+}: MoonProps) => {
   const sunX = size.width * 0.5
   const sunY = Sun.absoluteYPosition(background.time, size, edgeInsets)
   const ringRadius = useSharedValue(FADE_RING_RADIUS)
@@ -65,8 +68,7 @@ export const MoonDrawing = ({ background, size, edgeInsets }: SunProps) => {
 
   return (
     <Group>
-      <StarrySkyDrawing width={size.width} height={size.height} numStars={30} />
-      {/* Animated moonlight ring */}
+      <StarrySkyDrawing size={size} numStars={50} />
       <Circle cx={sunX} cy={sunY} r={moonGlowRadius}>
         <RadialGradient
           c={{ x: sunX, y: sunY }}
@@ -75,8 +77,6 @@ export const MoonDrawing = ({ background, size, edgeInsets }: SunProps) => {
           positions={[0.4, 0.6, 0.8, 1]}
         />
       </Circle>
-
-      {/* Static moon glow */}
       <Circle cx={sunX} cy={sunY} r={OUTER_RING_RADIUS + 16}>
         <RadialGradient
           c={{ x: sunX, y: sunY }}
@@ -85,8 +85,6 @@ export const MoonDrawing = ({ background, size, edgeInsets }: SunProps) => {
           positions={[0.3, 0.5, 0.7, 1]}
         />
       </Circle>
-
-      {/* Main moon body */}
       <Circle cx={sunX} cy={sunY} r={CORE_RADIUS}>
         <RadialGradient
           c={{ x: sunX, y: sunY }}
@@ -95,8 +93,6 @@ export const MoonDrawing = ({ background, size, edgeInsets }: SunProps) => {
           positions={[0.4, 0.6, 0.8, 1]}
         />
       </Circle>
-
-      {/* Crater details */}
       <Circle cx={sunX - 15} cy={sunY - 10} r={8} color="#E0E0E0" />
       <Circle cx={sunX + 10} cy={sunY + 15} r={12} color="#EBEBEB" />
       <Circle cx={sunX + 18} cy={sunY - 12} r={6} color="#E5E5E5" />
