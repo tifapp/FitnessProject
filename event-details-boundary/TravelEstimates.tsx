@@ -438,7 +438,9 @@ const styles = StyleSheet.create({
     paddingLeft: 48,
     paddingBottom: 32,
     paddingTop: 24,
-    borderRadius: 32
+    borderRadius: 32,
+    borderWidth: 2,
+    borderColor: AppStyles.cardColor
   },
   directionsText: {
     textAlign: "center",

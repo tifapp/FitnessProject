@@ -54,26 +54,27 @@ const _EventDetailsView = ({ state, style }: EventDetailsProps) => (
         />
       }
     >
-      <DashedLine axis="vertical" style={{ position: "absolute", height: "100%", left: 24 }} dashLength={6} dashThickness={2} dashGap={8} dashColor={AppStyles.colorOpacity15} />
+      <DashedLine axis="vertical" style={{ position: "absolute", height: "100%", left: 23 }} dashLength={6} dashThickness={2} dashGap={4} dashColor={AppStyles.colorOpacity15} />
+      <DashedLine axis="vertical" dashStyle={{ borderRadius: 100 }} style={{ position: "absolute", height: "100%", left: -4 }} dashLength={12} dashThickness={12} dashGap={64} dashColor={AppStyles.cardColor} />
       <View style={{
           gap: 16,
           marginLeft: 16,
           borderRadius: 32,
           paddingHorizontal: 16,
-          paddingTop: 24
+          paddingTop: 28
       }}>
         <Title>{state.event.title}</Title>
         <HostSectionView event={state.event} />
       </View>
       <ArrivalSectionView event={state.event} />
-
       <EventTravelEstimatesView
-          eventTitle={state.event.title}
-          host={state.event.host}
-          location={state.event.location}
-          result={useEventTravelEstimates(state.event.location.coordinate)}
-          parallaxFactor={1}
-        />
+        style={{ marginLeft: 32 }}
+        eventTitle={state.event.title}
+        host={state.event.host}
+        location={state.event.location}
+        result={useEventTravelEstimates(state.event.location.coordinate)}
+        parallaxFactor={3}
+      />
       <View style={{ paddingLeft: 32, rowGap: 16 }}>
       <LocationSectionView event={state.event} />
       <TimeSectionView event={state.event} />
@@ -225,7 +226,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between"
   },
   screen: {
-    // backgroundColor: AppStyles.cardColor
+    // backgroundColor: AppStyles.cardColor,
     overflow: "hidden"
   }
 })

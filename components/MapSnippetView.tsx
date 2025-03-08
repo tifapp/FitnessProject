@@ -35,10 +35,12 @@ import { FullWindowOverlay } from "react-native-screens"
 import { TouchableIonicon } from "./common/Icons"
 import { useScrollContext } from "./form-components/ScrollContext"
 import { useScreenBottomPadding } from "./Padding"
+
+// Updated inset padding function - still used but less critical with our new approach
 const getInsetPadding = (parallaxFactor = 0.5) => {
   // Calculate padding based on parallax factor
-  // Higher parallax needs more padding
-  const padding = Math.max(60 * parallaxFactor, 40)
+  // Base padding that doesn't need to grow as much now
+  const padding = Math.max(40 * parallaxFactor, 20)
   return {
     top: padding,
     bottom: padding,
@@ -97,21 +99,43 @@ const { scrollY } = useScrollContext()
 isExpandingShared.value = isExpanding
 useEffect(() => setIsExpanding(isExpanded), [isExpanded])
 
-// Create animated style for parallax effect
-const parallaxStyle = useAnimatedStyle(() => {
-  if (!scrollY || isExpanding) return {}
+// New function to calculate extended container styles based on parallax factor
+const getExtendedContainerStyles = (pFactor: number) => {
+  // Calculate how much the map will move during parallax (based on scrollY range)
+  const maxParallaxMovement = 120 * pFactor
 
-  // Keep the reverse direction for realistic window effect
+  // The container needs to be at least this much taller (doubled for safety)
+  const extraHeight = maxParallaxMovement * 2
+
+  // Position the map in the middle of this extended container
+  const topOffset = -extraHeight / 2
+
+  return {
+    // Make the container taller than it visually appears
+    height: `${100 + extraHeight}%`,
+    // Position the map in the middle of this extended container
+    top: topOffset
+  }
+}
+
+// Updated parallax style for the extended container approach
+const parallaxStyle = useAnimatedStyle(() => {
+  if (!scrollY || isExpanding) return { transform: [] }
+
+  // Calculate maximum parallax movement
+  const maxMovement = 120 * parallaxFactor
+
+  // Calculate translateY with the full range, since we now have room for it
   const translateY = interpolate(
     scrollY.value,
     [0, 300, 600],
-    [0, 60 * parallaxFactor, 120 * parallaxFactor],
+    [0, maxMovement * 0.5, maxMovement],
     Extrapolate.CLAMP
   )
 
   return {
     transform: [
-      { translateY }
+      { translateY: translateY - (415 * parallaxFactor) }
     ]
   }
 })
@@ -150,15 +174,15 @@ return (
         {overlayLayout && (
           <TouchableOpacity onPress={expand}>
             <View style={[styles.mapWrapper,
-    {
-      height: Math.max(overlay ? 450 : 300, 200 + overlayLayout.height)
-    }]}>
-              {/* Apply parallax effect to the map view */}
+              {
+                height: Math.max(overlay ? 450 : 300, 200 + overlayLayout.height)
+              }]}>
+              {/* Apply the extended container approach to the map view */}
               <Animated.View
                 style={[
                   styles.mapAnimatedContainer,
-                  // Apply a fixed scale to prevent edges from showing
-                  { transform: [{ scale: 1.2 }] },
+                  // Apply the extended container styles to give room for parallax
+                  getExtendedContainerStyles(parallaxFactor),
                   parallaxStyle
                 ]}
               >
@@ -189,8 +213,9 @@ return (
                   // Adjust the initial region to provide more map area for parallax
                   initialRegion={{
                     ...region,
-                    latitudeDelta: region.latitudeDelta * 1.2,
-                    longitudeDelta: region.longitudeDelta * 1.2
+                    // Still expand the region a bit, but not as aggressively as with scaling
+                    latitudeDelta: region.latitudeDelta * (1.1 + parallaxFactor * 0.2),
+                    longitudeDelta: region.longitudeDelta * (1.1 + parallaxFactor * 0.2)
                   }}
                 >
                   <Marker
@@ -372,7 +397,7 @@ mapContainer: {
   borderRadius: 32,
   overflow: "hidden",
   borderWidth: 2,
-  borderColor: AppStyles.primaryBlue.toString()
+  borderColor: AppStyles.colorOpacity35
 },
 mapWrapper: {
   overflow: "hidden",
