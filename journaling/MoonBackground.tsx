@@ -7,8 +7,10 @@ import {
 import { useEffect } from "react"
 import {
   Easing,
+  useDerivedValue,
   useSharedValue,
   withRepeat,
+  withSequence,
   withTiming
 } from "react-native-reanimated"
 import { Sun, SunGradient, SunProps } from "./SunBackground"
@@ -41,8 +43,8 @@ export type MoonProps = {
 
 const CORE_RADIUS = 48
 const OUTER_RING_RADIUS = 56
-const FADE_RING_RADIUS = 64
-const FADE_RING_TARGET_RADIUS = 80
+const FADE_RING_MID_POINT_RADIUS = 72
+const FADE_RING_TARGET_RADIUS = 96
 
 export const MoonBackgroundDrawing = ({
   background,
@@ -51,28 +53,48 @@ export const MoonBackgroundDrawing = ({
 }: MoonProps) => {
   const sunX = size.width * 0.5
   const sunY = Sun.absoluteYPosition(background.time, size, edgeInsets)
-  const ringRadius = useSharedValue(FADE_RING_RADIUS)
-  const ringOpacity = useSharedValue(0)
-  const moonGlowRadius = useSharedValue(FADE_RING_RADIUS)
+  const moonGlow = useSharedValue({
+    radius: CORE_RADIUS,
+    opacity: 0
+  })
 
   useEffect(() => {
-    moonGlowRadius.value = withRepeat(
-      withTiming(FADE_RING_TARGET_RADIUS + 20, {
-        duration: 5000,
-        easing: Easing.inOut(Easing.sin)
-      }),
-      -1,
-      true
+    moonGlow.value = withRepeat(
+      withSequence(
+        withTiming(
+          { radius: FADE_RING_MID_POINT_RADIUS, opacity: 0.5 },
+          { duration: 2500, easing: Easing.linear }
+        ),
+        withTiming(
+          { radius: FADE_RING_TARGET_RADIUS, opacity: 0 },
+          { duration: 2500, easing: Easing.linear }
+        )
+      ),
+      -1
     )
-  }, [ringRadius, ringOpacity, moonGlowRadius])
+  }, [moonGlow])
 
   return (
     <Group>
       <StarrySkyDrawing size={size} numStars={50} />
-      <Circle cx={sunX} cy={sunY} r={moonGlowRadius}>
+      <Circle cx={sunX} cy={sunY} r={FADE_RING_TARGET_RADIUS}>
         <RadialGradient
           c={{ x: sunX, y: sunY }}
-          r={FADE_RING_TARGET_RADIUS + 20}
+          r={FADE_RING_TARGET_RADIUS}
+          colors={Moon.gradients.ring}
+          positions={[0.4, 0.6, 0.8, 1]}
+        />
+      </Circle>
+
+      <Circle
+        cx={sunX}
+        cy={sunY}
+        r={useDerivedValue(() => moonGlow.value.radius, [moonGlow])}
+        opacity={useDerivedValue(() => moonGlow.value.opacity, [moonGlow])}
+      >
+        <RadialGradient
+          c={{ x: sunX, y: sunY }}
+          r={FADE_RING_TARGET_RADIUS}
           colors={Moon.gradients.ring}
           positions={[0.4, 0.6, 0.8, 1]}
         />
