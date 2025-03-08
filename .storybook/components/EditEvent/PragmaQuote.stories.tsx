@@ -1,18 +1,12 @@
-import React, { useState } from "react"
-import { Button, View } from "react-native"
-import { GestureHandlerRootView } from "react-native-gesture-handler"
-import {
-  PragmaQuoteView,
-  createEventQuote
-} from "@edit-event-boundary/PragmaQuotes"
-import { Provider, atom, useAtomValue } from "jotai"
+import { BASE_HEADER_SCREEN_OPTIONS } from "@components/Navigation"
+import { EditEventFormDismissButton } from "@edit-event-boundary/Dismiss"
 import { EditEventView } from "@edit-event-boundary/EditEvent"
-import { SafeAreaProvider } from "react-native-safe-area-context"
-import { SQLiteLocalSettingsStorage } from "@settings-storage/LocalSettings"
-import { PersistentSettingsStores } from "@settings-storage/PersistentStores"
-import { SQLiteUserSettingsStorage } from "@settings-storage/UserSettings"
-import { testSQLite } from "@test-helpers/SQLite"
-import { SettingsProvider } from "@settings-storage/Hooks"
+import { editEventFormValuesAtom } from "@edit-event-boundary/FormAtoms"
+import { defaultEditFormValues } from "@event/EditFormValues"
+import { BottomSheetModalProvider } from "@gorhom/bottom-sheet"
+import { sleep } from "@lib/utils/DelayData"
+import { GeocodingFunctionsProvider } from "@location/Geocoding"
+import { LocationCoordinatesMocks, mockPlacemark } from "@location/MockData"
 import {
   NavigationContainer,
   NavigationProp,
@@ -20,24 +14,17 @@ import {
   useNavigation
 } from "@react-navigation/native"
 import { createStackNavigator } from "@react-navigation/stack"
-import {
-  BASE_HEADER_SCREEN_OPTIONS,
-  XMarkBackButton
-} from "@components/Navigation"
-import { EditEventFormDismissButton } from "@edit-event-boundary/Dismiss"
-import {
-  LocationCoordinatesMocks,
-  mockLocationCoordinate2D,
-  mockPlacemark
-} from "@location/MockData"
+import { SettingsProvider } from "@settings-storage/Hooks"
+import { SQLiteLocalSettingsStorage } from "@settings-storage/LocalSettings"
+import { PersistentSettingsStores } from "@settings-storage/PersistentStores"
+import { SQLiteUserSettingsStorage } from "@settings-storage/UserSettings"
 import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
-import { sleep } from "@lib/utils/DelayData"
-import { EventMocks } from "@event-details-boundary/MockData"
-import { BottomSheetModalProvider } from "@gorhom/bottom-sheet"
-import { GeocodingFunctionsProvider } from "@location/Geocoding"
-import { neverPromise } from "@test-helpers/Promise"
-import { defaultEditFormValues } from "@event/EditFormValues"
-import { editEventFormValuesAtom } from "@edit-event-boundary/FormAtoms"
+import { testSQLite } from "@test-helpers/SQLite"
+import { useAtomValue } from "jotai"
+import React from "react"
+import { Button, View } from "react-native"
+import { GestureHandlerRootView } from "react-native-gesture-handler"
+import { SafeAreaProvider } from "react-native-safe-area-context"
 
 const EditEventPragmaQuotesMeta = {
   title: "Edit Event Pragma Quotes"
@@ -128,7 +115,6 @@ const EditEventScreen = () => {
           submit={async (id, edit) => {
             await sleep(3000)
             throw new Error()
-            return EventMocks.PickupBasketball
           }}
           onSuccess={(event) => {
             console.log("Edited", event)
