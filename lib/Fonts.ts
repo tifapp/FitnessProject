@@ -9,7 +9,7 @@ import { useWindowDimensions } from "react-native"
  */
 export const useAppFonts = () => {
   return useFonts({
-    OpenSansSemiBold: require("../assets/fonts/OpenSans-SemiBold.ttf"),
+    OpenSansSemiBold: require("../assets/fonts/OpenSans-Bold.ttf"),
     OpenSans: require("../assets/fonts/OpenSans-Regular.ttf"),
     OpenSansBold: require("../assets/fonts/RobotoSlab-SemiBold.ttf"),
     OpenDyslexic3: require("../assets/fonts/OpenDyslexic3-Regular.ttf"),

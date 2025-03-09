@@ -3,7 +3,7 @@ import { AppStyles } from "@lib/AppColorStyle"
 import { dayjs } from "TiFShared/lib/Dayjs"
 import { Image } from "expo-image"
 import { useEffect, useState } from "react"
-import { ViewStyle, StyleProp, View, StyleSheet } from "react-native"
+import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 import Animated, { FadeIn } from "react-native-reanimated"
 
 export type PragmaQuoteProps = {
@@ -51,7 +51,7 @@ export const PragmaQuoteView = ({
         <View style={styles.pragmaContainer}>
           <Image
             source={
-              "https://static.wikia.nocookie.net/xenoblade/images/c/cd/XC3FR_Alpha_portrait.png/revision/latest?cb=20230419030915"
+              "https://i.imgur.com/cqF5Mk4.png"
             }
             style={styles.pragmaImage}
           />
@@ -74,16 +74,21 @@ const styles = StyleSheet.create({
     columnGap: 16
   },
   pragmaContainer: {
-    borderRadius: 12,
+    borderRadius: 64,
+    borderWidth: 2,
+    borderColor: AppStyles.colorOpacity15,
     backgroundColor: AppStyles.cardColor,
-    padding: 8
+    overflow: "hidden",
+    marginVertical: 8
   },
   pragmaImage: {
+    borderRadius: 64,
     width: 48,
     height: 48
   },
   quote: {
-    flex: 1
+    flex: 1,
+    color: "white"
   },
   invisibleText: {
     opacity: 0
@@ -117,25 +122,37 @@ export const createEventQuote = (date: Date = new Date()) => {
 }
 
 const CREATE_EVENT_QUOTES = {
+  generic: [
+    "The north star guides your path.",
+    "Where to, Captain?",
+    "What's your next destination?",
+    "Adventure awaits! Where next?",
+    "What's on your radar?"
+  ],
   weekday: [
-    "What event is on your mind this week?",
-    "What event will you create this week?",
-    "How will you progress with this new event?"
+    "What adventure awaits this week?",
+    "Ready to chart a course for this week's journey?",
+    "Which destination will you set for this week?",
+    "What mission awaits this week?",
+    "Ready to barrel roll into a new quest this week?",
+    "What lies on your horizon this week?",
+    "Ready to set sail this week?"
   ],
   weekend: [
-    "What event is on you mind this weekend?",
-    "What event will you create this weekend?",
-    "Ready to gear up for this weekend's event?"
+    "Ready for takeoff this weekend?",
+    "Where does your compass point this weekend?",
+    "All systems go for this weekend's expedition?",
+    "Full steam ahead for this weekend?"
   ],
   upcomingHoliday: [
-    (name: string) => `Planning an event for ${name}?`,
-    (name: string) => `Will you make an event for ${name}?`,
-    (name: string) => `Want to make an event for ${name}?`
+    (name: string) => `Planning to navigate the skies for ${name}?`,
+    (name: string) => `Charting a flight path for ${name}?`,
+    (name: string) => `Ready to embark on a ${name} expedition?`
   ],
   holiday: [
-    (greeting: string) => `${greeting} Ready to make an event?`,
-    (greeting: string) => `${greeting} Want to celebrate with an event?`,
-    (greeting: string) => `${greeting} What event do you have in mind?`
+    (greeting: string) => `${greeting} Your adventure awaits!`,
+    (greeting: string) => `${greeting} Time to set your coordinates!`,
+    (greeting: string) => `${greeting} Which horizon calls to you today?`
   ]
 }
 

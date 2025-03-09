@@ -7,8 +7,8 @@ import { EditEventFormDismissButton } from "@edit-event-boundary/Dismiss"
 import { EditEventView } from "@edit-event-boundary/EditEvent"
 import { editEventFormValueAtoms } from "@edit-event-boundary/FormAtoms"
 import {
-  RouteableEditEventFormValues,
-  fromRouteableEditFormValues
+  fromRouteableEditFormValues,
+  RouteableEditEventFormValues
 } from "@event/EditFormValues"
 import {
   LocationsSearchView,
@@ -68,14 +68,14 @@ const EditEventFormBackButton = () => (
 export const editEventScreens = () => ({
   editEventForm: {
     options: {
-      headerTitle: "Edit Event",
+      headerTitle: "Change Your Adventure",
       headerLeft: EditEventFormBackButton
     },
     screen: EditEventScreen
   },
   createEventForm: {
     options: {
-      headerTitle: "Create Event",
+      headerTitle: "Chart Your Next Adventure",
       headerLeft: EditEventFormBackButton
     },
     screen: EditEventScreen

@@ -46,6 +46,7 @@ import {
   ViewStyle
 } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
+import { CartographicBackground } from "./CartographicalBackground"
 import { EditEventDurationPickerView } from "./DurationPicker"
 import {
   editEventFormInitialValuesAtom,
@@ -120,11 +121,12 @@ export const EditEventView = ({
 }: EditEventProps) => {
   useHydrateEditEvent(initialValues)
   return (
+    <>
+    <CartographicBackground />
     <TiFFormScrollableLayoutView
-      footer={<FooterView eventId={eventId} onSuccess={onSuccess} />}
+      footer={<FooterView currentDate={currentDate} eventId={eventId} onSuccess={onSuccess} />}
       style={style}
     >
-      <QuoteSectionView eventId={eventId} currentDate={currentDate} />
       <TitleSectionView />
       <LocationSectionView
         hostName={hostName}
@@ -136,6 +138,7 @@ export const EditEventView = ({
       <DescriptionSectionView />
       <AdvancedSectionView />
     </TiFFormScrollableLayoutView>
+    </>
   )
 }
 
@@ -164,7 +167,7 @@ const TitleSectionView = () => {
   const height = 32 * useFontScale()
   return (
     <ShadedTextField
-      placeholder="Enter an Event Title"
+      placeholder="Name Your Adventure!"
       value={title}
       onChangeText={setTitle}
       textStyle={{ height }}
@@ -300,7 +303,7 @@ const DurationSectionView = () => {
   return (
     <>
       <TiFFormSectionView
-        title="Length?"
+        title="For how long?"
         rightAddon={
           <TouchableIonicon
             icon={{ name: "ellipsis-horizontal" }}
@@ -345,9 +348,9 @@ const DescriptionSectionView = () => {
   )
   const minHeight = 128 * useFontScale()
   return (
-    <TiFFormSectionView title="Details?">
+    <TiFFormSectionView title="Why?">
       <ShadedTextField
-        placeholder="Enter an Event Description"
+        placeholder="Describe Your Adventure"
         multiline
         textAlignVertical="top"
         value={description}
@@ -363,7 +366,7 @@ const AdvancedSectionView = () => {
     editEventFormValueAtoms.shouldHideAfterStartDate
   )
   return (
-    <TiFFormCardSectionView title="Settings">
+    <TiFFormCardSectionView title="Anything else?">
       <TiFFormNamedToggleView
         name="Should Hide After Start Date"
         description="The event will be hidden from the map after it starts when enabled."
@@ -398,11 +401,13 @@ const EndTimeView = ({ style }: EndTimeProps) => {
 
 type FooterProps = {
   eventId?: EventID
+  currentDate: Date
   onSuccess: (event: ClientSideEvent) => void
 }
 
-const FooterView = ({ eventId, onSuccess }: FooterProps) => (
+const FooterView = ({ eventId, currentDate, onSuccess }: FooterProps) => (
   <TiFFooterView>
+    <QuoteSectionView eventId={eventId} currentDate={currentDate} />
     <EditEventFormSubmitButton
       state={useEditEventFormSubmission({
         eventId,

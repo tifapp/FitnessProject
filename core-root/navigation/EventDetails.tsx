@@ -13,7 +13,7 @@ import { EventID } from "TiFShared/domain-models/Event"
 export const eventDetailsScreens = () => ({
   eventDetails: {
     options: () => ({
-    headerTitle: "Event",
+    headerTitle: "Adventure",
     headerStyle: {
       backgroundColor: AppStyles.primaryBlue.toString()
     },
