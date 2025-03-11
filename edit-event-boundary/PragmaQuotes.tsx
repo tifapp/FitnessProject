@@ -13,7 +13,7 @@ export type PragmaQuoteProps = {
   style?: StyleProp<ViewStyle>
 }
 
-const usePragmaQuote = (
+export const usePragmaQuote = (
   quote: () => string,
   intervalMillis: number,
   initialDelay: number

@@ -1,12 +1,18 @@
 import { useJoinEvent } from "@event/JoinEvent"
 import { cloud } from "@journaling/Clouds"
+import {
+  JournalingIntroView,
+  useJournalingIntro
+} from "@journaling/JournalingIntro"
 import { JournalTimeView, useJournalTime } from "@journaling/JournalTime"
 import { MoonBackgroundDrawing } from "@journaling/MoonBackground"
 import { PragmaDrawing } from "@journaling/Pragma"
 import { SunBackgroundDrawing } from "@journaling/SunBackground"
-import { Canvas, SkSize } from "@shopify/react-native-skia"
+import { AppStyles } from "@lib/AppColorStyle"
+import { Canvas, Group, Rect, SkSize } from "@shopify/react-native-skia"
 import React, { useEffect, useMemo, useState } from "react"
 import { View } from "react-native"
+import { useSharedValue, withTiming } from "react-native-reanimated"
 import {
   SafeAreaProvider,
   useSafeAreaInsets
@@ -89,6 +95,7 @@ const getDayFraction = () => {
 export const TimeOfDayView = () => {
   const [size, setSize] = useState<SkSize>({ width: 0, height: 0 })
   const insets = useSafeAreaInsets()
+  const [isShowingIntro, setIsShowingIntro] = useState(false)
 
   const [time, setTime] = useState(0.5)
   // useEffect(() => {
@@ -99,10 +106,12 @@ export const TimeOfDayView = () => {
   //   return () => clearInterval(interval)
   // }, [])
   const background = useMemo(
-    () => ({ time, dayRange: DAY_RANGE, clouds: [] }),
+    () => ({ time, dayRange: DAY_RANGE, clouds: CLOUDS }),
     [time]
   )
-  const journalTime = useJournalTime({ onFinished: () => {} })
+  const journalTime = useJournalTime({
+    onFinished: () => setIsShowingIntro(true)
+  })
   return (
     <View style={{ position: "relative", flex: 1 }}>
       <Canvas
@@ -119,17 +128,64 @@ export const TimeOfDayView = () => {
           background={background}
           edgeInsets={insets}
         />
-        <PragmaDrawing
-          size={{ width: 256, height: 256 }}
-          pose="worship"
-          x={size.width / 2 - 64}
-          y={size.height / 2}
-        />
+        {!isShowingIntro && (
+          <PragmaDrawing
+            size={{ width: 256, height: 256 }}
+            pose="worship"
+            x={size.width / 2 - 64}
+            y={size.height / 2}
+          />
+        )}
+        {isShowingIntro && <IntroDrawing size={size} />}
       </Canvas>
-      <JournalTimeView
-        state={journalTime}
-        style={{ justifyContent: "center", flex: 1, padding: 24 }}
-      />
+      {!isShowingIntro && (
+        <JournalTimeView
+          state={journalTime}
+          style={{ justifyContent: "center", flex: 1, padding: 24 }}
+        />
+      )}
+      {isShowingIntro && <IntroView />}
     </View>
+  )
+}
+
+const IntroDrawing = ({ size }: { size: SkSize }) => {
+  const opacity = useSharedValue(0)
+  useEffect(() => {
+    opacity.value = withTiming(1, { duration: 500 })
+  }, [opacity])
+  return (
+    <Group opacity={opacity}>
+      <Rect
+        width={size.width}
+        height={size.height}
+        color={AppStyles.colorOpacity50}
+      />
+      <PragmaDrawing
+        size={{ width: size.width + 100, height: size.height + 100 }}
+        pose="normal"
+        x={-size.width / 4}
+        y={size.height / 24}
+        opacity={opacity}
+      />
+    </Group>
+  )
+}
+
+const IntroView = () => {
+  const journalIntro = useJournalingIntro({
+    lines: "bullying",
+    onFinished: () => {}
+  })
+  return (
+    <JournalingIntroView
+      state={journalIntro}
+      style={{
+        justifyContent: "flex-end",
+        flex: 1,
+        paddingHorizontal: 24,
+        paddingBottom: 64
+      }}
+    />
   )
 }

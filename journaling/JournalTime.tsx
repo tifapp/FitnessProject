@@ -19,7 +19,7 @@ export type UseJournalTimeEnvironment = {
 }
 
 export const useJournalTime = ({ onFinished }: UseJournalTimeEnvironment) => {
-  const { sound } = useSFX(require("../assets/audio/journaling-intro.wav"))
+  const { sound } = useSFX(require("../assets/audio/journaling-time.wav"))
   const [isShowing, setIsShowing] = useState(false)
   const play = useEffectEvent(async (sound: Audio.Sound) => {
     await sound?.playAsync()

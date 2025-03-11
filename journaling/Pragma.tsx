@@ -17,11 +17,12 @@ export const PRAGMA_POSES = {
 export type PragmaProps = {
   size: SkSize
   pose: keyof typeof PRAGMA_POSES
+  opacity?: AnimatedProp<number>
   x?: AnimatedProp<number>
   y?: AnimatedProp<number>
 }
 
-export const PragmaDrawing = ({ size, x, y, pose }: PragmaProps) => {
+export const PragmaDrawing = ({ size, x, y, pose, opacity }: PragmaProps) => {
   const svg = useSVG(PRAGMA_POSES[pose])
   const src = useMemo(
     () => rect(0, 0, svg?.width() ?? 0, svg?.height() ?? 0),
@@ -29,7 +30,7 @@ export const PragmaDrawing = ({ size, x, y, pose }: PragmaProps) => {
   )
   const dst = useMemo(() => rect(0, 0, size.width, size.height), [size])
   return (
-    <Group transform={fitbox("contain", src, dst)}>
+    <Group transform={fitbox("contain", src, dst)} opacity={opacity}>
       <ImageSVG svg={svg} width={size.width} height={size.height} x={x} y={y} />
     </Group>
   )
