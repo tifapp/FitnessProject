@@ -16,8 +16,8 @@ import {
   withTiming
 } from "react-native-reanimated"
 import { EdgeInsets } from "react-native-safe-area-context"
-import { Cloud, MovingCloudsDrawing } from "./Clouds"
 import { FixedDateRange } from "TiFShared/domain-models/FixedDateRange"
+import { Cloud, MovingCloudsDrawing } from "./Clouds"
 
 export type SunBackgroundColor = string
 
@@ -156,6 +156,7 @@ export const SunBackgroundDrawing = ({
     </Rect>
     <SunDrawing background={background} size={size} edgeInsets={edgeInsets} />
     <MovingCloudsDrawing size={size} clouds={background.clouds} />
+    {/* <MountainDrawing size={size} colorSet="sun" /> */}
   </Group>
 )
 

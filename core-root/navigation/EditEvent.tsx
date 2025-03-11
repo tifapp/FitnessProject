@@ -3,12 +3,13 @@ import {
   withAlphaRegistration,
   WithAlphaRegistrationProps
 } from "@core-root/AlphaRegister"
+import { CreateEventView } from "@edit-event-boundary/CreateEvent"
 import { EditEventFormDismissButton } from "@edit-event-boundary/Dismiss"
 import { EditEventView } from "@edit-event-boundary/EditEvent"
 import { editEventFormValueAtoms } from "@edit-event-boundary/FormAtoms"
 import {
-  RouteableEditEventFormValues,
-  fromRouteableEditFormValues
+  fromRouteableEditFormValues,
+  RouteableEditEventFormValues
 } from "@event/EditFormValues"
 import {
   LocationsSearchView,
@@ -16,7 +17,7 @@ import {
 } from "@location-search-boundary"
 import { StaticScreenProps } from "@react-navigation/native"
 import { EventID } from "TiFShared/domain-models/Event"
-import { useSetAtom } from "jotai"
+import { useAtom, useSetAtom } from "jotai"
 import { StyleSheet } from "react-native"
 
 type EditEventScreenProps = WithAlphaRegistrationProps<
@@ -26,6 +27,7 @@ type EditEventScreenProps = WithAlphaRegistrationProps<
 const EditEventScreen = withAlphaRegistration(
   ({ session, route }: EditEventScreenProps) => {
     const navigation = useTiFNavigation()
+    const [location, setLocation] = useAtom(editEventFormValueAtoms.location)
     const { pushEventDetails } = useCoreNavigation()
     return (
       <EditEventView
@@ -33,6 +35,39 @@ const EditEventScreen = withAlphaRegistration(
         initialValues={fromRouteableEditFormValues(route.params)}
         hostName={session.name}
         hostProfileImageURL={session.profileImageURL}
+        onSelectLocationTapped={() => {
+          navigation.navigate("modal", { screen: "editEventLocationSearch" })
+        }}
+        onMapLongPress={(e) =>
+          setLocation({
+            placemark: undefined,
+            coordinate: e.nativeEvent.coordinate
+          })
+        }
+        onSuccess={(e) => pushEventDetails(e.id, "replace")}
+        style={styles.screen}
+      />
+    )
+  }
+)
+
+const CreateEventScreen = withAlphaRegistration(
+  ({ session, route }: EditEventScreenProps) => {
+    const navigation = useTiFNavigation()
+    const { pushEventDetails } = useCoreNavigation()
+    const [location, setLocation] = useAtom(editEventFormValueAtoms.location)
+    return (
+      <CreateEventView
+        eventId={route.params.id}
+        initialValues={fromRouteableEditFormValues(route.params)}
+        hostName={session.name}
+        hostProfileImageURL={session.profileImageURL}
+        onMapLongPress={(e) =>
+          setLocation({
+            placemark: undefined,
+            coordinate: e.nativeEvent.coordinate
+          })
+        }
         onSelectLocationTapped={() => {
           navigation.navigate("modal", { screen: "editEventLocationSearch" })
         }}
@@ -68,17 +103,21 @@ const EditEventFormBackButton = () => (
 export const editEventScreens = () => ({
   editEventForm: {
     options: {
-      headerTitle: "Edit Event",
+      headerTitle: "Change Your Adventure",
       headerLeft: EditEventFormBackButton
     },
     screen: EditEventScreen
   },
   createEventForm: {
     options: {
-      headerTitle: "Create Event",
-      headerLeft: EditEventFormBackButton
+      headerTitle: "Chart Your Next Adventure",
+      headerLeft: EditEventFormBackButton,
+      headerStyle: {
+        backgroundColor: "black"
+      },
+      headerTintColor: "#fff"
     },
-    screen: EditEventScreen
+    screen: CreateEventScreen
   },
   editEventLocationSearch: {
     options: { headerShown: false },

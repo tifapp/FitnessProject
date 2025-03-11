@@ -108,7 +108,7 @@ const FooterView = ({ onPageIndexTapped }: FooterProps) => {
             maxFontSizeMultiplier={FontScaleFactors.xxxLarge}
             style={styles.footerCreateEventButtonText}
           >
-            Event
+            Adventure
           </Headline>
         </PrimaryButton>
       </View>

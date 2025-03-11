@@ -11,8 +11,6 @@ import { PersistentSettingsStores } from "@settings-storage/PersistentStores"
 import { SQLiteUserSettingsStorage } from "@settings-storage/UserSettings"
 import { testSQLite } from "@test-helpers/SQLite"
 import { AlphaUserSessionProvider, AlphaUserStorage } from "@user/alpha"
-import { AlphaUserMocks } from "@user/alpha/MockData"
-import { repeatElements } from "TiFShared/lib/Array"
 import React from "react"
 import { UserProfileFeature } from "user-profile-boundary/Context"
 
@@ -45,7 +43,7 @@ const store = new LiveEventsStore(tiFQueryClient, async () => {
   })
   await sleep(3000)
   return {
-    ongoing: repeatElements(3, (i) => ({ ...ongoingEvent, id: i })),
+    ongoing: [], //repeatElements(3, (i) => ({ ...ongoingEvent, id: i })),
     startingSoon: []
   }
 })

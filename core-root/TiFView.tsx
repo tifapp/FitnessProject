@@ -21,24 +21,24 @@ export type TiFProps = {
 export const TiFView = ({ isFontsLoaded, style, ...props }: TiFProps) => {
   if (!isFontsLoaded) return null
   return (
-    <HoverProvider>
       <GestureHandlerRootView>
-        <PortalProvider>
-          <TiFQueryClientProvider>
-            <SafeAreaProvider>
-              <RootSiblingParent>
-                <TiFBottomSheetProvider>
-                  <View style={style}>
-                    <TiFContext.Provider value={props}>
-                      <RootNavigation />
-                    </TiFContext.Provider>
-                  </View>
-                </TiFBottomSheetProvider>
-              </RootSiblingParent>
-            </SafeAreaProvider>
-          </TiFQueryClientProvider>
-        </PortalProvider>
+        <HoverProvider>
+          <PortalProvider>
+            <TiFQueryClientProvider>
+              <SafeAreaProvider>
+                <RootSiblingParent>
+                  <TiFBottomSheetProvider>
+                    <View style={style}>
+                      <TiFContext.Provider value={props}>
+                        <RootNavigation />
+                      </TiFContext.Provider>
+                    </View>
+                  </TiFBottomSheetProvider>
+                </RootSiblingParent>
+              </SafeAreaProvider>
+            </TiFQueryClientProvider>
+          </PortalProvider>
+        </HoverProvider>
       </GestureHandlerRootView>
-    </HoverProvider>
   )
 }

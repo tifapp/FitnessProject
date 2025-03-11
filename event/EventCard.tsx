@@ -1,24 +1,24 @@
-import { TiFFormCardView } from "@components/form-components/Card"
-import ProfileImageAndName from "@components/profileImageComponents/ProfileImageAndName"
-import { ClientSideEvent, isEventOngoing } from "@event/ClientSideEvent"
-import React, { memo } from "react"
-import { Pressable, StyleProp, StyleSheet, View, ViewStyle } from "react-native"
-import { EventActionsMenuView, useEventActionsMenu } from "./Menu"
+import { CalendarDayView } from "@components/CalendarDay"
+import { Ionicon } from "@components/common/Icons"
+import { useCoreNavigation } from "@components/Navigation"
+import ProfilePreview from "@components/profileImageComponents/ProfileImageAndName"
 import {
-  BoldFootnote,
   CaptionTitle,
   Footnote,
   Subtitle
 } from "@components/Text"
-import { CalendarDayView } from "@components/CalendarDay"
-import { EventUserAttendanceButton } from "./UserAttendance"
-import { Ionicon } from "@components/common/Icons"
-import dayjs from "dayjs"
-import { FixedDateRange } from "TiFShared/domain-models/FixedDateRange"
-import { ProfileCircleView } from "@components/profileImageComponents/ProfileCircle"
-import { FontScaleFactors } from "@lib/Fonts"
-import { useCoreNavigation } from "@components/Navigation"
+import { EventAttendeesPreview } from "@event-details-boundary/AttendeesPreview"
+import { ClientSideEvent, isEventOngoing } from "@event/ClientSideEvent"
 import { AppStyles } from "@lib/AppColorStyle"
+import { FontScaleFactors } from "@lib/Fonts"
+import dayjs from "dayjs"
+import React, { memo } from "react"
+import { Pressable, StyleProp, StyleSheet, View, ViewStyle } from "react-native"
+import DashedLine from "react-native-dashed-line"
+import { FixedDateRange } from "TiFShared/domain-models/FixedDateRange"
+import { EventActionsMenuView, useEventActionsMenu } from "./Menu"
+import PulsingDot from "./PulsingDot"
+import { EventUserAttendanceButton } from "./UserAttendance"
 
 export type EventCardProps = {
   event: ClientSideEvent
@@ -27,56 +27,55 @@ export type EventCardProps = {
 }
 
 const _EventCard = ({ event, onLeft, style }: EventCardProps) => {
-  const { presentProfile, pushEventDetails, pushAttendeesList } =
+  const { presentProfile, pushEventDetails } =
     useCoreNavigation()
-  const previewedAttendees = event.previewAttendees.slice(0, 3)
-  const attendeTextOffset =
-    previewedAttendees.length *
-    ATTENDEES_TEXT_SPACING[Math.max(0, previewedAttendees.length - 1)]
   return (
     <View style={style}>
-      <TiFFormCardView>
-        <View style={styles.container}>
-          <View style={styles.centeredRow}>
-            <Pressable
-              onPress={() => presentProfile(event.host.id)}
-              style={styles.leftRow}
-            >
-              <ProfileImageAndName
-                name={event.host.name}
-                handle={event.host.handle}
-                imageURL={event.host.profileImageURL}
-                maximumFontSizeMultiplier={FontScaleFactors.xxxLarge}
-              />
-            </Pressable>
-            <EventActionsMenuView
-              event={event}
-              state={useEventActionsMenu(event)}
-              eventShareContent={async () => ({
-                title: "TODO",
-                message: "We need to figure this out..."
-              })}
-              style={styles.menu}
+      <View style={styles.card}>
+        <View style={[styles.container, styles.centeredRow, styles.header]}>
+          <Pressable
+            onPress={() => presentProfile(event.host.id)}
+            style={styles.leftRow}
+          >
+            <ProfilePreview
+              name={event.host.name}
+              handle={event.host.handle}
+              imageURL={event.host.profileImageURL}
+              maximumFontSizeMultiplier={FontScaleFactors.xxxLarge}
+              textStyle={{ color: "white" }}
             />
-          </View>
+          </Pressable>
+          <EventActionsMenuView
+            event={event}
+            state={useEventActionsMenu(event)}
+            eventShareContent={async () => ({
+              title: "TODO",
+              message: "We need to figure this out..."
+            })}
+            style={styles.menu}
+          />
+        </View>
+        <DashedLine style={{ position: "absolute", top: 78, width: "25%", left: "36%", zIndex: 11 }} dashStyle={{ transform: "rotate(45deg)" }} dashLength={16} dashThickness={16} dashGap={6} dashColor={"white"} />
+        <View style={styles.container}>
           <Pressable onPress={() => pushEventDetails(event.id)}>
             <View style={styles.detailsRow}>
               <View style={styles.infoColumn}>
                 <Subtitle>{event.title}</Subtitle>
                 <View style={[styles.centeredRow, styles.iconSpacing]}>
-                  <Ionicon name="calendar" size={16} />
+                  <Ionicon color={AppStyles.primaryBlue.toString()} name="calendar-outline" size={16} />
                   <Footnote>
                     {eventCardFormattedDateRange(event.time.dateRange)}
                   </Footnote>
                 </View>
                 <View style={[styles.centeredRow, styles.iconSpacing]}>
-                  <Ionicon name="location" size={16} />
+                  <Ionicon color={AppStyles.primaryBlue.toString()} name="location-outline" size={16} />
                   <Footnote>
                     {event.location.placemark?.name ?? "Unknown Location"}
                   </Footnote>
                 </View>
                 {isEventOngoing(event) && (
                   <View style={styles.ongoingRow}>
+                    <PulsingDot style={{ marginHorizontal: 2 }} />
                     <View style={styles.ongoing}>
                       <CaptionTitle style={styles.ongoingText}>
                         ONGOING
@@ -89,38 +88,9 @@ const _EventCard = ({ event, onLeft, style }: EventCardProps) => {
               <CalendarDayView date={event.time.dateRange.startDateTime} />
             </View>
           </Pressable>
-          <View style={styles.centeredRow}>
-            <Pressable
-              onPress={() => pushAttendeesList(event.id)}
-              style={styles.leftRow}
-            >
-              <View style={styles.centeredRow}>
-                {previewedAttendees.slice(0, 3).map((a, index) => (
-                  <ProfileCircleView
-                    key={a.id}
-                    imageURL={a.profileImageURL}
-                    name={a.name}
-                    maximumFontSizeMultiplier={FontScaleFactors.large}
-                    style={[styles.profileCircle, { left: index * -16 }]}
-                  />
-                ))}
-                {event.attendeeCount > 3 ? (
-                  <BoldFootnote
-                    maxFontSizeMultiplier={FontScaleFactors.large}
-                    style={{ left: attendeTextOffset }}
-                  >
-                    + {event.attendeeCount - 3} Attending
-                  </BoldFootnote>
-                ) : (
-                  <BoldFootnote
-                    maxFontSizeMultiplier={FontScaleFactors.large}
-                    style={{ left: attendeTextOffset }}
-                  >
-                    Attending
-                  </BoldFootnote>
-                )}
-              </View>
-            </Pressable>
+          <View style={styles.border} />
+          <View style={[styles.centeredRow]}>
+            <EventAttendeesPreview event={event} />
             <EventUserAttendanceButton
               event={event}
               maximumFontSizeMultiplier={FontScaleFactors.large}
@@ -131,12 +101,10 @@ const _EventCard = ({ event, onLeft, style }: EventCardProps) => {
             />
           </View>
         </View>
-      </TiFFormCardView>
+      </View>
     </View>
   )
 }
-
-const ATTENDEES_TEXT_SPACING = [4, -4, -8]
 
 export const eventCardFormattedDateRange = (range: FixedDateRange) => {
   const start = dayjs(range.startDateTime).format("dddd, h:mm")
@@ -147,6 +115,18 @@ export const eventCardFormattedDateRange = (range: FixedDateRange) => {
 export const EventCard = memo(_EventCard)
 
 const styles = StyleSheet.create({
+  border: {
+    height: 1,
+    borderWidth: 2,
+    borderStyle: "dashed",
+    borderColor: AppStyles.cardColor
+  },
+  card: {
+    borderWidth: 2,
+    borderRadius: 32,
+    borderColor: AppStyles.colorOpacity15.toString(),
+    overflow: "hidden"
+  },
   container: {
     padding: 16,
     rowGap: 16
@@ -159,6 +139,9 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "row",
     alignItems: "center"
+  },
+  header: {
+    backgroundColor: AppStyles.primaryBlue.toString()
   },
   iconSpacing: {
     columnGap: 8
@@ -194,12 +177,10 @@ const styles = StyleSheet.create({
     flexDirection: "row"
   },
   ongoing: {
-    borderRadius: 32,
     overflow: "hidden"
   },
   ongoingText: {
-    color: "white",
-    backgroundColor: AppStyles.green.toString(),
+    color: AppStyles.green.toString(),
     padding: 4
   },
   ongoingSpacer: {
