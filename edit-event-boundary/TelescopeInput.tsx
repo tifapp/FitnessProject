@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react"
 import {
   Dimensions,
   LayoutChangeEvent,
@@ -10,40 +10,40 @@ import {
   TextInputKeyPressEventData,
   TextInputSelectionChangeEventData,
   View
-} from "react-native";
+} from "react-native"
 import Animated, {
   runOnJS,
   useAnimatedReaction,
   useAnimatedStyle,
   useSharedValue,
   withTiming
-} from "react-native-reanimated";
-import Svg, { Circle } from "react-native-svg";
+} from "react-native-reanimated"
+import Svg, { Circle } from "react-native-svg"
 
 // ======== Types ========
 interface TelescopeInputProps {
-  initialText?: string;
-  onChange?: (text: string) => void;
-  onSubmit?: (text: string) => void;
+  initialText?: string
+  onChange?: (text: string) => void
+  onSubmit?: (text: string) => void
 }
 
 interface CursorPosition {
-  x: number;
-  y: number;
+  x: number
+  y: number
 }
 
 interface ViewportDimensions {
-  width: number;
-  height: number;
+  width: number
+  height: number
 }
 
 interface LensAnimationProps {
-  animationProgress: Animated.SharedValue<number>;
-  width: number;
+  animationProgress: Animated.SharedValue<number>
+  width: number
 }
 
 interface BlinkingCursorProps {
-  isBlinking: boolean;
+  isBlinking: boolean
 }
 
 // ======== Constants ========
@@ -295,9 +295,11 @@ const TelescopeInput: React.FC<TelescopeInputProps> = ({ initialText = "", onCha
 
         // Submit after delay
         if (onSubmit) {
-          setTimeout(() => {
-            onSubmit(text)
-          }, ANIMATION.FINAL_DELAY)
+          runOnJS(() => {
+            setTimeout(() => {
+              onSubmit(text)
+            }, ANIMATION.FINAL_DELAY)
+          })()
         }
       })
     }
@@ -320,17 +322,20 @@ const TelescopeInput: React.FC<TelescopeInputProps> = ({ initialText = "", onCha
 
         <View style={styles.contentView}>
           <Animated.View style={[styles.textContainer, textContainerStyle]}>
-            <Text
-              style={[
-                styles.textDisplay,
-                {
-                  fontSize: FONT_SETTINGS.FIXED_SIZE,
-                  maxWidth: viewportDimensions.width * 0.7 // Limit width to 70% of viewport
-                }
-              ]}
-            >
-              {text || "|"}
-            </Text>
+            <View style={styles.textWithCursor}>
+              <Text
+                style={[
+                  styles.textDisplay,
+                  {
+                    fontSize: FONT_SETTINGS.FIXED_SIZE,
+                    maxWidth: viewportDimensions.width * 0.7 // Limit width to 70% of viewport
+                  }
+                ]}
+              >
+                {text}
+              </Text>
+              {!text && <BlinkingCursor isBlinking={true} />}
+            </View>
           </Animated.View>
         </View>
 
@@ -385,11 +390,22 @@ const styles = StyleSheet.create({
     // Add horizontal margin to prevent text from touching edges
     marginHorizontal: 20
   },
+  textWithCursor: {
+    flexDirection: "row",
+    alignItems: "flex-end",
+    justifyContent: "center"
+  },
   textDisplay: {
     color: "black",
     fontFamily: Platform.OS === "ios" ? "Menlo" : "monospace",
     lineHeight: FONT_SETTINGS.FIXED_SIZE * FONT_SETTINGS.LINE_HEIGHT_RATIO,
     textAlign: "center"
+  },
+  cursor: {
+    width: FONT_SETTINGS.FIXED_SIZE * 0.6,
+    height: 3,
+    backgroundColor: "black",
+    marginBottom: 2
   },
   hiddenInput: {
     ...StyleSheet.absoluteFillObject,
