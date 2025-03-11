@@ -1,5 +1,4 @@
 import { cloud } from "@journaling/Clouds"
-import { MoonBackgroundDrawing } from "@journaling/MoonBackground"
 import { SunBackgroundDrawing } from "@journaling/SunBackground"
 import { Canvas, SkSize } from "@shopify/react-native-skia"
 import React, { useMemo, useState } from "react"
@@ -91,16 +90,16 @@ export const TimeOfDayView = () => {
   )
   return (
     <Canvas style={{ flex: 1 }} onLayout={(e) => setSize(e.nativeEvent.layout)}>
-      {/* <SunBackgroundDrawing
-        size={size}
-        background={background}
-        edgeInsets={insets}
-      /> */}
-      <MoonBackgroundDrawing
+      <SunBackgroundDrawing
         size={size}
         background={background}
         edgeInsets={insets}
       />
+      {/* <MoonBackgroundDrawing
+        size={size}
+        background={background}
+        edgeInsets={insets}
+      /> */}
     </Canvas>
   )
 }
