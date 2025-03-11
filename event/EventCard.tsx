@@ -1,20 +1,20 @@
 import { CalendarDayView } from "@components/CalendarDay"
 import { Ionicon } from "@components/common/Icons"
 import { useCoreNavigation } from "@components/Navigation"
-import { ProfileCircleView } from "@components/profileImageComponents/ProfileCircle"
 import ProfilePreview from "@components/profileImageComponents/ProfileImageAndName"
 import {
-  BoldFootnote,
   CaptionTitle,
   Footnote,
   Subtitle
 } from "@components/Text"
+import { EventAttendeesPreview } from "@event-details-boundary/AttendeesPreview"
 import { ClientSideEvent, isEventOngoing } from "@event/ClientSideEvent"
 import { AppStyles } from "@lib/AppColorStyle"
 import { FontScaleFactors } from "@lib/Fonts"
 import dayjs from "dayjs"
 import React, { memo } from "react"
 import { Pressable, StyleProp, StyleSheet, View, ViewStyle } from "react-native"
+import DashedLine from "react-native-dashed-line"
 import { FixedDateRange } from "TiFShared/domain-models/FixedDateRange"
 import { EventActionsMenuView, useEventActionsMenu } from "./Menu"
 import PulsingDot from "./PulsingDot"
@@ -27,12 +27,8 @@ export type EventCardProps = {
 }
 
 const _EventCard = ({ event, onLeft, style }: EventCardProps) => {
-  const { presentProfile, pushEventDetails, pushAttendeesList } =
+  const { presentProfile, pushEventDetails } =
     useCoreNavigation()
-  const previewedAttendees = event.previewAttendees.slice(0, 3)
-  const attendeTextOffset =
-    previewedAttendees.length *
-    ATTENDEES_TEXT_SPACING[Math.max(0, previewedAttendees.length - 1)]
   return (
     <View style={style}>
       <View style={styles.card}>
@@ -59,6 +55,7 @@ const _EventCard = ({ event, onLeft, style }: EventCardProps) => {
             style={styles.menu}
           />
         </View>
+        <DashedLine style={{ position: "absolute", top: 78, width: "25%", left: "36%", zIndex: 11 }} dashStyle={{ transform: "rotate(45deg)" }} dashLength={16} dashThickness={16} dashGap={6} dashColor={"white"} />
         <View style={styles.container}>
           <Pressable onPress={() => pushEventDetails(event.id)}>
             <View style={styles.detailsRow}>
@@ -93,37 +90,7 @@ const _EventCard = ({ event, onLeft, style }: EventCardProps) => {
           </Pressable>
           <View style={styles.border} />
           <View style={[styles.centeredRow]}>
-            <Pressable
-              onPress={() => pushAttendeesList(event.id)}
-              style={styles.leftRow}
-            >
-              <View style={styles.centeredRow}>
-                {previewedAttendees.slice(0, 3).map((a, index) => (
-                  <ProfileCircleView
-                    key={a.id}
-                    imageURL={a.profileImageURL}
-                    name={a.name}
-                    maximumFontSizeMultiplier={FontScaleFactors.large}
-                    style={[styles.profileCircle, { left: index * -16 }]}
-                  />
-                ))}
-                {event.attendeeCount > 3 ? (
-                  <BoldFootnote
-                    maxFontSizeMultiplier={FontScaleFactors.large}
-                    style={{ left: attendeTextOffset }}
-                  >
-                    + {event.attendeeCount - 3} Attending
-                  </BoldFootnote>
-                ) : (
-                  <BoldFootnote
-                    maxFontSizeMultiplier={FontScaleFactors.large}
-                    style={{ left: attendeTextOffset }}
-                  >
-                    Attending
-                  </BoldFootnote>
-                )}
-              </View>
-            </Pressable>
+            <EventAttendeesPreview event={event} />
             <EventUserAttendanceButton
               event={event}
               maximumFontSizeMultiplier={FontScaleFactors.large}
@@ -138,8 +105,6 @@ const _EventCard = ({ event, onLeft, style }: EventCardProps) => {
     </View>
   )
 }
-
-const ATTENDEES_TEXT_SPACING = [4, -4, -8]
 
 export const eventCardFormattedDateRange = (range: FixedDateRange) => {
   const start = dayjs(range.startDateTime).format("dddd, h:mm")
@@ -159,7 +124,7 @@ const styles = StyleSheet.create({
   card: {
     borderWidth: 2,
     borderRadius: 32,
-    borderColor: AppStyles.cardColor.toString(),
+    borderColor: AppStyles.colorOpacity15.toString(),
     overflow: "hidden"
   },
   container: {
@@ -176,9 +141,7 @@ const styles = StyleSheet.create({
     alignItems: "center"
   },
   header: {
-    backgroundColor: AppStyles.primaryBlue.toString(),
-    borderTopLeftRadius: 32,
-    borderTopRightRadius: 32
+    backgroundColor: AppStyles.primaryBlue.toString()
   },
   iconSpacing: {
     columnGap: 8
