@@ -1,5 +1,5 @@
 import { AvatarMapMarkerView } from "@components/AvatarMapMarker"
-import { ExpandableMapSnippetView } from "@components/MapSnippetView"
+import { ReticleMapSnippetView } from "@components/ReticleMapSnippetView"
 import { Caption, Footnote } from "@components/Text"
 import { Ionicon } from "@components/common/Icons"
 import { TiFFormNavigationLinkView } from "@components/form-components/NavigationLink"
@@ -12,7 +12,9 @@ import {
   useGeocodeQuery,
   useReverseGeocodeQuery
 } from "@location/Geocoding"
+import { useUserCoordinatesQuery } from "@location/UserLocation"
 import { LocationCoordinate2D } from "TiFShared/domain-models/LocationCoordinate2D"
+import { LocationAccuracy } from "expo-location"
 import { useAtom } from "jotai"
 import React, { useEffect, useRef, useState } from "react"
 import {
@@ -60,79 +62,46 @@ export type EditEventFormLocationProps = {
   style?: StyleProp<ViewStyle>
 }
 
-export const EditEventFormLocationView = ({
-  hostName,
-  hostProfileImageURL,
-  location,
-  onSelectLocationTapped,
-  onMapLongPress,
-  style
-}: EditEventFormLocationProps) => (
-  <View style={style}>
-    {!location ? (
-      <TiFFormNavigationLinkView
-        iconName="location"
-        iconBackgroundColor={AppStyles.primary}
-        title="No Location"
-        description="You must select a location to create this event."
-        style={styles.locationNavigationLink}
-        chevronStyle={styles.locationNavigationLinkChevron}
-        onTapped={onSelectLocationTapped}
-      />
-    ) : (
-      <LocationView
-        hostName={hostName}
-        hostProfileImageURL={hostProfileImageURL}
-        location={location}
-        onSelectLocationTapped={onSelectLocationTapped}
-        onMapLongPress={onMapLongPress}
-      />
-    )}
-  </View>
-)
-
 type LocationProps = {
   hostName: string
   hostProfileImageURL?: string
-  location: EditEventFormLocation
+  location?: EditEventFormLocation
   onSelectLocationTapped: () => void
   onMapLongPress: (event: LongPressEvent) => void
+  isExpanded?: boolean
 }
 
-const LocationView = ({
+export const EditEventFormLocationView = ({
+  isExpanded = false,
   hostName,
   hostProfileImageURL,
   location,
   onSelectLocationTapped,
   onMapLongPress
 }: LocationProps) => {
+  const { data } = useUserCoordinatesQuery(
+    { accuracy: LocationAccuracy.BestForNavigation },
+    { enabled: true }
+  )
+
   const mapRef = useRef<MapView>(null)
+
+  const coords = location?.coordinate ?? data?.coords ?? { latitude: 0, longitude: 0 }
+
   useEffect(() => {
-    if (location.coordinate) {
-      mapRef.current?.animateToRegion(mapRegion(location.coordinate))
-    }
-  }, [location.coordinate])
-  const [isExpanded, setIsExpanded] = useState(false)
+    mapRef.current?.animateToRegion(mapRegion(coords))
+  }, [coords])
+
+  const [isExpandedInternal, setIsExpandedInternal] = useState(isExpanded)
+
   return (
     <View>
-      {location.coordinate ? (
-        <ExpandableMapSnippetView
+      {coords ? (
+        <ReticleMapSnippetView
           ref={mapRef}
-          isExpanded={isExpanded}
-          onExpansionChanged={setIsExpanded}
-          region={mapRegion(location.coordinate)}
-          collapsedMapProps={{
-            customMapStyle: [
-              {
-                featureType: "poi",
-                stylers: [{ visibility: "off" }]
-              },
-              {
-                featureType: "transit",
-                stylers: [{ visibility: "off" }]
-              }
-            ]
-          }}
+          isExpanded={isExpandedInternal}
+          onExpansionChanged={setIsExpandedInternal}
+          region={mapRegion(coords)}
           expandedMapProps={{
             onLongPress: onMapLongPress,
             showsUserLocation: true
@@ -161,7 +130,7 @@ const LocationView = ({
                     </Footnote>
                   </View>
                 )}
-                {!location.placemark ? (
+                {!location?.placemark ? (
                   <View style={styles.overlayContainer}>
                     <Caption style={styles.currentLocation}>
                       {"Current Location"}
@@ -171,9 +140,9 @@ const LocationView = ({
                       iconBackgroundColor={AppStyles.primary}
                       maximumFontScaleFactor={FontScaleFactors.xxxLarge}
                       style={styles.locationMapNavigationLink}
-                      title={`${location.coordinate.latitude}, ${location.coordinate.longitude}`}
+                      title={`${coords.latitude}, ${coords.longitude}`}
                       onTapped={() => {
-                        setIsExpanded(false)
+                        setIsExpandedInternal(false)
                         onSelectLocationTapped()
                       }}
                     />
@@ -194,7 +163,7 @@ const LocationView = ({
                         "Unknown Address"
                       }
                       onTapped={() => {
-                        setIsExpanded(false)
+                        setIsExpandedInternal(false)
                         onSelectLocationTapped()
                       }}
                     />
