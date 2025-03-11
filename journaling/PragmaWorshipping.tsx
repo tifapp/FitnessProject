@@ -4,6 +4,7 @@ import { Audio } from "expo-av"
 import { sleep } from "@lib/utils/DelayData"
 import { useEffect, useState } from "react"
 import {
+  AnimatedProp,
   Color,
   Group,
   LinearGradient,
@@ -13,6 +14,12 @@ import {
 } from "@shopify/react-native-skia"
 import { PragmaDrawing } from "./Pragma"
 import { useSharedValue, withTiming } from "react-native-reanimated"
+import { StarrySkyDrawing } from "./StarrySky"
+import { MountainDrawing } from "./Mountain"
+import { FixedDateRange } from "TiFShared/domain-models/FixedDateRange"
+import { EdgeInsets } from "react-native-safe-area-context"
+import { SunSkyDrawing } from "./SunBackground"
+import { Platform } from "react-native"
 
 export type UsePragmaWorshippingEnvironment = {
   onJournalTimeStarted: () => void
@@ -78,8 +85,8 @@ export const PragmaWorshippingDrawing = ({
       <PragmaDrawing
         size={PRAGMA_DIMENSIONS}
         pose="worship"
-        x={size.width / 2 - 64}
-        y={size.height / 2}
+        x={size.width / 2 - (Platform.OS === "ios" ? 64 : 80)}
+        y={size.height / 2 - 64}
       />
       <Rect width={size.width} height={size.height} opacity={opacity}>
         <LinearGradient
@@ -91,3 +98,49 @@ export const PragmaWorshippingDrawing = ({
     </Group>
   )
 }
+
+export type PragmaWorshippingIntroProps = {
+  theme: "sun" | "moon"
+  size: SkSize
+  dayRange: FixedDateRange
+  time: number
+  edgeInsets: EdgeInsets
+  opacity: AnimatedProp<number>
+}
+
+const PRAGMA_INTRO_DIMENSIONS = {
+  width: 384,
+  height: 384
+}
+
+export const PragmaWorshippingIntroDrawing = ({
+  theme,
+  size,
+  time,
+  edgeInsets,
+  dayRange,
+  opacity
+}: PragmaWorshippingIntroProps) => (
+  <Group opacity={opacity}>
+    {theme === "moon" && <StarrySkyDrawing size={size} numStars={50} />}
+    {theme === "sun" && (
+      <SunSkyDrawing
+        size={size}
+        time={time}
+        edgeInsets={edgeInsets}
+        dayRange={dayRange}
+      />
+    )}
+    <MountainDrawing
+      size={size}
+      mountainWidthRelativeOffset={0.4}
+      colorSet={theme}
+    />
+    <PragmaDrawing
+      size={PRAGMA_INTRO_DIMENSIONS}
+      pose="worship"
+      x={size.width / 2 - 198}
+      y={size.height / 2 - 198}
+    />
+  </Group>
+)

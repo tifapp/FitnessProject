@@ -2,6 +2,7 @@ import { PrimaryButton } from "@components/Buttons"
 import { Headline } from "@components/Text"
 import { cloud } from "@journaling/Clouds"
 import {
+  IntroDrawingProps,
   JournalingSequenceProps,
   JournalingSequenceView,
   PreambleProps
@@ -10,6 +11,7 @@ import { MoonBackgroundDrawing } from "@journaling/MoonBackground"
 import { PragmaDrawing } from "@journaling/Pragma"
 import {
   PragmaWorshippingDrawing,
+  PragmaWorshippingIntroDrawing,
   usePragmaWorshipping
 } from "@journaling/PragmaWorshipping"
 import { SunBackgroundDrawing } from "@journaling/SunBackground"
@@ -97,57 +99,6 @@ export const TimeOfDayView = () => {
   )
 }
 
-const PragmaSunWorshipping = ({
-  onJournalTimeStarted,
-  ...props
-}: PreambleProps) => {
-  const worshipping = usePragmaWorshipping({ onJournalTimeStarted })
-  return (
-    <PragmaWorshippingDrawing
-      state={worshipping}
-      holyLightColors="sun"
-      {...props}
-    />
-  )
-}
-
-const IntroDrawing = ({ size }: { size: SkSize }) => {
-  const opacity = useSharedValue(0)
-  useEffect(() => {
-    opacity.value = withTiming(1, { duration: 500 })
-  }, [opacity])
-  return (
-    <Group opacity={opacity}>
-      <Rect
-        width={size.width}
-        height={size.height}
-        color={AppStyles.colorOpacity50}
-      />
-      <PragmaDrawing
-        size={{ width: size.width + 100, height: size.height + 100 }}
-        pose="normal"
-        x={-size.width / 4}
-        y={size.height / 24}
-        opacity={opacity}
-      />
-    </Group>
-  )
-}
-
-const PragmaMoonWorshipping = ({
-  onJournalTimeStarted,
-  ...props
-}: PreambleProps) => {
-  const worshipping = usePragmaWorshipping({ onJournalTimeStarted })
-  return (
-    <PragmaWorshippingDrawing
-      state={worshipping}
-      holyLightColors="moon"
-      {...props}
-    />
-  )
-}
-
 type SequenceProps = Omit<JournalingSequenceProps, "onFinished"> & {
   title: string
 }
@@ -156,17 +107,49 @@ const JOURNAL_SEQUENCES = [
   {
     title: "Sun Worshipping",
     backgroundProps: { time: 0.5, dayRange: DAY_RANGE, clouds: CLOUDS },
-    PreambleDrawing: PragmaSunWorshipping,
+    PreambleDrawing: ({ onJournalTimeStarted, ...props }: PreambleProps) => {
+      const worshipping = usePragmaWorshipping({ onJournalTimeStarted })
+      return (
+        <PragmaWorshippingDrawing
+          state={worshipping}
+          holyLightColors="sun"
+          {...props}
+        />
+      )
+    },
     BackgroundDrawing: SunBackgroundDrawing,
     introLines: "midday",
-    IntroDrawing
+    IntroDrawing: (props) => (
+      <PragmaWorshippingIntroDrawing
+        theme="sun"
+        dayRange={DAY_RANGE}
+        time={0.5}
+        {...props}
+      />
+    )
   },
   {
     title: "Moon Worshipping",
     backgroundProps: { time: 0.5, dayRange: DAY_RANGE, clouds: CLOUDS },
-    PreambleDrawing: PragmaMoonWorshipping,
+    PreambleDrawing: ({ onJournalTimeStarted, ...props }: PreambleProps) => {
+      const worshipping = usePragmaWorshipping({ onJournalTimeStarted })
+      return (
+        <PragmaWorshippingDrawing
+          state={worshipping}
+          holyLightColors="moon"
+          {...props}
+        />
+      )
+    },
     BackgroundDrawing: MoonBackgroundDrawing,
     introLines: "reallyLateNight",
-    IntroDrawing
+    IntroDrawing: (props) => (
+      <PragmaWorshippingIntroDrawing
+        theme="moon"
+        dayRange={DAY_RANGE}
+        time={0.5}
+        {...props}
+      />
+    )
   }
 ] satisfies SequenceProps[]

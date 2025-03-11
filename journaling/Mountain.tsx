@@ -14,23 +14,25 @@ export const MOUNTAIN_COLOR_SET = {
 
 export type MountainProps = {
   size: SkSize
+  mountainWidthRelativeOffset?: number
   colorSet: keyof typeof MOUNTAIN_COLOR_SET
 }
 
 export const MountainDrawing = ({
   size: { width, height },
+  mountainWidthRelativeOffset = 0,
   colorSet
 }: MountainProps) => {
   const mountainPath = useMemo(
     () => `
-    M ${-width * 0.2} ${height}
+    M ${-width * (0.2 + mountainWidthRelativeOffset)} ${height}
     C
       ${width * 0.1} ${height * 0.2},
       ${width * 0.9} ${height * 0.2},
-      ${width * 1.2} ${height}
+      ${width * (1.2 + mountainWidthRelativeOffset)} ${height}
     Z
     `,
-    [width, height]
+    [width, height, mountainWidthRelativeOffset]
   )
   return (
     <Path path={mountainPath}>

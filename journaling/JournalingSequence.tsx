@@ -1,4 +1,4 @@
-import { Canvas, SkSize } from "@shopify/react-native-skia"
+import { AnimatedProp, Canvas, Group, SkSize } from "@shopify/react-native-skia"
 import { MoonBackgroundProps } from "./MoonBackground"
 import { SunBackgroundProps } from "./SunBackground"
 import { EdgeInsets, useSafeAreaInsets } from "react-native-safe-area-context"
@@ -16,6 +16,11 @@ import {
   JournalTimeView
 } from "./JournalTime"
 import { useScreenBottomPadding } from "@components/Padding"
+import {
+  useDerivedValue,
+  useSharedValue,
+  withTiming
+} from "react-native-reanimated"
 
 export type BackgroundProps = SunBackgroundProps | MoonBackgroundProps
 
@@ -28,6 +33,7 @@ export type PreambleProps = {
 export type IntroDrawingProps = {
   size: SkSize
   edgeInsets: EdgeInsets
+  opacity: AnimatedProp<number>
 }
 
 export type JournalingSequenceProps = {
@@ -52,17 +58,20 @@ export const JournalingSequenceView = ({
   const [isShowingPreamble, setIsShowingPreamble] = useState(true)
   const [isShowingIntro, setIsShowingIntro] = useState(false)
   const [isShowingJournalTime, setIsShowingJournalTime] = useState(false)
+  const introOpacity = useSharedValue(0)
   return (
     <View style={styles.container}>
       <Canvas
         style={styles.canvas}
         onLayout={(e) => setSize(e.nativeEvent.layout)}
       >
-        <BackgroundDrawing
-          background={backgroundProps}
-          size={size}
-          edgeInsets={insets}
-        />
+        <Group opacity={useDerivedValue(() => 1 - introOpacity.value)}>
+          <BackgroundDrawing
+            background={backgroundProps}
+            size={size}
+            edgeInsets={insets}
+          />
+        </Group>
         {isShowingPreamble && (
           <PreambleDrawing
             onJournalTimeStarted={() => {
@@ -72,11 +81,18 @@ export const JournalingSequenceView = ({
             size={size}
           />
         )}
-        {isShowingIntro && <IntroDrawing size={size} edgeInsets={insets} />}
+        {isShowingIntro && (
+          <IntroDrawing
+            size={size}
+            edgeInsets={insets}
+            opacity={introOpacity}
+          />
+        )}
       </Canvas>
       {isShowingJournalTime && (
         <JournalTime
           onFinished={() => {
+            introOpacity.value = withTiming(1, { duration: 500 })
             setIsShowingIntro(true)
             setIsShowingPreamble(false)
           }}

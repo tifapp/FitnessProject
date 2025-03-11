@@ -143,22 +143,34 @@ export const SunBackgroundDrawing = ({
   size
 }: SunBackgroundProps) => (
   <Group>
-    <Rect width={size.width} height={size.height}>
-      <LinearGradient
-        start={vec(size.width / 2, 0)}
-        end={vec(size.width / 2, size.height)}
-        colors={Sky.gradientAtTime(background.time, background.dayRange)}
-        positions={[
-          0,
-          Sky.gradientMidPoint(background.time, size, edgeInsets),
-          1
-        ]}
-      />
-    </Rect>
+    <SunSkyDrawing {...background} size={size} edgeInsets={edgeInsets} />
     <SunDrawing background={background} size={size} edgeInsets={edgeInsets} />
     <MovingCloudsDrawing size={size} clouds={background.clouds} />
     <MountainDrawing size={size} colorSet="sun" />
   </Group>
+)
+
+export type SunSkyProps = {
+  size: SkSize
+  dayRange: FixedDateRange
+  time: number
+  edgeInsets: EdgeInsets
+}
+
+export const SunSkyDrawing = ({
+  size,
+  dayRange,
+  time,
+  edgeInsets
+}: SunSkyProps) => (
+  <Rect width={size.width} height={size.height}>
+    <LinearGradient
+      start={vec(size.width / 2, 0)}
+      end={vec(size.width / 2, size.height)}
+      colors={Sky.gradientAtTime(time, dayRange)}
+      positions={[0, Sky.gradientMidPoint(time, size, edgeInsets), 1]}
+    />
+  </Rect>
 )
 
 export type SunProps = {
