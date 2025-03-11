@@ -25,4 +25,6 @@ export namespace AppStyles {
   export const purple = ColorString.parse("#A882DD")!
   export const orange = ColorString.parse("#FB5607")!
   export const emerald = ColorString.parse("#5BC087")!
+  export const inkRed = ColorString.parse("#B91C1C")!
+  export const vintage = ColorString.parse("#FFFBEB")!
 }
