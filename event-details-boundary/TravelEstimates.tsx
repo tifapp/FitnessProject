@@ -3,16 +3,13 @@ import { ExpandableMapSnippetView } from "@components/MapSnippetView"
 import { useCoreNavigation } from "@components/Navigation"
 import {
   BodyText,
-  BoldFootnote,
   Caption,
   CaptionTitle,
   Footnote,
   Headline
 } from "@components/Text"
 import { Ionicon, RoundedIonicon } from "@components/common/Icons"
-import { TiFFormLabelView } from "@components/form-components/Label"
 import { TiFFormNamedIconRowView } from "@components/form-components/NamedIconRow"
-import { TiFFormRowItemView } from "@components/form-components/RowItem"
 import { ClientSideEvent } from "@event/ClientSideEvent"
 import { openEventLocationInMaps } from "@event/LocationIdentifier"
 import { placemarkToFormattedAddress } from "@lib/AddressFormatting"
@@ -46,7 +43,7 @@ import {
   View,
   ViewStyle
 } from "react-native"
-import Animated, { FadeIn, FadeOut } from "react-native-reanimated"
+import Animated, { FadeIn } from "react-native-reanimated"
 
 export const EventTravelEstimatesFeature = featureContext({
   eventTravelEstimates

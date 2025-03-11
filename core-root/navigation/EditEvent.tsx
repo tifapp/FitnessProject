@@ -7,8 +7,8 @@ import { EditEventFormDismissButton } from "@edit-event-boundary/Dismiss"
 import { EditEventView } from "@edit-event-boundary/EditEvent"
 import { editEventFormValueAtoms } from "@edit-event-boundary/FormAtoms"
 import {
-  RouteableEditEventFormValues,
-  fromRouteableEditFormValues
+  fromRouteableEditFormValues,
+  RouteableEditEventFormValues
 } from "@event/EditFormValues"
 import {
   LocationsSearchView,
@@ -16,7 +16,7 @@ import {
 } from "@location-search-boundary"
 import { StaticScreenProps } from "@react-navigation/native"
 import { EventID } from "TiFShared/domain-models/Event"
-import { useSetAtom } from "jotai"
+import { useAtom, useSetAtom } from "jotai"
 import { StyleSheet } from "react-native"
 
 type EditEventScreenProps = WithAlphaRegistrationProps<
@@ -26,6 +26,7 @@ type EditEventScreenProps = WithAlphaRegistrationProps<
 const EditEventScreen = withAlphaRegistration(
   ({ session, route }: EditEventScreenProps) => {
     const navigation = useTiFNavigation()
+    const [location, setLocation] = useAtom(editEventFormValueAtoms.location)
     const { pushEventDetails } = useCoreNavigation()
     return (
       <EditEventView
@@ -36,6 +37,12 @@ const EditEventScreen = withAlphaRegistration(
         onSelectLocationTapped={() => {
           navigation.navigate("modal", { screen: "editEventLocationSearch" })
         }}
+        onMapLongPress={(e) =>
+          setLocation({
+            placemark: undefined,
+            coordinate: e.nativeEvent.coordinate
+          })
+        }
         onSuccess={(e) => pushEventDetails(e.id, "replace")}
         style={styles.screen}
       />
