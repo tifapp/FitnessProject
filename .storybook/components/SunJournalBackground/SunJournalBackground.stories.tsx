@@ -1,5 +1,6 @@
 import { cloud } from "@journaling/Clouds"
 import { MoonBackgroundDrawing } from "@journaling/MoonBackground"
+import { PragmaDrawing } from "@journaling/Pragma"
 import { SunBackgroundDrawing } from "@journaling/SunBackground"
 import { Canvas, SkSize } from "@shopify/react-native-skia"
 import React, { useEffect, useMemo, useState } from "react"
@@ -87,29 +88,35 @@ export const TimeOfDayView = () => {
   const insets = useSafeAreaInsets()
 
   const [time, setTime] = useState(0.5)
-  useEffect(() => {
-    const interval = setInterval(() => {
-      // console.log(time)
-      setTime((x) => (x >= 1 ? 0 : x + 0.1))
-    }, 1000)
-    return () => clearInterval(interval)
-  }, [])
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     // console.log(time)
+  //     setTime((x) => (x >= 1 ? 0 : x + 0.1))
+  //   }, 1000)
+  //   return () => clearInterval(interval)
+  // }, [])
   const background = useMemo(
-    () => ({ time, dayRange: DAY_RANGE, clouds: CLOUDS }),
+    () => ({ time, dayRange: DAY_RANGE, clouds: [] }),
     [time]
   )
   return (
     <Canvas style={{ flex: 1 }} onLayout={(e) => setSize(e.nativeEvent.layout)}>
-      <SunBackgroundDrawing
-        size={size}
-        background={background}
-        edgeInsets={insets}
-      />
-      {/* <MoonBackgroundDrawing
+      {/* <SunBackgroundDrawing
         size={size}
         background={background}
         edgeInsets={insets}
       /> */}
+      <MoonBackgroundDrawing
+        size={size}
+        background={background}
+        edgeInsets={insets}
+      />
+      <PragmaDrawing
+        size={{ width: 256, height: 256 }}
+        pose="worship"
+        x={size.width / 2 - 64}
+        y={size.height / 2}
+      />
     </Canvas>
   )
 }
