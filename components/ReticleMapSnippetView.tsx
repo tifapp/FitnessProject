@@ -216,7 +216,7 @@ const ExpandedMapView = ({
     )
   }))
   return (
-    <PortalView>
+    <View>
       {isVisible && (
         <Animated.View style={animatedMapStyle}>
           <MapView
@@ -257,7 +257,7 @@ const ExpandedMapView = ({
           <TargetReticle />
         </Animated.View>
       )}
-    </PortalView>
+    </View>
   )
 }
 

@@ -1,21 +1,14 @@
-import { AvatarMapMarkerView } from "@components/AvatarMapMarker"
-import { Ionicon } from "@components/common/Icons"
-import { TiFFormNavigationLinkView } from "@components/form-components/NavigationLink"
-import { ExpandableMapSnippetView } from "@components/MapSnippetView"
-import { Caption, Footnote } from "@components/Text"
 import { EditEventFormLocation } from "@event/EditFormValues"
-import { placemarkToFormattedAddress } from "@lib/AddressFormatting"
 import { AppStyles } from "@lib/AppColorStyle"
-import { FontScaleFactors } from "@lib/Fonts"
-import React, { useEffect, useRef, useState } from "react"
+import React, { useState } from "react"
 import {
   StyleSheet,
   View
 } from "react-native"
-import MapView, { LongPressEvent } from "react-native-maps"
+import { LongPressEvent } from "react-native-maps"
 import { LocationCoordinate2D } from "TiFShared/domain-models/LocationCoordinate2D"
 import { EditEventProps } from "./EditEvent"
-import { useEditEventFormLocation } from "./Location"
+import { EditEventFormLocationView, useEditEventFormLocation } from "./Location"
 
 type LocationProps = {
   hostName: string
@@ -32,129 +25,6 @@ const mapRegion = (coordinate: LocationCoordinate2D) => ({
   longitudeDelta: 0.07
 })
 
-const LocationView = ({
-  hostName,
-  hostProfileImageURL,
-  location,
-  onSelectLocationTapped,
-  onMapLongPress,
-  isExpanded
-}: LocationProps) => {
-  const mapRef = useRef<MapView>(null)
-  useEffect(() => {
-    if (location.coordinate) {
-      mapRef.current?.animateToRegion(mapRegion(location.coordinate))
-    }
-  }, [location.coordinate])
-  return (
-    <View>
-    <ExpandableMapSnippetView
-      ref={mapRef}
-      isExpanded={isExpanded ?? false}
-      onExpansionChanged={() => {}}
-      region={mapRegion(location.coordinate ?? { latitude: 0, longitude: 0 })}
-      expandedMapProps={{
-        onLongPress: onMapLongPress,
-        showsUserLocation: true
-      }}
-      marker={
-        <AvatarMapMarkerView
-          name={hostName}
-          imageURL={hostProfileImageURL}
-        />
-      }
-      overlay={(isExpanding) => {
-        return (
-          <View style={styles.container}>
-            {(
-              <View style={styles.instructionContainer}>
-                <Ionicon
-                  name="pin-sharp"
-                  size={24}
-                  style={styles.instructionIcon}
-                  color="black"
-                />
-                <Footnote style={styles.instructionText}>
-                  {
-                    "Tap and hold anywhere on the map to select a new location."
-                  }
-                </Footnote>
-              </View>
-            )}
-            {!location.placemark ? (
-              <View style={styles.overlayContainer}>
-                <Caption style={styles.currentLocation}>
-                  {"Current Location"}
-                </Caption>
-                <TiFFormNavigationLinkView
-                  iconName="location"
-                  iconBackgroundColor={AppStyles.primary}
-                  maximumFontScaleFactor={FontScaleFactors.xxxLarge}
-                  style={styles.locationMapNavigationLink}
-                  title={`${location.coordinate.latitude}, ${location.coordinate.longitude}`}
-                  onTapped={() => {
-                    onSelectLocationTapped()
-                  }}
-                />
-              </View>
-            ) : (
-              <View style={styles.overlayContainer}>
-                <Caption style={styles.currentLocation}>
-                  {"Current Location"}
-                </Caption>
-                <TiFFormNavigationLinkView
-                  iconName="location"
-                  iconBackgroundColor={AppStyles.primary}
-                  style={styles.locationMapNavigationLink}
-                  title={location.placemark.name ?? "Unknown Location"}
-                  maximumFontScaleFactor={FontScaleFactors.xxxLarge}
-                  description={
-                    placemarkToFormattedAddress(location.placemark) ??
-                    "Unknown Address"
-                  }
-                  onTapped={() => {
-                    onSelectLocationTapped()
-                  }}
-                />
-              </View>
-            )}
-          </View>
-        )
-      }}
-    />
-      <View style={styles.overlayContainer}>
-        {!location.placemark ? (
-          <TiFFormNavigationLinkView
-            iconName="location"
-            iconBackgroundColor={AppStyles.primary}
-            maximumFontScaleFactor={FontScaleFactors.xxxLarge}
-            style={styles.locationMapNavigationLink}
-            title={`${location.coordinate.latitude}, ${location.coordinate.longitude}`}
-            onTapped={() => {
-              onSelectLocationTapped()
-            }}
-          />
-        ) : (
-          <TiFFormNavigationLinkView
-            iconName="location"
-            iconBackgroundColor={AppStyles.primary}
-            style={styles.locationMapNavigationLink}
-            title={location.placemark.name ?? "Unknown Location"}
-            maximumFontScaleFactor={FontScaleFactors.xxxLarge}
-            description={
-              placemarkToFormattedAddress(location.placemark) ??
-              "Unknown Address"
-            }
-            onTapped={() => {
-              onSelectLocationTapped()
-            }}
-          />
-        )}
-      </View>
-    </View>
-  )
-}
-
 export const CreateEventView = ({
   hostName,
   hostProfileImageURL,
@@ -169,16 +39,14 @@ export const CreateEventView = ({
 
   return (
     <View style={{ backgroundColor: "black", flex: 1 }}>
-    <LocationView
-      hostName={hostName}
-      location={useEditEventFormLocation() ?? { placemark: {}, coordinate: { latitude: 0, longitude: 0 } }}
-      onSelectLocationTapped={function (): void {
-        throw new Error("Function not implemented.")
-      }}
-      onMapLongPress={function (event: LongPressEvent): void {
-        throw new Error("Function not implemented.")
-      }}
-    />
+      <EditEventFormLocationView
+        hostName={hostName}
+        hostProfileImageURL={hostProfileImageURL}
+        onSelectLocationTapped={onSelectLocationTapped}
+        // onMapLongPress={onMapLongPress}
+        location={useEditEventFormLocation()}
+        isExpanded={true}
+      />
       <View style={{ height: "60%" }}>
         {/* <TelescopeInput onSubmit={setTitle} /> */}
       </View>

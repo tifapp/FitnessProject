@@ -179,15 +179,15 @@ export const EditEventFormLocationView = ({
         </View>
       )}
       <View style={styles.overlayContainer}>
-        {!location.placemark ? (
+        {!location?.placemark ? (
           <TiFFormNavigationLinkView
             iconName="location"
             iconBackgroundColor={AppStyles.primary}
             maximumFontScaleFactor={FontScaleFactors.xxxLarge}
             style={styles.locationMapNavigationLink}
-            title={`${location.coordinate.latitude}, ${location.coordinate.longitude}`}
+            title={`${location?.coordinate.latitude}, ${location?.coordinate.longitude}`}
             onTapped={() => {
-              setIsExpanded(false)
+              setIsExpandedInternal(false)
               onSelectLocationTapped()
             }}
           />
@@ -203,7 +203,7 @@ export const EditEventFormLocationView = ({
               "Unknown Address"
             }
             onTapped={() => {
-              setIsExpanded(false)
+              setIsExpandedInternal(false)
               onSelectLocationTapped()
             }}
           />
