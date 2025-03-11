@@ -33,7 +33,7 @@ export const PRAGMA_LINES = {
     "It seems that you have been very naughty with your sleep schedule Sean.",
     "I'm very disappointed in you Sean, please go to bed.",
     "However, I would like you to internalize this before that.",
-    "Victorious warriors win first and then go to war, while defeated warriors go to war first and then seek to win."
+    "Thus it is that in war the victorious strategist only seeks battle after the victory has been won, whereas he who is destined to defeat first fights and afterwards looks for victory."
   ],
   bullying: [
     "Fuck You Sean.",

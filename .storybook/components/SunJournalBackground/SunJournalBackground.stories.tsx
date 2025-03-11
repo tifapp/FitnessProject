@@ -174,7 +174,7 @@ const IntroDrawing = ({ size }: { size: SkSize }) => {
 
 const IntroView = () => {
   const journalIntro = useJournalingIntro({
-    lines: "bullying",
+    lines: "reallyLateNight",
     onFinished: () => {}
   })
   return (
