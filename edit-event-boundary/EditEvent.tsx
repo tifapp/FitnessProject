@@ -406,7 +406,13 @@ type FooterProps = {
 }
 
 const FooterView = ({ eventId, currentDate, onSuccess }: FooterProps) => (
-  <TiFFooterView>
+  <TiFFooterView backgroundStyle={{
+    backgroundColor: "transparent",
+    paddingTop: 0,
+    paddingHorizontal: 0,
+    borderTopLeftRadius: 0,
+    borderTopRightRadius: 0
+  }}>
     <QuoteSectionView eventId={eventId} currentDate={currentDate} />
     <EditEventFormSubmitButton
       state={useEditEventFormSubmission({

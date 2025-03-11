@@ -3,6 +3,7 @@ import {
   withAlphaRegistration,
   WithAlphaRegistrationProps
 } from "@core-root/AlphaRegister"
+import { CreateEventView } from "@edit-event-boundary/CreateEvent"
 import { EditEventFormDismissButton } from "@edit-event-boundary/Dismiss"
 import { EditEventView } from "@edit-event-boundary/EditEvent"
 import { editEventFormValueAtoms } from "@edit-event-boundary/FormAtoms"
@@ -29,6 +30,26 @@ const EditEventScreen = withAlphaRegistration(
     const { pushEventDetails } = useCoreNavigation()
     return (
       <EditEventView
+        eventId={route.params.id}
+        initialValues={fromRouteableEditFormValues(route.params)}
+        hostName={session.name}
+        hostProfileImageURL={session.profileImageURL}
+        onSelectLocationTapped={() => {
+          navigation.navigate("modal", { screen: "editEventLocationSearch" })
+        }}
+        onSuccess={(e) => pushEventDetails(e.id, "replace")}
+        style={styles.screen}
+      />
+    )
+  }
+)
+
+const CreateEventScreen = withAlphaRegistration(
+  ({ session, route }: EditEventScreenProps) => {
+    const navigation = useTiFNavigation()
+    const { pushEventDetails } = useCoreNavigation()
+    return (
+      <CreateEventView
         eventId={route.params.id}
         initialValues={fromRouteableEditFormValues(route.params)}
         hostName={session.name}
@@ -76,9 +97,13 @@ export const editEventScreens = () => ({
   createEventForm: {
     options: {
       headerTitle: "Chart Your Next Adventure",
-      headerLeft: EditEventFormBackButton
+      headerLeft: EditEventFormBackButton,
+      headerStyle: {
+        backgroundColor: "black"
+      },
+      headerTintColor: "#fff"
     },
-    screen: EditEventScreen
+    screen: CreateEventScreen
   },
   editEventLocationSearch: {
     options: { headerShown: false },
