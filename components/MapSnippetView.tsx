@@ -135,7 +135,7 @@ const parallaxStyle = useAnimatedStyle(() => {
 
   return {
     transform: [
-      { translateY: translateY - (415 * parallaxFactor) }
+      { translateY: translateY - (425 * parallaxFactor) }
     ]
   }
 })
@@ -397,7 +397,7 @@ mapContainer: {
   borderRadius: 32,
   overflow: "hidden",
   borderWidth: 2,
-  borderColor: AppStyles.colorOpacity35
+  borderColor: AppStyles.colorOpacity15
 },
 mapWrapper: {
   overflow: "hidden",
