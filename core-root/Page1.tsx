@@ -1,8 +1,7 @@
-import { Headline } from "@components/Text"
 import { TimeOfDayView } from "@event-details-boundary/TimeOfDay"
-import { DraggableTarget } from "@journaling/HoverContext/DraggableTarget"
+import ConfigurableOrbitalComponent from "@journaling/OrbitList/AviationTheme"
 import React from "react"
-import { StyleProp, StyleSheet, Text, View, ViewStyle } from "react-native"
+import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 
 export type HomeProps = {
   style?: StyleProp<ViewStyle>
@@ -12,20 +11,7 @@ export const Page1 = () => (
   <>
     <TimeOfDayView />
     <View style={styles.todo}>
-      <DraggableTarget
-        style={[
-          styles.target,
-          styles.draggable,
-          {
-            top: "25%",
-            left: "50%"
-          }
-        ]}
-        activeStyle={styles.targetHovered}
-      >
-        <Text>Drag me!</Text>
-      </DraggableTarget>
-      <Headline>Drag Around</Headline>
+      <ConfigurableOrbitalComponent />
     </View>
   </>
 )

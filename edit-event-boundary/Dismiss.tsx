@@ -1,8 +1,8 @@
-import { useAtomValue } from "jotai"
-import { isEditEventFormDirtyAtom } from "./FormAtoms"
-import { StyleProp, ViewStyle, StyleSheet, View } from "react-native"
 import { TouchableIonicon } from "@components/common/Icons"
 import { AlertsObject, presentAlert } from "@lib/Alerts"
+import { useAtomValue } from "jotai"
+import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
+import { isEditEventFormDirtyAtom } from "./FormAtoms"
 
 export const ALERTS = {
   confirmDismissal: (onDiscard?: () => void) => ({
@@ -56,6 +56,7 @@ export const EditEventFormDismissButton = ({
 
 const styles = StyleSheet.create({
   button: {
-    marginRight: 24
+    marginRight: 24,
+    color: "white"
   }
 })

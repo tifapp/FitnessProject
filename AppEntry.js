@@ -5,6 +5,7 @@ import "TiFShared"
 
 console.log(BUILD_TYPE)
 
+// change
 const Module = require("./.storybook/App")
 registerRootComponent(Module.default)
 
