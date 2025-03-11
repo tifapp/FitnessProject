@@ -48,13 +48,16 @@ export const PragmaQuoteView = ({
   return (
     <View style={style}>
       <View style={styles.row}>
-        <View style={styles.pragmaContainer}>
-          <Image
-            source={
-              "https://i.imgur.com/cqF5Mk4.png"
-            }
-            style={styles.pragmaImage}
-          />
+        <View style={{ alignItems: "center" }}>
+          <View style={styles.pragmaContainer}>
+            <Image
+              source={
+                "https://i.imgur.com/cqF5Mk4.png"
+              }
+              style={styles.pragmaImage}
+            />
+          </View>
+          {/* <BoldFootnote>Pragma</BoldFootnote> */}
         </View>
         {text && (
           <Animated.View entering={FadeIn} style={styles.quote}>
@@ -71,7 +74,13 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "row",
     alignItems: "flex-start",
-    columnGap: 16
+    columnGap: 16,
+    padding: 16,
+    marginHorizontal: 32,
+    borderRadius: 32,
+    backgroundColor: AppStyles.cardColor,
+    borderColor: AppStyles.colorOpacity15.toString(),
+    borderWidth: 2
   },
   pragmaContainer: {
     borderRadius: 64,
@@ -88,7 +97,7 @@ const styles = StyleSheet.create({
   },
   quote: {
     flex: 1,
-    color: "white"
+    color: "black"
   },
   invisibleText: {
     opacity: 0
@@ -122,6 +131,9 @@ export const createEventQuote = (date: Date = new Date()) => {
 }
 
 const CREATE_EVENT_QUOTES = {
+  startOfDay: [
+    "Rise and shine! There's a glorious day of possibilities to explore!"
+  ],
   generic: [
     "The north star guides your path.",
     "Where to, Captain?",
