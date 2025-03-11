@@ -1,5 +1,84 @@
+import React from "react"
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
+import Svg, { Circle, Path } from "react-native-svg"
 import { ProfileCircleView } from "./profileImageComponents/ProfileCircle"
+
+const TargetReticle = ({ size = 100, strokeWidth = 2, color = "#000000" }: {size: number, strokeWidth: number, color: string}) => {
+  // Calculate dimensions
+  const outerRadius = size / 2
+  const arcLength = Math.PI / 3 // 60 degrees arc
+
+  // Calculate SVG viewBox
+  const viewBoxSize = size + strokeWidth * 2
+  const center = viewBoxSize / 2
+
+  // Create paths for the four corners
+  const createArc = (startAngle: number) => {
+    const x1 = center + outerRadius * Math.cos(startAngle)
+    const y1 = center + outerRadius * Math.sin(startAngle)
+    const x2 = center + outerRadius * Math.cos(startAngle + arcLength)
+    const y2 = center + outerRadius * Math.sin(startAngle + arcLength)
+
+    return `M ${x1} ${y1} A ${outerRadius} ${outerRadius} 0 0 1 ${x2} ${y2}`
+  }
+
+  // Create arcs at 45, 135, 225, and 315 degrees
+  const topRightArc = createArc(Math.PI * 7 / 4)
+  const bottomRightArc = createArc(Math.PI * 1 / 4)
+  const bottomLeftArc = createArc(Math.PI * 3 / 4)
+  const topLeftArc = createArc(Math.PI * 5 / 4)
+
+  // Optional tiny center dot
+  const centerDot = center
+  const dotRadius = strokeWidth
+
+  return (
+    <View style={styles.container}>
+      <Svg
+        width={size}
+        height={size}
+        viewBox={`0 0 ${viewBoxSize} ${viewBoxSize}`}
+      >
+        <Path
+          d={topRightArc}
+          fill="none"
+          stroke={color}
+          strokeWidth={strokeWidth}
+          strokeLinecap="round"
+        />
+        <Path
+          d={bottomRightArc}
+          fill="none"
+          stroke={color}
+          strokeWidth={strokeWidth}
+          strokeLinecap="round"
+        />
+        <Path
+          d={bottomLeftArc}
+          fill="none"
+          stroke={color}
+          strokeWidth={strokeWidth}
+          strokeLinecap="round"
+        />
+        <Path
+          d={topLeftArc}
+          fill="none"
+          stroke={color}
+          strokeWidth={strokeWidth}
+          strokeLinecap="round"
+        />
+
+        {/* Optional center dot */}
+        <Circle
+          cx={centerDot}
+          cy={centerDot}
+          r={dotRadius}
+          fill={color}
+        />
+      </Svg>
+    </View>
+  )
+}
 
 export type AvatarMapMarkerProps = {
   name: string
@@ -24,6 +103,7 @@ export const AvatarMapMarkerView = ({
       <View style={styles.markerContainer}>
         {children}
         <View style={styles.whiteBackground}>
+          <TargetReticle size={150} strokeWidth={3} color="#ffffff" />
           <ProfileCircleView
             name={name}
             imageURL={imageURL}
@@ -55,7 +135,6 @@ const styles = StyleSheet.create({
     height: AVATAR_MARKER_SIZE,
     backgroundColor: "white",
     borderRadius: 128,
-    justifySelf: "flex-end",
     alignItems: "center",
     justifyContent: "center",
     overflow: "hidden"
