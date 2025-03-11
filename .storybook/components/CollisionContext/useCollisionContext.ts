@@ -7,9 +7,9 @@ import {
   useSharedValue
 } from "react-native-reanimated"
 import { uuidString } from "TiFShared/lib/UUID"
-import { Measurements, Target } from "../HoverContext/types"
-import { areArraysEqual } from "../HoverContext/utils"
 import { CollisionContext } from "./CollisionContext"
+import { Measurements, Target } from "@journaling/HoverContext/types"
+import { areArraysEqual } from "@journaling/HoverContext/utils"
 
 type DragState = {
   onLayout: (event: LayoutChangeEvent) => void

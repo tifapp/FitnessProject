@@ -1,6 +1,7 @@
-import { DraggableCollidingTarget } from ".storybook/components/CollisionContext/DraggableCollidingTarget"
-import { TimeOfDayView } from ".storybook/components/SunJournalBackground/SunJournalBackground.stories"
 import { Headline } from "@components/Text"
+import { TimeOfDayView } from "@event-details-boundary/TimeOfDay"
+import { DraggableTarget } from "@journaling/HoverContext/DraggableTarget"
+import React from "react"
 import { StyleProp, StyleSheet, Text, View, ViewStyle } from "react-native"
 
 export type HomeProps = {
@@ -11,8 +12,7 @@ export const Page1 = () => (
   <>
     <TimeOfDayView />
     <View style={styles.todo}>
-      <TimeOfDayView />
-      <DraggableCollidingTarget
+      <DraggableTarget
         style={[
           styles.target,
           styles.draggable,
@@ -22,10 +22,9 @@ export const Page1 = () => (
           }
         ]}
         activeStyle={styles.targetHovered}
-        collidingStyle={styles.targetSelecting}
       >
         <Text>Drag me!</Text>
-      </DraggableCollidingTarget>
+      </DraggableTarget>
       <Headline>Drag Around</Headline>
     </View>
   </>

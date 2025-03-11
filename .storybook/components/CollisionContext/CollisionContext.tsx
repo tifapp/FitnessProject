@@ -1,8 +1,8 @@
+import { Measurements, Target } from '@journaling/HoverContext/types';
+import { useSharedState } from '@journaling/HoverContext/useSharedState';
+import { doSharedMeasurementsOverlap, remove, upsert } from '@journaling/HoverContext/utils';
 import React, { createContext, ReactNode } from 'react';
 import { SharedValue } from 'react-native-reanimated';
-import type { Measurements, Target } from "../HoverContext/types";
-import { useSharedState } from "../HoverContext/useSharedState";
-import { doSharedMeasurementsOverlap, remove, upsert } from "../HoverContext/utils";
 
 export const CollisionContext = createContext<
   {

@@ -1,7 +1,7 @@
+import { HoverProvider } from '@journaling/HoverContext/HoverContext';
 import React, { useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { HoverProvider } from '../HoverContext/HoverContext';
 import { DragAndDropSelect } from "./DragAndDropSelect";
 
 export const DragAndDropMeta = {

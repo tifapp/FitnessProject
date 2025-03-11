@@ -1,8 +1,8 @@
+import { usePanGesture } from "@journaling/DraggableView/usePanGesture"
+import { useHoverContext } from "@journaling/HoverContext/useHoverContext"
 import { useEffect, useState } from "react"
 import { PanGesture } from "react-native-gesture-handler"
 import { SharedValue } from "react-native-reanimated"
-import { usePanGesture } from "../DraggableView/usePanGesture"
-import { useHoverContext } from "../HoverContext/useHoverContext"
 
 type DragAndDropOption = {
   isSelecting: boolean

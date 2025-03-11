@@ -1,8 +1,8 @@
 import React from 'react';
 import { Text, ViewProps, ViewStyle } from 'react-native';
-import { DraggableView } from '../DraggableView/DraggableView';
-import { usePanGesture } from '../DraggableView/usePanGesture';
 import { useCollisionContext } from './useCollisionContext';
+import { DraggableView } from '@journaling/DraggableView/DraggableView';
+import { usePanGesture } from '@journaling/DraggableView/usePanGesture';
 
 export type DraggableCollidingTargetProps = ViewProps & {
   activeStyle?: ViewStyle;

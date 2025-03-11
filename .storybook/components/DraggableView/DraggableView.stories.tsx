@@ -1,9 +1,9 @@
+import { DraggableView } from "@journaling/DraggableView/DraggableView";
+import { usePanGesture } from "@journaling/DraggableView/usePanGesture";
 import React from "react";
 import { Text, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { StoryMeta } from "storybook/HelperTypes";
-import { DraggableView } from "./DraggableView";
-import { usePanGesture } from "./usePanGesture";
 
 export const DraggableViewMeta: StoryMeta = {
   title: "DraggableView",

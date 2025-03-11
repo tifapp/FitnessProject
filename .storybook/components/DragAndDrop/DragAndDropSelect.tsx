@@ -1,7 +1,7 @@
+import { DraggableView } from '@journaling/DraggableView/DraggableView';
 import React from 'react';
 import { Dimensions, StyleSheet, Text, View } from 'react-native';
 import Animated from 'react-native-reanimated';
-import { DraggableView } from '../DraggableView/DraggableView';
 import { useDragAndDrop } from "./useDragAndDrop";
 
 type DropOption = {

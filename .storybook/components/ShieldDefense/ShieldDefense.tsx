@@ -1,3 +1,4 @@
+import { DraggableView } from "@journaling/DraggableView/DraggableView"
 import React, { useCallback, useEffect, useState } from "react"
 import {
   Dimensions,
@@ -9,7 +10,6 @@ import {
 import { PanGesture } from "react-native-gesture-handler"
 import Animated, { SharedValue } from "react-native-reanimated"
 import { useDragAndDrop } from "../DragAndDrop/useDragAndDrop"
-import { DraggableView } from "../DraggableView/DraggableView"
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window")
 

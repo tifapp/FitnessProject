@@ -1,6 +1,6 @@
-import { CollisionProvider } from ".storybook/components/CollisionContext/CollisionContext"
 import { TiFBottomSheetProvider } from "@components/BottomSheet"
 import { PortalProvider } from "@gorhom/portal"
+import { HoverProvider } from "@journaling/HoverContext/HoverContext"
 import { TiFQueryClientProvider } from "@lib/ReactQuery"
 import React from "react"
 import { StyleProp, View, ViewStyle } from "react-native"
@@ -21,7 +21,7 @@ export type TiFProps = {
 export const TiFView = ({ isFontsLoaded, style, ...props }: TiFProps) => {
   if (!isFontsLoaded) return null
   return (
-    <CollisionProvider>
+    <HoverProvider>
       <GestureHandlerRootView>
         <PortalProvider>
           <TiFQueryClientProvider>
@@ -39,6 +39,6 @@ export const TiFView = ({ isFontsLoaded, style, ...props }: TiFProps) => {
           </TiFQueryClientProvider>
         </PortalProvider>
       </GestureHandlerRootView>
-    </CollisionProvider>
+    </HoverProvider>
   )
 }

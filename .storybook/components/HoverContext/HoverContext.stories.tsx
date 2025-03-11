@@ -1,9 +1,9 @@
+import { DraggableTarget } from '@journaling/HoverContext/DraggableTarget';
+import { HoverProvider } from '@journaling/HoverContext/HoverContext';
+import { DragTarget } from '@journaling/HoverContext/HoverTarget';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { DraggableTarget } from './DraggableTarget';
-import { HoverProvider } from './HoverContext';
-import { DragTarget } from './HoverTarget';
 
 export const HoverContextMeta = {
   title: "HoverContext",

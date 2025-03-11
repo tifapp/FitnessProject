@@ -1,20 +1,20 @@
-import React from 'react';
-import { Text, ViewProps, ViewStyle } from 'react-native';
-import { DraggableView } from '../DraggableView/DraggableView';
-import { usePanGesture } from '../DraggableView/usePanGesture';
-import { useHoverContext } from './useHoverContext';
+import { DraggableView } from "@journaling/DraggableView/DraggableView"
+import { usePanGesture } from "@journaling/DraggableView/usePanGesture"
+import React from "react"
+import { Text, ViewProps, ViewStyle } from "react-native"
+import { useHoverContext } from "./useHoverContext"
 
 export type DraggableTargetProps = ViewProps & {
   activeStyle?: ViewStyle;
 };
 
-export const DraggableTarget = ({ 
+export const DraggableTarget = ({
   activeStyle,
   style,
-  ...props 
+  ...props
 }: DraggableTargetProps) => {
-  const localDraggable = usePanGesture();
-  const { hoverGesture, } = useHoverContext();
+  const localDraggable = usePanGesture()
+  const { hoverGesture } = useHoverContext()
 
   return (
     <DraggableView
@@ -27,5 +27,5 @@ export const DraggableTarget = ({
     >
       <Text>Drag me!</Text>
     </DraggableView>
-  );
+  )
 }
