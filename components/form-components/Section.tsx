@@ -1,3 +1,4 @@
+import { CircularIoniconProps } from "@components/common/Icons"
 import { BodyText, Headline } from "@components/Text"
 import { AppStyles } from "@lib/AppColorStyle"
 import { TiFDefaultLayoutTransition } from "@lib/Reanimated"
@@ -25,6 +26,7 @@ export type TiFFormSectionProps = {
   isDisabled?: boolean
   children?: ReactNode
   color?: string;
+  iconName?: CircularIoniconProps["name"];
   style?: StyleProp<ViewStyle>
 }
 
@@ -35,7 +37,8 @@ export const TiFFormSectionView = ({
   isDisabled = false,
   children,
   style,
-  color
+  color,
+  iconName
 }: TiFFormSectionProps) => (
   <Animated.View
     entering={FadeIn}
@@ -47,28 +50,23 @@ export const TiFFormSectionView = ({
         <View style={[styles.container, { opacity: isDisabled ? 0.5 : 1 }]}>
           <View style={styles.textContainer}>
             {title && (
-              <View style={styles.titleRow}>
-                <View
-                  // style={{
-                  //   justifyContent: "center",
-                  //   alignItems: "center",
-                  //   borderRadius: 32,
-                  //   paddingHorizontal: 16,
-                  //   backgroundColor: AppStyles.primaryBlue.toString()
-                  // }}
-                >
-
-<Headline style={{ color: color ?? AppStyles.primaryBlue.toString() }}>
-                  {/* <CircularIonicon
-                    size={24}
-                    name={"calendar"}
-                    backgroundColor={AppStyles.primaryBlue.toString()}
-                  /> */}
+              <View style={[styles.titleRow]}>
+                <View>
+                  <Headline style={{ color: color ?? AppStyles.primaryBlue.toString() }}>
                   {title}
                 </Headline>
 
                 </View>
                 {rightAddon}
+                {/* {
+                  iconName &&
+                  <CircularIonicon
+                    size={24}
+                    name={iconName}
+                    color={AppStyles.primaryBlue.toString()}
+                    backgroundColor="white"
+                  />
+                } */}
               </View>
             )}
             {subtitle && typeof subtitle === "string" && (
@@ -96,7 +94,8 @@ const styles = StyleSheet.create({
   container: {
     display: "flex",
     flexDirection: "column",
-    rowGap: 16
+    rowGap: 16,
+    marginBottom: 32
   },
   textContainer: {
     rowGap: 4
@@ -104,8 +103,7 @@ const styles = StyleSheet.create({
   titleRow: {
     display: "flex",
     flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between"
+    alignItems: "center"
   },
   subtitle: {
     opacity: 0.5
