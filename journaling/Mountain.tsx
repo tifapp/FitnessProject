@@ -24,7 +24,10 @@ export const MountainDrawing = ({
   const mountainPath = useMemo(
     () => `
     M ${-width * 0.2} ${height}
-    C ${width * 0.1} ${height * 0.2}, ${width * 0.9} ${height * 0.2}, ${width * 1.2} ${height}
+    C
+      ${width * 0.1} ${height * 0.2},
+      ${width * 0.9} ${height * 0.2},
+      ${width * 1.2} ${height}
     Z
     `,
     [width, height]

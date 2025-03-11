@@ -1,4 +1,3 @@
-import { WINDOW_HEIGHT } from "@gorhom/bottom-sheet"
 import {
   Group,
   Rect,
@@ -105,10 +104,8 @@ const StarDrawing = ({
   star: Star
   time: SharedValue<number>
 }) => {
-  // We'll treat time.value as "milliseconds" and convert to seconds in our sine wave.
-  // Each star will have a slightly different base radius, speed, phase, and amplitude.
   const radius = useDerivedValue(() => {
-    const t = time.value / 1000 // time in seconds
+    const t = time.value / 1000
     return (
       star.baseRadius + star.amplitude * Math.sin(star.speed * t + star.phase)
     )
