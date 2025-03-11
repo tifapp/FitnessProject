@@ -3,6 +3,8 @@ import { useCallback, useEffect, useState } from "react"
 import { useTrack } from "./Audio"
 import { StyleProp, View, StyleSheet, ViewStyle, Pressable } from "react-native"
 import { BodyText, Headline } from "@components/Text"
+import { useEffectEvent } from "@lib/utils/UseEffectEvent"
+import { Audio } from "expo-av"
 
 export const PRAGMA_LINES = {
   sunrise: [
@@ -64,9 +66,7 @@ export const useJournalingIntro = ({
     0
   )
   useEffect(() => {
-    if (sound) {
-      sound.playAsync()
-    }
+    if (sound) sound.playAsync()
     return () => {
       sound?.stopAsync()
     }
@@ -77,7 +77,6 @@ export const useJournalingIntro = ({
       setLine((l) => {
         const next = l + 1
         if (next >= PRAGMA_LINES[lines].length) {
-          sound?.stopAsync()
           onFinished()
           return l
         }

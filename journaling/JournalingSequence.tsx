@@ -15,6 +15,7 @@ import {
   useJournalTime,
   JournalTimeView
 } from "./JournalTime"
+import { useScreenBottomPadding } from "@components/Padding"
 
 export type BackgroundProps = SunBackgroundProps | MoonBackgroundProps
 
@@ -100,15 +101,23 @@ const JournalTime = ({ onFinished }: UseJournalTimeEnvironment) => {
 
 const IntroView = ({ onFinished, lines }: UseJournalingIntroEnvironment) => {
   const journalIntro = useJournalingIntro({ lines, onFinished })
-  return <JournalingIntroView state={journalIntro} style={styles.intro} />
+  const padding = useScreenBottomPadding({
+    safeAreaScreens: 64,
+    nonSafeAreaScreens: 24
+  })
+  return (
+    <JournalingIntroView
+      state={journalIntro}
+      style={[styles.intro, { paddingBottom: padding }]}
+    />
+  )
 }
 
 const styles = StyleSheet.create({
   intro: {
     justifyContent: "flex-end",
     flex: 1,
-    paddingHorizontal: 24,
-    paddingBottom: 64
+    paddingHorizontal: 24
   },
   container: { position: "relative", flex: 1 },
   canvas: { position: "absolute", height: "100%", width: "100%" }
