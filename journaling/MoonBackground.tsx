@@ -60,7 +60,7 @@ export const MoonBackgroundDrawing = ({
         background={background}
         edgeInsets={edgeInsets}
       />
-      <MountainDrawing size={size} />
+      <MountainDrawing size={size} colorSet="moon" />
     </Group>
   )
 }
