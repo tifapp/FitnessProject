@@ -75,6 +75,40 @@ export const FormSubmissionPrimaryButton = <
   />
 )
 
+export const FormSubmissionSecondaryButton = <
+  SubmissionArgs,
+  SubmissionResult,
+  InvalidValidationResult extends { status: "invalid" },
+  Children extends ReactNode
+>({
+  style,
+  contentStyle,
+  submission,
+  ...props
+}: FormSubmissionButtonProps<
+  SubmissionArgs,
+  SubmissionResult,
+  InvalidValidationResult,
+  Children
+>) => (
+  <BaseButton
+    style={[
+      styles.container,
+      styles.outlinedButton,
+      style,
+      { opacity: submission.status !== "submittable" ? 0.4 : 1 }
+    ]}
+    disabled={submission.status !== "submittable"}
+    activeOpacity={0.65}
+    onPress={() => {
+      if (submission.status === "submittable") {
+        submission.submit()
+      }
+    }}
+    {...props}
+  />
+)
+
 /**
  * Props for a button.
  */

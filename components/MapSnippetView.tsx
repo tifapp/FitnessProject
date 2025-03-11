@@ -1,4 +1,3 @@
-// Add extra inset padding to ensure map edges don't show during parallax
 import { Portal } from "@gorhom/portal"
 import { AppStyles } from "@lib/AppColorStyle"
 import { withTiFDefaultSpring } from "@lib/Reanimated"
@@ -21,7 +20,12 @@ import {
   View,
   ViewStyle
 } from "react-native"
-import MapView, { MapViewProps, Marker, Region } from "react-native-maps"
+import MapView, {
+  LongPressEvent,
+  MapViewProps,
+  Marker,
+  Region
+} from "react-native-maps"
 import Animated, {
   Extrapolate,
   interpolate,
@@ -59,6 +63,7 @@ marker?: ReactNode
 style?: StyleProp<ViewStyle>
 collapsedMapProps?: MapViewProps
 expandedMapProps?: MapViewProps
+onMapLongPress?: (event: LongPressEvent) => void
 parallaxFactor?: number // How strong the parallax effect should be
 }
 
@@ -75,6 +80,7 @@ export const ExpandableMapSnippetView = forwardRef(function Snippet(
   overlay,
   marker,
   style,
+  onMapLongPress,
   onMarkerPressed,
   collapsedMapProps,
   expandedMapProps,
@@ -115,7 +121,7 @@ const getExtendedContainerStyles = (pFactor: number) => {
     height: `${100 + extraHeight}%`,
     // Position the map in the middle of this extended container
     top: topOffset
-  }
+  } as StyleProp<ViewStyle>
 }
 
 // Updated parallax style for the extended container approach

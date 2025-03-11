@@ -1,6 +1,6 @@
-import { BodyText, Title } from "@components/Text"
 import { PrimaryButton } from "@components/Buttons"
-import { useKeyboardState } from "@lib/Keyboard"
+import { TiFFooterView } from "@components/Footer"
+import { BodyText, Title } from "@components/Text"
 import { TiFDefaultLayoutTransition } from "@lib/Reanimated"
 import React, { ReactNode, useState } from "react"
 import {
@@ -15,8 +15,6 @@ import {
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
 import Animated from "react-native-reanimated"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
-import { TiFFooterView } from "@components/Footer"
-import { TiFFormScrollableLayoutView } from "@components/form-components/ScrollableFormLayout"
 
 export type AuthSectionProps = {
   title: string

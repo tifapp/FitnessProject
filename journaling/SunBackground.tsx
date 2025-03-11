@@ -18,6 +18,7 @@ import {
 import { EdgeInsets } from "react-native-safe-area-context"
 import { Cloud, MovingCloudsDrawing } from "./Clouds"
 import { FixedDateRange } from "TiFShared/domain-models/FixedDateRange"
+import { MountainDrawing } from "./Mountain"
 
 export type SunBackgroundColor = string
 
@@ -131,10 +132,10 @@ export type SunBackgroundProps = {
   edgeInsets: EdgeInsets
 }
 
-const CORE_RADIUS = 48
-const OUTER_RING_RADIUS = 56
-const FADE_RING_RADIUS = 64
-const FADE_RING_TARGET_RADIUS = 80
+export const CORE_RADIUS = 48
+export const OUTER_RING_RADIUS = 56
+export const FADE_RING_RADIUS = 64
+export const FADE_RING_TARGET_RADIUS = 80
 
 export const SunBackgroundDrawing = ({
   edgeInsets,
@@ -156,6 +157,7 @@ export const SunBackgroundDrawing = ({
     </Rect>
     <SunDrawing background={background} size={size} edgeInsets={edgeInsets} />
     <MovingCloudsDrawing size={size} clouds={background.clouds} />
+    <MountainDrawing size={size} colorSet="sun" />
   </Group>
 )
 

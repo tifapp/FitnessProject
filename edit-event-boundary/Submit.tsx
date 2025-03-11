@@ -1,4 +1,5 @@
-import { PrimaryButton } from "@components/Buttons"
+import { FormSubmissionPrimaryButton } from "@components/Buttons"
+
 import {
   ClientSideEvent,
   clientSideEventFromResponse
@@ -133,17 +134,12 @@ export const EditEventFormSubmitButton = ({
   style
 }: EditEventFormSubmitButtonProps) => (
   <View style={style}>
-    <PrimaryButton
-      disabled={state.submission.status !== "submittable"}
-      onPress={() => {
-        if (state.submission.status === "submittable") {
-          state.submission.submit()
-        }
-      }}
+    <FormSubmissionPrimaryButton
+      submission={state.submission}
       style={styles.submitButton}
     >
-      {!state.eventId ? "Create Adventure" : "Update Adventure"}
-    </PrimaryButton>
+      {!state.eventId ? "Create Your Adventure" : "Update Your Adventure"}
+    </FormSubmissionPrimaryButton>
   </View>
 )
 

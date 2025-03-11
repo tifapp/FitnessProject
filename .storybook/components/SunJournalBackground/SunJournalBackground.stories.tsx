@@ -1,7 +1,8 @@
 import { cloud } from "@journaling/Clouds"
+import { MoonBackgroundDrawing } from "@journaling/MoonBackground"
 import { SunBackgroundDrawing } from "@journaling/SunBackground"
 import { Canvas, SkSize } from "@shopify/react-native-skia"
-import React, { useMemo, useState } from "react"
+import React, { useEffect, useMemo, useState } from "react"
 import {
   SafeAreaProvider,
   useSafeAreaInsets
@@ -64,29 +65,38 @@ const SUNSET_DATE = new Date("2025-02-12T16:30:00")
 const DAY_RANGE = dateRange(SUNRISE_DATE, SUNSET_DATE)!
 
 const getDayFraction = () => {
-  const now = new Date();
-  const hours = now.getHours();
-  const minutes = now.getMinutes();
-  
+  const now = new Date()
+  const hours = now.getHours()
+  const minutes = now.getMinutes()
+
   // Convert current time to decimal hours (e.g., 9:30 = 9.5)
-  const currentTime = hours + (minutes / 60);
-  
+  const currentTime = hours + minutes / 60
+
   // Define sunrise (6am) and sunset (6pm) in decimal hours
-  const sunrise = 6;
-  const sunset = 18;
-  
+  const sunrise = 6
+  const sunset = 18
+
   // Calculate the fraction
-  let fraction = (currentTime - sunrise) / (sunset - sunrise);
-  
-  return fraction;
+  let fraction = (currentTime - sunrise) / (sunset - sunrise)
+
+  return fraction
 }
 
 export const TimeOfDayView = () => {
   const [size, setSize] = useState<SkSize>({ width: 0, height: 0 })
   const insets = useSafeAreaInsets()
+
+  const [time, setTime] = useState(0.5)
+  useEffect(() => {
+    const interval = setInterval(() => {
+      // console.log(time)
+      setTime((x) => (x >= 1 ? 0 : x + 0.1))
+    }, 1000)
+    return () => clearInterval(interval)
+  }, [])
   const background = useMemo(
-    () => ({ time: getDayFraction(), dayRange: DAY_RANGE, clouds: CLOUDS }),
-    []
+    () => ({ time, dayRange: DAY_RANGE, clouds: CLOUDS }),
+    [time]
   )
   return (
     <Canvas style={{ flex: 1 }} onLayout={(e) => setSize(e.nativeEvent.layout)}>
@@ -95,6 +105,11 @@ export const TimeOfDayView = () => {
         background={background}
         edgeInsets={insets}
       />
+      {/* <MoonBackgroundDrawing
+        size={size}
+        background={background}
+        edgeInsets={insets}
+      /> */}
     </Canvas>
   )
 }
