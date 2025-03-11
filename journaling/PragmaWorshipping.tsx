@@ -20,6 +20,10 @@ import { FixedDateRange } from "TiFShared/domain-models/FixedDateRange"
 import { EdgeInsets } from "react-native-safe-area-context"
 import { SunSkyDrawing } from "./SunBackground"
 import { Platform } from "react-native"
+import {
+  MountainTopIntroDrawing,
+  MountainTopIntroProps
+} from "./MountainTopIntro"
 
 export type UsePragmaWorshippingEnvironment = {
   onJournalTimeStarted: () => void
@@ -99,48 +103,11 @@ export const PragmaWorshippingDrawing = ({
   )
 }
 
-export type PragmaWorshippingIntroProps = {
-  theme: "sun" | "moon"
-  size: SkSize
-  dayRange: FixedDateRange
-  time: number
-  edgeInsets: EdgeInsets
-  opacity: AnimatedProp<number>
-}
+export type PragmaWorshippingIntroProps = Omit<
+  MountainTopIntroProps,
+  "pragmaPose"
+>
 
-const PRAGMA_INTRO_DIMENSIONS = {
-  width: 384,
-  height: 384
-}
-
-export const PragmaWorshippingIntroDrawing = ({
-  theme,
-  size,
-  time,
-  edgeInsets,
-  dayRange,
-  opacity
-}: PragmaWorshippingIntroProps) => (
-  <Group opacity={opacity}>
-    {theme === "moon" && <StarrySkyDrawing size={size} numStars={50} />}
-    {theme === "sun" && (
-      <SunSkyDrawing
-        size={size}
-        time={time}
-        edgeInsets={edgeInsets}
-        dayRange={dayRange}
-      />
-    )}
-    <MountainDrawing
-      size={size}
-      mountainWidthRelativeOffset={0.4}
-      colorSet={theme}
-    />
-    <PragmaDrawing
-      size={PRAGMA_INTRO_DIMENSIONS}
-      pose="worship"
-      x={size.width / 2 - 198}
-      y={size.height / 2 - 198}
-    />
-  </Group>
-)
+export const PragmaWorshippingIntroDrawing = (
+  props: PragmaWorshippingIntroProps
+) => <MountainTopIntroDrawing pragmaPose="worship" {...props} />

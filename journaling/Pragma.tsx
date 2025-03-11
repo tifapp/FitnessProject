@@ -14,9 +14,11 @@ export const PRAGMA_POSES = {
   worship: require("../assets/PragmaWorship.svg")
 } as const
 
+export type PragmaPose = keyof typeof PRAGMA_POSES
+
 export type PragmaProps = {
   size: SkSize
-  pose: keyof typeof PRAGMA_POSES
+  pose: PragmaPose
   opacity?: AnimatedProp<number>
   x?: AnimatedProp<number>
   y?: AnimatedProp<number>
