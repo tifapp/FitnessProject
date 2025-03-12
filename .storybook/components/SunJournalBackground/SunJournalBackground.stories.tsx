@@ -8,7 +8,12 @@ import {
   PreambleProps
 } from "@journaling/JournalingSequence"
 import { MoonBackgroundDrawing } from "@journaling/MoonBackground"
+import { MountainTopIntroDrawing } from "@journaling/MountainTopIntro"
 import { PragmaDrawing } from "@journaling/Pragma"
+import {
+  PragmaJumpingDrawing,
+  usePragmaJumping
+} from "@journaling/PragmaJumping"
 import {
   PragmaWorshippingDrawing,
   PragmaWorshippingIntroDrawing,
@@ -148,6 +153,26 @@ const JOURNAL_SEQUENCES = [
         theme="moon"
         dayRange={DAY_RANGE}
         time={0.5}
+        {...props}
+      />
+    )
+  },
+  {
+    title: "Sunrise Jumping",
+    backgroundProps: { time: 0.045, dayRange: DAY_RANGE, clouds: CLOUDS },
+    PreambleDrawing: ({ onJournalTimeStarted, ...props }: PreambleProps) => {
+      const state = usePragmaJumping({ onJournalTimeStarted })
+      return <PragmaJumpingDrawing state={state} {...props} />
+    },
+    BackgroundDrawing: SunBackgroundDrawing,
+    introLines: "sunrise",
+    IntroDrawing: (props) => (
+      <MountainTopIntroDrawing
+        theme="sun"
+        pragmaPose="normal"
+        dayRange={DAY_RANGE}
+        time={0.045}
+        includeThemeObject
         {...props}
       />
     )

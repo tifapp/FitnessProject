@@ -45,6 +45,8 @@ export type JournalingSequenceProps = {
   onFinished: () => void
 }
 
+const EMPTY_SIZE = { width: 0, height: 0 }
+
 export const JournalingSequenceView = ({
   backgroundProps,
   BackgroundDrawing,
@@ -53,7 +55,7 @@ export const JournalingSequenceView = ({
   IntroDrawing,
   onFinished
 }: JournalingSequenceProps) => {
-  const [size, setSize] = useState<SkSize>({ width: 0, height: 0 })
+  const [size, setSize] = useState<SkSize>(EMPTY_SIZE)
   const insets = useSafeAreaInsets()
   const [isShowingPreamble, setIsShowingPreamble] = useState(true)
   const [isShowingIntro, setIsShowingIntro] = useState(false)
@@ -72,7 +74,7 @@ export const JournalingSequenceView = ({
             edgeInsets={insets}
           />
         </Group>
-        {isShowingPreamble && (
+        {size !== EMPTY_SIZE && isShowingPreamble && (
           <PreambleDrawing
             onJournalTimeStarted={() => {
               setIsShowingJournalTime(true)

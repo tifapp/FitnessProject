@@ -4,7 +4,6 @@ import { Audio } from "expo-av"
 import { sleep } from "@lib/utils/DelayData"
 import { useEffect, useState } from "react"
 import {
-  AnimatedProp,
   Color,
   Group,
   LinearGradient,
@@ -14,11 +13,6 @@ import {
 } from "@shopify/react-native-skia"
 import { PragmaDrawing } from "./Pragma"
 import { useSharedValue, withTiming } from "react-native-reanimated"
-import { StarrySkyDrawing } from "./StarrySky"
-import { MountainDrawing } from "./Mountain"
-import { FixedDateRange } from "TiFShared/domain-models/FixedDateRange"
-import { EdgeInsets } from "react-native-safe-area-context"
-import { SunSkyDrawing } from "./SunBackground"
 import { Platform } from "react-native"
 import {
   MountainTopIntroDrawing,

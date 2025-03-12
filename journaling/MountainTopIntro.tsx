@@ -4,7 +4,9 @@ import { EdgeInsets } from "react-native-safe-area-context"
 import { MountainDrawing } from "./Mountain"
 import { PragmaDrawing, PragmaPose } from "./Pragma"
 import { StarrySkyDrawing } from "./StarrySky"
-import { SunSkyDrawing } from "./SunBackground"
+import { SunDrawing, SunSkyDrawing } from "./SunBackground"
+import { MoonDrawing } from "./MoonBackground"
+import { useMemo } from "react"
 
 export type MountainTopIntroProps = {
   theme: "sun" | "moon"
@@ -14,6 +16,7 @@ export type MountainTopIntroProps = {
   time: number
   edgeInsets: EdgeInsets
   opacity: AnimatedProp<number>
+  includeThemeObject?: boolean
 }
 
 const PRAGMA_DIMENSIONS = {
@@ -34,28 +37,49 @@ export const MountainTopIntroDrawing = ({
   pragmaPose,
   edgeInsets,
   dayRange,
-  opacity
-}: MountainTopIntroProps) => (
-  <Group opacity={opacity}>
-    {theme === "moon" && <StarrySkyDrawing size={size} numStars={50} />}
-    {theme === "sun" && (
-      <SunSkyDrawing
+  opacity,
+  includeThemeObject = false
+}: MountainTopIntroProps) => {
+  const background = useMemo(
+    () => ({ time, dayRange, clouds: [] }),
+    [time, dayRange]
+  )
+  return (
+    <Group opacity={opacity}>
+      {theme === "moon" && <StarrySkyDrawing size={size} numStars={50} />}
+      {theme === "sun" && (
+        <SunSkyDrawing
+          size={size}
+          time={time}
+          edgeInsets={edgeInsets}
+          dayRange={dayRange}
+        />
+      )}
+      {includeThemeObject && theme === "moon" && (
+        <MoonDrawing
+          background={background}
+          size={size}
+          edgeInsets={edgeInsets}
+        />
+      )}
+      {includeThemeObject && theme === "sun" && (
+        <SunDrawing
+          background={background}
+          size={size}
+          edgeInsets={edgeInsets}
+        />
+      )}
+      <MountainDrawing
         size={size}
-        time={time}
-        edgeInsets={edgeInsets}
-        dayRange={dayRange}
+        mountainWidthRelativeOffset={0.4}
+        colorSet={theme}
       />
-    )}
-    <MountainDrawing
-      size={size}
-      mountainWidthRelativeOffset={0.4}
-      colorSet={theme}
-    />
-    <PragmaDrawing
-      size={PRAGMA_DIMENSIONS}
-      pose={pragmaPose}
-      x={size.width / 2 - POSE_OFFSETS[pragmaPose].x}
-      y={size.height / 2 - POSE_OFFSETS[pragmaPose].y}
-    />
-  </Group>
-)
+      <PragmaDrawing
+        size={PRAGMA_DIMENSIONS}
+        pose={pragmaPose}
+        x={size.width / 2 - POSE_OFFSETS[pragmaPose].x}
+        y={size.height / 2 - POSE_OFFSETS[pragmaPose].y}
+      />
+    </Group>
+  )
+}

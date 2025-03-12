@@ -3,8 +3,6 @@ import { useCallback, useEffect, useState } from "react"
 import { useTrack } from "./Audio"
 import { StyleProp, View, StyleSheet, ViewStyle, Pressable } from "react-native"
 import { BodyText, Headline } from "@components/Text"
-import { useEffectEvent } from "@lib/utils/UseEffectEvent"
-import { Audio } from "expo-av"
 
 export const PRAGMA_LINES = {
   sunrise: [
