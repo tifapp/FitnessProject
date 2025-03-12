@@ -2,7 +2,7 @@ import { AnimatedProp, Canvas, Group, SkSize } from "@shopify/react-native-skia"
 import { MoonBackgroundProps } from "./MoonBackground"
 import { SunBackgroundProps } from "./SunBackground"
 import { EdgeInsets, useSafeAreaInsets } from "react-native-safe-area-context"
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import {
   JournalingIntroView,
   PRAGMA_LINES,
@@ -21,6 +21,7 @@ import {
   useSharedValue,
   withTiming
 } from "react-native-reanimated"
+import { useSFX } from "./Audio"
 
 export type BackgroundProps = SunBackgroundProps | MoonBackgroundProps
 
@@ -61,6 +62,13 @@ export const JournalingSequenceView = ({
   const [isShowingIntro, setIsShowingIntro] = useState(false)
   const [isShowingJournalTime, setIsShowingJournalTime] = useState(false)
   const introOpacity = useSharedValue(0)
+  const { sound: windSound } = useSFX(require("../assets/audio/calm.mp3"))
+  useEffect(() => {
+    if (windSound) windSound.playAsync()
+    return () => {
+      windSound?.stopAsync()
+    }
+  }, [windSound])
   return (
     <View style={styles.container}>
       <Canvas
