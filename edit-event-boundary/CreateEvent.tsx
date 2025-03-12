@@ -9,6 +9,7 @@ import { LongPressEvent } from "react-native-maps"
 import { LocationCoordinate2D } from "TiFShared/domain-models/LocationCoordinate2D"
 import { EditEventProps } from "./EditEvent"
 import { EditEventFormLocationView, useEditEventFormLocation } from "./Location"
+import TelescopeInput from "./TelescopeInput"
 
 type LocationProps = {
   hostName: string
@@ -43,12 +44,12 @@ export const CreateEventView = ({
         hostName={hostName}
         hostProfileImageURL={hostProfileImageURL}
         onSelectLocationTapped={onSelectLocationTapped}
-        // onMapLongPress={onMapLongPress}
+        onMapLongPress={() => {}}
         location={useEditEventFormLocation()}
         isExpanded={true}
       />
       <View style={{ height: "60%" }}>
-        {/* <TelescopeInput onSubmit={setTitle} /> */}
+         <TelescopeInput onSubmit={setTitle} />
       </View>
     </View>
   )

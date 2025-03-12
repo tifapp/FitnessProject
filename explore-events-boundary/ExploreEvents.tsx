@@ -227,7 +227,7 @@ export const ExploreEventsView = ({
 }
 
 const NearbyHeader = () => (
-  <Title style={styles.sheetHeaderText}>Choose Your Adventure</Title>
+  <Title style={styles.sheetHeaderText}>Find An Adventure</Title>
 )
 const FindingHeader = () => (
   <Title style={styles.sheetHeaderText}>Scanning...</Title>
