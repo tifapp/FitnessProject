@@ -1,5 +1,10 @@
+import { BalloonIcon } from "@components/Balloon"
+import { Title } from "@components/Text"
 import { TimeOfDayView } from "@event-details-boundary/TimeOfDay"
-import ConfigurableOrbitalComponent from "@journaling/OrbitList/AviationTheme"
+import EventItem from "@journaling/OrbitList/EventItem"
+import { sampleEvents } from "@journaling/OrbitList/MockEvents"
+import VirtualizedOrbit from "@journaling/OrbitList/VirtualizedOrbit"
+import { AppStyles } from "@lib/AppColorStyle"
 import React from "react"
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 
@@ -7,14 +12,36 @@ export type HomeProps = {
   style?: StyleProp<ViewStyle>
 }
 
-export const Page1 = () => (
-  <>
-    <TimeOfDayView />
-    <View style={styles.todo}>
-      <ConfigurableOrbitalComponent />
-    </View>
-  </>
-)
+export const Page1 = () => {
+  return (
+    <>
+      <TimeOfDayView />
+      <View style={styles.todo}>
+        <View style={{ position: "absolute", top: "10%" }}>
+          <Title style={{ color: "white" }}>{(new Date()).toDateString()}</Title>
+        </View>
+        <View style={{ zIndex: 101, position: "absolute", bottom: "20%", left: 32 }}>
+          <BalloonIcon
+            width={128}
+            height={128}
+            color={AppStyles.inkRed.toString()}
+          />
+        </View>
+        <VirtualizedOrbit
+          positionX={250}
+          positionY={700}
+          centerElement={<View style={{ left: "-50%", top: "-50%", width: 1000, height: 1000, borderRadius: 500, backgroundColor: AppStyles.primaryBlue.toString() }} />}
+          keyExtractor={(item) => item.id}
+          data={sampleEvents}
+          orbitRadius={600}
+          renderItem={(item, position, state) => (
+            <EventItem item={item} position={position} state={state} />
+          )}
+        />
+      </View>
+    </>
+  )
+}
 
 const styles = StyleSheet.create({
   todo: {
