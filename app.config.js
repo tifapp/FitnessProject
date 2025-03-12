@@ -62,6 +62,12 @@ const config = {
       "expo-font",
       {
         fonts: [
+          "./assets/fonts/PlayfairDisplay-Regular.ttf",
+          "./assets/fonts/PlayfairDisplay-Medium.ttf",
+          "./assets/fonts/PlayfairDisplay-SemiBold.ttf",
+          "./assets/fonts/PlayfairDisplay-Bold.ttf",
+          "./assets/fonts/PlayfairDisplay-ExtraBold.ttf",
+          "./assets/fonts/PlayfairDisplay-Black.ttf",
           "./assets/fonts/RobotoSlab-Medium.ttf",
           "./assets/fonts/RobotoSlab-Regular.ttf",
           "./assets/fonts/RobotoSlab-SemiBold.ttf",
