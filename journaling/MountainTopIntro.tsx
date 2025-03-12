@@ -21,6 +21,12 @@ const PRAGMA_DIMENSIONS = {
   height: 384
 }
 
+const POSE_OFFSETS = {
+  normal: { x: 240, y: 160 },
+  worship: { x: 198, y: 198 },
+  standing: { x: 198, y: 256 }
+} as const
+
 export const MountainTopIntroDrawing = ({
   theme,
   size,
@@ -48,8 +54,8 @@ export const MountainTopIntroDrawing = ({
     <PragmaDrawing
       size={PRAGMA_DIMENSIONS}
       pose={pragmaPose}
-      x={size.width / 2 - 198}
-      y={size.height / 2 - 198}
+      x={size.width / 2 - POSE_OFFSETS[pragmaPose].x}
+      y={size.height / 2 - POSE_OFFSETS[pragmaPose].y}
     />
   </Group>
 )

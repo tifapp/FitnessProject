@@ -11,7 +11,8 @@ import { useMemo } from "react"
 
 export const PRAGMA_POSES = {
   normal: require("../assets/Pragma.svg"),
-  worship: require("../assets/PragmaWorship.svg")
+  worship: require("../assets/PragmaWorship.svg"),
+  standing: require("../assets/PragmaStanding.svg")
 } as const
 
 export type PragmaPose = keyof typeof PRAGMA_POSES
