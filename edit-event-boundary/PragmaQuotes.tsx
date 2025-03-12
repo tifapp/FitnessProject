@@ -1,4 +1,4 @@
-import { Subtitle } from "@components/Text"
+import { Quote } from "@components/Text"
 import { AppStyles } from "@lib/AppColorStyle"
 import { dayjs } from "TiFShared/lib/Dayjs"
 import { Image } from "expo-image"
@@ -10,31 +10,61 @@ export type PragmaQuoteProps = {
   quote: () => string
   animationInterval: number
   initialDelay?: number
+  newlineDelayMultiplier?: number // Added param for controlling newline delay
   style?: StyleProp<ViewStyle>
 }
 
 const usePragmaQuote = (
   quote: () => string,
   intervalMillis: number,
-  initialDelay: number
+  initialDelay: number,
+  newlineDelayMultiplier: number = 4 // Default to 4x normal interval
 ) => {
   const [text, setText] = useState<string | undefined>()
+
   useEffect(() => {
     const quoteText = quote()
     let index = 0
-    let interval: NodeJS.Timeout
-    const timeout = setTimeout(() => {
-      interval = setInterval(() => {
-        const nextText = quoteText.substring(0, index++)
-        setText(nextText)
-        if (index > quoteText.length) clearInterval(interval)
-      }, intervalMillis)
-    }, initialDelay)
-    return () => {
-      clearTimeout(timeout)
-      clearInterval(interval)
+    let timeout: NodeJS.Timeout
+
+    const animateNextChar = () => {
+      // Update the text with the current character
+      const nextText = quoteText.substring(0, index + 1)
+      setText(nextText)
+
+      index++
+
+      // Check if we've reached the end of the text
+      if (index >= quoteText.length) {
+        return
+      }
+
+      // Get the current character (the one we just added)
+      const currentChar = quoteText.charAt(index - 1)
+
+      // Check if we should add a delay because the character is a newline
+      const isNewline = currentChar === "\n"
+
+      // Determine the delay for the next character
+      const nextDelay = isNewline
+        ? 800
+        : intervalMillis
+
+      // Schedule the next character animation
+      timeout = setTimeout(animateNextChar, nextDelay)
     }
-  }, [quote, intervalMillis, initialDelay])
+
+    // Start the animation after the initial delay
+    const initialTimeout = setTimeout(() => {
+      animateNextChar()
+    }, initialDelay)
+
+    return () => {
+      clearTimeout(initialTimeout)
+      clearTimeout(timeout)
+    }
+  }, [quote, intervalMillis, initialDelay, newlineDelayMultiplier])
+
   return text
 }
 
@@ -42,9 +72,10 @@ export const PragmaQuoteView = ({
   quote,
   animationInterval,
   initialDelay = 300,
+  newlineDelayMultiplier = 4, // Default to 4x normal interval
   style
 }: PragmaQuoteProps) => {
-  const text = usePragmaQuote(quote, animationInterval, initialDelay)
+  const text = usePragmaQuote(quote, animationInterval, initialDelay, newlineDelayMultiplier)
   return (
     <View style={style}>
       <View style={styles.row}>
@@ -60,8 +91,8 @@ export const PragmaQuoteView = ({
           {/* <BoldFootnote>Pragma</BoldFootnote> */}
         </View>
         {text && (
-          <Animated.View entering={FadeIn} style={styles.quote}>
-            <Subtitle style={styles.quote}>{text}</Subtitle>
+          <Animated.View style={{ flex: 1 }} entering={FadeIn}>
+            <Quote style={{ flex: 1 }}>{text}</Quote>
           </Animated.View>
         )}
       </View>
@@ -132,13 +163,13 @@ export const createEventQuote = (date: Date = new Date()) => {
 
 const CREATE_EVENT_QUOTES = {
   startOfDay: [
-    "Rise and shine! There's a glorious day of possibilities to explore!"
+    "Rise and shine!\nThere's a glorious day of possibilities to explore!"
   ],
   generic: [
     "The north star guides your path.",
     "Where to, Captain?",
     "What's your next destination?",
-    "Adventure awaits! Where next?",
+    "Adventure awaits!\nWhere next?",
     "What's on your radar?"
   ],
   weekday: [
@@ -162,9 +193,9 @@ const CREATE_EVENT_QUOTES = {
     (name: string) => `Ready to embark on a ${name} expedition?`
   ],
   holiday: [
-    (greeting: string) => `${greeting} Your adventure awaits!`,
-    (greeting: string) => `${greeting} Time to set your coordinates!`,
-    (greeting: string) => `${greeting} Which horizon calls to you today?`
+    (greeting: string) => `${greeting}\nYour adventure awaits!`,
+    (greeting: string) => `${greeting}\nTime to set your coordinates!`,
+    (greeting: string) => `${greeting}\nWhich horizon calls to you today?`
   ]
 }
 

@@ -19,6 +19,13 @@ export const Subtitle = (props: TextProps) => (
 )
 
 /**
+ * A text component for secondary titles on screens.
+ */
+export const Quote = (props: TextProps) => (
+  <Animated.Text {...props} style={[props.style, styles.quote]} />
+)
+
+/**
  * A text component for standard text that the user sees.
  */
 export const BodyText = (props: TextProps) => (
@@ -76,6 +83,10 @@ const styles = StyleSheet.create({
   subtitle: {
     fontFamily: "OpenSansBold",
     fontSize: 20
+  },
+  quote: {
+    fontFamily: "OpenSansBold",
+    fontSize: 19
   },
   body: {
     fontFamily: "OpenSans",
