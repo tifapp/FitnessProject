@@ -4,13 +4,32 @@ import {
   LinearGradient,
   vec,
   SkSize,
-  Color
+  Color,
+  Rect
 } from "@shopify/react-native-skia"
 
 export const MOUNTAIN_COLOR_SET = {
   sun: ["#24D12B", "#1B8B23"] as Color[],
   moon: ["#2DC6B8", "#087865"] as Color[]
 } as const
+
+export type StraightMountainDrawingProps = {
+  size: SkSize
+  colorSet: keyof typeof MOUNTAIN_COLOR_SET
+}
+
+export const StraightMountainDrawing = ({
+  size,
+  colorSet
+}: StraightMountainDrawingProps) => (
+  <Rect width={size.width} height={size.height} x={0} y={size.height / 2}>
+    <LinearGradient
+      start={vec(size.width / 2, size.height * 0.4)}
+      end={vec(size.width / 2, size.height)}
+      colors={MOUNTAIN_COLOR_SET[colorSet]}
+    />
+  </Rect>
+)
 
 export type MountainProps = {
   size: SkSize

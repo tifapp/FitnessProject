@@ -11,6 +11,11 @@ import { MoonBackgroundDrawing } from "@journaling/MoonBackground"
 import { MountainTopIntroDrawing } from "@journaling/MountainTopIntro"
 import { PragmaDrawing } from "@journaling/Pragma"
 import {
+  PragmaFallingDrawing,
+  PragmaFallingIntroDrawing,
+  usePragmaFalling
+} from "@journaling/PragmaFalling"
+import {
   PragmaJumpingDrawing,
   usePragmaJumping
 } from "@journaling/PragmaJumping"
@@ -22,7 +27,7 @@ import {
 import { SunBackgroundDrawing } from "@journaling/SunBackground"
 import { AppStyles } from "@lib/AppColorStyle"
 import { Group, Rect, SkSize } from "@shopify/react-native-skia"
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useMemo, useState } from "react"
 import { View } from "react-native"
 import { useSharedValue, withTiming } from "react-native-reanimated"
 import { SafeAreaProvider } from "react-native-safe-area-context"
@@ -108,9 +113,87 @@ type SequenceProps = Omit<JournalingSequenceProps, "onFinished"> & {
   title: string
 }
 
+const FALLING_BACKGROUND_CLOUDS = [
+  cloud({
+    relativeX: 0.6,
+    relativeY: 0.1,
+    relativeRangeX: 0.1,
+    scale: 0.3,
+    speed: 30_000
+  }),
+  cloud({
+    relativeX: 0.4,
+    relativeY: 0.15,
+    relativeRangeX: 0.15,
+    scale: 0.5,
+    speed: 23_000
+  }),
+  cloud({
+    relativeX: 0.6,
+    relativeY: 0.17,
+    relativeRangeX: 0.15,
+    scale: 0.55,
+    speed: 21_000
+  }),
+  cloud({
+    relativeX: 0.03,
+    relativeY: 0.23,
+    relativeRangeX: 0.2,
+    scale: 0.7,
+    speed: 16_000
+  }),
+  cloud({
+    relativeX: 0.2,
+    relativeY: 0.26,
+    relativeRangeX: 0.25,
+    scale: 0.8,
+    speed: 12_000
+  })
+]
+
 const JOURNAL_SEQUENCES = [
   {
-    title: "Sun Worshipping",
+    title: "Sunrise",
+    backgroundProps: { time: 0.045, dayRange: DAY_RANGE, clouds: CLOUDS },
+    PreambleDrawing: ({ onJournalTimeStarted, ...props }: PreambleProps) => {
+      const state = usePragmaJumping({ onJournalTimeStarted })
+      return <PragmaJumpingDrawing state={state} {...props} />
+    },
+    BackgroundDrawing: SunBackgroundDrawing,
+    introLines: "sunrise",
+    IntroDrawing: (props) => (
+      <MountainTopIntroDrawing
+        theme="sun"
+        pragmaPose="normal"
+        dayRange={DAY_RANGE}
+        time={0.045}
+        includeThemeObject
+        {...props}
+      />
+    )
+  },
+  {
+    title: "Morning",
+    backgroundProps: { time: 0.3, dayRange: DAY_RANGE, clouds: CLOUDS },
+    PreambleDrawing: ({ onJournalTimeStarted, ...props }: PreambleProps) => {
+      usePragmaFalling({ onJournalTimeStarted })
+      return <PragmaFallingDrawing {...props} />
+    },
+    BackgroundDrawing: SunBackgroundDrawing,
+    introLines: "morning",
+    IntroDrawing: (props) => (
+      <PragmaFallingIntroDrawing
+        theme="sun"
+        background={useMemo(
+          () => ({ time: 0.3, dayRange: DAY_RANGE, clouds: CLOUDS }),
+          []
+        )}
+        {...props}
+      />
+    )
+  },
+  {
+    title: "Noon",
     backgroundProps: { time: 0.5, dayRange: DAY_RANGE, clouds: CLOUDS },
     PreambleDrawing: ({ onJournalTimeStarted, ...props }: PreambleProps) => {
       const worshipping = usePragmaWorshipping({ onJournalTimeStarted })
@@ -134,7 +217,67 @@ const JOURNAL_SEQUENCES = [
     )
   },
   {
-    title: "Moon Worshipping",
+    title: "Afternoon",
+    backgroundProps: { time: 0.75, dayRange: DAY_RANGE, clouds: CLOUDS },
+    PreambleDrawing: ({ onJournalTimeStarted, ...props }: PreambleProps) => {
+      const state = usePragmaJumping({ onJournalTimeStarted })
+      return <PragmaJumpingDrawing state={state} {...props} />
+    },
+    BackgroundDrawing: SunBackgroundDrawing,
+    introLines: "afternoon",
+    IntroDrawing: (props) => (
+      <MountainTopIntroDrawing
+        theme="sun"
+        pragmaPose="normal"
+        dayRange={DAY_RANGE}
+        time={0.75}
+        includeThemeObject
+        {...props}
+      />
+    )
+  },
+  {
+    title: "Sunset",
+    backgroundProps: { time: 0.975, dayRange: DAY_RANGE, clouds: CLOUDS },
+    PreambleDrawing: ({ onJournalTimeStarted, ...props }: PreambleProps) => {
+      usePragmaFalling({ onJournalTimeStarted })
+      return <PragmaFallingDrawing {...props} />
+    },
+    BackgroundDrawing: SunBackgroundDrawing,
+    introLines: "sunset",
+    IntroDrawing: (props) => (
+      <PragmaFallingIntroDrawing
+        theme="sun"
+        background={useMemo(
+          () => ({ time: 0.975, dayRange: DAY_RANGE, clouds: CLOUDS }),
+          []
+        )}
+        {...props}
+      />
+    )
+  },
+  {
+    title: "Night",
+    backgroundProps: { time: 0.35, dayRange: DAY_RANGE, clouds: CLOUDS },
+    PreambleDrawing: ({ onJournalTimeStarted, ...props }: PreambleProps) => {
+      usePragmaFalling({ onJournalTimeStarted })
+      return <PragmaFallingDrawing {...props} />
+    },
+    BackgroundDrawing: MoonBackgroundDrawing,
+    introLines: "night",
+    IntroDrawing: (props) => (
+      <PragmaFallingIntroDrawing
+        theme="moon"
+        background={useMemo(
+          () => ({ time: 0.35, dayRange: DAY_RANGE, clouds: CLOUDS }),
+          []
+        )}
+        {...props}
+      />
+    )
+  },
+  {
+    title: "Midnight",
     backgroundProps: { time: 0.5, dayRange: DAY_RANGE, clouds: CLOUDS },
     PreambleDrawing: ({ onJournalTimeStarted, ...props }: PreambleProps) => {
       const worshipping = usePragmaWorshipping({ onJournalTimeStarted })
@@ -158,20 +301,20 @@ const JOURNAL_SEQUENCES = [
     )
   },
   {
-    title: "Sunrise Jumping",
-    backgroundProps: { time: 0.045, dayRange: DAY_RANGE, clouds: CLOUDS },
+    title: "Bullying",
+    backgroundProps: { time: 0.75, dayRange: DAY_RANGE, clouds: CLOUDS },
     PreambleDrawing: ({ onJournalTimeStarted, ...props }: PreambleProps) => {
       const state = usePragmaJumping({ onJournalTimeStarted })
       return <PragmaJumpingDrawing state={state} {...props} />
     },
-    BackgroundDrawing: SunBackgroundDrawing,
-    introLines: "sunrise",
+    BackgroundDrawing: MoonBackgroundDrawing,
+    introLines: "bullying",
     IntroDrawing: (props) => (
       <MountainTopIntroDrawing
-        theme="sun"
-        pragmaPose="normal"
+        theme="moon"
+        pragmaPose="standing"
         dayRange={DAY_RANGE}
-        time={0.045}
+        time={0.75}
         includeThemeObject
         {...props}
       />

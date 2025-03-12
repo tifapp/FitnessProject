@@ -11,11 +11,23 @@ export const PRAGMA_LINES = {
     "In any case, it would do you well to remember this for today.",
     "Simulated disorder postulates perfect discipline, simulated fear postulates courage; simulated weakness postulates strength."
   ],
+  morning: [
+    "Good morning Sean! Welcome to yet another step of your journey.",
+    "What is it that you wish to accomplish today?",
+    "It would be wise to enjoy this before reflecting on that.",
+    "In all fighting, the direct method may be used for joining battle, but indirect methods will be needed in order to secure victory."
+  ],
   midday: [
     "What brings you here today, Sean?",
-    "The day seems to be well underway, are you ready for it?",
-    "Yet, take this time to digest this before you reflect.",
+    "The day seems to be well underway, what do you wish to do?",
+    "Take this time to digest this before you reflect.",
     "According as circumstances are favorable, one should modify one’s plans."
+  ],
+  afternoon: [
+    "Good afternoon Sean! It seems the day time could be winding down.",
+    "Are you satisfied with your day?",
+    "I believe you should take this to heart regardless of how it went.",
+    "His victories bring him neither reputation for wisdom nor credit for courage."
   ],
   sunset: [
     "It seems that the day is coming to an end.",
@@ -38,7 +50,7 @@ export const PRAGMA_LINES = {
   bullying: [
     "Fuck You Sean.",
     "🖕🖕🖕🖕🖕🖕🖕🖕🖕🖕🖕🖕🖕🖕🖕🖕🖕🖕🖕🖕🖕🖕🖕🖕🖕🖕🖕🖕🖕🖕🖕🖕🖕🖕🖕🖕",
-    "I hope you die, so I'm not even going to leave you with advice this time.",
+    "You're such a loser, so I'm not even going to leave you with advice this time.",
     "I am hereby sending you to TiF Hell.",
     "Goodbye, Sean. You were so pathetic, but thanks for leaving us with your money.",
     "Now die you pathetic fucker."
