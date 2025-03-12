@@ -253,7 +253,7 @@ const NoResultsView = () => (
   <View style={styles.emptyEventsContentContainer}>
     <Ionicon name="map" size={48} style={styles.emptyEventsIcon} />
     <BodyText style={styles.emptyEventsText}>
-      Nothing was found in this area. Try exploring a different location!
+      Nothing found in this area. Chart your own or try exploring a different location!
     </BodyText>
   </View>
 )
@@ -282,7 +282,7 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     paddingHorizontal: 24,
     paddingBottom: 16,
-    color: AppStyles.primaryBlue.toString(),
+    color: AppStyles.primaryColor.toString(),
     textAlign: "center"
   },
   water: {

@@ -67,30 +67,25 @@ export const TargetReticle = ({ x = 200, y = 300 }) => {
     pulseValue.value = pulseAnimation
   }, [])
 
-  // Top-level container that covers the entire screen
-  const containerStyle = {
-    position: "absolute",
-    width: "100%",
-    height: "100%",
-    justifyContent: "center",
-    alignItems: "center"
-  }
-
-  // Style for reticle position - centered on the provided coordinates
-  const reticleStyle = {
+  return (
+    <View style={ {
+      position: "absolute",
+      width: "100%",
+      height: "100%",
+      justifyContent: "center",
+      alignItems: "center",
+      pointerEvents: "none"
+    }}>
+      {/* Target reticle - position from props, not animated */}
+      <View style={{
     position: "absolute",
     width: 320,
     height: 320,
-    left: x - 160,
-    top: y - 160,
+    left: x - 145,
+    top: y - 100,
     justifyContent: "center",
     alignItems: "center"
-  }
-
-  return (
-    <View style={containerStyle}>
-      {/* Target reticle - position from props, not animated */}
-      <View style={reticleStyle}>
+  }}>
         {/* Layer 1: Radar sweep */}
         <Svg width="320" height="320" viewBox="0 0 200 200">
           <Defs>

@@ -317,7 +317,7 @@ const CustomStorybookUI = () => {
         <StoryComponent {...args} />
         <Text
           onPress={() => setSelectedStory(-1)}
-          style={{ position: "absolute", bottom: 30, left: 10 }}
+          style={{ position: "absolute", bottom: 30, left: 10, opacity: 0.025 }}
         >
           Close
         </Text>

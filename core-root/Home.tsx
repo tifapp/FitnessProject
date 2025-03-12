@@ -4,7 +4,6 @@ import { PlusIconView } from "@components/common/Icons"
 import { TiFFooterView } from "@components/Footer"
 import { useCoreNavigation } from "@components/Navigation"
 import { AnimatedPagerView } from "@components/Pager"
-import { ProfileCircleView } from "@components/profileImageComponents/ProfileCircle"
 import { Headline } from "@components/Text"
 import { defaultEditFormValues } from "@event/EditFormValues"
 import {
@@ -15,7 +14,6 @@ import {
 } from "@explore-events-boundary"
 import { AppStyles } from "@lib/AppColorStyle"
 import { FontScaleFactors } from "@lib/Fonts"
-import { IfAuthenticated } from "@user/Session"
 import { atom, useAtomValue, useSetAtom } from "jotai"
 import React, { useContext, useRef } from "react"
 import { Pressable, StyleProp, StyleSheet, View, ViewStyle } from "react-native"
@@ -117,24 +115,6 @@ const FooterView = ({ onPageIndexTapped }: FooterProps) => {
           <PageDotView index={0} onTapped={onPageIndexTapped} />
           <PageDotView index={1} onTapped={onPageIndexTapped} />
         </View>
-      </View>
-      <View style={styles.footerItem}>
-        <IfAuthenticated
-          thenRender={(session) => (
-            <Pressable
-              onPress={() => presentProfile(session.id)}
-              style={styles.footerProfileImageContainer}
-            >
-              <ProfileCircleView
-                name={session.name}
-                imageURL={session.profileImageURL}
-                maximumFontSizeMultiplier={FontScaleFactors.xxxLarge}
-                style={styles.footerProfileImage}
-              />
-              <View style={styles.footerProfileLineIndicator} />
-            </Pressable>
-          )}
-        />
       </View>
     </View>
   )

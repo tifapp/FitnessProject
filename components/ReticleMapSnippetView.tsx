@@ -1,3 +1,4 @@
+import { PragmaQuoteView } from "@edit-event-boundary/PragmaQuotes"
 import { Portal } from "@gorhom/portal"
 import { withTiFDefaultSpring } from "@lib/Reanimated"
 import React, {
@@ -215,6 +216,18 @@ const ExpandedMapView = ({
       isExpandingShared.value ? safeAreaInsets.bottom + bottomPadding : 16
     )
   }))
+
+    const [showQuote, setShowQuote] = useState(false)
+
+    useEffect(() => {
+      // Set a timeout to show the quote after 3 seconds (3000ms)
+      const timer = setTimeout(() => {
+        setShowQuote(true)
+      }, 6000)
+
+      // Clean up the timer when component unmounts
+      return () => clearTimeout(timer)
+    }, [])
   return (
     <View>
       {isVisible && (
@@ -255,6 +268,15 @@ const ExpandedMapView = ({
           </Animated.View>
           <TransparentHoleOverlay />
           <TargetReticle />
+          {
+            showQuote &&
+            <PragmaQuoteView
+              style={{ position: "absolute", bottom: 196, width: "100%" }}
+              quote={() => "Have you been here before?"}
+              animationInterval={5}
+              initialDelay={300}
+            />
+          }
         </Animated.View>
       )}
     </View>

@@ -1,4 +1,4 @@
-import React, { FC, useEffect } from "react";
+import React, { FC, memo, useEffect } from "react";
 import {
   StyleSheet
 } from "react-native";
@@ -20,8 +20,8 @@ interface FadingOverlayProps {
   visible?: boolean;
 }
 
-// FadingOverlay component with TypeScript props and Reanimated 3
-export const FadingOverlay: FC<FadingOverlayProps> = ({
+// Base FadingOverlay component
+const FadingOverlayBase: FC<FadingOverlayProps> = ({
   duration = 3000,
   initialOpacity = 1,
   onComplete = () => {},
@@ -78,6 +78,24 @@ export const FadingOverlay: FC<FadingOverlayProps> = ({
     />
   )
 }
+
+// Custom comparison function to determine if the component should re-render
+const arePropsEqual = (prevProps: FadingOverlayProps, nextProps: FadingOverlayProps) => {
+  // Compare only the props that affect the animation behavior
+  return (
+    prevProps.visible === nextProps.visible &&
+    prevProps.fadeIn === nextProps.fadeIn &&
+    prevProps.duration === nextProps.duration &&
+    prevProps.initialOpacity === nextProps.initialOpacity &&
+    prevProps.color === nextProps.color &&
+    // For the onComplete callback, we can compare references
+    // This means the component will re-render if a new function reference is passed
+    prevProps.onComplete === nextProps.onComplete
+  )
+}
+
+// Export the memoized version of the component
+export const FadingOverlay = memo(FadingOverlayBase, arePropsEqual)
 
 // Styles
 const styles = StyleSheet.create({

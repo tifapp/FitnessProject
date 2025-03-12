@@ -50,16 +50,7 @@ export const EventDetailsContentView = <
         style={styles.noContent}
       />
     )}
-    {isExploratoryFailure(result.status) && (
-      <NoContentView
-        onActionButtonTapped={onExploreOtherEventsTapped}
-        actionButtonTitle="Explore Other Events"
-        possibleMessages={UNSUCCESSFUL_MESSAGE_SET[result.status]}
-        style={styles.noContent}
-      />
-    )}
-    {result.status === "success" &&
-      children(result as Extract<Result, { status: "success" }>)}
+    {children(result as Extract<Result, { status: "success" }>)}
   </View>
 )
 

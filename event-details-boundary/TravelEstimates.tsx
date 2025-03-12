@@ -5,6 +5,7 @@ import {
   BodyText,
   Caption,
   CaptionTitle,
+  Footnote,
   Headline
 } from "@components/Text"
 import { Ionicon, RoundedIonicon } from "@components/common/Icons"

@@ -2,7 +2,6 @@ import { TiFView } from "@core-root"
 import { EventMocks } from "@event-details-boundary/MockData"
 import { clientSideEventFromResponse } from "@event/ClientSideEvent"
 import { LiveEventsFeature, LiveEventsStore } from "@event/LiveEvents"
-import { eventsByRegion } from "@explore-events-boundary"
 import { tiFQueryClient } from "@lib/ReactQuery"
 import { sleep } from "@lib/utils/DelayData"
 import { SettingsProvider } from "@settings-storage/Hooks"
@@ -33,6 +32,8 @@ userSettings.update({
   eventPresetDurations: [3900, 7500, 8400, 12300, 9500, 13700]
 })
 
+const mockEvents = [EventMocks.MockMultipleAttendeeResponse, EventMocks.MockSingleAttendeeResponse, EventMocks.Multiday, EventMocks.PickupBasketball].map(event => clientSideEventFromResponse(event))
+
 const store = new LiveEventsStore(tiFQueryClient, async () => {
   const ongoingEvent = clientSideEventFromResponse({
     ...EventMocks.MockSingleAttendeeResponse,
@@ -58,7 +59,7 @@ export const Basic = () => (
       <UserProfileFeature.Provider>
         <AlphaUserSessionProvider storage={storage}>
           <TiFView
-            fetchEvents={eventsByRegion}
+            fetchEvents={async () => mockEvents}
             isFontsLoaded={true}
             style={{ flex: 1 }}
           />

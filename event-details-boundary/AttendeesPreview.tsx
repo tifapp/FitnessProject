@@ -29,7 +29,7 @@ export const EventAttendeesPreview = ({
   TextVariant?: TextComponent
 }) => {
   const { pushAttendeesList } = useCoreNavigation()
-  const previewedAttendees = event.previewAttendees.slice(0, maxAttendees)
+  const previewedAttendees = event.previewAttendees?.slice(0, maxAttendees) ?? []
   const attendeTextOffset =
     previewedAttendees.length *
     ATTENDEES_TEXT_SPACING[Math.max(0, previewedAttendees.length - 1)]

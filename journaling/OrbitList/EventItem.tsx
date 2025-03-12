@@ -1,7 +1,23 @@
-import React from "react";
-import { StyleSheet, Text, View } from "react-native";
-import Svg, { Path } from "react-native-svg";
-import { PositionData } from "./VirtualizedOrbit";
+import React, { useMemo } from "react"
+import { Image, StyleSheet, View } from "react-native"
+import { PositionData } from "./VirtualizedOrbit"
+
+// Import all floating island assets
+import FloatingIsland1 from "../../assets/floating1.png"
+import FloatingIsland10 from "../../assets/floating10.png"
+import FloatingIsland11 from "../../assets/floating11.png"
+import FloatingIsland12 from "../../assets/floating12.png"
+import FloatingIsland13 from "../../assets/floating13.png"
+import FloatingIsland14 from "../../assets/floating14.png"
+import FloatingIsland15 from "../../assets/floating15.png"
+import FloatingIsland16 from "../../assets/floating16.png"
+import FloatingIsland2 from "../../assets/floating2.png"
+import FloatingIsland3 from "../../assets/floating3.png"
+import FloatingIsland4 from "../../assets/floating4.png"
+import FloatingIsland5 from "../../assets/floating5.png"
+import FloatingIsland6 from "../../assets/floating6.png"
+import FloatingIsland7 from "../../assets/floating7.png"
+import FloatingIsland8 from "../../assets/floating8.png"
 
 interface SportEvent {
   id: string;
@@ -23,28 +39,45 @@ interface EventItemProps {
   state: { swappedAt?: number };
 }
 
+// Array of all floating island images
+const floatingIslands = [
+  FloatingIsland1,
+  FloatingIsland2,
+  FloatingIsland3,
+  FloatingIsland4,
+  FloatingIsland5,
+  FloatingIsland6,
+  FloatingIsland7,
+  FloatingIsland8,
+  FloatingIsland10,
+  FloatingIsland11,
+  FloatingIsland12,
+  FloatingIsland13,
+  FloatingIsland14,
+  FloatingIsland15,
+  FloatingIsland16
+]
+
 const EventItem: React.FC<EventItemProps> = ({ item, position, state }) => {
-  // Generate a subtle variation in grass and rock colors based on event title
-  const generateColors = (title: string) => {
-    const hash = title.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0)
+  // Generate a consistent random island based on event ID or title
+  const randomIsland = useMemo(() => {
+    // Use the event title to generate a consistent index for the same event
+    const hash = item.title.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0)
+    const index = hash % floatingIslands.length
+    return floatingIslands[index]
+  }, [item.title])
 
-    // Grass color variations (greens)
-    const grassH = 100 + (hash % 40) // Green hue with some variation
-    const grassS = 50 + (hash % 20)
-    const grassL = 55 + (hash % 15)
+  // Generate a subtle variation in the island tint color based on event title
+  const tintColor = useMemo(() => {
+    const hash = item.title.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0)
 
-    // Rock color variations (brown/gray)
-    const rockH = 25 + (hash % 15) // Brown/earthy hue
-    const rockS = 30 + (hash % 20)
-    const rockL = 40 + (hash % 10)
+    // Generate HSL values with subtle variations
+    const h = 100 + (hash % 40) // Hue variation (green/blue range)
+    const s = 50 + (hash % 20) // Saturation
+    const l = 75 + (hash % 15) // Lightness
 
-    return {
-      grass: `hsl(${grassH}, ${grassS}%, ${grassL}%)`,
-      rock: `hsl(${rockH}, ${rockS}%, ${rockL}%)`
-    }
-  }
-
-  const colors = generateColors(item.title)
+    return `hsl(${h}, ${s}%, ${l}%)`
+  }, [item.title])
 
   return (
     <View
@@ -59,48 +92,13 @@ const EventItem: React.FC<EventItemProps> = ({ item, position, state }) => {
         }
       ]}
     >
-      {/* Simple Island Silhouette */}
-      <Svg height="100%" width="100%" style={styles.islandSvg}>
-        {/* Rocky bottom part */}
-        <Path
-          d={`
-            M 10,45
-            L 20,55 L 35,50 L 50,60 L 65,53 L 80,62 L 95,54
-            L 110,59 L 125,52 L 140,61 L 155,55 L 170,63 L 190,56
-            L 190,80 L 10,80
-            Z
-          `}
-          fill={colors.rock}
-        />
-
-        {/* Grassy top part */}
-        <Path
-          d={`
-            M 10,45
-            C 40,35 70,30 100,30
-            C 130,30 160,35 190,45
-            L 190,56 L 170,63 L 155,55 L 140,61 L 125,52
-            L 110,59 L 95,54 L 80,62 L 65,53 L 50,60
-            L 35,50 L 20,55 L 10,45
-            Z
-          `}
-          fill={colors.grass}
-        />
-      </Svg>
-
-      {/* Content */}
-      <View style={styles.contentContainer}>
-        <Text style={styles.title} numberOfLines={2} ellipsizeMode="tail">
-          {item.title}
-        </Text>
-
-        <Text style={styles.dateTime}>
-          {item.dateTime}
-        </Text>
-      </View>
-
-      {/* Simple shadow/reflection */}
-      <View style={styles.reflection} />
+      {/* Random Floating Island Image */}
+      <Image
+        source={randomIsland}
+        style={styles.islandImage}
+        resizeMode="contain"
+        tintColor={tintColor}
+      />
     </View>
   )
 }
@@ -112,10 +110,13 @@ const styles = StyleSheet.create({
     position: "relative",
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 10 },
-    alignItems: "center"
+    alignItems: "center",
+    justifyContent: "center"
   },
-  islandSvg: {
+  islandImage: {
     position: "absolute",
+    width: "150%",
+    height: "150%",
     top: 0
   },
   contentContainer: {

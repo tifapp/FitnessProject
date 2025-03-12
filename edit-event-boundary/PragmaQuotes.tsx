@@ -167,7 +167,7 @@ const CREATE_EVENT_QUOTES = {
   ],
   generic: [
     "The north star guides your path.",
-    "Where to, Captain?",
+    "Ready to set sail?",
     "What's your next destination?",
     "Adventure awaits!\nWhere next?",
     "What's on your radar?"

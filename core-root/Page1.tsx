@@ -1,4 +1,3 @@
-import { BalloonIcon } from "@components/Balloon"
 import { Title } from "@components/Text"
 import { TimeOfDayView } from "@event-details-boundary/TimeOfDay"
 import EventItem from "@journaling/OrbitList/EventItem"
@@ -7,10 +6,22 @@ import VirtualizedOrbit from "@journaling/OrbitList/VirtualizedOrbit"
 import { AppStyles } from "@lib/AppColorStyle"
 import React from "react"
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
+import { AnimatedBalloonWithAvatar } from "./AvatarBalloon"
 
 export type HomeProps = {
   style?: StyleProp<ViewStyle>
 }
+
+const date = new Date()
+const options = {
+  weekday: "long",
+  year: "numeric",
+  month: "long",
+  day: "numeric"
+}
+
+const formattedDate = date.toLocaleDateString("en-US", options)
+  .replace(", ", "\n")
 
 export const Page1 = () => {
   return (
@@ -18,15 +29,9 @@ export const Page1 = () => {
       <TimeOfDayView />
       <View style={styles.todo}>
         <View style={{ position: "absolute", top: "10%" }}>
-          <Title style={{ color: "white" }}>{(new Date()).toDateString()}</Title>
+          <Title style={{ color: "black", textAlign: "center" }}>{formattedDate}</Title>
         </View>
-        <View style={{ zIndex: 101, position: "absolute", bottom: "20%", left: 32 }}>
-          <BalloonIcon
-            width={128}
-            height={128}
-            color={AppStyles.inkRed.toString()}
-          />
-        </View>
+        <AnimatedBalloonWithAvatar style={{ position: "absolute", bottom: 150, left: 32 }} name={"Bobby Dhillon"} />
         <VirtualizedOrbit
           positionX={250}
           positionY={700}

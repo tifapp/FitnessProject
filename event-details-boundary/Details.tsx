@@ -17,7 +17,6 @@ import { useUserSettings } from "@settings-storage/Hooks"
 import { settingsSelector } from "@settings-storage/Settings"
 import { memo } from "react"
 import {
-  RefreshControl,
   StyleProp,
   StyleSheet,
   View,
@@ -34,6 +33,7 @@ import {
 import { EventAttendeeCardView } from "./AttendeesList"
 import { EventAttendeesPreview } from "./AttendeesPreview"
 import FlipClockCountdown from "./FlipClockCountdown"
+import { EventMocks } from "./MockData"
 import { useEventSecondsToStart } from "./SecondsToStart"
 import { EventTravelEstimatesView, useEventTravelEstimates } from "./TravelEstimates"
 
@@ -42,18 +42,15 @@ export type EventDetailsProps = {
   style?: StyleProp<ViewStyle>
 }
 
-const _EventDetailsView = ({ state, style }: EventDetailsProps) => (
+const _EventDetailsView = ({ style }: EventDetailsProps) => {
+  const state = { event: EventMocks.PickupBasketball }
+
+  return (
   <View style={[styles.screen, style]}>
     <DashedLine style={{ position: "absolute", left: -8, top: -8, width: "100%", zIndex: 11 }} dashStyle={{ transform: "rotate(45deg)" }} dashLength={16} dashThickness={16} dashGap={6} dashColor={AppStyles.primaryBlue.toString()} />
     <TiFFormScrollableLayoutView
       footer={<FooterView event={state.event} />}
       style={styles.details}
-      refreshControl={
-        <RefreshControl
-          onRefresh={state.refresh}
-          refreshing={state.refreshStatus === "pending"}
-        />
-      }
     >
       <DashedLine axis="vertical" style={{ position: "absolute", height: "100%", left: 23 }} dashLength={6} dashThickness={2} dashGap={4} dashColor={AppStyles.colorOpacity15} />
       <DashedLine axis="vertical" dashStyle={{ borderRadius: 100 }} style={{ position: "absolute", height: "100%", left: -4 }} dashLength={12} dashThickness={12} dashGap={48} dashColor={AppStyles.cardColor} />
@@ -87,6 +84,7 @@ const _EventDetailsView = ({ state, style }: EventDetailsProps) => (
     </TiFFormScrollableLayoutView>
   </View>
 )
+}
 
 export const EventDetailsView = memo(_EventDetailsView)
 
