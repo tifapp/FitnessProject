@@ -1,11 +1,12 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react"
 import {
   Dimensions,
   StyleSheet,
   View
-} from "react-native";
-import { Gesture, GestureDetector } from "react-native-gesture-handler";
-import { runOnJS, useSharedValue } from "react-native-reanimated";
+} from "react-native"
+import { Gesture, GestureDetector } from "react-native-gesture-handler"
+import { runOnJS, useSharedValue } from "react-native-reanimated"
+import Svg, { Ellipse } from "react-native-svg"
 
 export interface PositionData {
   x: number;
@@ -64,6 +65,16 @@ interface VirtualizedOrbitProps<T> {
   showRings?: boolean;
   renderRings?: (rotation: number) => React.ReactNode;
 
+  // New props for center element and orbit trace
+  centerElement?: React.ReactNode;
+  showOrbitTrace?: boolean;
+  orbitTraceProps?: {
+    strokeWidth?: number;
+    strokeColor?: string;
+    strokeDasharray?: string;
+    opacity?: number;
+  };
+
   // Optional debug mode
   debug?: boolean;
   renderDebugOverlay?: (debugInfo: {
@@ -76,6 +87,8 @@ interface VirtualizedOrbitProps<T> {
     direction: number;
   }) => React.ReactNode;
 }
+
+const PERSPECTIVE = 0.3
 
 function VirtualizedOrbit<T>({
   // Core props with defaults
@@ -93,7 +106,7 @@ function VirtualizedOrbit<T>({
   onEndReachedThreshold = 0.5,
 
   // Orbit properties with defaults
-  tiltAngle = 45,
+  tiltAngle = 100,
   orbitRadius = 200,
   numberOfItems = 12,
   autoRotateSpeed = 0,
@@ -107,8 +120,19 @@ function VirtualizedOrbit<T>({
   scrollSensitivity = 0.003,
 
   // Optional features
-  showRings = false,
+  showRings = true,
   renderRings,
+
+  // New props with defaults
+  centerElement,
+  showOrbitTrace = true,
+  orbitTraceProps = {
+    strokeWidth: 2,
+    strokeColor: "#fff",
+    strokeDasharray: "5,5",
+    opacity: 0.7
+  },
+
   debug = false,
   renderDebugOverlay
 }: VirtualizedOrbitProps<T>) {
@@ -160,7 +184,7 @@ function VirtualizedOrbit<T>({
     const angle = item.angle + rotationJS
 
     const baseX = positionX + Math.cos(angle) * orbitRadius
-    const baseY = positionY + Math.sin(angle) * orbitRadius * 0.4
+    const baseY = positionY + Math.sin(angle) * orbitRadius * PERSPECTIVE
 
     const { x, y } = applyTilt(baseX, baseY)
 
@@ -400,6 +424,55 @@ function VirtualizedOrbit<T>({
     lastEndReachedIndex: virtualWindowRef.current.lastEndReachedIndex,
     endReachedDirection: virtualWindowRef.current.endReachedDirection
   }
+// Second fix: Use a different approach to handle z-index
+// Replace the renderOrbitTrace function with this:
+  const renderOrbitTrace = () => {
+    if (!showOrbitTrace) return null
+
+    // Apply the tilt to the ellipse
+    const rx = orbitRadius
+    const ry = orbitRadius * 0.3 // Match the narrower ratio used in calculatePosition
+
+    // Calculate ellipse perimeter approximately
+    const perimeter = 2 * Math.PI * Math.sqrt((rx * rx + ry * ry) / 2)
+    const dashOffset = -1 * (perimeter * (rotationJS % (2 * Math.PI)) / (2 * Math.PI)) % perimeter
+    const dashArray = orbitTraceProps.strokeDasharray || "5,5"
+
+    // Create a larger viewport to ensure the entire ellipse is visible
+    // Add padding around all sides to prevent clipping
+    const viewBoxWidth = componentWidth + orbitRadius * 2
+    const viewBoxHeight = componentHeight + orbitRadius * 2
+    const viewBoxX = -orbitRadius
+    const viewBoxY = -orbitRadius
+
+    return (
+      <Svg
+        style={{
+          position: "absolute",
+          width: viewBoxWidth,
+          height: viewBoxHeight,
+          left: -orbitRadius,
+          top: -orbitRadius,
+          zIndex: 51
+        }}
+        viewBox={`${viewBoxX} ${viewBoxY} ${viewBoxWidth} ${viewBoxHeight}`}
+      >
+        <Ellipse
+          cx={positionX}
+          cy={positionY}
+          rx={rx}
+          ry={ry}
+          stroke={orbitTraceProps.strokeColor || "#555"}
+          strokeWidth={orbitTraceProps.strokeWidth || 1}
+          strokeDasharray={dashArray}
+          strokeDashoffset={dashOffset}
+          fill="transparent"
+          opacity={orbitTraceProps.opacity || 0.7}
+          transform={`rotate(${tiltAngle} ${positionX} ${positionY})`}
+        />
+      </Svg>
+    )
+  }
 
   return (
     <View style={styles.container}>
@@ -424,12 +497,32 @@ function VirtualizedOrbit<T>({
             styles.orbitalContainer,
             {
               width: componentWidth,
-              height: componentHeight
+              height: componentHeight,
+              // Add extra padding to prevent items from being clipped at edges
+              marginHorizontal: itemSize,
+              marginVertical: itemSize
             }
           ]}
         >
+          {/* Orbit Trace */}
+          {renderOrbitTrace()}
+
           {/* Custom Rings (optional) */}
           {showRings && renderRings && renderRings(rotationJS)}
+
+          {/* Center Element */}
+          {centerElement && (
+            <View style={[
+              styles.centerElementContainer,
+              {
+                left: positionX,
+                top: positionY,
+                zIndex: 50 // Middle z-index to ensure it appears between front and back items
+              }
+            ]}>
+              {centerElement}
+            </View>
+          )}
 
           {/* Orbit items */}
           {orbitItems.map((item) => {
@@ -476,9 +569,15 @@ const styles = StyleSheet.create({
   },
   orbitalContainer: {
     position: "relative",
-    overflow: "hidden"
+    overflow: "visible", // Changed from "hidden" to allow items to be visible outside the container
+    paddingHorizontal: 20,
+    paddingVertical: 20
   },
   orbitItemContainer: {
+    position: "absolute",
+    transform: [{ translateX: -50 }, { translateY: -50 }]
+  },
+  centerElementContainer: {
     position: "absolute",
     transform: [{ translateX: -50 }, { translateY: -50 }]
   }

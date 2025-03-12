@@ -88,3 +88,28 @@ export const isColorDark = (hexColor: string): boolean => {
   // If luminance is less than 0.5, the color is considered dark
   return luminance < 0.5
 }
+
+// Generate a dataset with clearly numbered sequential items
+export const generateSequentialDataset = (
+  count: number,
+  startIndex: number = 0
+) => {
+  return Array.from({ length: count }).map((_, index) => {
+    const realIndex = startIndex + index
+    return {
+      id: `item-${realIndex}`,
+      label: `#${realIndex}`,
+      title: `Item ${realIndex}`,
+      // Use different color schemes for different ranges to make swaps obvious
+      color:
+        realIndex < 100
+          ? `hsl(${(realIndex * 10) % 360}, 70%, 50%)`
+          : realIndex < 200
+            ? `hsl(${(realIndex * 5) % 360}, 90%, 40%)`
+            : `hsl(${(realIndex * 15) % 360}, 80%, 60%)`,
+      value: realIndex,
+      // Add a timestamp to verify we're getting new data
+      createdAt: new Date().toISOString()
+    }
+  })
+}

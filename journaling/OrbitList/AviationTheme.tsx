@@ -1,27 +1,7 @@
 import React, { useRef, useState } from "react"
 import { Alert, Button, SafeAreaView, StyleSheet, Text, View } from "react-native"
 import VirtualizedOrbit from "./VirtualizedOrbit"
-
-// Generate a dataset with clearly numbered sequential items
-const generateSequentialDataset = (count: number, startIndex: number = 0) => {
-  return Array.from({ length: count }).map((_, index) => {
-    const realIndex = startIndex + index
-    return {
-      id: `item-${realIndex}`,
-      label: `#${realIndex}`,
-      title: `Item ${realIndex}`,
-      // Use different color schemes for different ranges to make swaps obvious
-      color: realIndex < 100
-              ? `hsl(${(realIndex * 10) % 360}, 70%, 50%)`
-              : realIndex < 200
-                ? `hsl(${(realIndex * 5) % 360}, 90%, 40%)`
-                : `hsl(${(realIndex * 15) % 360}, 80%, 60%)`,
-      value: realIndex,
-      // Add a timestamp to verify we're getting new data
-      createdAt: new Date().toISOString()
-    }
-  })
-}
+import { generateSequentialDataset } from "./colorUtils"
 
 const EnhancedOrbitDemo = () => {
   // Start with items #0-199
