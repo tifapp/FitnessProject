@@ -1,15 +1,15 @@
-import React, { useMemo } from "react"
 import {
-  Path,
+  Color,
   LinearGradient,
-  vec,
+  Path,
   SkSize,
-  Color
+  vec
 } from "@shopify/react-native-skia"
+import React, { useMemo } from "react"
 
 export const MOUNTAIN_COLOR_SET = {
   sun: ["#24D12B", "#1B8B23"] as Color[],
-  moon: ["#2DC6B8", "#087865"] as Color[]
+  moon: ["#A882DD", "#000000"] as Color[]
 } as const
 
 export type MountainProps = {

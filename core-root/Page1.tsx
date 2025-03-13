@@ -1,6 +1,7 @@
 import { Title } from "@components/Text"
 import { TimeOfDayView } from "@event-details-boundary/TimeOfDay"
 import EventItem from "@journaling/OrbitList/EventItem"
+import FoggyEventItem from "@journaling/OrbitList/FoggyEventItem"
 import { sampleEvents } from "@journaling/OrbitList/MockEvents"
 import VirtualizedOrbit from "@journaling/OrbitList/VirtualizedOrbit"
 import { AppStyles } from "@lib/AppColorStyle"
@@ -24,6 +25,25 @@ const formattedDate = date.toLocaleDateString("en-US", options)
   .replace(", ", "\n")
 
 export const Page1 = () => {
+  // Function to determine whether to use foggy or regular event item
+  // Using a ratio of 1:5 (foggy:regular) but making it consistent based on item ID
+  const getRandomEventItem = (item: any, position: any, state: any) => {
+    // Generate a hash from the event ID to ensure consistent rendering
+    const hash = item.id.split("").reduce((acc: number, char: string) => acc + char.charCodeAt(0), 0)
+
+    // Use modulo 6 to create a 1:5 ratio (foggy:regular)
+    // This ensures the same event will always render the same way
+    const value = hash % 6
+
+    // If it's 0, use the foggy item (approximately 1/6 probability)
+    // Otherwise use the regular item (approximately 5/6 probability)
+    if (value === 0) {
+      return <FoggyEventItem item={item} position={position} state={state} />
+    } else {
+      return <EventItem item={item} position={position} state={state} />
+    }
+  }
+
   return (
     <>
       <TimeOfDayView />
@@ -40,7 +60,7 @@ export const Page1 = () => {
           data={sampleEvents}
           orbitRadius={600}
           renderItem={(item, position, state) => (
-            <EventItem item={item} position={position} state={state} />
+            getRandomEventItem(item, position, state)
           )}
         />
       </View>
