@@ -1,5 +1,5 @@
 import { cloud } from "@journaling/Clouds"
-import { SunBackgroundDrawing } from "@journaling/SunBackground"
+import { MoonBackgroundDrawing } from "@journaling/MoonBackground"
 import { Canvas, SkSize } from "@shopify/react-native-skia"
 import { useMemo, useState } from "react"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
@@ -70,21 +70,21 @@ export const TimeOfDayView = () => {
   const insets = useSafeAreaInsets()
   const timeOfDay = getDayFraction()
   const background = useMemo(
-    () => ({ time: timeOfDay, dayRange: DAY_RANGE, clouds: CLOUDS }),
+    () => ({ time: 0.5, dayRange: DAY_RANGE, clouds: CLOUDS }),
     []
   )
   return (
     <Canvas style={{ flex: 1 }} onLayout={(e) => setSize(e.nativeEvent.layout)}>
-      <SunBackgroundDrawing
-        size={size}
-        background={background}
-        edgeInsets={insets}
-      />
-      {/* <MoonBackgroundDrawing
+      {/* <SunBackgroundDrawing
         size={size}
         background={background}
         edgeInsets={insets}
       /> */}
+      <MoonBackgroundDrawing
+        size={size}
+        background={background}
+        edgeInsets={insets}
+      />
     </Canvas>
   )
 }

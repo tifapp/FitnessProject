@@ -45,10 +45,9 @@ export const mockEventChatTokenRequest = (): ChatTokenRequest => ({
 export namespace EventAttendeeMocks {
   export const Alivs = {
     id: uuidString(),
-    name: "Alvis",
-    handle: UserHandle.optionalParse("alvis")!,
-    profileImageURL:
-      "https://www.escapistmagazine.com/wp-content/uploads/2023/05/xc3-future-redeemed-alvis.jpg?resize=1200%2C673",
+    name: "Morgan",
+    handle: UserHandle.optionalParse("morgz20")!,
+    profileImageURL: "https://picsum.photos/200",
     relationStatus: "not-friends",
     joinedDateTime: new Date(1000)
   } as EventAttendee
@@ -124,7 +123,7 @@ export namespace EventMocks {
   export const PickupBasketball = {
     host: EventAttendeeMocks.Alivs,
     id: randomIntegerInRange(1000, 9999),
-    title: "Pickup Basketball at UCSC",
+    title: "Pickup Basketball",
     description:
       "Looking for players of all skill levels for a casual pickup game at the UCSC East Field House courts. Bring water and good vibes!",
     color: ColorString.parse("#FF5733"),

@@ -4,7 +4,8 @@ import {
 } from "@components/AvatarMapMarker"
 import { CaptionTitle } from "@components/Text"
 import { Ionicon } from "@components/common/Icons"
-import React, { memo } from "react"
+import { AppStyles } from "@lib/AppColorStyle"
+import React from "react"
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 
 export type ExploreEventsMarkerProps = {
@@ -42,7 +43,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    overflow: "scroll"
+    overflow: "scroll",
+    backgroundColor: AppStyles.primaryBlue.toString()
   },
   badgeIcon: {
     marginLeft: 4

@@ -83,7 +83,9 @@ export const PragmaQuoteView = ({
           <View style={styles.pragmaContainer}>
             <Image
               source={
-                "https://i.imgur.com/cqF5Mk4.png"
+                // "https://i.imgur.com/rnIu01S.jpeg" // tom
+                "https://i.imgur.com/lLdOk7e.jpeg" // girl
+                // "https://i.imgur.com/cqF5Mk4.png" // star
               }
               style={styles.pragmaImage}
             />
@@ -109,7 +111,7 @@ const styles = StyleSheet.create({
     padding: 16,
     marginHorizontal: 32,
     borderRadius: 32,
-    backgroundColor: AppStyles.cardColor,
+    backgroundColor: AppStyles.orange.toString(),
     borderColor: AppStyles.colorOpacity15.toString(),
     borderWidth: 2
   },

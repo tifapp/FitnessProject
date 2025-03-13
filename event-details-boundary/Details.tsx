@@ -15,7 +15,7 @@ import { placemarkToFormattedAddress } from "@lib/AddressFormatting"
 import { AppStyles } from "@lib/AppColorStyle"
 import { useUserSettings } from "@settings-storage/Hooks"
 import { settingsSelector } from "@settings-storage/Settings"
-import { memo } from "react"
+import React, { memo } from "react"
 import {
   StyleProp,
   StyleSheet,
@@ -32,8 +32,8 @@ import {
 } from "./ArrivalBanner"
 import { EventAttendeeCardView } from "./AttendeesList"
 import { EventAttendeesPreview } from "./AttendeesPreview"
-import FlipClockCountdown from "./FlipClockCountdown"
 import { EventMocks } from "./MockData"
+import PassportCountdown from "./PassportCountdown"
 import { useEventSecondsToStart } from "./SecondsToStart"
 import { EventTravelEstimatesView, useEventTravelEstimates } from "./TravelEstimates"
 
@@ -184,13 +184,13 @@ type FooterProps = {
 const FooterView = ({ event }: FooterProps) => (
   <TiFFooterView backgroundStyle={{ backgroundColor: "transparent" }}>
     <View style={styles.footer}>
-      <CountdownView time={event.time} />
       <EventUserAttendanceButton
         event={event}
         onJoinSuccess={() => console.log("TODO: Sean Organize Query Cache")}
         onLeaveSuccess={() => console.log("TODO: Sean Oragnize Query Cache")}
         style={styles.attendanceButton}
       />
+      <CountdownView time={event.time} />
     </View>
   </TiFFooterView>
 )
@@ -203,12 +203,7 @@ const CountdownView = ({ time }: CountdownProps) => {
   // const secondsToStart = useEventSecondsToStart(time)
   const futureDate = new Date()
   futureDate.setDate(futureDate.getDate() + 50)
-  return <FlipClockCountdown
-    to={futureDate}
-    labelStyle={styles.labelStyle}
-    digitBlockStyle={styles.digitBlockStyle}
-    separatorStyle={styles.separatorStyle}
-    showLabels={true}
+  return <PassportCountdown
   />
 }
 
@@ -229,12 +224,15 @@ const styles = StyleSheet.create({
     borderColor: AppStyles.colorOpacity15
   },
   attendanceButton: {
-    alignSelf: "flex-end"
+    position: "absolute",
+    bottom: 16,
+    right: 32
   },
   footer: {
     display: "flex",
     flexDirection: "row",
-    justifyContent: "space-between"
+    justifyContent: "space-between",
+    height: 64
   },
   screen: {
     // backgroundColor: AppStyles.cardColor,

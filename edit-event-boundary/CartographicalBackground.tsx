@@ -26,7 +26,7 @@ export const CartographicBackground = () => {
     // Slow continuous rotation for longitude lines
     rotation.value = withRepeat(
       withTiming(100, {
-        duration: 500000, // Very slow rotation
+        duration: 200000, // Very slow rotation
         easing: Easing.linear
       }),
       -1, // Infinite repeats
@@ -36,7 +36,7 @@ export const CartographicBackground = () => {
     // Faster scan effect for latitude lines
     scanPosition.value = withRepeat(
       withTiming(28.57, {
-        duration: 14000, // 14 seconds to complete a full cycle
+        duration: 6000, // 14 seconds to complete a full cycle
         easing: Easing.linear
       }),
       -1, // Infinite repeats
@@ -163,15 +163,15 @@ const LatitudeLine = ({ index, scanPosition }: {index: number, scanPosition: Sha
     const curveFactor = 8 * (1 - distFromMiddle * distFromMiddle * distFromMiddle)
 
     // Dramatic fade into distance
-    const opacityTop = 0.05
-    const opacityBottom = 0.2
+    const opacityTop = 0.1
+    const opacityBottom = 0.25
     const opacityFactor = opacityTop + ((opacityBottom - opacityTop) * (y / 200))
 
     return {
       // Extended further to cover the expanded viewBox completely
       d: `M -25 ${y} Q 50 ${y + curveFactor} 125 ${y}`,
       stroke: `rgba(120, 120, 120, ${opacityFactor})`,
-      strokeWidth: 0.25,
+      strokeWidth: 1,
       strokeDasharray: "1,2",
       fill: "none"
     }
@@ -188,7 +188,7 @@ const styles = StyleSheet.create({
     justifyContent: "center"
   },
   background: {
-    backgroundColor: "white",
+    backgroundColor: "black",
     overflow: "hidden"
   }
 })

@@ -1,11 +1,10 @@
 import { useTiFNavigation } from "@components/Navigation"
 import { PragmaQuoteView } from "@edit-event-boundary/PragmaQuotes"
+import { SidewaysWallpaperDramaticMemo } from "@edit-event-boundary/SidewaysWallpaperDramatic"
 import { StaticScreenProps } from "@react-navigation/native"
 import React, { useEffect, useState } from "react"
 import { View } from "react-native"
 import { EventID } from "TiFShared/domain-models/Event"
-import { FadingOverlay } from "./FadingOverlay"
-import { FogOverlookWallpaper } from "./FogOverlook"
 
 export const openingScreenNav = () => ({
   opening: {
@@ -19,7 +18,8 @@ type OpeningScreenProps = StaticScreenProps<{ id: EventID }>
 export const openingQuote = () => EDIT_EVENT_QUOTES.ext.randomElement()
 
 const EDIT_EVENT_QUOTES = [
-  "Look! The fog is clearing up!!!"
+  // "Hey!\nWatch it, punk!"
+  "The north star guides your path."
 ]
 
 const OpeningScreen = ({ route }: OpeningScreenProps) => {
@@ -30,7 +30,7 @@ const OpeningScreen = ({ route }: OpeningScreenProps) => {
     // Set a timeout to show the quote after 3 seconds (3000ms)
     const timer = setTimeout(() => {
       setShowQuote(true)
-    }, 3000)
+    }, 15000)
 
     // Clean up the timer when component unmounts
     return () => clearTimeout(timer)
@@ -40,7 +40,19 @@ const OpeningScreen = ({ route }: OpeningScreenProps) => {
 
   return (
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <FogOverlookWallpaper />
+      {/* <FogOverlookWallpaper /> */}
+      {/* <SidewaysWallpaper /> */}
+      {/* <CartographicBackground /> */}
+{/*
+      <View style={{ position: "absolute", width: "100%", top: 64, left: "0%" }}>
+        <GratitudeList />
+      </View> */}
+
+      {/* <DialogueOverlookWallpaper /> */}
+
+      {/* <SidewaysWallpaper /> */}
+
+      <SidewaysWallpaperDramaticMemo/>
 
       {showQuote && (
         <PragmaQuoteView
@@ -52,7 +64,7 @@ const OpeningScreen = ({ route }: OpeningScreenProps) => {
       )}
 
       {/* <View style={{ position: "absolute", height: "100%", width: "100%", backgroundColor: "orange", opacity: 0.15 }} /> */}
-      <FadingOverlay color="white" />
+      {/* <FadingOverlay color="white" /> */}
     </View>
   )
 }
