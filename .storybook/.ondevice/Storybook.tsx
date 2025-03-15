@@ -1,14 +1,34 @@
 import React, { useState } from "react"
 
+import PragmaDesignMeta, {
+  Basic as PragmaDesign
+} from "../components/PragmaDesign/PragmaDesign.stories"
+
+import CollisionContextMeta, {
+  Basic as CollisionContext
+} from "../components/CollisionContext/CollisionContext.stories"
+import HoverContextMeta, {
+  Basic as HoverContext
+} from "../components/HoverContext/HoverContext.stories"
+
+import DragAndDropMeta, {
+  Basic as DragAndDrop
+} from "../components/DragAndDrop/DragAndDrop.stories"
+import DraggableViewMeta, {
+  Basic as DraggableView
+} from "../components/DraggableView/DraggableView.stories"
+
 import MapSnippetMeta, {
   Basic as MapSnippet
 } from "../components/MapSnippet/MapSnippet.stories"
+import SunJournalBackgroundMeta, {
+  Basic as SunJournalBackground
+} from "../components/SunJournalBackground/SunJournalBackground.stories"
 
 import { FlatList, SafeAreaView, Text, TouchableOpacity } from "react-native"
 import { useAppFonts } from "../../lib/Fonts"
 import awsconfig from "../../src/aws-exports"
 
-// Import your
 import { setupCognito } from "@auth-boundary/CognitoHelpers"
 import AttendeesListMeta, {
   Basic as AttendeesListBasic
@@ -53,6 +73,9 @@ import EventSettingsDurationMeta, {
   Basic as EventSettingsDurationBasic
 } from "../components/SettingsScreen/EventSettingsDurations.stories"
 
+import ShieldDefenseMeta, {
+  Basic as ShieldDefense
+} from ".storybook/components/ShieldDefense/ShieldDefense.stories"
 import { Geo } from "@aws-amplify/geo"
 import { sqliteLogHandler, sqliteLogs } from "@lib/Logging"
 import { InMemorySecureStore } from "@lib/SecureStore"
@@ -102,11 +125,42 @@ addLogHandler(
 // Create an array of stories
 const stories = [
   {
+    name: PragmaDesignMeta.title,
+    component: PragmaDesign,
+    args: PragmaDesignMeta.args
+  },
+
+  {
+    name: DragAndDropMeta.title,
+    component: DragAndDrop
+  },
+  {
+    name: HoverContextMeta.title,
+    component: HoverContext
+  },
+  {
+    name: CollisionContextMeta.title,
+    component: CollisionContext
+  },
+  {
+    name: DraggableViewMeta.title,
+    component: DraggableView,
+    args: DraggableViewMeta.args
+  },
+  {
+    name: SunJournalBackgroundMeta.title,
+    component: SunJournalBackground,
+    args: SunJournalBackgroundMeta.args
+  },
+  {
+    name: ShieldDefenseMeta.title,
+    component: ShieldDefense
+  },
+  {
     name: MapSnippetMeta.title,
     component: MapSnippet,
     args: MapSnippetMeta.args
   },
-
   {
     name: NameEntryMeta.title,
     component: NameEntryBasic
