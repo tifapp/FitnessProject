@@ -76,7 +76,7 @@ export const UserProfileView = ({
               style={styles.profileContainer}
             />
             <Subtitle style={styles.upcomingEventsTitle}>
-              {"Upcoming Events"}
+              Upcoming Events
             </Subtitle>
           </View>
         }
