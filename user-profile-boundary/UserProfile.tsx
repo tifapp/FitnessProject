@@ -69,12 +69,15 @@ export const UserProfileView = ({
         }
         renderItem={({ item }) => <EventCard event={item}></EventCard>}
         ListHeaderComponent={
-          <View>
+          <View style={styles.container}>
             <UserInfoView
               state={userInfoState}
               onRelationStatusChanged={onRelationStatusChanged}
+              style={styles.profileContainer}
             />
-            <Subtitle>{"Upcoming Events"}</Subtitle>
+            <Subtitle style={styles.upcomingEventsTitle}>
+              {"Upcoming Events"}
+            </Subtitle>
           </View>
         }
         ListEmptyComponent={<View></View>}
@@ -145,6 +148,16 @@ const BaseUserInfoView = ({
 }
 
 const styles = StyleSheet.create({
+  container: {
+    paddingBottom: 8
+  },
+  profileContainer: {
+    padding: 8
+  },
+  upcomingEventsTitle: {
+    paddingBottom: 8,
+    textAlign: "center"
+  },
   profileFrame: {
     height: 128,
     width: 128,

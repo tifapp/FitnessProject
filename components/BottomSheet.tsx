@@ -5,16 +5,17 @@ import {
   BottomSheetModalProvider,
   useBottomSheetModal
 } from "@gorhom/bottom-sheet"
+import { Portal } from "@gorhom/portal"
 import { AppStyles } from "@lib/AppColorStyle"
 import { useLastDefinedValue } from "@lib/utils/UseLastDefinedValue"
 import React, { useEffect, useRef } from "react"
 import {
-  ViewStyle,
+  Dimensions,
+  Platform,
   Pressable,
   StyleProp,
   StyleSheet,
-  Platform,
-  Dimensions
+  ViewStyle
 } from "react-native"
 import Animated, {
   Extrapolation,
@@ -123,7 +124,7 @@ export const TiFBottomSheet = <Item = boolean,>({
           // NB: iOS needs a FullWindowOverlay in order to have the sheet appear above the native
           // stack navigator when presented in a modal.
           overlay === "above-screen" && Platform.OS === "ios"
-            ? FullWindowOverlay
+            ? FullScreenOverlay
             : undefined
         }
         backdropComponent={shouldIncludeBackdrop ? TiFBackdropView : null}
@@ -134,6 +135,17 @@ export const TiFBottomSheet = <Item = boolean,>({
       </BottomSheetModal>
     </Container>
   )
+}
+
+type FullScreenOverlayProps = {
+  children: React.ReactNode
+}
+
+const FullScreenOverlay = ({ children }: FullScreenOverlayProps) => {
+  if (Platform.OS === "ios") {
+    return <FullWindowOverlay>{children}</FullWindowOverlay>
+  }
+  return <Portal>{children}</Portal>
 }
 
 const TiFBackdropView = ({
