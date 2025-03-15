@@ -113,44 +113,6 @@ type SequenceProps = Omit<JournalingSequenceProps, "onFinished"> & {
   title: string
 }
 
-const FALLING_BACKGROUND_CLOUDS = [
-  cloud({
-    relativeX: 0.6,
-    relativeY: 0.1,
-    relativeRangeX: 0.1,
-    scale: 0.3,
-    speed: 30_000
-  }),
-  cloud({
-    relativeX: 0.4,
-    relativeY: 0.15,
-    relativeRangeX: 0.15,
-    scale: 0.5,
-    speed: 23_000
-  }),
-  cloud({
-    relativeX: 0.6,
-    relativeY: 0.17,
-    relativeRangeX: 0.15,
-    scale: 0.55,
-    speed: 21_000
-  }),
-  cloud({
-    relativeX: 0.03,
-    relativeY: 0.23,
-    relativeRangeX: 0.2,
-    scale: 0.7,
-    speed: 16_000
-  }),
-  cloud({
-    relativeX: 0.2,
-    relativeY: 0.26,
-    relativeRangeX: 0.25,
-    scale: 0.8,
-    speed: 12_000
-  })
-]
-
 const JOURNAL_SEQUENCES = [
   {
     title: "Sunrise",
@@ -316,6 +278,31 @@ const JOURNAL_SEQUENCES = [
         dayRange={DAY_RANGE}
         time={0.75}
         includeThemeObject
+        {...props}
+      />
+    )
+  },
+  {
+    title: "A Test",
+    backgroundProps: { time: 0.35, dayRange: DAY_RANGE, clouds: CLOUDS },
+    PreambleDrawing: ({ onJournalTimeStarted, ...props }: PreambleProps) => {
+      usePragmaFalling({ onJournalTimeStarted })
+      const state = usePragmaWorshipping({ onJournalTimeStarted })
+      return (
+        <PragmaWorshippingDrawing
+          state={state}
+          holyLightColors="sun"
+          {...props}
+        />
+      )
+    },
+    BackgroundDrawing: MoonBackgroundDrawing,
+    introLines: "midday",
+    IntroDrawing: (props) => (
+      <PragmaWorshippingIntroDrawing
+        theme="sun"
+        dayRange={DAY_RANGE}
+        time={0.5}
         {...props}
       />
     )
