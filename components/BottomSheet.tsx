@@ -9,12 +9,12 @@ import { AppStyles } from "@lib/AppColorStyle"
 import { useLastDefinedValue } from "@lib/utils/UseLastDefinedValue"
 import React, { useEffect, useRef } from "react"
 import {
-  ViewStyle,
+  Dimensions,
+  Platform,
   Pressable,
   StyleProp,
   StyleSheet,
-  Platform,
-  Dimensions
+  ViewStyle
 } from "react-native"
 import Animated, {
   Extrapolation,
