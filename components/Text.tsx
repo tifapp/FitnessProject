@@ -1,6 +1,6 @@
 import { AppStyles } from "@lib/AppColorStyle"
 import React from "react"
-import { StyleSheet, Text, TextProps } from "react-native"
+import { StyleSheet, TextProps } from "react-native"
 import Animated from "react-native-reanimated"
 
 /**
@@ -86,7 +86,7 @@ const styles = StyleSheet.create({
     fontSize: 14
   },
   boldFootnote: {
-    fontFamily: "OpenSansBold",
+    fontFamily: "OpenSansSemiBold",
     fontSize: 14
   },
   caption: {
@@ -98,10 +98,10 @@ const styles = StyleSheet.create({
   },
   captionTitle: {
     fontSize: 12,
-    fontFamily: "OpenSansBold"
+    fontFamily: "OpenSansSemiBold"
   },
   headline: {
-    fontFamily: "OpenSansBold",
+    fontFamily: "OpenSansSemiBold",
     fontSize: 16
   },
   color: {

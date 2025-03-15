@@ -1,8 +1,9 @@
 import { CircularIonicon, IoniconName } from "@components/common/Icons"
+import { AppStyles } from "@lib/AppColorStyle"
 import { ColorString } from "TiFShared/domain-models/ColorString"
+import { ReactNode } from "react"
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 import { TiFFormLabelView } from "./Label"
-import { ReactNode } from "react"
 
 export type TiFFormNamedIconRowProps = {
   iconName: IoniconName
@@ -26,6 +27,8 @@ export const TiFFormNamedIconRowView = ({
   <View style={style}>
     <View style={styles.container}>
       <CircularIonicon
+        style={{ borderWidth: 2, borderColor: AppStyles.colorOpacity10, borderRadius: 128 }}
+        color={AppStyles.primaryBlue.toString()}
         size={24}
         name={iconName}
         maximumFontScaleFactor={maximumFontSizeMultiplier}
@@ -49,7 +52,6 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "row",
     alignItems: "center",
-    columnGap: 16,
-    padding: 16
+    columnGap: 16
   }
 })

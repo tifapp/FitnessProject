@@ -166,6 +166,40 @@ export type EventTravelEstimatesProps = {
   location: EventLocation
   result: UseEventTravelEstimatesResult
   style?: StyleProp<ViewStyle>
+  parallaxFactor?: number
+}
+
+const TravelEstimatesView = ({ location, result }: Pick<EventTravelEstimatesProps, "location" | "result">) => {
+  return (
+    <View style={styles.travelEstimatesOverlay}>
+      <Headline
+        maxFontSizeMultiplier={FontScaleFactors.xxxLarge}
+        style={styles.directionsText}
+      >
+        Find Your Way
+      </Headline>
+      <View style={styles.travelTypesContainer}>
+        <TravelTypeButton
+          travelKey="walking"
+          location={location}
+          result={result}
+          style={styles.travelTypeButton}
+        />
+        <TravelTypeButton
+          travelKey="automobile"
+          location={location}
+          result={result}
+          style={styles.travelTypeButton}
+        />
+        <TravelTypeButton
+          travelKey="publicTransportation"
+          location={location}
+          result={result}
+          style={styles.travelTypeButton}
+        />
+      </View>
+    </View>
+  )
 }
 
 /**
@@ -180,7 +214,8 @@ export const EventTravelEstimatesView = ({
   host,
   location,
   result,
-  style
+  style,
+  parallaxFactor
 }: EventTravelEstimatesProps) => {
   const [isExpanded, setIsExpanded] = useState(false)
   const { presentProfile } = useCoreNavigation()
@@ -211,15 +246,18 @@ export const EventTravelEstimatesView = ({
       )}
       <Animated.View layout={TiFDefaultLayoutTransition}>
         <ExpandableMapSnippetView
+          parallaxFactor={parallaxFactor}
           isExpanded={isExpanded}
           onExpansionChanged={setIsExpanded}
           region={{
-            ...location.coordinate,
+            latitude: location.coordinate.latitude - 0.001,
+            longitude: location.coordinate.longitude,
             latitudeDelta: 0.007,
             longitudeDelta: 0.007
           }}
           overlay={(isExpanding) => (
             <View style={{ rowGap: 16 }}>
+              <TravelEstimatesView location={location} result={result} />
               {isExpanding && (
                 <View style={styles.viewingOverlay}>
                   <TiFFormNamedIconRowView
@@ -235,34 +273,6 @@ export const EventTravelEstimatesView = ({
                   />
                 </View>
               )}
-              <View style={styles.overlay}>
-                <Headline
-                  maxFontSizeMultiplier={FontScaleFactors.xxxLarge}
-                  style={styles.directionsText}
-                >
-                  Get Directions
-                </Headline>
-                <View style={styles.travelTypesContainer}>
-                  <TravelTypeButton
-                    travelKey="walking"
-                    location={location}
-                    result={result}
-                    style={styles.travelTypeButton}
-                  />
-                  <TravelTypeButton
-                    travelKey="automobile"
-                    location={location}
-                    result={result}
-                    style={styles.travelTypeButton}
-                  />
-                  <TravelTypeButton
-                    travelKey="publicTransportation"
-                    location={location}
-                    result={result}
-                    style={styles.travelTypeButton}
-                  />
-                </View>
-              </View>
             </View>
           )}
           collapsedMapProps={{
@@ -352,9 +362,9 @@ const TravelTypeButton = ({
       <View style={styles.travelTypeButtonContentContainer}>
         <RoundedIonicon
           name={TRAVEL_KEYS_INFO[travelKey].iconName}
-          color="black"
+          color={AppStyles.primaryBlue.toString()}
           maximumFontScaleFactor={FontScaleFactors.xxxLarge}
-          borderRadius={12}
+          borderRadius={128}
           backgroundColor={AppStyles.cardColor}
           accessibilityLabel={TRAVEL_KEYS_INFO[travelKey].accessibilityLabel}
         />
@@ -425,16 +435,22 @@ const styles = StyleSheet.create({
   viewingOverlay: {
     width: "100%",
     backgroundColor: "white",
-    borderRadius: 12
+    borderRadius: 128
   },
-  overlay: {
+  travelEstimatesOverlay: {
     width: "100%",
-    backgroundColor: "white",
-    padding: 16,
-    borderRadius: 12
+    backgroundColor: "rgba(255, 255, 255, 1)",
+    paddingRight: 48,
+    paddingLeft: 48,
+    paddingBottom: 32,
+    paddingTop: 24,
+    borderRadius: 32,
+    borderWidth: 2,
+    borderColor: AppStyles.cardColor
   },
   directionsText: {
-    textAlign: "center"
+    textAlign: "center",
+    color: AppStyles.primaryBlue.toString()
   },
   travelTypesContainer: {
     display: "flex",

@@ -75,15 +75,19 @@ const EditEventFormBackButton = () => (
 export const editEventScreens = () => ({
   editEventForm: {
     options: {
-      headerTitle: "Edit Event",
+      headerTitle: "Change Your Adventure",
       headerLeft: EditEventFormBackButton
     },
     screen: EditEventScreen
   },
   createEventForm: {
     options: {
-      headerTitle: "Create Event",
-      headerLeft: EditEventFormBackButton
+      headerTitle: "Chart Your Next Adventure",
+      headerLeft: EditEventFormBackButton,
+      headerStyle: {
+        backgroundColor: "black"
+      },
+      headerTintColor: "#fff"
     },
     screen: EditEventScreen
   },

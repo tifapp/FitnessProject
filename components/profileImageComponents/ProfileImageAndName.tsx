@@ -1,17 +1,16 @@
+import { useFontScale } from "@lib/Fonts"
 import React from "react"
 import {
   ImageStyle,
   StyleProp,
   StyleSheet,
+  TextStyle,
   View,
   ViewStyle
 } from "react-native"
 import { UserHandle } from "TiFShared/domain-models/User"
 import { BodyText, Caption, Headline, Subtitle } from "../Text"
-import ProfileImage from "./ProfileImage"
-import { AvatarView } from "@components/Avatar"
 import { ProfileCircleView } from "./ProfileCircle"
-import { useFontScale } from "@lib/Fonts"
 
 interface ImageAndNameProps {
   name: string
@@ -21,6 +20,7 @@ interface ImageAndNameProps {
   style?: StyleProp<ViewStyle>
   size?: "normal" | "large"
   imageStyle?: StyleProp<ImageStyle>
+  textStyle?: StyleProp<TextStyle>
 }
 
 const SIZE_TEXT_COMPONENTS = {
@@ -35,7 +35,8 @@ const ProfileImageAndName = ({
   style,
   size = "normal",
   maximumFontSizeMultiplier,
-  imageStyle
+  imageStyle,
+  textStyle
 }: ImageAndNameProps) => {
   const fontScale = useFontScale({
     maximumScaleFactor: maximumFontSizeMultiplier
@@ -55,8 +56,8 @@ const ProfileImageAndName = ({
         style={profileImageStyle}
       />
       <View style={styles.textContainer}>
-        <Name>{name}</Name>
-        <Handle style={styles.handle}>{handle.toString()}</Handle>
+        <Name style={textStyle}>{name}</Name>
+        <Handle style={[styles.handle, textStyle]}>{handle.toString()}</Handle>
       </View>
     </View>
   )
@@ -81,7 +82,7 @@ const styles = StyleSheet.create({
     flex: 1
   },
   handle: {
-    opacity: 0.5
+    opacity: 1
   }
 })
 
