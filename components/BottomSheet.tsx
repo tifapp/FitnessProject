@@ -110,29 +110,27 @@ export const TiFBottomSheet = <Item = boolean,>({
       : children
   )
   return (
-    <Container>
-      <BottomSheetModal
-        ref={bottomSheetRef}
-        enablePanDownToClose={canSwipeToDismiss}
-        enableContentPanningGesture={enableContentPanningGesture}
-        handleStyle={bottomSheetHandleStyle}
-        animatedIndex={animatedIndex}
-        handleComponent={HandleView}
-        onDismiss={onDismiss}
-        containerComponent={
-          // NB: iOS needs a FullWindowOverlay in order to have the sheet appear above the native
-          // stack navigator when presented in a modal.
-          overlay === "above-screen" && Platform.OS === "ios"
-            ? FullWindowOverlay
-            : undefined
-        }
-        backdropComponent={shouldIncludeBackdrop ? TiFBackdropView : null}
-        style={style}
-        {...sizeProp}
-      >
-        <Container>{renderedChildren}</Container>
-      </BottomSheetModal>
-    </Container>
+    <BottomSheetModal
+      ref={bottomSheetRef}
+      enablePanDownToClose={canSwipeToDismiss}
+      enableContentPanningGesture={enableContentPanningGesture}
+      handleStyle={bottomSheetHandleStyle}
+      animatedIndex={animatedIndex}
+      handleComponent={HandleView}
+      onDismiss={onDismiss}
+      containerComponent={
+        // NB: iOS needs a FullWindowOverlay in order to have the sheet appear above the native
+        // stack navigator when presented in a modal.
+        overlay === "above-screen" && Platform.OS === "ios"
+          ? FullWindowOverlay
+          : undefined
+      }
+      backdropComponent={shouldIncludeBackdrop ? TiFBackdropView : null}
+      style={style}
+      {...sizeProp}
+    >
+      {renderedChildren}
+    </BottomSheetModal>
   )
 }
 
