@@ -10,6 +10,7 @@ import { useLastDefinedValue } from "@lib/utils/UseLastDefinedValue"
 import React, { useEffect, useRef } from "react"
 import {
   Dimensions,
+  Modal,
   Platform,
   Pressable,
   StyleProp,
@@ -122,9 +123,7 @@ export const TiFBottomSheet = <Item = boolean,>({
         containerComponent={
           // NB: iOS needs a FullWindowOverlay in order to have the sheet appear above the native
           // stack navigator when presented in a modal.
-          overlay === "above-screen" && Platform.OS === "ios"
-            ? FullWindowOverlay
-            : undefined
+          overlay === "above-screen" ? FullScreenOverlay : undefined
         }
         backdropComponent={shouldIncludeBackdrop ? TiFBackdropView : null}
         style={style}
@@ -134,6 +133,23 @@ export const TiFBottomSheet = <Item = boolean,>({
       </BottomSheetModal>
     </Container>
   )
+}
+
+type FullScreenOverlayProps = {
+  visible: boolean
+  children?: React.ReactNode
+}
+
+const FullScreenOverlay = ({ visible, children }: FullScreenOverlayProps) => {
+  if (Platform.OS === "ios") {
+    return <FullWindowOverlay>{children}</FullWindowOverlay>
+  } else {
+    return (
+      <Modal visible={true} transparent={true} statusBarTranslucent={true}>
+        {children}
+      </Modal>
+    )
+  }
 }
 
 const TiFBackdropView = ({
