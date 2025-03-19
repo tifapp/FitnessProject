@@ -2,6 +2,7 @@ import {
   EditEventFormValues,
   toRouteableEditFormValues
 } from "@event/EditFormValues"
+import { useBottomSheetModal } from "@gorhom/bottom-sheet"
 import { useNavigation } from "@react-navigation/native"
 import { NativeStackHeaderLeftProps } from "@react-navigation/native-stack"
 import { type NavigationState } from "@react-navigation/routers"
@@ -14,7 +15,6 @@ import { StyleProp, StyleSheet, ViewStyle } from "react-native"
 import { EventID } from "TiFShared/domain-models/Event"
 import { UserHandle, UserID } from "TiFShared/domain-models/User"
 import { TouchableIonicon } from "./common/Icons"
-import { useBottomSheetModal } from "@gorhom/bottom-sheet"
 
 /**
  * A helper type that's useful for making reusable navigation flows.
@@ -160,7 +160,7 @@ export const ChevronBackButton = ({
   const currentNavigation = useTiFNavigation()
   return (
     <TouchableIonicon
-      icon={{ name: "chevron-back" }}
+      icon={{ name: "chevron-back", color: "white" }}
       accessibilityLabel="Go Back"
       onPress={() => (navigation ?? currentNavigation).goBack()}
       style={style}
@@ -175,7 +175,7 @@ export const XMarkBackButton = ({
   const currentNavigation = useTiFNavigation()
   return (
     <TouchableIonicon
-      icon={{ name: "close" }}
+      icon={{ name: "close", color: "white" }}
       accessibilityLabel="Go Back"
       onPress={() => (navigation ?? currentNavigation).goBack()}
       style={style}

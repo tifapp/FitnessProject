@@ -6,6 +6,8 @@ import {
   clientSideEventFromResponse
 } from "@event/ClientSideEvent"
 import { setEventDetailsQueryEvent } from "@event/DetailsQuery"
+import { useLiveEvents } from "@event/LiveEvents"
+import { AppStyles } from "@lib/AppColorStyle"
 import { QueryHookOptions } from "@lib/ReactQuery"
 import { useLastDefinedValue } from "@lib/utils/UseLastDefinedValue"
 import {
@@ -30,7 +32,6 @@ import {
   maxRegionMeterRadius
 } from "./Region"
 import { SkeletonEventCard } from "./SkeletonEventCard"
-import { useLiveEvents } from "@event/LiveEvents"
 
 export const eventsByRegion = async (
   region: ExploreEventsRegion,
@@ -226,10 +227,10 @@ export const ExploreEventsView = ({
 }
 
 const NearbyHeader = () => (
-  <Title style={styles.sheetHeaderText}>Nearby Events</Title>
+  <Title style={styles.sheetHeaderText}>Find An Adventure</Title>
 )
 const FindingHeader = () => (
-  <Title style={styles.sheetHeaderText}>Finding Nearby Events...</Title>
+  <Title style={styles.sheetHeaderText}>Scanning...</Title>
 )
 
 type ErrorProps = {
@@ -252,7 +253,7 @@ const NoResultsView = () => (
   <View style={styles.emptyEventsContentContainer}>
     <Ionicon name="map" size={48} style={styles.emptyEventsIcon} />
     <BodyText style={styles.emptyEventsText}>
-      No events were found in this area. Try moving to a different location.
+      Nothing found in this area. Chart your own or try exploring a different location!
     </BodyText>
   </View>
 )
@@ -280,7 +281,9 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "white",
     paddingHorizontal: 24,
-    paddingBottom: 16
+    paddingBottom: 16,
+    color: AppStyles.primaryColor.toString(),
+    textAlign: "center"
   },
   water: {
     width: "100%",

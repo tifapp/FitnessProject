@@ -1,4 +1,5 @@
 import { FormSubmissionPrimaryButton } from "@components/Buttons"
+
 import {
   ClientSideEvent,
   clientSideEventFromResponse
@@ -137,7 +138,7 @@ export const EditEventFormSubmitButton = ({
       submission={state.submission}
       style={styles.submitButton}
     >
-      {!state.eventId ? "Create Event" : "Update Event"}
+      {!state.eventId ? "Create Your Adventure" : "Update Your Adventure"}
     </FormSubmissionPrimaryButton>
   </View>
 )
