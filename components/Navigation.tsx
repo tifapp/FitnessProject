@@ -40,21 +40,7 @@ export type UseNavigationReturn = Omit<
  * modals when navigating.
  */
 export const useTiFNavigation = (): UseNavigationReturn => {
-  const { dismissAll } = useBottomSheetModal()
-  const navigation = useNavigation<UseNavigationReturn>()
-  const navigate: UseNavigationReturn["navigate"] = (
-    ...args: Parameters<UseNavigationReturn["navigate"]>
-  ) => {
-    dismissAll()
-    navigation.navigate(...args)
-  }
-  const replace: UseNavigationReturn["replace"] = (
-    ...args: Parameters<UseNavigationReturn["replace"]>
-  ) => {
-    dismissAll()
-    navigation.navigate(...args)
-  }
-  return { ...navigation, navigate, replace }
+  return useNavigation<UseNavigationReturn>()
 }
 
 /**
