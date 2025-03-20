@@ -20,6 +20,7 @@ import {
 } from "react-native"
 import MapView, {
   LongPressEvent,
+  MapType,
   MapViewProps,
   Marker,
   Region
@@ -34,12 +35,12 @@ import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { FullWindowOverlay } from "react-native-screens"
 import { TouchableIonicon } from "./common/Icons"
 import { useScreenBottomPadding } from "./Padding"
+import { MapTypePickerView } from "./form-components/MapTypePicker"
 
 export type ExpandableMapSnippetProps = {
   isExpanded: boolean
   onExpansionChanged: (isExpanded: boolean) => void
   onMarkerPressed?: () => void
-  onMapLongPress?: (event: LongPressEvent) => void
   region: Region
   overlay?: ReactNode | ((isExpanding: boolean) => ReactNode)
   marker?: ReactNode
@@ -61,7 +62,6 @@ export const ExpandableMapSnippetView = forwardRef(function Snippet(
     marker,
     style,
     onMarkerPressed,
-    onMapLongPress,
     collapsedMapProps,
     expandedMapProps
   }: ExpandableMapSnippetProps,
@@ -98,6 +98,7 @@ export const ExpandableMapSnippetView = forwardRef(function Snippet(
       }
     })
   }, [progress, onExpansionChanged])
+  const [mapType, setMapType] = useState<MapType>("standard")
   return (
     <View style={style}>
       <View style={styles.container}>
@@ -115,6 +116,7 @@ export const ExpandableMapSnippetView = forwardRef(function Snippet(
               loadingEnabled
               zoomEnabled={false}
               scrollEnabled={false}
+              mapType={mapType}
               mapPadding={{
                 top: 0,
                 left: 0,
@@ -132,12 +134,17 @@ export const ExpandableMapSnippetView = forwardRef(function Snippet(
               </Marker>
             </MapView>
           )}
-          <TouchableIonicon
-            icon={{ name: "contract" }}
-            onPress={expand}
-            activeOpacity={0.8}
-            style={styles.expandButton}
-          />
+          <View style={styles.expandButton}>
+            <TouchableIonicon
+              icon={{ name: "contract" }}
+              onPress={expand}
+              activeOpacity={0.8}
+            />
+            <MapTypePickerView
+              selectedOption={mapType}
+              onOptionSelected={setMapType}
+            />
+          </View>
           <View style={styles.overlayContainer}>
             <View
               style={styles.overlay}
@@ -158,6 +165,8 @@ export const ExpandableMapSnippetView = forwardRef(function Snippet(
             overlay={overlay}
             marker={marker}
             mapLayout={snippetLayout}
+            mapType={mapType}
+            onMapTypeChanged={setMapType}
             overlayLayout={overlayLayout}
             onMarkerPressed={onMarkerPressed}
             expandedMapProps={expandedMapProps}
@@ -178,6 +187,8 @@ type ExpandedMapProps = {
   mapLayout: LayoutRectangle
   overlayLayout: LayoutRectangle
   isVisible: boolean
+  mapType: MapType
+  onMapTypeChanged: (type: MapType) => void
   expandedMapProps?: MapViewProps
   onMarkerPressed?: () => void
   onCollapsed: () => void
@@ -196,6 +207,8 @@ const ExpandedMapView = ({
   progress,
   isExpanding,
   isExpandingShared,
+  mapType,
+  onMapTypeChanged,
   onMarkerPressed,
   expandedMapProps
 }: ExpandedMapProps) => {
@@ -247,6 +260,7 @@ const ExpandedMapView = ({
         <Animated.View style={animatedMapStyle}>
           <MapView
             {...expandedMapProps}
+            mapType={mapType}
             style={StyleSheet.absoluteFill}
             initialRegion={region}
             mapPadding={{
@@ -272,12 +286,17 @@ const ExpandedMapView = ({
             </View>
           </Animated.View>
           <Animated.View style={animatedCollapseButtonStyle}>
-            <TouchableIonicon
-              icon={{ name: "contract" }}
-              onPress={onCollapsed}
-              activeOpacity={0.8}
-              style={styles.zoomButton}
-            />
+            <View style={styles.zoomButton}>
+              <TouchableIonicon
+                icon={{ name: "contract" }}
+                onPress={onCollapsed}
+                activeOpacity={0.8}
+              />
+              <MapTypePickerView
+                selectedOption={mapType}
+                onOptionSelected={onMapTypeChanged}
+              />
+            </View>
           </Animated.View>
         </Animated.View>
       )}
@@ -291,7 +310,9 @@ const ZOOM_BUTTON_STYLES = {
   borderRadius: 12,
   backgroundColor: "white",
   alignItems: "center",
-  justifyContent: "center"
+  justifyContent: "center",
+  rowGap: 8,
+  padding: 8
 } as const
 
 const styles = StyleSheet.create({

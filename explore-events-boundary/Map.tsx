@@ -2,7 +2,7 @@ import { ExploreEventsMarkerView } from "./MapMarker"
 import { ClientSideEvent } from "@event/ClientSideEvent"
 import React, { memo } from "react"
 import { StyleProp, ViewStyle } from "react-native"
-import MapView, { Marker } from "react-native-maps"
+import MapView, { MapType, Marker } from "react-native-maps"
 import { ExploreEventsRegion } from "./Region"
 import { useCoreNavigation } from "@components/Navigation"
 import { AppStyles } from "@lib/AppColorStyle"
@@ -11,6 +11,7 @@ import { defaultEditFormValues } from "@event/EditFormValues"
 export type ExploreEventsMapProps = {
   initialRegion: ExploreEventsRegion
   events: ClientSideEvent[]
+  mapType: MapType
   onRegionChanged: (region: ExploreEventsRegion) => void
   style?: StyleProp<ViewStyle>
 }
@@ -18,6 +19,7 @@ export type ExploreEventsMapProps = {
 export const ExploreEventsMap = ({
   initialRegion,
   events,
+  mapType,
   onRegionChanged,
   style
 }: ExploreEventsMapProps) => {
@@ -39,6 +41,7 @@ export const ExploreEventsMap = ({
       }}
       moveOnMarkerPress={false}
       showsUserLocation
+      mapType={mapType}
       onRegionChangeComplete={(region) => onRegionChanged(region)}
       showsMyLocationButton={false}
       customMapStyle={[
