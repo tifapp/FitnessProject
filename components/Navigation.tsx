@@ -36,8 +36,7 @@ export type UseNavigationReturn = Omit<
 /**
  * Returns the main navigator in the current navigation context in the app.
  *
- * Use this instead hook of `useNavigation`, as this hook will ensure to dismiss any bottom sheet
- * modals when navigating.
+ * Use this instead hook of `useNavigation` for better type safety.
  */
 export const useTiFNavigation = (): UseNavigationReturn => {
   return useNavigation<UseNavigationReturn>()
