@@ -1,9 +1,4 @@
 import { TiFBottomSheet } from "@components/BottomSheet"
-import {
-  NavigatorContext,
-  NavigatorProvider,
-  useTiFNavigation
-} from "@components/Navigation"
 import { useScreenBottomPadding } from "@components/Padding"
 import { Title } from "@components/Text"
 import { IoniconCloseButton } from "@components/common/Icons"
@@ -15,7 +10,6 @@ import {
   BottomSheetHandle,
   BottomSheetHandleProps
 } from "@gorhom/bottom-sheet"
-import { UserID } from "TiFShared/domain-models/User"
 import dayjs from "dayjs"
 import { useCallback, useState } from "react"
 import { ViewStyle, StyleProp, View, StyleSheet } from "react-native"
@@ -40,14 +34,13 @@ export const useHomeLiveEvents = () => {
 }
 
 export type HomeLiveEventsProps = {
-  id: UserID
   style?: StyleProp<ViewStyle>
 }
 
 const SNAP_POINTS = ["50%", "85%"]
 
-export const HomeLiveEventsView = ({ id, style }: HomeLiveEventsProps) => {
-  const state = useHomeLiveEvents(id)
+export const HomeLiveEventsView = ({ style }: HomeLiveEventsProps) => {
+  const state = useHomeLiveEvents()
   const inset = useScreenBottomPadding({
     safeAreaScreens: 48,
     nonSafeAreaScreens: 0

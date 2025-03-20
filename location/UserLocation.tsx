@@ -26,7 +26,7 @@ export const useUserCoordinatesQuery = (
 ) => {
   const { getCurrentLocation } = useUserLocationFunctions()
   return useQuery({
-    queryKey: ["user-coordinates", { preview: true }],
+    queryKey: ["user-coordinates", locationOptions],
     queryFn: async () => await getCurrentLocation(locationOptions),
     ...options
   })

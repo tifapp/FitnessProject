@@ -14,7 +14,7 @@ import {
   View,
   ViewStyle
 } from "react-native"
-import { TiFBottomSheet } from "@components/BottomSheet"
+import { TiFBottomSheet, TiFBottomSheetProvider } from "@components/BottomSheet"
 
 export type ExploreEventsBottomSheetProps = {
   events: ClientSideEvent[]
@@ -34,38 +34,40 @@ export const ExploreEventsBottomSheet = ({
   EmptyEventsComponent,
   style
 }: ExploreEventsBottomSheetProps) => (
-  <TiFBottomSheet
-    isTerminallyPresented
-    overlay="on-screen"
-    sizing={{ snapPoints: SNAP_POINTS }}
-    initialSnapPointIndex={1}
-    HandleView={useCallback(
-      (props: BottomSheetHandleProps) => (
-        <View style={styles.handle}>
-          <BottomSheetHandle {...props} />
-          <HeaderComponent />
-        </View>
-      ),
-      [HeaderComponent]
-    )}
-    canSwipeToDismiss={false}
-    shouldIncludeBackdrop={false}
-    style={style}
-  >
-    <BottomSheetFlatList
-      data={events}
-      keyExtractor={(event) => event.id.toString()}
-      renderItem={({ item }: ListRenderItemInfo<ClientSideEvent>) => (
-        <EventCard event={item} style={styles.event} />
+  <TiFBottomSheetProvider>
+    <TiFBottomSheet
+      isTerminallyPresented
+      overlay="on-screen"
+      sizing={{ snapPoints: SNAP_POINTS }}
+      initialSnapPointIndex={1}
+      HandleView={useCallback(
+        (props: BottomSheetHandleProps) => (
+          <View style={styles.handle}>
+            <BottomSheetHandle {...props} />
+            <HeaderComponent />
+          </View>
+        ),
+        [HeaderComponent]
       )}
-      ListEmptyComponent={EmptyEventsComponent}
-      ItemSeparatorComponent={() => <View style={styles.separator} />}
-      contentContainerStyle={{
-        paddingBottom: Platform.OS === "ios" ? 16 : 104
-      }}
-      contentInset={{ bottom: 104 }}
-    />
-  </TiFBottomSheet>
+      canSwipeToDismiss={false}
+      shouldIncludeBackdrop={false}
+      style={style}
+    >
+      <BottomSheetFlatList
+        data={events}
+        keyExtractor={(event) => event.id.toString()}
+        renderItem={({ item }: ListRenderItemInfo<ClientSideEvent>) => (
+          <EventCard event={item} style={styles.event} />
+        )}
+        ListEmptyComponent={EmptyEventsComponent}
+        ItemSeparatorComponent={() => <View style={styles.separator} />}
+        contentContainerStyle={{
+          paddingBottom: Platform.OS === "ios" ? 16 : 104
+        }}
+        contentInset={{ bottom: 104 }}
+      />
+    </TiFBottomSheet>
+  </TiFBottomSheetProvider>
 )
 
 const styles = StyleSheet.create({
