@@ -1,4 +1,4 @@
-import { StyleProp, ViewStyle } from "react-native"
+import { StyleProp, ViewStyle, Platform } from "react-native"
 import { MapType } from "react-native-maps"
 import { TiFFormMenuPickerView } from "./MenuPicker"
 import { Ionicon } from "@components/common/Icons"
@@ -24,9 +24,18 @@ export const MapTypePickerView = ({
   </TiFFormMenuPickerView>
 )
 
-const MAP_TYPE_OPTIONS = new Map<MapType, { title: string }>([
-  ["standard", { title: "Default" }],
-  ["satellite", { title: "Satellite" }],
-  ["hybrid", { title: "Hybrid" }],
-  ["terrain", { title: "Terrain" }]
-])
+const MAP_TYPE_OPTIONS = new Map<MapType, { title: string }>(
+  Platform.select({
+    ios: [
+      ["standard", { title: "Default" }],
+      ["satellite", { title: "Satellite" }],
+      ["hybrid", { title: "Hybrid" }]
+    ],
+    android: [
+      ["standard", { title: "Default" }],
+      ["satellite", { title: "Satellite" }],
+      ["hybrid", { title: "Hybrid" }],
+      ["terrain", { title: "Terrain" }]
+    ]
+  })
+)
