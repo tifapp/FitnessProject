@@ -1,11 +1,11 @@
+import { faker } from "@faker-js/faker"
+import { mockLocationCoordinate2D, mockPlacemark } from "@location/MockData"
 import { createStore } from "jotai"
 import {
   _DEFAULT_FORM_VALUES,
   editEventFormValueAtoms,
   eventEditAtom
 } from "./FormAtoms"
-import { mockLocationCoordinate2D, mockPlacemark } from "@location/MockData"
-import { faker } from "@faker-js/faker"
 
 describe("EventFormValues tests", () => {
   test("Default Values should not be submittable", () => {
@@ -45,19 +45,20 @@ describe("EventFormValues tests", () => {
     })
   })
 
-  it("should prefer the placemark to the coordinate when validating form values", () => {
+  it("should prefer the coordinate to the placemark when validating form values", () => {
     const store = createStore()
     const title = faker.lorem.words()
-    const placemark = mockPlacemark()
+    const coordinate = mockLocationCoordinate2D()
+
     store.set(editEventFormValueAtoms.title, title)
     store.set(editEventFormValueAtoms.location, {
-      coordinate: mockLocationCoordinate2D(),
-      placemark
+      coordinate,
+      placemark: mockPlacemark()
     })
     expect(store.get(eventEditAtom)).toEqual({
       ..._DEFAULT_FORM_VALUES,
       title,
-      location: { type: "placemark", value: placemark }
+      location: { type: "coordinate", value: coordinate }
     })
   })
 })
