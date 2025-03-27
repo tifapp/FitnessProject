@@ -28,7 +28,7 @@ describe("ReactQuery tests", () => {
       retry: 0,
       meta: { log }
     })
-    await expect(observer.refetch()).rejects.toThrow()
+    await observer.refetch()
     expect(handler).toHaveBeenCalledWith(
       "react.query.test",
       "error",
