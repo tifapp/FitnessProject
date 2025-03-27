@@ -118,7 +118,6 @@ const submitFormAtom = (
   return atom((get) => {
     const isDirty = get(isEditEventFormDirtyAtom)
     const eventEdit = get(eventEditAtom)
-    console.log(eventEdit)
     if (!isDirty || !eventEdit) return undefined
     return async () => await submit(eventId, eventEdit)
   })
