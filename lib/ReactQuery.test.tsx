@@ -16,7 +16,7 @@ describe("ReactQuery tests", () => {
   afterEach(() => resetLogHandlers())
 
   it("should log errors globally with the log handler", async () => {
-    const client = new QueryClient(TIF_BASE_QUERY_CLIENT_CONFIG)
+    const client = queryClient()
     const log = logger("react.query.test")
     const error = new Error("Test error")
     const observer = new QueryObserver(client, {
@@ -39,7 +39,7 @@ describe("ReactQuery tests", () => {
   })
 
   it("should log mutation errors globally with the log handler", async () => {
-    const client = new QueryClient(TIF_BASE_QUERY_CLIENT_CONFIG)
+    const client = queryClient()
     const log = logger("react.query.test")
     const error = new Error("Test error")
     const observer = new MutationObserver(client, {
@@ -59,7 +59,7 @@ describe("ReactQuery tests", () => {
   })
 
   it("should not log non-throwing queries", async () => {
-    const client = new QueryClient(TIF_BASE_QUERY_CLIENT_CONFIG)
+    const client = queryClient()
     const log = logger("react.query.test")
     const observer = new QueryObserver(client, {
       queryKey: ["test"],
@@ -72,7 +72,7 @@ describe("ReactQuery tests", () => {
   })
 
   it("should not log non-throwing mutations", async () => {
-    const client = new QueryClient(TIF_BASE_QUERY_CLIENT_CONFIG)
+    const client = queryClient()
     const log = logger("react.query.test")
     const observer = new MutationObserver(client, {
       mutationFn: async () => 1,
@@ -81,4 +81,14 @@ describe("ReactQuery tests", () => {
     await observer.mutate()
     expect(handler).not.toHaveBeenCalled()
   })
+
+  const queryClient = () => {
+    return new QueryClient({
+      ...TIF_BASE_QUERY_CLIENT_CONFIG,
+      defaultOptions: {
+        queries: { gcTime: Infinity },
+        mutations: { gcTime: Infinity }
+      }
+    })
+  }
 })
