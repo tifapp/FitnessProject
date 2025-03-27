@@ -1,5 +1,8 @@
 import {
+  MutationCache,
+  QueryCache,
   QueryClient,
+  QueryClientConfig,
   QueryClientProvider,
   UseMutationOptions,
   UseQueryOptions,
@@ -28,10 +31,39 @@ export type MutationHookOptions<
   Context = unknown
 > = Omit<UseMutationOptions<Data, Error, Args, Context>, "mutationFn">
 
+const logErrorIfPresent = (
+  error: Error,
+  metaHolder: { meta?: Record<string, unknown> },
+  message: string
+) => {
+  const log = metaHolder.meta?.log
+  if (
+    log &&
+    typeof log === "object" &&
+    "error" in log &&
+    log.error instanceof Function
+  ) {
+    log.error(message, { error, message: error.message })
+  }
+}
+
+export const TIF_BASE_QUERY_CLIENT_CONFIG = {
+  queryCache: new QueryCache({
+    onError: (error, query) => {
+      logErrorIfPresent(error, query, "A query threw an error.")
+    }
+  }),
+  mutationCache: new MutationCache({
+    onError: (error, _, __, mutation) => {
+      logErrorIfPresent(error, mutation, "A mutation threw an error.")
+    }
+  })
+} satisfies QueryClientConfig
+
 /**
  * The singleton query client to use for the app.
  */
-export const tiFQueryClient = new QueryClient()
+export const tiFQueryClient = new QueryClient(TIF_BASE_QUERY_CLIENT_CONFIG)
 
 export type TiFQueryClientProviderProps = {
   children: ReactNode
