@@ -15,7 +15,7 @@ import {
 import { UseQueryResult, useQuery, useQueryClient } from "@tanstack/react-query"
 import { TiFAPI } from "TiFShared/api"
 import { LocationAccuracy, PermissionResponse } from "expo-location"
-import React, { useState } from "react"
+import React, { memo, useState } from "react"
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 import { ExploreEventsBottomSheet } from "./BottomSheet"
 import {
@@ -31,6 +31,8 @@ import {
 } from "./Region"
 import { SkeletonEventCard } from "./SkeletonEventCard"
 import { useLiveEvents } from "@event/LiveEvents"
+import { MapType } from "react-native-maps"
+import { MapTypePickerView } from "@components/form-components/MapTypePicker"
 
 export const eventsByRegion = async (
   region: ExploreEventsRegion,
@@ -133,9 +135,7 @@ const useUserRegion = (
   const permissionQuery = useRequestForegroundLocationPermissions(options)
   const locationQuery = useUserCoordinatesQuery(
     { accuracy: LocationAccuracy.Balanced },
-    {
-      enabled: permissionQuery.data !== undefined
-    }
+    { enabled: permissionQuery.data !== undefined }
   )
   if (permissionQuery.isFetching || locationQuery.isFetching) {
     return "pending"
@@ -196,12 +196,14 @@ export const ExploreEventsView = ({
   // NB: - Ensure the current events are still on the map when the
   // user pans to a new region
   const mapEventsData = useLastDefinedValue(data.events)
+  const [mapType, setMapType] = useState<MapType>("standard")
   return (
     <View style={[style, styles.container]}>
       {region ? (
         <ExploreEventsMap
           initialRegion={region}
           onRegionChanged={onRegionUpdated}
+          mapType={mapType}
           events={mapEventsData ?? []}
           style={styles.map}
         />
@@ -210,9 +212,13 @@ export const ExploreEventsView = ({
       )}
       <ExploreEventsBottomSheet
         events={ongoingEvents.concat(data.events ?? [])}
-        HeaderComponent={
-          data.status !== "pending" ? NearbyHeader : FindingHeader
-        }
+        HeaderComponent={() => (
+          <SheetHeaderView
+            mapType={mapType}
+            onMapTypeChanged={setMapType}
+            isLoading={data.status === "pending"}
+          />
+        )}
         EmptyEventsComponent={
           <View style={styles.emptyEventsContainer}>
             {data.status === "pending" && <LoadingView />}
@@ -225,12 +231,29 @@ export const ExploreEventsView = ({
   )
 }
 
-const NearbyHeader = () => (
-  <Title style={styles.sheetHeaderText}>Nearby Events</Title>
-)
-const FindingHeader = () => (
-  <Title style={styles.sheetHeaderText}>Finding Nearby Events...</Title>
-)
+type SheetHeaderProps = {
+  mapType: MapType
+  onMapTypeChanged: (type: MapType) => void
+  isLoading: boolean
+}
+
+const SheetHeaderView = memo(function Header({
+  mapType,
+  onMapTypeChanged,
+  isLoading
+}: SheetHeaderProps) {
+  return (
+    <View style={styles.sheetHeaderRow}>
+      <Title style={styles.sheetHeaderText}>
+        {isLoading ? "Finding Nearby Events..." : "Nearby Events"}
+      </Title>
+      <MapTypePickerView
+        selectedOption={mapType}
+        onOptionSelected={onMapTypeChanged}
+      />
+    </View>
+  )
+})
 
 type ErrorProps = {
   onRetried: () => void
@@ -278,9 +301,7 @@ const styles = StyleSheet.create({
   },
   sheetHeaderText: {
     flex: 1,
-    backgroundColor: "white",
-    paddingHorizontal: 24,
-    paddingBottom: 16
+    backgroundColor: "white"
   },
   water: {
     width: "100%",
@@ -320,5 +341,13 @@ const styles = StyleSheet.create({
   tryAgainButton: {
     marginTop: 24,
     width: "100%"
+  },
+  sheetHeaderRow: {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 24,
+    paddingBottom: 16
   }
 })
