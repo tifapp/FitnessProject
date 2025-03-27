@@ -13,6 +13,9 @@ export type TiFFormMenuPickerProps<Value extends ToStringable> = {
   options: Readonly<Map<Value, { title: string }>>
   selectedOption: Value
   onOptionSelected: (value: Value) => void
+  children?:
+    | JSX.Element
+    | ((props: TiFFormMenuPickerLabelProps<Value>) => JSX.Element)
   style?: StyleProp<ViewStyle>
 }
 
@@ -20,6 +23,7 @@ export const TiFFormMenuPickerView = <Value extends ToStringable>({
   options,
   selectedOption,
   onOptionSelected,
+  children = TiFFormMenuPickerLabelView,
   style
 }: TiFFormMenuPickerProps<Value>) => (
   <View style={style}>
@@ -36,13 +40,29 @@ export const TiFFormMenuPickerView = <Value extends ToStringable>({
         image: selectedOption === value ? selectedIcon : undefined
       }))}
     >
-      <View style={styles.row}>
-        <BodyText style={styles.title}>
-          {options.get(selectedOption)?.title}
-        </BodyText>
-        <Ionicon name="chevron-expand" style={styles.icon} />
-      </View>
+      {children instanceof Function
+        ? children({ options, selectedOption })
+        : children}
     </MenuView>
+  </View>
+)
+
+export type TiFFormMenuPickerLabelProps<Value extends ToStringable> = {
+  options: Readonly<Map<Value, { title: string }>>
+  selectedOption: Value
+  style?: StyleProp<ViewStyle>
+}
+
+export const TiFFormMenuPickerLabelView = <Value extends ToStringable>({
+  options,
+  selectedOption,
+  style
+}: TiFFormMenuPickerLabelProps<Value>) => (
+  <View style={[style, styles.row]}>
+    <BodyText style={styles.title}>
+      {options.get(selectedOption)?.title}
+    </BodyText>
+    <Ionicon name="chevron-expand" style={styles.icon} />
   </View>
 )
 
