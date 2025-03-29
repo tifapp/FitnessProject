@@ -55,7 +55,8 @@ export const useLocationsSearch = () => {
   const userLocation = useLocationSearchCenter()
   const locationsQuery = useQuery({
     queryKey: ["search-locations", query, userLocation?.coords],
-    queryFn: async () => await searchResults(query, userLocation?.coords)
+    queryFn: async () => await searchResults(query, userLocation?.coords),
+    meta: { log }
   })
   return {
     userLocation,

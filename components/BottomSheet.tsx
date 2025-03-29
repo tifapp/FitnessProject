@@ -7,14 +7,16 @@ import {
 } from "@gorhom/bottom-sheet"
 import { AppStyles } from "@lib/AppColorStyle"
 import { useLastDefinedValue } from "@lib/utils/UseLastDefinedValue"
-import React, { useEffect, useRef } from "react"
+import { useFocusEffect } from "@react-navigation/native"
+import React, { useCallback, useEffect, useRef } from "react"
 import {
-  ViewStyle,
+  Dimensions,
+  Modal,
+  Platform,
   Pressable,
   StyleProp,
   StyleSheet,
-  Platform,
-  Dimensions
+  ViewStyle
 } from "react-native"
 import Animated, {
   Extrapolation,
@@ -99,9 +101,6 @@ export const TiFBottomSheet = <Item = boolean,>({
 
   // NB: When terminally presented, we can use a provider to ensure that `useTiFNavigation` will
   // not dismiss the sheet when navigating.
-  const Container = isTerminallyPresented
-    ? TiFBottomSheetProvider
-    : React.Fragment
   const renderedChildren = useLastDefinedValue(
     typeof children === "function"
       ? typeof anchor !== "boolean" && anchor
@@ -110,30 +109,62 @@ export const TiFBottomSheet = <Item = boolean,>({
       : children
   )
   return (
-    <Container>
-      <BottomSheetModal
-        ref={bottomSheetRef}
-        enablePanDownToClose={canSwipeToDismiss}
-        enableContentPanningGesture={enableContentPanningGesture}
-        handleStyle={bottomSheetHandleStyle}
-        animatedIndex={animatedIndex}
-        handleComponent={HandleView}
-        onDismiss={onDismiss}
-        containerComponent={
-          // NB: iOS needs a FullWindowOverlay in order to have the sheet appear above the native
-          // stack navigator when presented in a modal.
-          overlay === "above-screen" && Platform.OS === "ios"
-            ? FullWindowOverlay
-            : undefined
-        }
-        backdropComponent={shouldIncludeBackdrop ? TiFBackdropView : null}
-        style={style}
-        {...sizeProp}
-      >
-        <Container>{renderedChildren}</Container>
-      </BottomSheetModal>
-    </Container>
+    <BottomSheetModal
+      ref={bottomSheetRef}
+      enablePanDownToClose={canSwipeToDismiss}
+      enableContentPanningGesture={enableContentPanningGesture}
+      handleStyle={bottomSheetHandleStyle}
+      animatedIndex={animatedIndex}
+      handleComponent={HandleView}
+      onDismiss={onDismiss}
+      containerComponent={
+        overlay === "above-screen" ? FullScreenOverlay : undefined
+      }
+      backdropComponent={shouldIncludeBackdrop ? TiFBackdropView : null}
+      style={style}
+      {...sizeProp}
+    >
+      <TiFBottomSheetChildrenView isTerminallyPresented={isTerminallyPresented}>
+        {renderedChildren}
+      </TiFBottomSheetChildrenView>
+    </BottomSheetModal>
   )
+}
+
+type ChildrenProps = {
+  children: React.ReactNode
+  isTerminallyPresented: boolean
+}
+
+const TiFBottomSheetChildrenView = ({
+  children,
+  isTerminallyPresented
+}: ChildrenProps) => {
+  const { dismiss } = useBottomSheetModal()
+  useFocusEffect(
+    useCallback(() => {
+      if (isTerminallyPresented) return
+      return () => dismiss()
+    }, [isTerminallyPresented, dismiss])
+  )
+  return children
+}
+
+type FullScreenOverlayProps = {
+  visible: boolean
+  children?: React.ReactNode
+}
+
+const FullScreenOverlay = ({ visible, children }: FullScreenOverlayProps) => {
+  if (Platform.OS === "ios") {
+    return <FullWindowOverlay>{children}</FullWindowOverlay>
+  } else {
+    return (
+      <Modal visible={visible} transparent={true} statusBarTranslucent={true}>
+        {children}
+      </Modal>
+    )
+  }
 }
 
 const TiFBackdropView = ({
