@@ -50,8 +50,8 @@ export const eventEditAtom = atom<EventEdit | undefined>((get) => {
   const result = EventEditSchema.safeParse({
     ...formValues,
     location: {
-      type: formValues.location?.placemark ? "placemark" : "coordinate",
-      value: formValues.location?.placemark ?? formValues.location?.coordinate
+      type: formValues.location?.coordinate ? "coordinate" : "placemark",
+      value: formValues.location?.coordinate ?? formValues.location?.placemark
     }
   })
   return result.success ? result.data : undefined

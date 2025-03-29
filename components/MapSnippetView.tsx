@@ -22,6 +22,7 @@ import {
 } from "react-native"
 import MapView, {
   LongPressEvent,
+  MapType,
   MapViewProps,
   Marker,
   Region
@@ -39,6 +40,7 @@ import { FullWindowOverlay } from "react-native-screens"
 import { TouchableIonicon } from "./common/Icons"
 import { useScrollContext } from "./form-components/ScrollContext"
 import { useScreenBottomPadding } from "./Padding"
+import { MapTypePickerView } from "./form-components/MapTypePicker"
 
 // Updated inset padding function - still used but less critical with our new approach
 const getInsetPadding = (parallaxFactor = 0.5) => {
@@ -54,17 +56,17 @@ const getInsetPadding = (parallaxFactor = 0.5) => {
 }
 
 export type ExpandableMapSnippetProps = {
-isExpanded: boolean
-onExpansionChanged: (isExpanded: boolean) => void
-onMarkerPressed?: () => void
-region: Region
-overlay?: ReactNode | ((isExpanding: boolean) => ReactNode)
-marker?: ReactNode
-style?: StyleProp<ViewStyle>
-collapsedMapProps?: MapViewProps
-expandedMapProps?: MapViewProps
-onMapLongPress?: (event: LongPressEvent) => void
-parallaxFactor?: number // How strong the parallax effect should be
+  isExpanded: boolean
+  onExpansionChanged: (isExpanded: boolean) => void
+  onMarkerPressed?: () => void
+  region: Region
+  overlay?: ReactNode | ((isExpanding: boolean) => ReactNode)
+  marker?: ReactNode
+  style?: StyleProp<ViewStyle>
+  collapsedMapProps?: MapViewProps
+  expandedMapProps?: MapViewProps
+  onMapLongPress?: (event: LongPressEvent) => void
+  parallaxFactor?: number // How strong the parallax effect should be
 }
 
 /**

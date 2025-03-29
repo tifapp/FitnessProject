@@ -1,33 +1,36 @@
+import { EventMocks } from "@event-details-boundary/MockData"
+import { renderUseLoadEventDetails } from "@event-details-boundary/TestHelpers"
+import {
+  EditEventFormValues,
+  defaultEditFormValues
+} from "@event/EditFormValues"
+import {
+  LocationCoordinatesMocks,
+  mockLocationCoordinate2D
+} from "@location/MockData"
+import { SettingsProvider } from "@settings-storage/Hooks"
 import { PersistentSettingsStores } from "@settings-storage/PersistentStores"
 import { SQLiteUserSettingsStorage } from "@settings-storage/UserSettings"
-import { resetTestSQLiteBeforeEach, testSQLite } from "@test-helpers/SQLite"
-import { editEventFormValuesAtom } from "./FormAtoms"
-import {
-  TEST_EDIT_EVENT_FORM_STORE,
-  renderUseHydrateEditEvent
-} from "./TestHelpers"
-import { act, renderHook, waitFor } from "@testing-library/react-native"
-import { ALERTS, submitEventEdit, useEditEventFormSubmission } from "./Submit"
-import { SettingsProvider } from "@settings-storage/Hooks"
-import { Provider } from "jotai"
-import { LocationCoordinatesMocks, mockPlacemark } from "@location/MockData"
 import { captureAlerts } from "@test-helpers/Alerts"
+import { TestInternetConnectionStatus } from "@test-helpers/InternetConnectionStatus"
+import { neverPromise } from "@test-helpers/Promise"
 import {
   TestQueryClientProvider,
   createTestQueryClient
 } from "@test-helpers/ReactQuery"
-import { EventEdit, EventID } from "TiFShared/domain-models/Event"
-import { EventMocks } from "@event-details-boundary/MockData"
-import { renderUseLoadEventDetails } from "@event-details-boundary/TestHelpers"
-import { TestInternetConnectionStatus } from "@test-helpers/InternetConnectionStatus"
-import { neverPromise } from "@test-helpers/Promise"
-import { mockTiFEndpoint } from "TiFShared/test-helpers/mockAPIServer"
+import { resetTestSQLiteBeforeEach, testSQLite } from "@test-helpers/SQLite"
 import { fakeTimers } from "@test-helpers/Timers"
+import { act, renderHook, waitFor } from "@testing-library/react-native"
+import { Provider } from "jotai"
 import { TiFAPI } from "TiFShared/api"
+import { EventEdit, EventID } from "TiFShared/domain-models/Event"
+import { mockTiFEndpoint } from "TiFShared/test-helpers/mockAPIServer"
+import { editEventFormValuesAtom } from "./FormAtoms"
+import { ALERTS, submitEventEdit, useEditEventFormSubmission } from "./Submit"
 import {
-  defaultEditFormValues,
-  EditEventFormValues
-} from "@event/EditFormValues"
+  TEST_EDIT_EVENT_FORM_STORE,
+  renderUseHydrateEditEvent
+} from "./TestHelpers"
 
 describe("EditEventSubmit tests", () => {
   describe("SubmitEventEdit tests", () => {
@@ -120,7 +123,10 @@ describe("EditEventSubmit tests", () => {
     const TEST_VALUES = {
       ...defaultEditFormValues(),
       title: "Blob",
-      location: { placemark: mockPlacemark(), coordinate: undefined }
+      location: {
+        placemark: undefined,
+        coordinate: mockLocationCoordinate2D()
+      }
     }
 
     it("should not be able to submit the initial event", () => {
@@ -139,7 +145,7 @@ describe("EditEventSubmit tests", () => {
     it("should submit a changed valid event", async () => {
       submit.mockResolvedValueOnce({
         status: "success",
-        event: EventMocks.PickupBasketball
+        event: EventMocks.NoPlacemarkInfo
       })
       renderUseHydrateEditEvent(TEST_VALUES, settings)
       const { result } = renderUseEditEventSubmission(10)
@@ -149,11 +155,11 @@ describe("EditEventSubmit tests", () => {
       await waitFor(() => {
         expect(submit).toHaveBeenCalledWith(10, {
           ...newValues,
-          location: { type: "placemark", value: newValues.location.placemark }
+          location: { type: "coordinate", value: newValues.location.coordinate }
         })
       })
       await waitFor(() => {
-        expect(onSuccess).toHaveBeenCalledWith(EventMocks.PickupBasketball)
+        expect(onSuccess).toHaveBeenCalledWith(EventMocks.NoPlacemarkInfo)
       })
       expect(submit).toHaveBeenCalledTimes(1)
       expect(onSuccess).toHaveBeenCalledTimes(1)

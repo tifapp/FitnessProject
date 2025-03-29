@@ -65,7 +65,7 @@ export const CaptionTitle = (props: TextProps) => (
  * group.
  */
 export const Headline = (props: TextProps) => (
-  <Animated.Text {...props} style={[props.style, styles.headline]} />
+  <Animated.Text {...props} style={[styles.headline, props.style]} />
 )
 
 const styles = StyleSheet.create({

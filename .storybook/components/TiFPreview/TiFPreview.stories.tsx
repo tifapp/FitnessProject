@@ -5,6 +5,7 @@ import { LiveEventsFeature, LiveEventsStore } from "@event/LiveEvents"
 import { eventsByRegion } from "@explore-events-boundary"
 import { tiFQueryClient } from "@lib/ReactQuery"
 import { sleep } from "@lib/utils/DelayData"
+import { LocationsSearchFeature } from "@location-search-boundary"
 import { SettingsProvider } from "@settings-storage/Hooks"
 import { SQLiteLocalSettingsStorage } from "@settings-storage/LocalSettings"
 import { PersistentSettingsStores } from "@settings-storage/PersistentStores"
@@ -57,15 +58,21 @@ export const Basic = () => (
     userSettingsStore={userSettings}
   >
     <LiveEventsFeature.Provider store={store}>
-      <UserProfileFeature.Provider>
-        <AlphaUserSessionProvider storage={storage}>
-          <TiFView
-            fetchEvents={eventsByRegion}
-            isFontsLoaded={true}
-            style={{ flex: 1 }}
-          />
-        </AlphaUserSessionProvider>
-      </UserProfileFeature.Provider>
+      <LocationsSearchFeature.Provider
+        searchResults={async () => {
+          throw new Error("Big chungus")
+        }}
+      >
+        <UserProfileFeature.Provider>
+          <AlphaUserSessionProvider storage={storage}>
+            <TiFView
+              fetchEvents={eventsByRegion}
+              isFontsLoaded={true}
+              style={{ flex: 1 }}
+            />
+          </AlphaUserSessionProvider>
+        </UserProfileFeature.Provider>
+      </LocationsSearchFeature.Provider>
     </LiveEventsFeature.Provider>
   </SettingsProvider>
 )
