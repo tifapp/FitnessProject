@@ -1,6 +1,15 @@
-import React, { useMemo, useState } from "react"
+import React, { useState } from "react"
+import { StyleSheet, View, StyleProp, ViewStyle } from "react-native"
 
-import { StyleSheet, View } from "react-native"
+export type DashedLineProps = {
+  axis?: "horizontal" | "vertical"
+  dashGap?: number
+  dashLength?: number
+  dashThickness?: number
+  dashColor?: string
+  dashStyle?: StyleProp<ViewStyle>
+  style?: StyleProp<ViewStyle>
+}
 
 export const DashedLine = ({
   axis = "horizontal",
@@ -10,25 +19,13 @@ export const DashedLine = ({
   dashColor = "#000",
   dashStyle,
   style
-}) => {
+}: DashedLineProps) => {
   const [lineLength, setLineLength] = useState(0)
   const isRow = axis === "horizontal"
   const numOfDashes = Math.ceil(lineLength / (dashGap + dashLength))
-
-  const dashStyles = useMemo(
-    () => ({
-      width: isRow ? dashLength : dashThickness,
-      height: isRow ? dashThickness : dashLength,
-      marginRight: isRow ? dashGap : 0,
-      marginBottom: isRow ? 0 : dashGap,
-      backgroundColor: dashColor
-    }),
-    [dashColor, dashGap, dashLength, dashThickness, isRow]
-  )
-
   return (
     <View
-      onLayout={event => {
+      onLayout={(event) => {
         const { width, height } = event.nativeEvent.layout
         setLineLength(isRow ? width : height)
       }}
@@ -36,7 +33,21 @@ export const DashedLine = ({
     >
       {[...Array(numOfDashes)].map((_, i) => {
         // eslint-disable-next-line react/no-array-index-key
-        return <View key={i} style={[dashStyles, dashStyle]} />
+        return (
+          <View
+            key={i}
+            style={[
+              {
+                width: isRow ? dashLength : dashThickness,
+                height: isRow ? dashThickness : dashLength,
+                marginRight: isRow ? dashGap : 0,
+                marginBottom: isRow ? 0 : dashGap,
+                backgroundColor: dashColor
+              },
+              dashStyle
+            ]}
+          />
+        )
       })}
     </View>
   )

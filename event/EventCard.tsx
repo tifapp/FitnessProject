@@ -3,11 +3,7 @@ import { Ionicon } from "@components/common/Icons"
 import { DashedLine } from "@components/form-components/DashedLine"
 import { useCoreNavigation } from "@components/Navigation"
 import ProfilePreview from "@components/profileImageComponents/ProfileImageAndName"
-import {
-  CaptionTitle,
-  Footnote,
-  Subtitle
-} from "@components/Text"
+import { CaptionTitle, Footnote, Subtitle } from "@components/Text"
 import { EventAttendeesPreview } from "@event-details-boundary/AttendeesPreview"
 import { ClientSideEvent, isEventOngoing } from "@event/ClientSideEvent"
 import { AppStyles } from "@lib/AppColorStyle"
@@ -27,8 +23,7 @@ export type EventCardProps = {
 }
 
 const _EventCard = ({ event, onLeft, style }: EventCardProps) => {
-  const { presentProfile, pushEventDetails } =
-    useCoreNavigation()
+  const { presentProfile, pushEventDetails } = useCoreNavigation()
   return (
     <View style={style}>
       <View style={styles.card}>
@@ -55,27 +50,42 @@ const _EventCard = ({ event, onLeft, style }: EventCardProps) => {
             style={styles.menu}
           />
         </View>
-        <DashedLine style={{ position: "absolute", top: 78, width: "25%", left: "36%", zIndex: 11 }} dashStyle={{ transform: "rotate(45deg)" }} dashLength={16} dashThickness={16} dashGap={6} dashColor={"white"} />
+        <DashedLine
+          dashLength={16}
+          dashThickness={16}
+          dashGap={8}
+          dashColor={"white"}
+          dashStyle={styles.dash}
+          style={styles.dashedLine}
+        />
         <View style={styles.container}>
           <Pressable onPress={() => pushEventDetails(event.id)}>
             <View style={styles.detailsRow}>
               <View style={styles.infoColumn}>
                 <Subtitle>{event.title}</Subtitle>
                 <View style={[styles.centeredRow, styles.iconSpacing]}>
-                  <Ionicon color={AppStyles.primaryBlue.toString()} name="calendar-outline" size={16} />
+                  <Ionicon
+                    color={AppStyles.primaryBlue.toString()}
+                    name="calendar-outline"
+                    size={16}
+                  />
                   <Footnote>
                     {eventCardFormattedDateRange(event.time.dateRange)}
                   </Footnote>
                 </View>
                 <View style={[styles.centeredRow, styles.iconSpacing]}>
-                  <Ionicon color={AppStyles.primaryBlue.toString()} name="location-outline" size={16} />
+                  <Ionicon
+                    color={AppStyles.primaryBlue.toString()}
+                    name="location-outline"
+                    size={16}
+                  />
                   <Footnote>
                     {event.location.placemark?.name ?? "Unknown Location"}
                   </Footnote>
                 </View>
                 {isEventOngoing(event) && (
                   <View style={styles.ongoingRow}>
-                    <PulsingDot style={{ marginHorizontal: 2 }} />
+                    <PulsingDot style={styles.pulsingDot} />
                     <View style={styles.ongoing}>
                       <CaptionTitle style={styles.ongoingText}>
                         ONGOING
@@ -172,9 +182,15 @@ const styles = StyleSheet.create({
   moreAttendeesText: {
     left: -24
   },
+  pulsingDot: {
+    marginRight: 8,
+    marginLeft: 4
+  },
   ongoingRow: {
     display: "flex",
-    flexDirection: "row"
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center"
   },
   ongoing: {
     overflow: "hidden"
@@ -185,5 +201,13 @@ const styles = StyleSheet.create({
   },
   ongoingSpacer: {
     flex: 1
-  }
+  },
+  dashedLine: {
+    position: "absolute",
+    top: 78,
+    width: "25%",
+    left: "36%",
+    zIndex: 11
+  },
+  dash: { transform: "rotate(45deg)" }
 })
