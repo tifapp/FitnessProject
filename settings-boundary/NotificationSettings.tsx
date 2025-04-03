@@ -1,9 +1,9 @@
 import { PrimaryButton } from "@components/Buttons"
+import { TiFScrollView } from "@components/common/ScrollView"
+import { TiFFormCardView } from "@components/form-components/Card"
+import { TiFFormSectionView } from "@components/form-components/Section"
 import { BodyText, Headline } from "@components/Text"
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
-import { TiFFormCardView } from "@components/form-components/Card"
-import { TiFFormScrollView } from "@components/form-components/ScrollView"
-import { TiFFormSectionView } from "@components/form-components/Section"
 
 import { useUserSettings } from "@settings-storage/Hooks"
 import { settingsSelector } from "@settings-storage/Settings"
@@ -25,7 +25,7 @@ export const NotificationSettingsView = ({
   notificationPermission,
   style
 }: NotificationSettingsProps) => (
-  <TiFFormScrollView style={style}>
+  <TiFScrollView style={style}>
     {!notificationPermission.isGranted && (
       <PermissionsDisabledSectionView
         onPermissionsRequested={notificationPermission.onToggled}
@@ -35,7 +35,7 @@ export const NotificationSettingsView = ({
     <EventTimingSectionView isEnabled={notificationPermission.isGranted} />
     <EventArrivalsSectionView isEnabled={notificationPermission.isGranted} />
     <ProfileSectionView isEnabled={notificationPermission.isGranted} />
-  </TiFFormScrollView>
+  </TiFScrollView>
 )
 
 type PermissionsDisabledSectionProps = {

@@ -1,5 +1,5 @@
 import { AvatarMapMarkerView } from "@components/AvatarMapMarker"
-import { ExpandableMapSnippetView } from "@components/MapSnippetView"
+import { MapPreview } from "@components/MapPreview"
 import { Caption, Footnote } from "@components/Text"
 import { Ionicon } from "@components/common/Icons"
 import { TiFFormNavigationLinkView } from "@components/form-components/NavigationLink"
@@ -116,7 +116,7 @@ const LocationView = ({
   return (
     <View>
       {location.coordinate ? (
-        <ExpandableMapSnippetView
+        <MapPreview
           ref={mapRef}
           isExpanded={isExpanded}
           onExpansionChanged={setIsExpanded}

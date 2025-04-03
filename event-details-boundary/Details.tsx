@@ -32,7 +32,6 @@ import {
 } from "./ArrivalBanner"
 import { EventAttendeeCardView } from "./AttendeesList"
 import { EventAttendeesPreview } from "./AttendeesPreview"
-import { EventMocks } from "./MockData"
 import PassportCountdown from "./PassportCountdown"
 import { useEventSecondsToStart } from "./SecondsToStart"
 import { EventTravelEstimatesView, useEventTravelEstimates } from "./TravelEstimates"
@@ -68,7 +67,6 @@ const _EventDetailsView = ({ state, style }: EventDetailsProps) => (
         host={state.event.host}
         location={state.event.location}
         result={useEventTravelEstimates(state.event.location.coordinate)}
-        parallaxFactor={3}
       />
       <View style={{ paddingLeft: 16, rowGap: 16, marginTop: 12 }}>
         <LocationSectionView event={state.event} />

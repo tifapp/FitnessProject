@@ -1,20 +1,20 @@
-import { StyleProp, ViewStyle } from "react-native"
-import { TiFFormScrollView } from "@components/form-components/ScrollView"
-import { TiFFormCardSectionView } from "@components/form-components/Section"
-import { settingsSelector } from "@settings-storage/Settings"
-import { useUserSettings } from "@settings-storage/Hooks"
+import { TiFScrollView } from "@components/common/ScrollView"
 import { TiFFormMenuPickerView } from "@components/form-components/MenuPicker"
-import { EventCalendarWeekdayID } from "TiFShared/domain-models/Settings"
 import { TiFFormRowItemView } from "@components/form-components/RowItem"
+import { TiFFormCardSectionView } from "@components/form-components/Section"
+import { useUserSettings } from "@settings-storage/Hooks"
+import { settingsSelector } from "@settings-storage/Settings"
+import { StyleProp, ViewStyle } from "react-native"
+import { EventCalendarWeekdayID } from "TiFShared/domain-models/Settings"
 
 export type CalendarSettingsProps = {
   style?: StyleProp<ViewStyle>
 }
 
 export const CalendarSettingsView = ({ style }: CalendarSettingsProps) => (
-  <TiFFormScrollView style={style}>
+  <TiFScrollView style={style}>
     <WeekdayPickerSection />
-  </TiFFormScrollView>
+  </TiFScrollView>
 )
 
 const WeekdayPickerSection = () => {
