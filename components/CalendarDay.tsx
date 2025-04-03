@@ -1,50 +1,58 @@
 import { AppStyles } from "@lib/AppColorStyle"
 import dayjs from "dayjs"
-import React, { useMemo } from "react"
+import React from "react"
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 import { BalloonIcon } from "./Balloon"
 import { CaptionTitle, Subtitle } from "./Text"
+import { now } from "TiFShared/lib/Dayjs"
 
 export type CalendarDayProps = {
-  date: Date;
-  style?: StyleProp<ViewStyle>;
-  maxDaysAhead?: number; // Maximum days ahead to show balloon (default 30)
-};
+  date: Date
+  style?: StyleProp<ViewStyle>
+  maxDaysAhead?: number
+}
+
+export const calendarDay = (date: Date, maxDaysAhead: number = 7) => {
+  const daysDiff = date.ext.diff(new Date()).days
+  const isToday = now().isSame(date, "day")
+  return {
+    isToday,
+    isStartingSoon: daysDiff <= maxDaysAhead && daysDiff > 0,
+    isPast: daysDiff < 0,
+    isFuture: !isToday && daysDiff > 0
+  }
+}
 
 export const CalendarDayView = ({
   date,
   style,
   maxDaysAhead = 7
 }: CalendarDayProps) => {
-  const day = dayjs(date).format("D")
-  const month = dayjs(date).format("MMM").toUpperCase()
-
-  // Calculate days away from today (positive for future, negative for past)
-  const daysAway = useMemo(() => {
-    const today = dayjs()
-    return dayjs(date).diff(today, "day")
-  }, [date])
-
-  // Calculate if the date is today
-  const isToday = daysAway === 0
-
+  const { isToday, isPast, isStartingSoon, isFuture } = calendarDay(
+    date,
+    maxDaysAhead
+  )
   return (
-    <View style={[styles.container, style,
-      (daysAway < 0) && { opacity: 0.5 }, // Past dates are faded
-      (!isToday && daysAway > 0) && { opacity: 0.75 } // Future dates slightly faded
-    ]}>
-      {/* Month header styled like a flight gate/destination display */}
+    <View
+      style={[
+        styles.container,
+        style,
+        isPast && !isToday && styles.pastOpacity,
+        isFuture && styles.futureOpacity
+      ]}
+    >
       <View style={styles.monthContainer}>
-        <CaptionTitle style={styles.monthText}>{month}</CaptionTitle>
+        <CaptionTitle style={styles.monthText}>
+          {dayjs(date).format("MMM").toUpperCase()}
+        </CaptionTitle>
       </View>
-
-      {/* Day styled as a ticket or boarding pass */}
-      <View style={[
-        styles.dayContainer,
-        isToday && styles.todayContainer,
-        (daysAway > 0 && daysAway <= maxDaysAhead) && styles.upcomingContainer
-      ]}>
-        {/* Balloon SVG - only shown for upcoming dates within range */}
+      <View
+        style={[
+          styles.dayContainer,
+          isToday && styles.todayContainer,
+          isStartingSoon && styles.upcomingContainer
+        ]}
+      >
         {isToday && (
           <View style={styles.balloon}>
             <BalloonIcon
@@ -54,9 +62,7 @@ export const CalendarDayView = ({
             />
           </View>
         )}
-
-        {/* Day number displays on top of the balloon */}
-        <Subtitle style={styles.dayText}>{day}</Subtitle>
+        <Subtitle style={styles.dayText}>{dayjs(date).format("D")}</Subtitle>
       </View>
     </View>
   )
@@ -69,6 +75,12 @@ const styles = StyleSheet.create({
     position: "absolute",
     right: "-100%",
     bottom: 0
+  },
+  pastOpacity: {
+    opacity: 0.5
+  },
+  futureOpacity: {
+    opacity: 0.75
   },
   container: {
     width: 64,
@@ -99,12 +111,12 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 8,
     borderBottomRightRadius: 8,
     position: "relative",
-    overflow: "hidden", // Prevents content from bleeding outside
-    minHeight: 40 // Ensures consistent height
+    overflow: "hidden",
+    minHeight: 40
   },
   todayContainer: {
     borderColor: AppStyles.primaryColor,
-    backgroundColor: "#f8fbff" // Very light blue background for today
+    backgroundColor: "#f8fbff"
   },
   upcomingContainer: {
     borderColor: AppStyles.colorOpacity10
@@ -113,6 +125,6 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: "bold",
     color: "#2c3e50",
-    zIndex: 2 // Ensures day text appears above the balloon
+    zIndex: 2
   }
 })
