@@ -17,25 +17,22 @@ import { AppStyles } from "@lib/AppColorStyle"
 import { useUserSettings } from "@settings-storage/Hooks"
 import { settingsSelector } from "@settings-storage/Settings"
 import React, { memo } from "react"
-import {
-  StyleProp,
-  StyleSheet,
-  View,
-  ViewStyle
-} from "react-native"
+import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated"
 import { isAttendingEvent } from "TiFShared/domain-models/Event"
 import {
-  EventArrivalBannerView,
   eventArrivalBannerCountdown,
+  EventArrivalBannerView,
   useIsShowingEventArrivalBanner
 } from "./ArrivalBanner"
 import { EventAttendeeCardView } from "./AttendeesList"
 import { EventAttendeesPreview } from "./AttendeesPreview"
-import { EventMocks } from "./MockData"
-import PassportCountdown from "./PassportCountdown"
+import { eventCountdown, EventCountdownView } from "./Countdown"
 import { useEventSecondsToStart } from "./SecondsToStart"
-import { EventTravelEstimatesView, useEventTravelEstimates } from "./TravelEstimates"
+import {
+  EventTravelEstimatesView,
+  useEventTravelEstimates
+} from "./TravelEstimates"
 
 export type EventDetailsProps = {
   state: Extract<UseLoadEventDetailsResult, { status: "success" }>
@@ -44,20 +41,50 @@ export type EventDetailsProps = {
 
 const _EventDetailsView = ({ state, style }: EventDetailsProps) => (
   <View style={style}>
-    <DashedLine style={{ position: "absolute", left: -8, top: -8, width: "100%", zIndex: 11 }} dashStyle={{ transform: "rotate(45deg)" }} dashLength={16} dashThickness={16} dashGap={6} dashColor={AppStyles.primaryBlue.toString()} />
+    <DashedLine
+      style={{
+        position: "absolute",
+        left: -8,
+        top: -8,
+        width: "100%",
+        zIndex: 11
+      }}
+      dashStyle={{ transform: "rotate(45deg)" }}
+      dashLength={16}
+      dashThickness={16}
+      dashGap={6}
+      dashColor={AppStyles.primaryBlue.toString()}
+    />
     <TiFFormScrollableLayoutView
       footer={<FooterView event={state.event} />}
       style={styles.details}
     >
-      <DashedLine axis="vertical" style={{ position: "absolute", height: "100%", left: 23 }} dashLength={6} dashThickness={2} dashGap={4} dashColor={AppStyles.colorOpacity15} />
-      <DashedLine axis="vertical" dashStyle={{ borderRadius: 100 }} style={{ position: "absolute", height: "100%", left: -4 }} dashLength={12} dashThickness={12} dashGap={48} dashColor={AppStyles.cardColor} />
-      <View style={{
+      <DashedLine
+        axis="vertical"
+        style={{ position: "absolute", height: "100%", left: 23 }}
+        dashLength={6}
+        dashThickness={2}
+        dashGap={4}
+        dashColor={AppStyles.colorOpacity15}
+      />
+      <DashedLine
+        axis="vertical"
+        dashStyle={{ borderRadius: 100 }}
+        style={{ position: "absolute", height: "100%", left: -4 }}
+        dashLength={12}
+        dashThickness={12}
+        dashGap={48}
+        dashColor={AppStyles.cardColor}
+      />
+      <View
+        style={{
           gap: 16,
           marginLeft: 16,
           borderRadius: 32,
           paddingTop: 28,
           marginBottom: -8 - 32
-      }}>
+        }}
+      >
         <Title>{state.event.title}</Title>
         <HostSectionView event={state.event} />
       </View>
@@ -75,7 +102,11 @@ const _EventDetailsView = ({ state, style }: EventDetailsProps) => (
         <TimeSectionView event={state.event} />
         <DescriptionSectionView event={state.event} />
         <TiFFormSectionView iconName="people-outline" title="Attendees">
-          <EventAttendeesPreview TextVariant={Headline} attendeeSize={64} event={state.event} />
+          <EventAttendeesPreview
+            TextVariant={Headline}
+            attendeeSize={64}
+            event={state.event}
+          />
         </TiFFormSectionView>
       </View>
     </TiFFormScrollableLayoutView>
@@ -197,10 +228,11 @@ type CountdownProps = {
 
 const CountdownView = ({ time }: CountdownProps) => {
   const secondsToStart = useEventSecondsToStart(time)
-
-  return <PassportCountdown
-  secondsToStart={secondsToStart}
-  />
+  return (
+    <EventCountdownView
+      countdown={eventCountdown(secondsToStart, time.dateRange)}
+    />
+  )
 }
 
 const styles = StyleSheet.create({

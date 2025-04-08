@@ -7,13 +7,19 @@ import { EventDetailsContentView } from "@event-details-boundary/Content"
 import { EventDetailsView } from "@event-details-boundary/Details"
 import { useLoadEventDetails } from "@event/DetailsQuery"
 import { AppStyles } from "@lib/AppColorStyle"
-import { StaticScreenProps, useNavigation } from "@react-navigation/native"
+import { StaticScreenProps } from "@react-navigation/native"
 import { EventID } from "TiFShared/domain-models/Event"
 import React from "react"
-import { SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from "react-native"
+import {
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
+} from "react-native"
 
 const AdventureHeader = ({ title, showBackButton = true }) => {
-  const navigation = useNavigation()
+  const navigation = useTiFNavigation()
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -46,8 +52,7 @@ export const eventDetailsScreens = () => ({
       },
       headerTintColor: "#fff"
       // header: (props) => <AdventureHeader {...props} />
-    }
-  ),
+    }),
     screen: EventDetailsScreen
   },
   eventAttendeesList: {
