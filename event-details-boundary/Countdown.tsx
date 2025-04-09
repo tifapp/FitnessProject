@@ -107,9 +107,7 @@ type CountdownLabelProps = {
 }
 
 const CountdownLabel = ({ title, formattedCountdown }: CountdownLabelProps) => {
-  const days = Math.floor(formattedCountdown.seconds / (60 * 60 * 24))
-  const hours = Math.floor((formattedCountdown.seconds / (60 * 60)) % 24)
-  const minutes = Math.floor((formattedCountdown.seconds / 60) % 60)
+  const duration = dayjs.duration(formattedCountdown.seconds)
   return (
     <CountdownCard
       title={title}
@@ -119,25 +117,25 @@ const CountdownLabel = ({ title, formattedCountdown }: CountdownLabelProps) => {
         {formattedCountdown ? (
           <View style={styles.dateContainer}>
             <View style={styles.timeValues}>
-              {displayTime({
-                timeUnit: days,
-                unitType: "days",
-                shouldFOMO: formattedCountdown.shouldDisplayFomoEffect
-              })}
+              <DisplayTime
+                timeUnit={duration.asDays()}
+                unitType={"days"}
+                shouldFOMO={formattedCountdown.shouldDisplayFomoEffect}
+              />
               <BodyText style={styles.colonText}>:</BodyText>
 
-              {displayTime({
-                timeUnit: hours,
-                unitType: "hours",
-                shouldFOMO: formattedCountdown.shouldDisplayFomoEffect
-              })}
+              <DisplayTime
+                timeUnit={duration.asHours()}
+                unitType={"hours"}
+                shouldFOMO={formattedCountdown.shouldDisplayFomoEffect}
+              />
               <BodyText style={styles.colonText}>:</BodyText>
 
-              {displayTime({
-                timeUnit: minutes,
-                unitType: "minutes",
-                shouldFOMO: formattedCountdown.shouldDisplayFomoEffect
-              })}
+              <DisplayTime
+                timeUnit={duration.asMinutes()}
+                unitType={"minutes"}
+                shouldFOMO={formattedCountdown.shouldDisplayFomoEffect}
+              />
             </View>
           </View>
         ) : (
@@ -150,11 +148,11 @@ const CountdownLabel = ({ title, formattedCountdown }: CountdownLabelProps) => {
 
 type DisplayTimeProps = {
   timeUnit: number
-  unitType: "days" | "hours" | "minutes"
+  unitType: string
   shouldFOMO: boolean
 }
 
-const displayTime = ({ timeUnit, unitType, shouldFOMO }: DisplayTimeProps) => {
+const DisplayTime = ({ timeUnit, unitType, shouldFOMO }: DisplayTimeProps) => {
   return (
     <View style={styles.timeUnit}>
       <View style={styles.digitContainer}>
