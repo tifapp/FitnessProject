@@ -15,7 +15,7 @@ describe("EventDetailsCountdown tests", () => {
 
     test("done type when seconds to start is greater than dateRange", () => {
       const baseDate = new Date()
-      act(() => timeTravel(10000000))
+      act(() => timeTravel(dayjs.duration(3, "hours").asMilliseconds()))
       const countdown = eventCountdown(
         -dayjs.duration(2, "hours").asSeconds(),
         dateRange(baseDate, dayjs(baseDate).add(1, "hour").toDate())!
