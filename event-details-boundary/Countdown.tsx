@@ -8,6 +8,8 @@ import {
 } from "TiFShared/domain-models/FixedDateRange"
 import { dayjs } from "TiFShared/lib/Dayjs"
 
+const STANDARD_COUNTDOWN_UNITS = ["days", "hours", "minutes"]
+
 export type EventCountdownTime = ClientSideEvent["time"]
 
 export type EventCountdown = {
@@ -62,17 +64,23 @@ export const EventCountdownView = ({
       {countdown.kind === "starts-in" && (
         <CountdownLabel
           title="Starts in"
+          units={STANDARD_COUNTDOWN_UNITS}
           formattedCountdown={countdown.formatted}
         />
       )}
       {countdown.kind === "ends-in" && (
         <CountdownLabel
           title="Ends in"
+          units={STANDARD_COUNTDOWN_UNITS}
           formattedCountdown={countdown.formatted}
         />
       )}
       {countdown.kind === "done" && (
-        <CountdownLabel title="Done" formattedCountdown={countdown.formatted} />
+        <CountdownLabel
+          title="Done"
+          units={STANDARD_COUNTDOWN_UNITS}
+          formattedCountdown={countdown.formatted}
+        />
       )}
     </View>
   )
@@ -103,11 +111,15 @@ const CountdownCard = ({ title, shouldFOMO, children }: CountdownCardProps) => {
 
 type CountdownLabelProps = {
   title: string
+  units: string[]
   formattedCountdown: EventFormattedCountdown
 }
 
-const CountdownLabel = ({ title, formattedCountdown }: CountdownLabelProps) => {
-  const duration = dayjs.duration(formattedCountdown.seconds)
+const CountdownLabel = ({
+  title,
+  units,
+  formattedCountdown
+}: CountdownLabelProps) => {
   return (
     <CountdownCard
       title={title}
@@ -117,25 +129,17 @@ const CountdownLabel = ({ title, formattedCountdown }: CountdownLabelProps) => {
         {formattedCountdown ? (
           <View style={styles.dateContainer}>
             <View style={styles.timeValues}>
-              <DisplayTime
-                timeUnit={duration.asDays()}
-                unitType={"days"}
-                shouldFOMO={formattedCountdown.shouldDisplayFomoEffect}
-              />
-              <BodyText style={styles.colonText}>:</BodyText>
-
-              <DisplayTime
-                timeUnit={duration.asHours()}
-                unitType={"hours"}
-                shouldFOMO={formattedCountdown.shouldDisplayFomoEffect}
-              />
-              <BodyText style={styles.colonText}>:</BodyText>
-
-              <DisplayTime
-                timeUnit={duration.asMinutes()}
-                unitType={"minutes"}
-                shouldFOMO={formattedCountdown.shouldDisplayFomoEffect}
-              />
+              {units.map((unit, index) => (
+                <>
+                  <DisplayTime
+                    unitType={unit}
+                    formattedCountdown={formattedCountdown}
+                  />
+                  {index < units.length - 1 ? (
+                    <BodyText style={styles.colonText}>:</BodyText>
+                  ) : undefined}
+                </>
+              ))}
             </View>
           </View>
         ) : (
@@ -147,19 +151,29 @@ const CountdownLabel = ({ title, formattedCountdown }: CountdownLabelProps) => {
 }
 
 type DisplayTimeProps = {
-  timeUnit: number
   unitType: string
-  shouldFOMO: boolean
+  formattedCountdown: EventFormattedCountdown
 }
 
-const DisplayTime = ({ timeUnit, unitType, shouldFOMO }: DisplayTimeProps) => {
+const DisplayTime = ({ unitType, formattedCountdown }: DisplayTimeProps) => {
+  const duration = dayjs.duration(formattedCountdown.seconds * 1000)
+  const unitTypeToDuration = {
+    days: duration.days(),
+    hours: duration.hours(),
+    minutes: duration.minutes()
+  }
   return (
     <View style={styles.timeUnit}>
       <View style={styles.digitContainer}>
         <Subtitle
-          style={[styles.timeValue, shouldFOMO && { color: "#B91C1C" }]}
+          style={[
+            styles.timeValue,
+            formattedCountdown.shouldDisplayFomoEffect && { color: "#B91C1C" }
+          ]}
         >
-          {String(timeUnit).padStart(2, "0")}
+          {String(
+            unitTypeToDuration[unitType as keyof typeof unitTypeToDuration]
+          ).padStart(2, "0")}
         </Subtitle>
       </View>
       <Caption style={styles.unitLabel}>{unitType[0]}</Caption>
