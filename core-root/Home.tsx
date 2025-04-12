@@ -24,7 +24,6 @@ import { useAnimatedStyle, useSharedValue } from "react-native-reanimated"
 import { colorWithOpacity } from "TiFShared/lib/Color"
 import { TiFContext } from "./Context"
 import { HomeLiveEventsView } from "./HomeLiveEvents"
-import { Page1 } from "./Page1"
 
 export type HomeProps = {
   style?: StyleProp<ViewStyle>
@@ -59,8 +58,8 @@ export const HomeView = ({ style }: HomeProps) => {
             }}
             style={styles.pager}
           >
-            <View key="1" style={styles.screen}>
-              <Page1 />
+            <View key="1" style={[styles.screen, styles.center]}>
+              <Headline>TODO</Headline>
             </View>
             <View key="2" style={styles.screen}>
               <ExploreView />
@@ -198,6 +197,10 @@ const styles = StyleSheet.create({
   todo: {
     flex: 1,
     height: "100%",
+    alignItems: "center",
+    justifyContent: "center"
+  },
+  center: {
     alignItems: "center",
     justifyContent: "center"
   },
