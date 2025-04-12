@@ -1,12 +1,13 @@
 import { PrimaryButton } from "@components/Buttons"
 import { BodyText, Title } from "@components/Text"
 import { Ionicon } from "@components/common/Icons"
+import { MapTypePickerView } from "@components/form-components/MapTypePicker"
 import {
   ClientSideEvent,
   clientSideEventFromResponse
 } from "@event/ClientSideEvent"
 import { setEventDetailsQueryEvent } from "@event/DetailsQuery"
-import { AppStyles } from "@lib/AppColorStyle"
+import { useLiveEvents } from "@event/LiveEvents"
 import { QueryHookOptions } from "@lib/ReactQuery"
 import { useLastDefinedValue } from "@lib/utils/UseLastDefinedValue"
 import {
@@ -18,6 +19,7 @@ import { TiFAPI } from "TiFShared/api"
 import { LocationAccuracy, PermissionResponse } from "expo-location"
 import React, { memo, useState } from "react"
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
+import { MapType } from "react-native-maps"
 import { ExploreEventsBottomSheet } from "./BottomSheet"
 import {
   ExploreEventsInitialCenter,
@@ -31,9 +33,6 @@ import {
   maxRegionMeterRadius
 } from "./Region"
 import { SkeletonEventCard } from "./SkeletonEventCard"
-import { useLiveEvents } from "@event/LiveEvents"
-import { MapType } from "react-native-maps"
-import { MapTypePickerView } from "@components/form-components/MapTypePicker"
 
 export const eventsByRegion = async (
   region: ExploreEventsRegion,
@@ -248,7 +247,7 @@ const SheetHeaderView = memo(function Header({
   return (
     <View style={styles.sheetHeaderRow}>
       <Title style={styles.sheetHeaderText}>
-        {isLoading ? "Finding Nearby Events..." : "Nearby Events"}
+        {isLoading ? "Scanning..." : "Find An Adventure"}
       </Title>
       <MapTypePickerView
         selectedOption={mapType}
