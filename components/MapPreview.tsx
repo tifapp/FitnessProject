@@ -1,10 +1,11 @@
+import { useSharedState } from ".storybook/components/HoverContext/useSharedState"
 import { Portal } from "@gorhom/portal"
 import { AppStyles } from "@lib/AppColorStyle"
+import { useAnimatedParallaxStyle } from "@lib/Parallax"
 import { withTiFDefaultSpring } from "@lib/Reanimated"
 import React, {
   ReactNode,
   useCallback,
-  useEffect,
   useRef,
   useState
 } from "react"
@@ -34,24 +35,11 @@ import Animated, {
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { FullWindowOverlay } from "react-native-screens"
 import { TouchableIonicon } from "./common/Icons"
-import { useScrollContext } from "./common/ScrollView"
 import { useScreenBottomPadding } from "./Padding"
 
 const PARALLAX_FACTOR = 3
 
-const getInsetPadding = () => {
-  const padding = Math.max(40 * PARALLAX_FACTOR, 20)
-  return {
-    top: padding,
-    bottom: padding,
-    left: padding,
-    right: padding
-  }
-}
-
-const mapInsetPadding = getInsetPadding()
-
-export type ExpandableMapSnippetProps = {
+export type ExpandableMapPreviewProps = {
 isExpanded: boolean
 onExpansionChanged: (isExpanded: boolean) => void
 onMarkerPressed?: () => void
@@ -62,6 +50,13 @@ style?: StyleProp<ViewStyle>
 collapsedMapProps?: MapViewProps
 expandedMapProps?: MapViewProps
 onMapLongPress?: (event: LongPressEvent) => void
+}
+
+const getExtendedContainerStyles = (pFactor: number) => {
+  return {
+    height: `${100 * pFactor}%`,
+    top: "50%"
+  } as StyleProp<ViewStyle>
 }
 
 /**
@@ -77,7 +72,7 @@ export const MapPreview = ({
   onMarkerPressed,
   collapsedMapProps,
   expandedMapProps
-}: ExpandableMapSnippetProps) => {
+}: ExpandableMapPreviewProps) => {
   const snippetRef = useRef<View>(null)
   const [snippetLayout, setSnippetLayout] = useState<
     LayoutRectangle | undefined
@@ -86,43 +81,25 @@ export const MapPreview = ({
     LayoutRectangle | undefined
   >()
   const progress = useSharedValue(0)
-  const isExpandingShared = useSharedValue(false)
-  const [isExpanding, setIsExpanding] = useState(false)
 
-  const { scrollY } = useScrollContext()
+  const [isExpanding, setIsExpanding, isExpandingShared] = useSharedState(false)
 
-  isExpandingShared.value = isExpanding
-  useEffect(() => setIsExpanding(isExpanded), [isExpanded])
+  const parallaxStyle = useAnimatedParallaxStyle((scrollProgress) => {
+    "worklet"
 
-  const getExtendedContainerStyles = (pFactor: number) => {
-    const maxParallaxMovement = 120 * pFactor
-
-    const extraHeight = maxParallaxMovement * 2
-
-    const topOffset = -extraHeight / 2
-
-    return {
-      height: `${100 + extraHeight}%`,
-      top: topOffset
-    } as StyleProp<ViewStyle>
-  }
-
-  const { height } = useWindowDimensions()
-
-  const parallaxStyle = useAnimatedStyle(() => {
-    if (!scrollY || isExpanding) return { transform: [] }
+    if (isExpandingShared.value) return { transform: [] }
 
     const maxMovement = 120 * PARALLAX_FACTOR
 
     const translateY = interpolate(
-      scrollY.value,
-      [0, height * 0.3, height * 0.7],
+      scrollProgress.value,
+      [0, 0.3, 0.7],
       [0, maxMovement * 0.4, maxMovement]
     )
 
     return {
       transform: [
-        { translateY: translateY - (425 * PARALLAX_FACTOR) }
+        { translateY: translateY - (350 * PARALLAX_FACTOR) }
       ]
     }
   })
@@ -189,15 +166,15 @@ export const MapPreview = ({
                     zoomEnabled={false}
                     scrollEnabled={false}
                     mapPadding={{
-                      top: mapInsetPadding.top,
-                      left: mapInsetPadding.left,
-                      right: mapInsetPadding.right,
-                      bottom: overlayLayout.height + 24 + mapInsetPadding.bottom
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      bottom: overlayLayout.height + 24 * PARALLAX_FACTOR
                     }}
                     initialRegion={{
                       ...region,
-                      latitudeDelta: region.latitudeDelta * (1.1 + PARALLAX_FACTOR * 0.2),
-                      longitudeDelta: region.longitudeDelta * (1.1 + PARALLAX_FACTOR * 0.2)
+                      latitudeDelta: region.latitudeDelta,
+                      longitudeDelta: region.longitudeDelta
                     }}
                   >
                     <Marker

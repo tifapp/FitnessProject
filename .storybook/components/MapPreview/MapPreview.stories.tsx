@@ -8,11 +8,11 @@ import React, { useState } from "react"
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context"
 import { StoryMeta } from "storybook/HelperTypes"
 
-export const MapSnippetMeta: StoryMeta = {
-  title: "MapSnippet"
+export const MapPreviewMeta: StoryMeta = {
+  title: "MapPreview"
 }
 
-export default MapSnippetMeta
+export default MapPreviewMeta
 
 const firstContent = faker.lorem.paragraph(8)
 const secondContent = faker.lorem.paragraph(15)
