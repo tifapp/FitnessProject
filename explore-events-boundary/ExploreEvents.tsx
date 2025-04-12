@@ -136,7 +136,9 @@ const useUserRegion = (
   const permissionQuery = useRequestForegroundLocationPermissions(options)
   const locationQuery = useUserCoordinatesQuery(
     { accuracy: LocationAccuracy.Balanced },
-    { enabled: permissionQuery.data !== undefined }
+    {
+      enabled: permissionQuery.data !== undefined
+    }
   )
   if (permissionQuery.isFetching || locationQuery.isFetching) {
     return "pending"
