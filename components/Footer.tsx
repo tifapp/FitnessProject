@@ -1,10 +1,10 @@
-import { ReactNode } from "react"
-import { View, ViewStyle, StyleProp, StyleSheet } from "react-native"
-import { useScreenBottomPadding } from "./Padding"
-import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { AppStyles } from "@lib/AppColorStyle"
 import { useKeyboardState } from "@lib/Keyboard"
+import { ReactNode } from "react"
+import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 import Animated, { AnimatedStyle } from "react-native-reanimated"
+import { useSafeAreaInsets } from "react-native-safe-area-context"
+import { useScreenBottomPadding } from "./Padding"
 
 export type TiFFooterProps = {
   children: ReactNode
@@ -31,7 +31,7 @@ export const TiFFooterView = ({
           backgroundStyle,
           {
             paddingBottom: isKeyboardPresented
-              ? 24
+              ? 48
               : safeArea.bottom + bottomPadding
           }
         ]}

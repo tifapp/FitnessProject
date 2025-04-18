@@ -41,63 +41,35 @@ export type EventDetailsProps = {
 
 const _EventDetailsView = ({ state, style }: EventDetailsProps) => (
   <View style={style}>
-    <DashedLine
-      style={{
-        position: "absolute",
-        left: -8,
-        top: -8,
-        width: "100%",
-        zIndex: 11
-      }}
-      dashStyle={{ transform: "rotate(45deg)" }}
-      dashLength={16}
-      dashThickness={16}
-      dashGap={6}
-      dashColor={AppStyles.primaryBlue.toString()}
-    />
     <TiFFormScrollableLayoutView
       footer={<FooterView event={state.event} />}
       style={styles.details}
     >
       <DashedLine
         axis="vertical"
-        style={{ position: "absolute", height: "100%", left: 23 }}
+        style={styles.dottedPaperLine}
         dashLength={6}
         dashThickness={2}
         dashGap={4}
         dashColor={AppStyles.colorOpacity15}
       />
-      <DashedLine
-        axis="vertical"
-        dashStyle={{ borderRadius: 100 }}
-        style={{ position: "absolute", height: "100%", left: -4 }}
-        dashLength={12}
-        dashThickness={12}
-        dashGap={48}
-        dashColor={AppStyles.cardColor}
-      />
-      <View
-        style={{
-          gap: 16,
-          marginLeft: 16,
-          borderRadius: 32,
-          paddingTop: 28,
-          marginBottom: -8 - 32
-        }}
-      >
+      <View style={styles.titleContainer}>
         <Title>{state.event.title}</Title>
         <HostSectionView event={state.event} />
       </View>
-      <ArrivalSectionView event={state.event} />
+      <View style={styles.arrivalContainer}>
+        <ArrivalSectionView event={state.event} style={styles.arrivalSection} />
+      </View>
+
       <EventTravelEstimatesView
-        style={{ marginLeft: 16 }}
+        style={styles.travelEstimates}
         eventTitle={state.event.title}
         host={state.event.host}
         location={state.event.location}
         result={useEventTravelEstimates(state.event.location.coordinate)}
         parallaxFactor={3}
       />
-      <View style={{ paddingLeft: 16, rowGap: 16, marginTop: 12 }}>
+      <View style={styles.informationContainer}>
         <LocationSectionView event={state.event} />
         <TimeSectionView event={state.event} />
         <DescriptionSectionView event={state.event} />
@@ -117,9 +89,10 @@ export const EventDetailsView = memo(_EventDetailsView)
 
 type SectionProps = {
   event: ClientSideEvent
+  style?: StyleProp<ViewStyle>
 }
 
-const ArrivalSectionView = ({ event }: SectionProps) => {
+const ArrivalSectionView = ({ event, style }: SectionProps) => {
   const {
     settings: { canShareArrivalStatus }
   } = useUserSettings(settingsSelector("canShareArrivalStatus"))
@@ -132,7 +105,7 @@ const ArrivalSectionView = ({ event }: SectionProps) => {
   return (
     isShowing && (
       <Animated.View entering={FadeIn} exiting={FadeOut}>
-        <TiFFormSectionView>
+        <TiFFormSectionView style={style}>
           <EventArrivalBannerView
             hasJoinedEvent={isAttendingEvent(event.userAttendeeStatus)}
             canShareArrivalStatus={canShareArrivalStatus}
@@ -149,25 +122,19 @@ const ArrivalSectionView = ({ event }: SectionProps) => {
 }
 
 const TimeSectionView = ({ event }: SectionProps) => (
-  <TiFFormCardSectionView title="Showtime">
+  <TiFFormCardSectionView title="Showtime at:">
     <TiFFormNamedIconRowView
       iconName="calendar"
-      iconBackgroundColor={"transparent"}
+      iconBackgroundColor={AppStyles.transparent}
       name={event.time.dateRange.ext.formatted()}
     />
   </TiFFormCardSectionView>
 )
 
-const HostSectionView = ({ event }: SectionProps) => (
+const HostSectionView = ({ event, style }: SectionProps) => (
   <TiFFormSectionView color="black" title="Hosted By">
     <EventAttendeeCardView
-      style={{
-        borderRadius: 64,
-        paddingVertical: 16,
-        borderWidth: 2,
-        borderColor: AppStyles.cardColor,
-        overflow: "hidden"
-      }}
+      style={[style, styles.attendeeCard]}
       attendee={event.host}
       onRelationStatusChanged={() =>
         console.log("TODO: Sean Organize Query Cache")
@@ -191,7 +158,7 @@ const LocationSectionView = ({ event }: SectionProps) => (
     <TiFFormCardView>
       <TiFFormNamedIconRowView
         iconName="location"
-        iconBackgroundColor={"transparent"}
+        iconBackgroundColor={AppStyles.transparent}
         name={event.location.placemark?.name ?? "Unknown Location"}
         description={
           event.location.placemark
@@ -239,6 +206,30 @@ const styles = StyleSheet.create({
   details: {
     height: "100%"
   },
+  attendeeCard: {
+    borderRadius: 64,
+    paddingVertical: 16,
+    borderWidth: 2,
+    borderColor: AppStyles.cardColor,
+    overflow: "hidden"
+  },
+  arrivalContainer: {
+    marginLeft: 16,
+    marginBottom: -40,
+    backgroundColor: "transparent"
+  },
+  titleContainer: {
+    gap: 16,
+    marginLeft: 16,
+    borderRadius: 32,
+    paddingTop: 28,
+    marginBottom: -40
+  },
+  informationContainer: {
+    paddingLeft: 16,
+    rowGap: 16,
+    marginTop: 12
+  },
   border: {
     height: 2000,
     width: 100,
@@ -251,6 +242,14 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: AppStyles.colorOpacity15
   },
+  dottedPaperLine: {
+    position: "absolute",
+    height: "100%",
+    left: 23
+  },
+  arrivalSection: {
+    marginTop: -16
+  },
   attendanceButton: {
     position: "absolute",
     bottom: 0,
@@ -261,6 +260,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     height: 64
+  },
+  travelEstimates: {
+    marginLeft: 16
   },
   screen: {
     // backgroundColor: AppStyles.cardColor,

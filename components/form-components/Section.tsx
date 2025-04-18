@@ -25,8 +25,8 @@ export type TiFFormSectionProps = {
   rightAddon?: JSX.Element
   isDisabled?: boolean
   children?: ReactNode
-  color?: string;
-  iconName?: CircularIoniconProps["name"];
+  color?: string
+  iconName?: CircularIoniconProps["name"]
   style?: StyleProp<ViewStyle>
 }
 
@@ -52,10 +52,11 @@ export const TiFFormSectionView = ({
             {title && (
               <View style={[styles.titleRow]}>
                 <View>
-                  <Headline style={{ color: color ?? AppStyles.primaryBlue.toString() }}>
-                  {title}
-                </Headline>
-
+                  <Headline
+                    style={{ color: color ?? AppStyles.primaryBlue.toString() }}
+                  >
+                    {title}
+                  </Headline>
                 </View>
                 {rightAddon}
                 {/* {

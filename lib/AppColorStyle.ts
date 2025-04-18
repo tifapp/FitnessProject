@@ -13,6 +13,7 @@ export namespace AppStyles {
   export const cardColor = "#F1F5F3"
   export const eventCardBorder = "rgba(145, 145, 145, 0.2)"
   export const linkColor = "#4287f5"
+  export const transparent = blackColor.withOpacity(0)
   export const primary = blackColor
   export const blue = ColorString.parse("#4169E1")!
   export const primaryBlue = ColorString.parse("#466DEC")!
