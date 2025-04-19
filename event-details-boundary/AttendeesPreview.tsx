@@ -1,6 +1,15 @@
 import { useCoreNavigation } from "@components/Navigation"
 import { ProfileCircleView } from "@components/profileImageComponents/ProfileCircle"
-import { BodyText, BoldFootnote, Caption, CaptionTitle, Footnote, Headline, Subtitle, Title } from "@components/Text"
+import {
+  BodyText,
+  BoldFootnote,
+  Caption,
+  CaptionTitle,
+  Footnote,
+  Headline,
+  Subtitle,
+  Title
+} from "@components/Text"
 import { ClientSideEvent } from "@event/ClientSideEvent"
 import { AppStyles } from "@lib/AppColorStyle"
 import { FontScaleFactors } from "@lib/Fonts"
@@ -8,29 +17,34 @@ import { Pressable, StyleSheet, View } from "react-native"
 
 const ATTENDEES_TEXT_SPACING = [4, -4, -8]
 
-/**
- * A view that displays travel estimates for an event on iOS.
- *
- * On Android, estimates are not supported, and therefore are not displayed.
- * However, the user can still get directions for a travel type by tapping on
- * the displayed icon.
- */
-type TextComponent = typeof BoldFootnote | typeof Caption | typeof Headline | typeof BodyText | typeof Footnote | typeof CaptionTitle | typeof Title | typeof Subtitle;
+type TextComponent =
+  | typeof BoldFootnote
+  | typeof Caption
+  | typeof Headline
+  | typeof BodyText
+  | typeof Footnote
+  | typeof CaptionTitle
+  | typeof Title
+  | typeof Subtitle
 
+/**
+ * A view that displays a preview of the current attendees in the event.
+ */
 export const EventAttendeesPreview = ({
   event,
   attendeeSize = 32,
   maxAttendees = 3,
   TextVariant = BoldFootnote
 }: {
-  event: ClientSideEvent,
-  attendeeSize?: number,
-  maxAttendees?: number,
+  event: ClientSideEvent
+  attendeeSize?: number
+  maxAttendees?: number
   TextVariant?: TextComponent
 }) => {
   const { pushAttendeesList } = useCoreNavigation()
-  const previewedAttendees = event.previewAttendees?.slice(0, maxAttendees) ?? []
-  const attendeTextOffset =
+  const previewedAttendees =
+    event.previewAttendees?.slice(0, maxAttendees) ?? []
+  const attendeeTextOffset =
     previewedAttendees.length *
     ATTENDEES_TEXT_SPACING[Math.max(0, previewedAttendees.length - 1)]
 
@@ -61,14 +75,14 @@ export const EventAttendeesPreview = ({
         {event.attendeeCount > maxAttendees ? (
           <TextVariant
             maxFontSizeMultiplier={FontScaleFactors.large}
-            style={{ left: attendeTextOffset }}
+            style={{ left: attendeeTextOffset }}
           >
             + {event.attendeeCount - maxAttendees} Attending
           </TextVariant>
         ) : (
           <TextVariant
             maxFontSizeMultiplier={FontScaleFactors.large}
-            style={{ left: attendeTextOffset }}
+            style={{ left: attendeeTextOffset }}
           >
             Attending
           </TextVariant>

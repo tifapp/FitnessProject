@@ -12,7 +12,7 @@ import { UserHandle } from "TiFShared/domain-models/User"
 import { BodyText, Caption, Headline, Subtitle } from "../Text"
 import { ProfileCircleView } from "./ProfileCircle"
 
-interface ImageAndNameProps {
+interface ProfilePreviewProps {
   name: string
   handle: UserHandle
   imageURL: string | null | undefined
@@ -28,7 +28,7 @@ const SIZE_TEXT_COMPONENTS = {
   large: [Subtitle, BodyText]
 }
 
-const ProfileImageAndName = ({
+const ProfilePreview = ({
   name,
   handle,
   imageURL,
@@ -37,7 +37,7 @@ const ProfileImageAndName = ({
   maximumFontSizeMultiplier,
   imageStyle,
   textStyle
-}: ImageAndNameProps) => {
+}: ProfilePreviewProps) => {
   const fontScale = useFontScale({
     maximumScaleFactor: maximumFontSizeMultiplier
   })
@@ -86,4 +86,4 @@ const styles = StyleSheet.create({
   }
 })
 
-export default ProfileImageAndName
+export default ProfilePreview

@@ -3,6 +3,7 @@ import {
   toRouteableEditFormValues
 } from "@event/EditFormValues"
 import { useBottomSheetModal } from "@gorhom/bottom-sheet"
+import { AppStyles } from "@lib/AppColorStyle"
 import { useNavigation } from "@react-navigation/native"
 import { NativeStackHeaderLeftProps } from "@react-navigation/native-stack"
 import { type NavigationState } from "@react-navigation/routers"
@@ -101,10 +102,10 @@ export const useCoreNavigation = () => {
  */
 export const BASE_HEADER_SCREEN_OPTIONS = {
   cardStyle: {
-    backgroundColor: "white"
+    backgroundColor: AppStyles.white.toString()
   },
   headerShadowVisible: false,
-  contentStyle: { backgroundColor: "white" },
+  contentStyle: { backgroundColor: AppStyles.white.toString() },
   headerTitleStyle: {
     fontSize: 16,
     fontFamily: "OpenSansBold"
@@ -160,7 +161,7 @@ export const ChevronBackButton = ({
   const currentNavigation = useTiFNavigation()
   return (
     <TouchableIonicon
-      icon={{ name: "chevron-back", color: "white" }}
+      icon={{ name: "chevron-back", color: AppStyles.white.toString() }}
       accessibilityLabel="Go Back"
       onPress={() => (navigation ?? currentNavigation).goBack()}
       style={style}
@@ -175,7 +176,7 @@ export const XMarkBackButton = ({
   const currentNavigation = useTiFNavigation()
   return (
     <TouchableIonicon
-      icon={{ name: "close", color: "white" }}
+      icon={{ name: "close", color: AppStyles.white.toString() }}
       accessibilityLabel="Go Back"
       onPress={() => (navigation ?? currentNavigation).goBack()}
       style={style}

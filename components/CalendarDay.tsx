@@ -3,8 +3,8 @@ import dayjs from "dayjs"
 import React from "react"
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 import { now } from "TiFShared/lib/Dayjs"
-import { BalloonIcon } from "./Balloon"
 import { CaptionTitle, Subtitle } from "./Text"
+import { BalloonIcon } from "./common/Icons"
 
 export type CalendarDayProps = {
   date: Date

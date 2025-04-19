@@ -1,4 +1,3 @@
-import { CollisionProvider } from ".storybook/components/CollisionContext/CollisionContext"
 import { TiFBottomSheetProvider } from "@components/BottomSheet"
 import { PortalProvider } from "@gorhom/portal"
 import { TiFQueryClientProvider } from "@lib/ReactQuery"
@@ -21,24 +20,22 @@ export type TiFProps = {
 export const TiFView = ({ isFontsLoaded, style, ...props }: TiFProps) => {
   if (!isFontsLoaded) return null
   return (
-    <CollisionProvider>
-      <GestureHandlerRootView>
-        <PortalProvider>
-          <TiFQueryClientProvider>
-            <SafeAreaProvider>
-              <RootSiblingParent>
-                <TiFBottomSheetProvider>
-                  <View style={style}>
-                    <TiFContext.Provider value={props}>
-                      <RootNavigation />
-                    </TiFContext.Provider>
-                  </View>
-                </TiFBottomSheetProvider>
-              </RootSiblingParent>
-            </SafeAreaProvider>
-          </TiFQueryClientProvider>
-        </PortalProvider>
-      </GestureHandlerRootView>
-    </CollisionProvider>
+    <GestureHandlerRootView>
+      <PortalProvider>
+        <TiFQueryClientProvider>
+          <SafeAreaProvider>
+            <RootSiblingParent>
+              <TiFBottomSheetProvider>
+                <View style={style}>
+                  <TiFContext.Provider value={props}>
+                    <RootNavigation />
+                  </TiFContext.Provider>
+                </View>
+              </TiFBottomSheetProvider>
+            </RootSiblingParent>
+          </SafeAreaProvider>
+        </TiFQueryClientProvider>
+      </PortalProvider>
+    </GestureHandlerRootView>
   )
 }

@@ -59,15 +59,6 @@ export const TiFFormSectionView = ({
                   </Headline>
                 </View>
                 {rightAddon}
-                {/* {
-                  iconName &&
-                  <CircularIonicon
-                    size={24}
-                    name={iconName}
-                    color={AppStyles.primaryBlue.toString()}
-                    backgroundColor="white"
-                  />
-                } */}
               </View>
             )}
             {subtitle && typeof subtitle === "string" && (
