@@ -265,7 +265,6 @@ const styles = StyleSheet.create({
     marginLeft: 16
   },
   screen: {
-    // backgroundColor: AppStyles.cardColor,
     overflow: "hidden"
   },
   labelStyle: {
