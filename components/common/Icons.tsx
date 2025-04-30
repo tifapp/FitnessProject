@@ -11,6 +11,7 @@ import {
   ViewProps,
   ViewStyle
 } from "react-native"
+import Svg, { Path } from "react-native-svg"
 
 /**
  * A base type for icon props.
@@ -96,6 +97,7 @@ export const CircularIonicon = ({
   maximumFontScaleFactor,
   name,
   style,
+  color,
   size = DEFAULT_ICON_SIZE,
   ...props
 }: CircularIoniconProps) => (
@@ -125,7 +127,7 @@ export const CircularIonicon = ({
         {...props}
         name={name}
         size={(size * 1.5) / 2}
-        color="white"
+        color={color}
         style={circularStyles.icon}
       />
     </View>
@@ -243,6 +245,25 @@ export const PlusIconView = ({
         />
       </View>
     </View>
+  )
+}
+
+export const BalloonIcon = ({
+  width = 48,
+  height = 48,
+  color = AppStyles.colorOpacity10
+}: {
+  width: number
+  height: number
+  color: string
+}) => {
+  return (
+    <Svg width={width} height={height} viewBox="0 0 100 100">
+      <Path
+        d="M62.352,69.572c7.372-12.111,15.308-27.046,15.308-35.23c0-15.276-12.384-27.66-27.66-27.66  c-15.276,0-27.66,12.384-27.66,27.66c0,8.184,7.937,23.119,15.308,35.23c-0.551,0.337-0.922,0.939-0.922,1.633  c0,1.06,0.859,1.919,1.919,1.919h2.924c0.462,1.424,0.933,2.834,1.398,4.219c0.691,2.06,1.39,4.161,2.049,6.284h-1.288  c-0.471,0-0.853,0.382-0.853,0.853c0,0.471,0.382,0.853,0.853,0.853h0.178l1.666,7.986h8.854l1.666-7.986h0.178  c0.471,0,0.853-0.382,0.853-0.853c0-0.471-0.382-0.853-0.853-0.853h-0.957c0.486-1.582,0.992-3.148,1.49-4.688  c0.617-1.907,1.241-3.853,1.826-5.815h2.724c1.06,0,1.919-0.859,1.919-1.919C63.273,70.511,62.903,69.909,62.352,69.572z   M55.587,78.545c-0.539,1.666-1.086,3.364-1.609,5.081h-7.624c-0.696-2.264-1.439-4.501-2.174-6.691  c-0.42-1.252-0.844-2.529-1.263-3.812h14.38C56.747,74.95,56.163,76.764,55.587,78.545z"
+        fill={color}
+      />
+    </Svg>
   )
 }
 

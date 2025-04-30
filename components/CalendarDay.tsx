@@ -1,55 +1,130 @@
 import { AppStyles } from "@lib/AppColorStyle"
-import { StyleProp, ViewStyle, StyleSheet, View } from "react-native"
-import { CaptionTitle, Headline } from "./Text"
 import dayjs from "dayjs"
+import React from "react"
+import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
+import { now } from "TiFShared/lib/Dayjs"
+import { CaptionTitle, Subtitle } from "./Text"
+import { BalloonIcon } from "./common/Icons"
 
 export type CalendarDayProps = {
   date: Date
   style?: StyleProp<ViewStyle>
+  maxDaysAhead?: number
 }
 
-export const CalendarDayView = ({ date, style }: CalendarDayProps) => (
-  <View style={style}>
-    <View>
-      <View style={styles.month}>
+export const calendarCountdown = (date: Date, maxDaysAhead: number = 7) => {
+  const daysDiff = date.ext.diff(new Date()).days
+  const isToday = now().isSame(date, "day")
+  return {
+    isToday,
+    isStartingSoon: daysDiff <= maxDaysAhead && daysDiff > 0,
+    isPast: daysDiff < 0,
+    isFuture: !isToday && daysDiff > 0
+  }
+}
+
+export const CalendarDayView = ({
+  date,
+  style,
+  maxDaysAhead = 7
+}: CalendarDayProps) => {
+  const { isToday, isPast, isStartingSoon, isFuture } = calendarCountdown(
+    date,
+    maxDaysAhead
+  )
+  return (
+    <View
+      style={[
+        styles.container,
+        style,
+        isPast && !isToday && styles.pastOpacity,
+        isFuture && styles.futureOpacity
+      ]}
+    >
+      <View style={styles.monthContainer}>
         <CaptionTitle style={styles.monthText}>
-          {dayjs(date).format("MMM")}
+          {dayjs(date).format("MMM").toUpperCase()}
         </CaptionTitle>
       </View>
-      <View style={styles.day}>
-        <Headline style={styles.dayText}>{dayjs(date).format("D")}</Headline>
+      <View
+        style={[
+          styles.dayContainer,
+          isToday && styles.todayContainer,
+          isStartingSoon && styles.upcomingContainer
+        ]}
+      >
+        {isToday && (
+          <View style={styles.balloon}>
+            <BalloonIcon
+              width={128}
+              height={128}
+              color={AppStyles.colorOpacity10}
+            />
+          </View>
+        )}
+        <Subtitle style={styles.dayText}>{dayjs(date).format("D")}</Subtitle>
       </View>
     </View>
-  </View>
-)
+  )
+}
 
 const styles = StyleSheet.create({
-  column: {
-    display: "flex",
-    flexDirection: "column-reverse"
+  balloon: {
+    width: 128,
+    height: 128,
+    position: "absolute",
+    right: "-100%",
+    bottom: 0
   },
-  month: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 12,
-    color: "white",
+  pastOpacity: {
+    opacity: 0.5
+  },
+  futureOpacity: {
+    opacity: 0.75
+  },
+  container: {
+    width: 64,
+    overflow: "visible"
+  },
+  monthContainer: {
+    paddingHorizontal: 8,
+    paddingVertical: 6,
     backgroundColor: AppStyles.primaryColor,
-    zIndex: 1
+    borderTopLeftRadius: 8,
+    borderTopRightRadius: 8,
+    alignItems: "center"
   },
   monthText: {
-    color: "white"
+    color: "white",
+    fontWeight: "600",
+    fontSize: 12,
+    letterSpacing: 1
   },
-  day: {
-    borderBottomLeftRadius: 12,
-    borderBottomRightRadius: 12,
+  dayContainer: {
     backgroundColor: "white",
+    paddingVertical: 8,
+    paddingBottom: 12,
+    alignItems: "center",
     borderWidth: 2,
+    borderTopWidth: 0,
     borderColor: AppStyles.colorOpacity15,
-    top: -12
+    borderBottomLeftRadius: 8,
+    borderBottomRightRadius: 8,
+    position: "relative",
+    overflow: "hidden",
+    minHeight: 40
+  },
+  todayContainer: {
+    borderColor: AppStyles.primaryColor,
+    backgroundColor: "#f8fbff"
+  },
+  upcomingContainer: {
+    borderColor: AppStyles.colorOpacity10
   },
   dayText: {
-    paddingHorizontal: 16,
-    paddingBottom: 8,
-    paddingTop: 16
+    fontSize: 22,
+    fontWeight: "bold",
+    color: "#2c3e50",
+    zIndex: 2
   }
 })

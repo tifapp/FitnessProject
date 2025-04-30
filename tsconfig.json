@@ -50,6 +50,8 @@
       "@edit-event-boundary/*": ["./edit-event-boundary/*"],
       "@api": ["./api"],
       "@api/*": ["./api/*"],
+      "@journaling": ["./journaling"],
+      "@journaling/*": ["./journaling/*"],
       "env": ["./.env"]
     }
   },

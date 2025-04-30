@@ -1,76 +1,53 @@
+import { BodyText, Caption, CaptionTitle, Subtitle } from "@components/Text"
 import { ClientSideEvent } from "@event/ClientSideEvent"
-import { formattedEventCountdownSeconds } from "./SharedCountdownFormatting"
-import { StyleProp, ViewStyle, View, StyleSheet } from "react-native"
-import { Footnote, Headline } from "@components/Text"
-import { AppStyles } from "@lib/AppColorStyle"
-import { FontScaleFactors, useFontScale } from "@lib/Fonts"
+import React from "react"
+import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
+import {
+  dateRange,
+  FixedDateRange
+} from "TiFShared/domain-models/FixedDateRange"
 import { dayjs } from "TiFShared/lib/Dayjs"
-import { capitalizeFirstLetter } from "TiFShared/lib/String"
-import { FixedDateRange } from "TiFShared/domain-models/FixedDateRange"
-import { TodayOrTomorrow } from "TiFShared/domain-models/TodayOrTomorrow"
+
+const STANDARD_COUNTDOWN_UNITS = ["days", "hours", "minutes"]
 
 export type EventCountdownTime = ClientSideEvent["time"]
 
-export type EventCountdown =
-  | {
-      kind: "starts-in" | "ends-in"
-      formatted: EventFormattedCountdown
-    }
-  | { kind: "done" }
+export type EventCountdown = {
+  kind: "starts-in" | "ends-in" | "done"
+  formatted: EventFormattedCountdown
+}
 
-export type EventFormattedCountdown =
-  | { todayOrTomorrow: "Today" | "Tomorrow"; shouldDisplayFomoEffect: false }
-  | { formatted: string; shouldDisplayFomoEffect: boolean }
+export type EventFormattedCountdown = {
+  seconds: number
+  shouldDisplayFomoEffect: boolean
+}
 
 export const eventCountdown = (
   secondsToStart: number,
-  dateRange: FixedDateRange,
-  todayOrTomorrow: TodayOrTomorrow | null
+  countdownDateRange: FixedDateRange
 ): EventCountdown => {
   if (secondsToStart > 0) {
     return {
       kind: "starts-in",
-      formatted: eventFormattedCountdown(secondsToStart, todayOrTomorrow)
+      formatted: eventFormattedCountdown(secondsToStart)
     }
   }
-  const { seconds } = dateRange.diff
+  const { seconds } = countdownDateRange.diff
   const secondsToEnd = seconds - Math.abs(secondsToStart)
-  const formatted = eventFormattedCountdown(secondsToEnd, todayOrTomorrow)
-  return secondsToEnd <= 0 ? { kind: "done" } : { kind: "ends-in", formatted }
+  return secondsToEnd <= 0 && countdownDateRange.endDateTime < new Date()
+    ? {
+        kind: "done",
+        formatted: eventFormattedCountdown(
+          dateRange(countdownDateRange.endDateTime, new Date())!.diff.seconds
+        )
+      }
+    : { kind: "ends-in", formatted: eventFormattedCountdown(secondsToEnd) }
 }
 
-const eventFormattedCountdown = (
-  seconds: number,
-  todayOrTomorrow: TodayOrTomorrow | null
-): EventFormattedCountdown => {
+const eventFormattedCountdown = (seconds: number): EventFormattedCountdown => {
   const duration = dayjs.duration(seconds, "second")
-  const formatted = formattedEventCountdownSeconds(seconds).replace(
-    /(a|an) /,
-    "1 "
-  )
   const shouldDisplayFomoEffect = duration.asMinutes() <= 15
-  if (
-    (duration.asHours() >= 1 && duration.asHours() <= 6) ||
-    !todayOrTomorrow
-  ) {
-    return { formatted, shouldDisplayFomoEffect }
-  } else if (duration.asHours() < 1) {
-    const seconds = Math.floor(duration.asSeconds() % 60)
-    const minutes = Math.floor(duration.asMinutes())
-    return {
-      formatted: formatMinuteAndSecond(minutes, seconds),
-      shouldDisplayFomoEffect
-    }
-  } else {
-    return {
-      todayOrTomorrow: capitalizeFirstLetter(todayOrTomorrow),
-      shouldDisplayFomoEffect: false
-    }
-  }
-}
-
-const formatMinuteAndSecond = (left: number, right: number) => {
-  return `${left}:${right < 10 ? `0${right}` : right}`
+  return { seconds: duration.asSeconds(), shouldDisplayFomoEffect }
 }
 
 export type EventCountdownProps = {
@@ -81,72 +58,128 @@ export type EventCountdownProps = {
 export const EventCountdownView = ({
   countdown,
   style
-}: EventCountdownProps) => (
-  <View style={style}>
-    {countdown.kind === "starts-in" && (
-      <CountdownLabel
-        title="Starts in"
-        todayOrTomorrowTitle="Starts"
-        formattedCountdown={countdown.formatted}
-      />
-    )}
-    {countdown.kind === "ends-in" && (
-      <CountdownLabel
-        title="Ends in"
-        todayOrTomorrowTitle="Ends"
-        formattedCountdown={countdown.formatted}
-      />
-    )}
-  </View>
-)
+}: EventCountdownProps) => {
+  return (
+    <View style={style}>
+      {countdown.kind === "starts-in" && (
+        <CountdownLabel
+          title="Starts in"
+          units={STANDARD_COUNTDOWN_UNITS}
+          formattedCountdown={countdown.formatted}
+        />
+      )}
+      {countdown.kind === "ends-in" && (
+        <CountdownLabel
+          title="Ends in"
+          units={STANDARD_COUNTDOWN_UNITS}
+          formattedCountdown={countdown.formatted}
+        />
+      )}
+      {countdown.kind === "done" && (
+        <CountdownLabel
+          title="Done"
+          units={STANDARD_COUNTDOWN_UNITS}
+          formattedCountdown={countdown.formatted}
+        />
+      )}
+    </View>
+  )
+}
+
+type CountdownCardProps = {
+  title: string
+  shouldFOMO: boolean
+  children?: React.JSX.Element
+}
+
+const CountdownCard = ({ title, shouldFOMO, children }: CountdownCardProps) => {
+  return (
+    <View style={styles.labelContainer}>
+      <View style={[styles.card, shouldFOMO && { borderColor: "#B91C1C" }]}>
+        <View
+          style={[styles.header, shouldFOMO && { backgroundColor: "#B91C1C" }]}
+        >
+          <View style={styles.headerTextContainer}>
+            <CaptionTitle style={styles.headerText}>{title}</CaptionTitle>
+          </View>
+        </View>
+        {children}
+      </View>
+    </View>
+  )
+}
 
 type CountdownLabelProps = {
   title: string
-  todayOrTomorrowTitle: string
+  units: string[]
   formattedCountdown: EventFormattedCountdown
 }
 
 const CountdownLabel = ({
   title,
-  todayOrTomorrowTitle,
+  units,
   formattedCountdown
-}: CountdownLabelProps) => (
-  <View style={styles.container}>
-    <Footnote
-      maxFontSizeMultiplier={FontScaleFactors.xxxLarge}
-      style={styles.titleText}
+}: CountdownLabelProps) => {
+  return (
+    <CountdownCard
+      title={title}
+      shouldFOMO={formattedCountdown.shouldDisplayFomoEffect}
     >
-      {"todayOrTomorrow" in formattedCountdown ? todayOrTomorrowTitle : title}
-    </Footnote>
-    <View
-      style={[
-        styles.countdownTextContainerContainer,
-        {
-          height:
-            48 * useFontScale({ maximumScaleFactor: FontScaleFactors.xxxLarge })
-        }
-      ]}
-    >
-      <View style={styles.countdownTextContainer}>
-        <Headline
-          maxFontSizeMultiplier={FontScaleFactors.xxxLarge}
+      <View style={styles.content}>
+        {formattedCountdown ? (
+          <View style={styles.dateContainer}>
+            <View style={styles.timeValues}>
+              {units.map((unit, index) => (
+                <>
+                  <DisplayTime
+                    unitType={unit}
+                    formattedCountdown={formattedCountdown}
+                  />
+                  {index < units.length - 1 ? (
+                    <BodyText style={styles.colonText}>:</BodyText>
+                  ) : undefined}
+                </>
+              ))}
+            </View>
+          </View>
+        ) : (
+          <CaptionTitle style={styles.headerText}>{title}</CaptionTitle>
+        )}
+      </View>
+    </CountdownCard>
+  )
+}
+
+type DisplayTimeProps = {
+  unitType: string
+  formattedCountdown: EventFormattedCountdown
+}
+
+const DisplayTime = ({ unitType, formattedCountdown }: DisplayTimeProps) => {
+  const duration = dayjs.duration(formattedCountdown.seconds * 1000)
+  const unitTypeToDuration = {
+    days: duration.days(),
+    hours: duration.hours(),
+    minutes: duration.minutes()
+  }
+  return (
+    <View style={styles.timeUnit}>
+      <View style={styles.digitContainer}>
+        <Subtitle
           style={[
-            styles.countdownText,
-            {
-              color: formattedCountdown.shouldDisplayFomoEffect
-                ? AppStyles.errorColor
-                : "black"
-            }
+            styles.timeValue,
+            formattedCountdown.shouldDisplayFomoEffect && { color: "#B91C1C" }
           ]}
         >
-          {"formatted" in formattedCountdown
-            ? formattedCountdown.formatted
-            : formattedCountdown.todayOrTomorrow}
-        </Headline>
+          {String(
+            unitTypeToDuration[unitType as keyof typeof unitTypeToDuration]
+          ).padStart(2, "0")}
+        </Subtitle>
       </View>
+      <Caption style={styles.unitLabel}>{unitType[0]}</Caption>
     </View>
-  </View>
-)
+  )
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -172,5 +205,84 @@ const styles = StyleSheet.create({
   },
   countdownTextSpacer: {
     flex: 1
+  },
+  labelContainer: {
+    position: "absolute",
+    bottom: 0,
+    left: 24,
+    zIndex: 50
+  },
+  card: {
+    backgroundColor: "#FFFBEB", // amber-50
+    borderRadius: 16,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+    overflow: "hidden",
+    borderWidth: 2,
+    borderColor: "#4F7942"
+  },
+  header: {
+    backgroundColor: "#4F7942",
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    flexDirection: "row",
+    justifyContent: "center", // Center the text
+    alignItems: "center"
+  },
+  headerTextContainer: {
+    flexDirection: "row",
+    alignItems: "center"
+  },
+  headerText: {
+    color: "white",
+    fontSize: 12,
+    fontWeight: "bold"
+  },
+  content: {
+    padding: 8, // Reduced padding
+    borderTopWidth: 1,
+    borderTopColor: "#4F7942"
+  },
+  dateContainer: {
+    alignItems: "center"
+  },
+  timeValues: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center"
+  },
+  // Wrapper for digit and its label
+  timeUnit: {
+    flexDirection: "row",
+    alignItems: "flex-end"
+  },
+  // Container for digit to ensure fixed width
+  digitContainer: {
+    minWidth: 34,
+    justifyContent: "center",
+    alignItems: "center"
+  },
+  timeValue: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#4F7942",
+    fontFamily: "monospace"
+  },
+  // Style for the D/H/M/S labels
+  unitLabel: {
+    fontSize: 10,
+    fontWeight: "bold",
+    color: "#4F7942",
+    marginRight: 2
+  },
+  colonText: {
+    // Additional styling for the blinking colons
+    fontWeight: "900",
+    fontSize: 20,
+    color: "#4F7942",
+    marginHorizontal: 1
   }
 })

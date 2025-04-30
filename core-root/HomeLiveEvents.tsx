@@ -10,9 +10,10 @@ import {
   BottomSheetHandle,
   BottomSheetHandleProps
 } from "@gorhom/bottom-sheet"
+import { AppStyles } from "@lib/AppColorStyle"
 import dayjs from "dayjs"
 import { useCallback, useState } from "react"
-import { ViewStyle, StyleProp, View, StyleSheet } from "react-native"
+import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 
 const TWO_HOURS = dayjs.duration(2, "hours").asSeconds()
 
@@ -84,7 +85,7 @@ const HandleView = (
       <IoniconCloseButton size={20} onPress={props.onCloseTapped} />
     </View>
     <Title style={styles.titleText}>
-      Don&apos;t miss out on your upcoming events!
+      Stay tuned for your upcoming adventures!
     </Title>
   </View>
 )
@@ -100,7 +101,7 @@ const styles = StyleSheet.create({
   eventCard: { paddingHorizontal: 24 },
   closeButtonRow: { display: "flex", flexDirection: "row" },
   closeButtonSpacer: { flex: 1 },
-  titleText: { textAlign: "center" },
+  titleText: { textAlign: "center", color: AppStyles.primaryBlue.toString() },
   separator: { height: 16 },
   listContainer: { paddingBottom: 16 }
 })

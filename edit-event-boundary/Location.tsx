@@ -1,5 +1,5 @@
 import { AvatarMapMarkerView } from "@components/AvatarMapMarker"
-import { ExpandableMapSnippetView } from "@components/MapSnippetView"
+import { MapPreview } from "@components/MapPreview"
 import { Caption, Footnote } from "@components/Text"
 import { Ionicon } from "@components/common/Icons"
 import { TiFFormNavigationLinkView } from "@components/form-components/NavigationLink"
@@ -72,7 +72,7 @@ export const EditEventFormLocationView = ({
     {!location ? (
       <TiFFormNavigationLinkView
         iconName="location"
-        iconBackgroundColor={AppStyles.primary}
+        iconBackgroundColor={"transparent"}
         title="No Location"
         description="You must select a location to create this event."
         style={styles.locationNavigationLink}
@@ -116,7 +116,7 @@ const LocationView = ({
   return (
     <View>
       {location.coordinate ? (
-        <ExpandableMapSnippetView
+        <MapPreview
           ref={mapRef}
           isExpanded={isExpanded}
           onExpansionChanged={setIsExpanded}
@@ -185,7 +185,7 @@ const LocationView = ({
                     </Caption>
                     <TiFFormNavigationLinkView
                       iconName="location"
-                      iconBackgroundColor={AppStyles.primary}
+                      iconBackgroundColor={"transparent"}
                       style={styles.locationMapNavigationLink}
                       title={location.placemark.name ?? "Unknown Location"}
                       maximumFontScaleFactor={FontScaleFactors.xxxLarge}
@@ -247,6 +247,7 @@ const styles = StyleSheet.create({
     width: "100%",
     borderStyle: "dashed",
     borderRadius: 12,
+    padding: 16,
     borderColor: AppStyles.primaryColor,
     borderWidth: 2
   },
@@ -254,7 +255,8 @@ const styles = StyleSheet.create({
     opacity: 1
   },
   locationMapNavigationLink: {
-    width: "100%"
+    width: "100%",
+    padding: 16
   },
   mapDimensions: {
     width: "100%",

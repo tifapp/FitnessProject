@@ -1,29 +1,29 @@
+import { TiFBottomSheetProvider } from "@components/BottomSheet"
 import { PrimaryButton } from "@components/Buttons"
-import { TiFFooterView } from "@components/Footer"
-import { AnimatedPagerView } from "@components/Pager"
-import { Headline } from "@components/Text"
 import { PlusIconView } from "@components/common/Icons"
+import { TiFFooterView } from "@components/Footer"
+import { useCoreNavigation } from "@components/Navigation"
+import { AnimatedPagerView } from "@components/Pager"
+import { ProfileCircleView } from "@components/profileImageComponents/ProfileCircle"
+import { Headline } from "@components/Text"
+import { defaultEditFormValues } from "@event/EditFormValues"
 import {
   ExploreEventsView,
   createInitialCenter,
   isSignificantlyDifferentRegions,
   useExploreEvents
 } from "@explore-events-boundary"
+import { AppStyles } from "@lib/AppColorStyle"
+import { FontScaleFactors } from "@lib/Fonts"
+import { IfAuthenticated } from "@user/Session"
+import { atom, useAtomValue, useSetAtom } from "jotai"
+import React, { useContext, useRef } from "react"
+import { Pressable, StyleProp, StyleSheet, View, ViewStyle } from "react-native"
+import PagerView from "react-native-pager-view"
 import { useAnimatedStyle, useSharedValue } from "react-native-reanimated"
 import { colorWithOpacity } from "TiFShared/lib/Color"
-import { FontScaleFactors } from "@lib/Fonts"
-import { ProfileCircleView } from "@components/profileImageComponents/ProfileCircle"
-import { IfAuthenticated } from "@user/Session"
-import { AppStyles } from "@lib/AppColorStyle"
-import { useRef, useContext } from "react"
-import { StyleProp, ViewStyle, View, Pressable, StyleSheet } from "react-native"
-import PagerView from "react-native-pager-view"
 import { TiFContext } from "./Context"
-import { useCoreNavigation } from "@components/Navigation"
-import { defaultEditFormValues } from "@event/EditFormValues"
-import { atom, useAtomValue, useSetAtom } from "jotai"
 import { HomeLiveEventsView } from "./HomeLiveEvents"
-import { TiFBottomSheetProvider } from "@components/BottomSheet"
 
 export type HomeProps = {
   style?: StyleProp<ViewStyle>
@@ -58,8 +58,8 @@ export const HomeView = ({ style }: HomeProps) => {
             }}
             style={styles.pager}
           >
-            <View key="1" style={styles.screen}>
-              <TODO />
+            <View key="1" style={[styles.screen, styles.center]}>
+              <Headline>TODO</Headline>
             </View>
             <View key="2" style={styles.screen}>
               <ExploreView />
@@ -85,12 +85,6 @@ export const HomeView = ({ style }: HomeProps) => {
   )
 }
 
-const TODO = () => (
-  <View style={styles.todo}>
-    <Headline>TODO: - Journey Screen</Headline>
-  </View>
-)
-
 type FooterProps = {
   onPageIndexTapped: (index: number) => void
 }
@@ -113,7 +107,7 @@ const FooterView = ({ onPageIndexTapped }: FooterProps) => {
             maxFontSizeMultiplier={FontScaleFactors.xxxLarge}
             style={styles.footerCreateEventButtonText}
           >
-            Event
+            Adventure
           </Headline>
         </PrimaryButton>
       </View>
@@ -203,6 +197,10 @@ const styles = StyleSheet.create({
   todo: {
     flex: 1,
     height: "100%",
+    alignItems: "center",
+    justifyContent: "center"
+  },
+  center: {
     alignItems: "center",
     justifyContent: "center"
   },

@@ -1,95 +1,118 @@
 import React, { useState } from "react"
 
-import MapSnippetMeta, {
-  Basic as MapSnippet
-} from "../components/MapSnippet/MapSnippet.stories"
+import PragmaDesignMeta, {
+    Basic as PragmaDesign
+} from "../components/PragmaDesign/PragmaDesign.stories"
+
+import CollisionContextMeta, {
+    Basic as CollisionContext
+} from "../components/CollisionContext/CollisionContext.stories"
+import HoverContextMeta, {
+    Basic as HoverContext
+} from "../components/HoverContext/HoverContext.stories"
+
+import DragAndDropMeta, {
+    Basic as DragAndDrop
+} from "../components/DragAndDrop/DragAndDrop.stories"
+import DraggableViewMeta, {
+    Basic as DraggableView
+} from "../components/DraggableView/DraggableView.stories"
+
+import MapPreviewMeta, {
+    Basic as MapPreview
+} from "../components/MapPreview/MapPreview.stories"
+import SunJournalBackgroundMeta, {
+    Basic as SunJournalBackground
+} from "../components/SunJournalBackground/SunJournalBackground.stories"
 
 import { FlatList, SafeAreaView, Text, TouchableOpacity } from "react-native"
 import { useAppFonts } from "../../lib/Fonts"
 import awsconfig from "../../src/aws-exports"
 
-// Import your
 import { setupCognito } from "@auth-boundary/CognitoHelpers"
 import AttendeesListMeta, {
-  Basic as AttendeesListBasic
+    Basic as AttendeesListBasic
 } from "../components/AttendeesList/AttendeesList.stories"
 import ButtonsMeta, {
-  Basic as ButtonsBasic
+    Basic as ButtonsBasic
 } from "../components/Buttons/Buttons.stories"
 import ChangePasswordMeta, {
-  Basic as ChangePasswordBasic
+    Basic as ChangePasswordBasic
 } from "../components/ChangePassword/ChangePassword.stories"
 import ContentReportingMeta, {
-  Default as DefaultReportingFlow
+    Default as DefaultReportingFlow
 } from "../components/ContentReporting/ContentReporting.stories"
 import ContentTextMeta, {
-  Basic as ContentTextBasic
+    Basic as ContentTextBasic
 } from "../components/ContentText/ContextText.stories"
 import EventDetailsMeta, {
-  Basic as EventDetailsBasic
+    Basic as EventDetailsBasic
 } from "../components/EventDetails/EventDetails.stories"
 import ExploreEventsMeta, {
-  Basic as ExploreEventsBasic
+    Basic as ExploreEventsBasic
 } from "../components/Explore/Explore.stories"
 import ForgotPasswordMeta, {
-  Basic as ForgotPasswordBasic
+    Basic as ForgotPasswordBasic
 } from "../components/ForgotPassword/ForgotPasswordForm.stories"
 import LocationSearchMeta, {
-  Basic as LocationSearchBasic
+    Basic as LocationSearchBasic
 } from "../components/LocationSearch/LocationSearch.stories"
 import NameEntryMeta, {
-  Basic as NameEntryBasic
+    Basic as NameEntryBasic
 } from "../components/NameEntry/NameEntry.stories"
 import ProfileMeta, {
-  Basic as ProfileScreenBasic
+    Basic as ProfileScreenBasic
 } from "../components/ProfileScreen/Avatar.stories"
 import RegionMonitoringMeta, {
-  Basic as RegionMonitoringBasic
+    Basic as RegionMonitoringBasic
 } from "../components/RegionMonitoring/RegionMonitoring.stories"
 import SearchBarMeta, {
-  Default as SearchBarBasic
+    Default as SearchBarBasic
 } from "../components/SearchBar/SearchBar.stories"
 import EventSettingsDurationMeta, {
-  Basic as EventSettingsDurationBasic
+    Basic as EventSettingsDurationBasic
 } from "../components/SettingsScreen/EventSettingsDurations.stories"
 
+import ShieldDefenseMeta, {
+    Basic as ShieldDefense
+} from ".storybook/components/ShieldDefense/ShieldDefense.stories"
 import { Geo } from "@aws-amplify/geo"
 import { sqliteLogHandler, sqliteLogs } from "@lib/Logging"
 import { InMemorySecureStore } from "@lib/SecureStore"
 import { dayjs } from "TiFShared/lib/Dayjs"
 import { addLogHandler, consoleLogHandler } from "TiFShared/logging"
 import EditEventDurationsMeta, {
-  Basic as EditEventDurationsBasic
+    Basic as EditEventDurationsBasic
 } from "../components/EditEvent/DurationPicker.stories"
 import EditEventPragmaQuotesMeta, {
-  Basic as EditEventPragmaQuotesBasic
+    Basic as EditEventPragmaQuotesBasic
 } from "../components/EditEvent/PragmaQuote.stories"
 import HapticsMeta, {
-  Basic as HapticsBasic
+    Basic as HapticsBasic
 } from "../components/Haptics/Haptics.stories"
 import RudeusEditorMeta, {
-  Basic as RudeusEditorBasic
+    Basic as RudeusEditorBasic
 } from "../components/RudeusEditor/RudeusEditor.stories"
 import EventSettingsMeta, {
-  Basic as EventSettingsBasic
+    Basic as EventSettingsBasic
 } from "../components/SettingsScreen/EventSettingsScreen.stories"
 import SettingsMeta, {
-  Basic as SettingsScreenBasic
+    Basic as SettingsScreenBasic
 } from "../components/SettingsScreen/SettingsScreen.stories"
 import SignInMeta, {
-  Basic as SignInBasic
+    Basic as SignInBasic
 } from "../components/SignIn/SignIn.stories"
 import SignUpMeta, {
-  Basic as SignUpBasic
+    Basic as SignUpBasic
 } from "../components/SignUp/SignUp.stories"
 import TextFieldMeta, {
-  Basic as TextFieldBasic
+    Basic as TextFieldBasic
 } from "../components/TextField/TextField.stories"
 import TiFPreviewMeta, {
-  Basic as TiFPreviewBasic
+    Basic as TiFPreviewBasic
 } from "../components/TiFPreview/TiFPreview.stories"
 import VerifcationCodeMeta, {
-  Basic as VerifcationCodeBasic
+    Basic as VerifcationCodeBasic
 } from "../components/VerificationCode/VerifyCode.stories"
 
 Geo.configure(awsconfig)
@@ -102,11 +125,42 @@ addLogHandler(
 // Create an array of stories
 const stories = [
   {
-    name: MapSnippetMeta.title,
-    component: MapSnippet,
-    args: MapSnippetMeta.args
+    name: PragmaDesignMeta.title,
+    component: PragmaDesign,
+    args: PragmaDesignMeta.args
   },
 
+  {
+    name: DragAndDropMeta.title,
+    component: DragAndDrop
+  },
+  {
+    name: HoverContextMeta.title,
+    component: HoverContext
+  },
+  {
+    name: CollisionContextMeta.title,
+    component: CollisionContext
+  },
+  {
+    name: DraggableViewMeta.title,
+    component: DraggableView,
+    args: DraggableViewMeta.args
+  },
+  {
+    name: SunJournalBackgroundMeta.title,
+    component: SunJournalBackground,
+    args: SunJournalBackgroundMeta.args
+  },
+  {
+    name: ShieldDefenseMeta.title,
+    component: ShieldDefense
+  },
+  {
+    name: MapPreviewMeta.title,
+    component: MapPreview,
+    args: MapPreviewMeta.args
+  },
   {
     name: NameEntryMeta.title,
     component: NameEntryBasic

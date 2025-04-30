@@ -1,7 +1,9 @@
+import { CircularIoniconProps } from "@components/common/Icons"
 import { BodyText, Headline } from "@components/Text"
+import { AppStyles } from "@lib/AppColorStyle"
 import { TiFDefaultLayoutTransition } from "@lib/Reanimated"
 import { ReactNode, createContext, useContext } from "react"
-import { ViewStyle, View, StyleProp, StyleSheet } from "react-native"
+import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated"
 import { TiFFormCardView } from "./Card"
 
@@ -23,6 +25,8 @@ export type TiFFormSectionProps = {
   rightAddon?: JSX.Element
   isDisabled?: boolean
   children?: ReactNode
+  color?: string
+  iconName?: CircularIoniconProps["name"]
   style?: StyleProp<ViewStyle>
 }
 
@@ -32,7 +36,9 @@ export const TiFFormSectionView = ({
   rightAddon,
   isDisabled = false,
   children,
-  style
+  style,
+  color,
+  iconName
 }: TiFFormSectionProps) => (
   <Animated.View
     entering={FadeIn}
@@ -44,8 +50,14 @@ export const TiFFormSectionView = ({
         <View style={[styles.container, { opacity: isDisabled ? 0.5 : 1 }]}>
           <View style={styles.textContainer}>
             {title && (
-              <View style={styles.titleRow}>
-                <Headline>{title}</Headline>
+              <View style={[styles.titleRow]}>
+                <View>
+                  <Headline
+                    style={{ color: color ?? AppStyles.primaryBlue.toString() }}
+                  >
+                    {title}
+                  </Headline>
+                </View>
                 {rightAddon}
               </View>
             )}
@@ -74,7 +86,8 @@ const styles = StyleSheet.create({
   container: {
     display: "flex",
     flexDirection: "column",
-    rowGap: 16
+    rowGap: 16,
+    marginBottom: 32
   },
   textContainer: {
     rowGap: 4
@@ -82,8 +95,7 @@ const styles = StyleSheet.create({
   titleRow: {
     display: "flex",
     flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between"
+    alignItems: "center"
   },
   subtitle: {
     opacity: 0.5

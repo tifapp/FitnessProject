@@ -1,34 +1,34 @@
-import {
-  StyleProp,
-  ViewStyle,
-  StyleSheet,
-  View,
-  Text,
-  TextProps,
-  TextStyle,
-  Platform
-} from "react-native"
-import { TiFFormScrollView } from "@components/form-components/ScrollView"
-import { TiFFormSectionView } from "@components/form-components/Section"
+import { TiFScrollView } from "@components/common/ScrollView"
 import { TiFFormCardView } from "@components/form-components/Card"
-import { useLocalSettings } from "@settings-storage/Hooks"
-import { settingsSelector } from "@settings-storage/Settings"
+import { TiFFormPreviewableOptionView } from "@components/form-components/PreviewableOption"
+import { TiFFormSectionView } from "@components/form-components/Section"
 import { BodyText } from "@components/Text"
 import { AppStyles } from "@lib/AppColorStyle"
 import { FontScaleFactors, useFontScale } from "@lib/Fonts"
-import { useOpenWeblink } from "@modules/tif-weblinks"
-import { TiFFormPreviewableOptionView } from "@components/form-components/PreviewableOption"
 import { isOSMajorVersionAvailable } from "@lib/Platform"
+import { useOpenWeblink } from "@modules/tif-weblinks"
+import { useLocalSettings } from "@settings-storage/Hooks"
+import { settingsSelector } from "@settings-storage/Settings"
+import {
+  Platform,
+  StyleProp,
+  StyleSheet,
+  Text,
+  TextProps,
+  TextStyle,
+  View,
+  ViewStyle
+} from "react-native"
 
 export type AppearanceSettingsProps = {
   style?: StyleProp<ViewStyle>
 }
 
 export const AppearanceSettingsView = ({ style }: AppearanceSettingsProps) => (
-  <TiFFormScrollView style={style}>
+  <TiFScrollView style={style}>
     <ThemeSectionView />
     <FontFamilySectionView />
-  </TiFFormScrollView>
+  </TiFScrollView>
 )
 
 const ThemeSectionView = () => {

@@ -4,6 +4,8 @@ const blackColor = ColorString.parse("#01160A")!
 
 export namespace AppStyles {
   export const primaryColor = blackColor.toString()
+  export const transparent = blackColor.withOpacity(0.0)
+  export const colorOpacity10 = blackColor.withOpacity(0.1).toString()
   export const colorOpacity15 = blackColor.withOpacity(0.15).toString()
   export const colorOpacity50 = blackColor.withOpacity(0.5).toString()
   export const colorOpacity35 = blackColor.withOpacity(0.35).toString()
@@ -13,11 +15,18 @@ export namespace AppStyles {
   export const eventCardBorder = "rgba(145, 145, 145, 0.2)"
   export const linkColor = "#4287f5"
   export const primary = blackColor
-  export const blue = ColorString.parse(linkColor)!
+  export const blue = ColorString.parse("#4169E1")!
+  export const primaryBlue = ColorString.parse("#466DEC")!
+  export const backgroundBlue = ColorString.parse("#F0F8FF")!
+  export const decorativeBlue = ColorString.parse("#65C8FF")!
+  export const darkGray = ColorString.parse("#2F4858")!
   export const red = ColorString.parse("#FB3640")!
+  export const white = ColorString.parse("#FFFFFF")!
   export const yellow = ColorString.parse("#F7CD24")!
   export const green = ColorString.parse("#14B329")!
   export const purple = ColorString.parse("#A882DD")!
   export const orange = ColorString.parse("#FB5607")!
   export const emerald = ColorString.parse("#5BC087")!
+  export const inkRed = ColorString.parse("#B91C1C")!
+  export const vintage = ColorString.parse("#FFFBEB")!
 }

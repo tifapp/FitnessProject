@@ -1,6 +1,5 @@
-import { AppStyles } from "@lib/AppColorStyle"
 import { ReactNode } from "react"
-import { StyleProp, ViewStyle, View, StyleSheet } from "react-native"
+import { StyleProp, View, ViewStyle } from "react-native"
 
 export type TiFFormCardProps = {
   children?: ReactNode
@@ -10,17 +9,10 @@ export type TiFFormCardProps = {
 
 export const TiFFormCardView = ({
   children,
-  borderRadius = 12,
+  borderRadius = 32,
   style
 }: TiFFormCardProps) => (
   <View style={style}>
-    <View style={[styles.container, { borderRadius }]}>{children}</View>
+    <View style={{ borderRadius }}>{children}</View>
   </View>
 )
-
-const styles = StyleSheet.create({
-  container: {
-    backgroundColor: AppStyles.cardColor,
-    overflow: "hidden"
-  }
-})

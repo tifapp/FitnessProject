@@ -1,5 +1,6 @@
 import { EventMocks } from "@event-details-boundary/MockData"
 import { renderUseLoadEventDetails } from "@event-details-boundary/TestHelpers"
+import { LiveEventsFeature, LiveEventsStore } from "@event/LiveEvents"
 import {
   mockExpoLocationObject,
   mockLocationCoordinate2D,
@@ -15,6 +16,7 @@ import {
 } from "@test-helpers/ReactQuery"
 import { fakeTimers, timeTravel } from "@test-helpers/Timers"
 import { act, renderHook, waitFor } from "@testing-library/react-native"
+import { AlphaUserMocks } from "@user/alpha/MockData"
 import { TiFAPI } from "TiFShared/api"
 import { EventsInAreaResponse } from "TiFShared/api/models/Event"
 import { EventID } from "TiFShared/domain-models/Event"
@@ -28,8 +30,6 @@ import {
   XEROX_ALTO_DEFAULT_REGION,
   createDefaultMapRegion
 } from "./Region"
-import { LiveEventsFeature, LiveEventsStore } from "@event/LiveEvents"
-import { AlphaUserMocks } from "@user/alpha/MockData"
 
 const TEST_EVENTS = [EventMocks.Multiday, EventMocks.PickupBasketball]
 

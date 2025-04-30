@@ -2,7 +2,10 @@
 module.exports = {
   verbose: true,
   preset: "jest-expo",
-  setupFiles: ["<rootDir>/jest/setup.js"],
+  setupFiles: [
+    "<rootDir>/jest/setup.js",
+    "@shopify/react-native-skia/jestSetup.js"
+  ],
   setupFilesAfterEnv: [
     "<rootDir>/jest/setupAnimations.js",
     "<rootDir>/jest/setupNav.js",
@@ -19,7 +22,7 @@ module.exports = {
   ],
   testPathIgnorePatterns: ["/node_modules/"],
   transformIgnorePatterns: [
-    "node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@unimodules/.*|unimodules|native-base|react-native-svg|@alessiocancian/react-native-actionsheet|@sentry/.*|node-fetch|data-uri-to-buffer|fetch-blob|formdata-polyfill|TiFShared)"
+    "node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@unimodules/.*|unimodules|native-base|react-native-svg|@alessiocancian/react-native-actionsheet|@sentry/.*|node-fetch|data-uri-to-buffer|fetch-blob|formdata-polyfill|TiFShared|@shopify/react-native-skia)"
   ],
   transform: {
     "^.+\\.jsx$": "babel-jest"

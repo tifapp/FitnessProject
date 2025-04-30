@@ -1,21 +1,21 @@
+import { useKeyboardState } from "@lib/Keyboard"
 import { ReactNode, useState } from "react"
 import {
-  ViewStyle,
   LayoutRectangle,
+  Platform,
   StyleProp,
   StyleSheet,
   View,
-  Platform
+  ViewStyle
 } from "react-native"
-import { TiFFormScrollView, TiFFormScrollViewProps } from "./ScrollView"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
-import { useKeyboardState } from "@lib/Keyboard"
+import { TiFScrollView, TiFScrollViewProps } from "../common/ScrollView"
 
 export type TiFFormScrollableLayoutProps = {
   children: ReactNode
   footer: JSX.Element
   style?: StyleProp<ViewStyle>
-} & Omit<TiFFormScrollViewProps, "contentInset">
+} & Omit<TiFScrollViewProps, "contentInset">
 
 export const TiFFormScrollableLayoutView = ({
   children,
@@ -28,6 +28,7 @@ export const TiFFormScrollableLayoutView = ({
   >()
   const { isPresented: isKeyboardPresented } = useKeyboardState()
   const safeArea = useSafeAreaInsets().bottom
+
   // NB: We have to omit the contentInset key entirely on iOS to ensure that the entire view is
   // scrollable when the keyboard is presented. For some reason, even setting contentInset to
   // undefined will mess things up on iOS.
@@ -43,10 +44,13 @@ export const TiFFormScrollableLayoutView = ({
           ...props
         }
       : props
+
   return (
     <View style={style}>
       <View style={styles.container}>
-        <TiFFormScrollView {...scrollProps}>
+        <TiFScrollView
+          {...scrollProps}
+        >
           {children}
           {footerLayout && (
             <View
@@ -60,7 +64,7 @@ export const TiFFormScrollableLayoutView = ({
               }}
             />
           )}
-        </TiFFormScrollView>
+        </TiFScrollView>
         <View
           style={styles.footer}
           onLayout={(e) => setFooterLayout(e.nativeEvent.layout)}
