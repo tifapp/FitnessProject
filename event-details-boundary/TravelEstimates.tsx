@@ -1,5 +1,5 @@
 import { AvatarMapMarkerView } from "@components/AvatarMapMarker"
-import { ExpandableMapSnippetView } from "@components/MapSnippetView"
+import { MapPreview } from "@components/MapPreview"
 import { useCoreNavigation } from "@components/Navigation"
 import {
   BodyText,
@@ -166,7 +166,6 @@ export type EventTravelEstimatesProps = {
   location: EventLocation
   result: UseEventTravelEstimatesResult
   style?: StyleProp<ViewStyle>
-  parallaxFactor?: number
 }
 
 const TravelEstimatesView = ({ location, result }: Pick<EventTravelEstimatesProps, "location" | "result">) => {
@@ -214,8 +213,7 @@ export const EventTravelEstimatesView = ({
   host,
   location,
   result,
-  style,
-  parallaxFactor
+  style
 }: EventTravelEstimatesProps) => {
   const [isExpanded, setIsExpanded] = useState(false)
   const { presentProfile } = useCoreNavigation()
@@ -245,8 +243,7 @@ export const EventTravelEstimatesView = ({
         </NoticeLabel>
       )}
       <Animated.View layout={TiFDefaultLayoutTransition}>
-        <ExpandableMapSnippetView
-          parallaxFactor={parallaxFactor}
+        <MapPreview
           isExpanded={isExpanded}
           onExpansionChanged={setIsExpanded}
           region={{

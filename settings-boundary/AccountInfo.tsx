@@ -1,6 +1,6 @@
+import { TiFScrollView } from "@components/common/ScrollView"
 import { TiFFormRowButton } from "@components/form-components/Button"
 import { TiFFormNavigationLinkView } from "@components/form-components/NavigationLink"
-import { TiFFormScrollView } from "@components/form-components/ScrollView"
 import { TiFFormCardSectionView } from "@components/form-components/Section"
 import { BodyText, Headline } from "@components/Text"
 import { AlertsObject, presentAlert } from "@lib/Alerts"
@@ -73,7 +73,7 @@ export const AccountInfoSettingsView = ({
   onForgotPasswordTapped,
   style
 }: AccountInfoSettingsProps) => (
-  <TiFFormScrollView style={style}>
+  <TiFScrollView style={style}>
     <ContactInfoSectionView
       isDisabled={state.shouldDisableActions}
       userContactInfo={userContactInfo}
@@ -89,7 +89,7 @@ export const AccountInfoSettingsView = ({
       onSignOutTapped={state.signOutStarted}
       onDeleteAccountTapped={() => console.log("TODO: - Delete Account")}
     />
-  </TiFFormScrollView>
+  </TiFScrollView>
 )
 
 type ContactInfoSectionProps = {

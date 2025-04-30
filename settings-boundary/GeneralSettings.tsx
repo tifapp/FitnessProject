@@ -1,14 +1,14 @@
-import { StyleProp, ViewStyle, Platform } from "react-native"
-import { TiFFormScrollView } from "@components/form-components/ScrollView"
-import { TiFFormCardSectionView } from "@components/form-components/Section"
+import { TiFScrollView } from "@components/common/ScrollView"
+import { TiFFormRowButton } from "@components/form-components/Button"
+import { TiFFormChecklistPickerView } from "@components/form-components/ChecklistPicker"
 import { TiFFormNamedToggleView } from "@components/form-components/NamedToggle"
+import { TiFFormCardSectionView } from "@components/form-components/Section"
+import { Headline } from "@components/Text"
 import { useHaptics } from "@modules/tif-haptics"
 import { useLocalSettings } from "@settings-storage/Hooks"
-import { settingsSelector } from "@settings-storage/Settings"
-import { TiFFormChecklistPickerView } from "@components/form-components/ChecklistPicker"
 import { PreferredBrowserName } from "@settings-storage/LocalSettings"
-import { TiFFormRowButton } from "@components/form-components/Button"
-import { Headline } from "@components/Text"
+import { settingsSelector } from "@settings-storage/Settings"
+import { Platform, StyleProp, ViewStyle } from "react-native"
 
 export type GeneralSettingsProps = {
   onClearCacheTapped: () => void
@@ -25,7 +25,7 @@ export const GeneralSettingsView = ({
     isAudioSupportedOnDevice
   )
   return (
-    <TiFFormScrollView style={style}>
+    <TiFScrollView style={style}>
       {hapticsTitle && (
         <HapticsSectionView
           title={hapticsTitle}
@@ -36,7 +36,7 @@ export const GeneralSettingsView = ({
       {/* TODO: - Check for Availability */}
       <WebBrowserSectionView />
       <AdvancedSectionView onClearCacheTapped={onClearCacheTapped} />
-    </TiFFormScrollView>
+    </TiFScrollView>
   )
 }
 

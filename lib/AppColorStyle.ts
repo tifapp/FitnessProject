@@ -4,6 +4,7 @@ const blackColor = ColorString.parse("#01160A")!
 
 export namespace AppStyles {
   export const primaryColor = blackColor.toString()
+  export const transparent = blackColor.withOpacity(0.0)
   export const colorOpacity10 = blackColor.withOpacity(0.1).toString()
   export const colorOpacity15 = blackColor.withOpacity(0.15).toString()
   export const colorOpacity50 = blackColor.withOpacity(0.5).toString()

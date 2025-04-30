@@ -1,14 +1,14 @@
-import { IfAuthenticated, UserSession } from "@user/Session"
-import { StyleProp, ViewStyle, StyleSheet, View } from "react-native"
-import { TiFFormScrollView } from "@components/form-components/ScrollView"
-import { TiFFormCardSectionView } from "@components/form-components/Section"
-import { useState } from "react"
-import { useConst } from "@lib/utils/UseConst"
-import { TiFFormNavigationLinkView } from "@components/form-components/NavigationLink"
-import { AppStyles } from "@lib/AppColorStyle"
-import { BodyText } from "@components/Text"
-import { nativeBuildVersion } from "expo-application"
+import { TiFScrollView } from "@components/common/ScrollView"
 import { TiFFormCardView } from "@components/form-components/Card"
+import { TiFFormNavigationLinkView } from "@components/form-components/NavigationLink"
+import { TiFFormCardSectionView } from "@components/form-components/Section"
+import { BodyText } from "@components/Text"
+import { AppStyles } from "@lib/AppColorStyle"
+import { useConst } from "@lib/utils/UseConst"
+import { IfAuthenticated, UserSession } from "@user/Session"
+import { nativeBuildVersion } from "expo-application"
+import { useState } from "react"
+import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 import Animated, { FadeIn } from "react-native-reanimated"
 
 export type RootSettingsScreenLinkID =
@@ -29,12 +29,12 @@ export type RootSettingsProps = {
 }
 
 export const RootSettingsView = ({ style, ...props }: RootSettingsProps) => (
-  <TiFFormScrollView style={style}>
+  <TiFScrollView style={style}>
     <MainScreenLinksSection {...props} />
     <SupportSectionView
       onSettingsScreenLinkTapped={props.onSettingsScreenLinkTapped}
     />
-  </TiFFormScrollView>
+  </TiFScrollView>
 )
 
 type MainScreenLinksSectionProps = Omit<RootSettingsProps, "style">

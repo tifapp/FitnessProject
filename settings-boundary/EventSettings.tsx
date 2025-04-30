@@ -29,14 +29,14 @@ import Animated, {
   ZoomOut
 } from "react-native-reanimated"
 
-import { DurationPickerButton } from "./EventSettingsDurationPicker"
+import { TiFScrollView } from "@components/common/ScrollView"
 import { TiFFormNamedToggleView } from "@components/form-components/NamedToggle"
 import { TiFFormNavigationLinkView } from "@components/form-components/NavigationLink"
-import { TiFFormScrollView } from "@components/form-components/ScrollView"
 import {
   TiFFormCardSectionView,
   TiFFormSectionView
 } from "@components/form-components/Section"
+import { DurationPickerButton } from "./EventSettingsDurationPicker"
 
 export const eventSettingsEditMode = atomWithStorage("OFF", false)
 
@@ -236,12 +236,12 @@ export const EventSettingsView = ({
   onDurationTapped
 }: EventSettingsProps) => {
   return (
-    <TiFFormScrollView style={style}>
+    <TiFScrollView style={style}>
       <PresetSectionView
         onLocationPresetTapped={onLocationPresetTapped}
         onDurationTapped={onDurationTapped}
       />
-    </TiFFormScrollView>
+    </TiFScrollView>
   )
 }
 
@@ -251,9 +251,9 @@ export type EventDurationsProps = {
 
 export const EventDurationView = ({ style }: EventDurationsProps) => {
   return (
-    <TiFFormScrollView style={style}>
+    <TiFScrollView style={style}>
       <DurationSectionView />
-    </TiFFormScrollView>
+    </TiFScrollView>
   )
 }
 

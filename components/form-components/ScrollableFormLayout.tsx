@@ -8,19 +8,14 @@ import {
   View,
   ViewStyle
 } from "react-native"
-import {
-  useAnimatedScrollHandler,
-  useSharedValue
-} from "react-native-reanimated"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
-import { ScrollContext } from "./ScrollContext"
-import { TiFFormScrollView, TiFFormScrollViewProps } from "./ScrollView"
+import { TiFScrollView, TiFScrollViewProps } from "../common/ScrollView"
 
 export type TiFFormScrollableLayoutProps = {
   children: ReactNode
   footer: JSX.Element
   style?: StyleProp<ViewStyle>
-} & Omit<TiFFormScrollViewProps, "contentInset">
+} & Omit<TiFScrollViewProps, "contentInset">
 
 export const TiFFormScrollableLayoutView = ({
   children,
@@ -33,16 +28,6 @@ export const TiFFormScrollableLayoutView = ({
   >()
   const { isPresented: isKeyboardPresented } = useKeyboardState()
   const safeArea = useSafeAreaInsets().bottom
-
-  // Create a shared value to track scroll position
-  const scrollY = useSharedValue(0)
-
-  // Create a scroll handler that updates the shared value
-  const scrollHandler = useAnimatedScrollHandler({
-    onScroll: (event) => {
-      scrollY.value = event.contentOffset.y
-    }
-  })
 
   // NB: We have to omit the contentInset key entirely on iOS to ensure that the entire view is
   // scrollable when the keyboard is presented. For some reason, even setting contentInset to
@@ -59,37 +44,34 @@ export const TiFFormScrollableLayoutView = ({
           ...props
         }
       : props
+
   return (
     <View style={style}>
-      <ScrollContext.Provider value={{ scrollY }}>
-        <View style={styles.container}>
-          <TiFFormScrollView
-            {...scrollProps}
-            onScroll={scrollHandler}
-            scrollEventThrottle={16} // Important for smooth scrolling
-          >
-            {children}
-            {footerLayout && (
-              <View
-                style={{
-                  marginBottom:
-                    Platform.OS === "android"
-                      ? footerLayout.height + safeArea
-                      : isKeyboardPresented
-                        ? 0
-                        : safeArea
-                }}
-              />
-            )}
-          </TiFFormScrollView>
-          <View
-            style={styles.footer}
-            onLayout={(e) => setFooterLayout(e.nativeEvent.layout)}
-          >
-            {footer}
-          </View>
+      <View style={styles.container}>
+        <TiFScrollView
+          {...scrollProps}
+        >
+          {children}
+          {footerLayout && (
+            <View
+              style={{
+                marginBottom:
+                  Platform.OS === "android"
+                    ? footerLayout.height + safeArea
+                    : isKeyboardPresented
+                      ? 0
+                      : safeArea
+              }}
+            />
+          )}
+        </TiFScrollView>
+        <View
+          style={styles.footer}
+          onLayout={(e) => setFooterLayout(e.nativeEvent.layout)}
+        >
+          {footer}
         </View>
-      </ScrollContext.Provider>
+      </View>
     </View>
   )
 }

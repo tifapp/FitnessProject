@@ -1,5 +1,5 @@
+import { TiFScrollView } from "@components/common/ScrollView"
 import { TiFFormNavigationLinkView } from "@components/form-components/NavigationLink"
-import { TiFFormScrollView } from "@components/form-components/ScrollView"
 import { TiFFormCardSectionView } from "@components/form-components/Section"
 import { AlertsObject, presentAlert } from "@lib/Alerts"
 import { AppStyles } from "@lib/AppColorStyle"
@@ -177,9 +177,9 @@ export type EventSettingsProps = {
 }
 
 export const HelpAndSupportView = ({ style, state }: EventSettingsProps) => (
-  <TiFFormScrollView style={style}>
+  <TiFScrollView style={style}>
     <HelpSectionView state={state} />
-  </TiFFormScrollView>
+  </TiFScrollView>
 )
 
 export const HelpAndSupportFeature = featureContext({

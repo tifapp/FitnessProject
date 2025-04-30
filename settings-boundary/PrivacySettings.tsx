@@ -1,19 +1,19 @@
-import { useUserSettings } from "@settings-storage/Hooks"
-import { StyleProp, ViewStyle, StyleSheet, View } from "react-native"
+import { TiFScrollView } from "@components/common/ScrollView"
+import { TiFFormCardView } from "@components/form-components/Card"
+import { TiFFormNavigationLinkView } from "@components/form-components/NavigationLink"
 import { TiFFormSectionView } from "@components/form-components/Section"
+import { TiFFormToggleCardView } from "@components/form-components/ToggleCard"
 import { BodyText } from "@components/Text"
+import { AppStyles } from "@lib/AppColorStyle"
+import { useUserSettings } from "@settings-storage/Hooks"
+import { settingsSelector } from "@settings-storage/Settings"
 import {
   useBackgroundPermissions as useBackgroundLocationPermissions,
   useForegroundPermissions as useForegroundLocationPermissions
 } from "expo-location"
 import { usePermissions as useNotificationPermissions } from "expo-notifications"
-import { TiFFormToggleCardView } from "@components/form-components/ToggleCard"
-import { AppStyles } from "@lib/AppColorStyle"
-import { TiFFormNavigationLinkView } from "@components/form-components/NavigationLink"
-import { TiFFormCardView } from "@components/form-components/Card"
-import { TiFFormScrollView } from "@components/form-components/ScrollView"
+import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 import { settingsPermission } from "./Permissions"
-import { settingsSelector } from "@settings-storage/Settings"
 
 export const usePrivacySettingsPermissions = () => {
   const [foregroundStatus, requestForeground] =
@@ -41,12 +41,12 @@ export const PrivacySettingsView = ({
   style
 }: PrivacySettingsProps) => {
   return (
-    <TiFFormScrollView style={style}>
+    <TiFScrollView style={style}>
       <PreabmleSectionView />
       <LearnMoreSectionView onPrivacyPolicyTapped={onPrivacyPolicyTapped} />
       <ShareSectionView />
       <PermissionsSectionView permissions={permissions} />
-    </TiFFormScrollView>
+    </TiFScrollView>
   )
 }
 

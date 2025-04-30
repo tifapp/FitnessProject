@@ -18,6 +18,7 @@ import { useUserSettings } from "@settings-storage/Hooks"
 import { settingsSelector } from "@settings-storage/Settings"
 import React, { memo } from "react"
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
+
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated"
 import { isAttendingEvent } from "TiFShared/domain-models/Event"
 import {
@@ -27,12 +28,12 @@ import {
 } from "./ArrivalBanner"
 import { EventAttendeeCardView } from "./AttendeesList"
 import { EventAttendeesPreview } from "./AttendeesPreview"
-import { eventCountdown, EventCountdownView } from "./Countdown"
 import { useEventSecondsToStart } from "./SecondsToStart"
 import {
   EventTravelEstimatesView,
   useEventTravelEstimates
 } from "./TravelEstimates"
+import { EventCountdownView, eventCountdown } from "./Countdown"
 
 export type EventDetailsProps = {
   state: Extract<UseLoadEventDetailsResult, { status: "success" }>
@@ -41,19 +42,50 @@ export type EventDetailsProps = {
 
 const _EventDetailsView = ({ state, style }: EventDetailsProps) => (
   <View style={style}>
+    <DashedLine
+      style={{
+        position: "absolute",
+        left: -8,
+        top: -8,
+        width: "100%",
+        zIndex: 11
+      }}
+      dashStyle={{ transform: "rotate(45deg)" }}
+      dashLength={16}
+      dashThickness={16}
+      dashGap={6}
+      dashColor={AppStyles.primaryBlue.toString()}
+    />
     <TiFFormScrollableLayoutView
       footer={<FooterView event={state.event} />}
       style={styles.details}
     >
       <DashedLine
         axis="vertical"
-        style={styles.dottedPaperLine}
+        style={{ position: "absolute", height: "100%", left: 23 }}
         dashLength={6}
         dashThickness={2}
         dashGap={4}
         dashColor={AppStyles.colorOpacity15}
       />
-      <View style={styles.titleContainer}>
+      <DashedLine
+        axis="vertical"
+        dashStyle={{ borderRadius: 100 }}
+        style={{ position: "absolute", height: "100%", left: -4 }}
+        dashLength={12}
+        dashThickness={12}
+        dashGap={48}
+        dashColor={AppStyles.cardColor}
+      />
+      <View
+        style={{
+          gap: 16,
+          marginLeft: 16,
+          borderRadius: 32,
+          paddingTop: 28,
+          marginBottom: -8 - 32
+        }}
+      >
         <Title>{state.event.title}</Title>
         <HostSectionView event={state.event} />
       </View>
@@ -67,7 +99,6 @@ const _EventDetailsView = ({ state, style }: EventDetailsProps) => (
         host={state.event.host}
         location={state.event.location}
         result={useEventTravelEstimates(state.event.location.coordinate)}
-        parallaxFactor={3}
       />
       <View style={styles.informationContainer}>
         <LocationSectionView event={state.event} />
