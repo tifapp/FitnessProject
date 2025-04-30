@@ -4,7 +4,7 @@ import { Ionicon } from "@components/common/Icons"
 import { TextToastView } from "@components/common/Toasts"
 import { TiFFormCardView } from "@components/form-components/Card"
 import { TiFFormSectionView } from "@components/form-components/Section"
-import ProfileImageAndName from "@components/profileImageComponents/ProfileImageAndName"
+import ProfileImageAndName from "@components/profileImageComponents/ProfilePreview"
 import { AlertsObject, presentAlert } from "@lib/Alerts"
 import { AppStyles } from "@lib/AppColorStyle"
 import { TiFDefaultLayoutTransition } from "@lib/Reanimated"
@@ -154,8 +154,7 @@ const useBlocklistSettingsUnblocking = ({
         return activeIds.filter((id) => id !== user.id)
       })
     }
-  }
-  )
+  })
   return {
     activeUnblockingIds,
     mostRecentUnblockedUser,

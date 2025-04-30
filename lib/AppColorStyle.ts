@@ -14,6 +14,7 @@ export namespace AppStyles {
   export const cardColor = "#F1F5F3"
   export const eventCardBorder = "rgba(145, 145, 145, 0.2)"
   export const linkColor = "#4287f5"
+  export const transparent = blackColor.withOpacity(0)
   export const primary = blackColor
   export const blue = ColorString.parse("#4169E1")!
   export const primaryBlue = ColorString.parse("#466DEC")!
@@ -21,6 +22,7 @@ export namespace AppStyles {
   export const decorativeBlue = ColorString.parse("#65C8FF")!
   export const darkGray = ColorString.parse("#2F4858")!
   export const red = ColorString.parse("#FB3640")!
+  export const white = ColorString.parse("#FFFFFF")!
   export const yellow = ColorString.parse("#F7CD24")!
   export const green = ColorString.parse("#14B329")!
   export const purple = ColorString.parse("#A882DD")!

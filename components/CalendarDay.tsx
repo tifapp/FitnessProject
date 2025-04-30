@@ -2,9 +2,9 @@ import { AppStyles } from "@lib/AppColorStyle"
 import dayjs from "dayjs"
 import React from "react"
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
-import { BalloonIcon } from "./Balloon"
-import { CaptionTitle, Subtitle } from "./Text"
 import { now } from "TiFShared/lib/Dayjs"
+import { CaptionTitle, Subtitle } from "./Text"
+import { BalloonIcon } from "./common/Icons"
 
 export type CalendarDayProps = {
   date: Date
@@ -12,7 +12,7 @@ export type CalendarDayProps = {
   maxDaysAhead?: number
 }
 
-export const calendarDay = (date: Date, maxDaysAhead: number = 7) => {
+export const calendarCountdown = (date: Date, maxDaysAhead: number = 7) => {
   const daysDiff = date.ext.diff(new Date()).days
   const isToday = now().isSame(date, "day")
   return {
@@ -28,7 +28,7 @@ export const CalendarDayView = ({
   style,
   maxDaysAhead = 7
 }: CalendarDayProps) => {
-  const { isToday, isPast, isStartingSoon, isFuture } = calendarDay(
+  const { isToday, isPast, isStartingSoon, isFuture } = calendarCountdown(
     date,
     maxDaysAhead
   )

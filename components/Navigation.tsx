@@ -3,6 +3,7 @@ import {
   toRouteableEditFormValues
 } from "@event/EditFormValues"
 import { useBottomSheetModal } from "@gorhom/bottom-sheet"
+import { AppStyles } from "@lib/AppColorStyle"
 import { useNavigation } from "@react-navigation/native"
 import { NativeStackHeaderLeftProps } from "@react-navigation/native-stack"
 import { type NavigationState } from "@react-navigation/routers"
@@ -36,10 +37,25 @@ export type UseNavigationReturn = Omit<
 /**
  * Returns the main navigator in the current navigation context in the app.
  *
- * Use this instead hook of `useNavigation` for better type safety.
+ * Use this instead hook of `useNavigation`, as this hook will ensure to dismiss any bottom sheet
+ * modals when navigating.
  */
 export const useTiFNavigation = (): UseNavigationReturn => {
-  return useNavigation<UseNavigationReturn>()
+  const { dismissAll } = useBottomSheetModal()
+  const navigation = useNavigation<UseNavigationReturn>()
+  const navigate: UseNavigationReturn["navigate"] = (
+    ...args: Parameters<UseNavigationReturn["navigate"]>
+  ) => {
+    dismissAll()
+    navigation.navigate(...args)
+  }
+  const replace: UseNavigationReturn["replace"] = (
+    ...args: Parameters<UseNavigationReturn["replace"]>
+  ) => {
+    dismissAll()
+    navigation.navigate(...args)
+  }
+  return { ...navigation, navigate, replace }
 }
 
 /**
@@ -86,10 +102,10 @@ export const useCoreNavigation = () => {
  */
 export const BASE_HEADER_SCREEN_OPTIONS = {
   cardStyle: {
-    backgroundColor: "white"
+    backgroundColor: AppStyles.white.toString()
   },
   headerShadowVisible: false,
-  contentStyle: { backgroundColor: "white" },
+  contentStyle: { backgroundColor: AppStyles.white.toString() },
   headerTitleStyle: {
     fontSize: 16,
     fontFamily: "OpenSansBold"
@@ -145,7 +161,7 @@ export const ChevronBackButton = ({
   const currentNavigation = useTiFNavigation()
   return (
     <TouchableIonicon
-      icon={{ name: "chevron-back", color: "white" }}
+      icon={{ name: "chevron-back", color: AppStyles.white.toString() }}
       accessibilityLabel="Go Back"
       onPress={() => (navigation ?? currentNavigation).goBack()}
       style={style}
@@ -160,7 +176,7 @@ export const XMarkBackButton = ({
   const currentNavigation = useTiFNavigation()
   return (
     <TouchableIonicon
-      icon={{ name: "close", color: "white" }}
+      icon={{ name: "close", color: AppStyles.white.toString() }}
       accessibilityLabel="Go Back"
       onPress={() => (navigation ?? currentNavigation).goBack()}
       style={style}

@@ -1,18 +1,18 @@
-import { BodyText, Subtitle } from "@components/Text"
-import { TouchableIonicon } from "@components/common/Icons"
-import { AppStyles } from "@lib/AppColorStyle"
-import { FontScaleFactors } from "@lib/Fonts"
-import { dayjs } from "TiFShared/lib/Dayjs"
-import { useState } from "react"
-import { View, ViewStyle, StyleSheet, StyleProp } from "react-native"
-import Animated, { FadeIn, FadeOut } from "react-native-reanimated"
 import {
   EventRegionMonitor,
   useHasArrivedAtRegion
 } from "@arrival-tracking/region-monitoring"
-import { formattedEventCountdownSeconds } from "./SharedCountdownFormatting"
+import { BodyText, Subtitle } from "@components/Text"
+import { TouchableIonicon } from "@components/common/Icons"
+import { AppStyles } from "@lib/AppColorStyle"
+import { FontScaleFactors } from "@lib/Fonts"
 import { EventRegion } from "TiFShared/domain-models/Event"
 import { TodayOrTomorrow } from "TiFShared/domain-models/TodayOrTomorrow"
+import { dayjs } from "TiFShared/lib/Dayjs"
+import { useState } from "react"
+import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
+import Animated, { FadeIn, FadeOut } from "react-native-reanimated"
+import { formattedEventCountdownSeconds } from "./SharedCountdownFormatting"
 
 /**
  * Handles state related to whether or not to show the event arrival banner for

@@ -1,6 +1,7 @@
 import { TiFFormCardView } from "@components/form-components/Card"
 import { TiFFormSectionView } from "@components/form-components/Section"
-import ProfileImageAndName from "@components/profileImageComponents/ProfileImageAndName"
+import { useCoreNavigation } from "@components/Navigation"
+import ProfileImageAndName from "@components/profileImageComponents/ProfilePreview"
 import { CaptionTitle, Headline } from "@components/Text"
 import {
   updateEventDetailsQueryEvent,
@@ -27,7 +28,6 @@ import Animated, {
   withRepeat,
   withTiming
 } from "react-native-reanimated"
-import { useCoreNavigation } from "@components/Navigation"
 import { EventAttendee, EventID } from "TiFShared/domain-models/Event"
 import {
   UnblockedUserRelationsStatus,
