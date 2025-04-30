@@ -1,4 +1,4 @@
-import { createContext, ReactNode, useContext } from "react"
+import React, { createContext, ReactNode, useContext } from "react"
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 import {
   KeyboardAwareScrollView,
@@ -7,24 +7,28 @@ import {
 import Animated, {
   SharedValue,
   useAnimatedScrollHandler,
+  useAnimatedStyle,
+  useDerivedValue,
   useSharedValue
 } from "react-native-reanimated"
+import { DefaultStyle } from "react-native-reanimated/lib/typescript/hook/commonTypes"
 
 const ScrollContext = createContext<{
   scrollY: SharedValue<number>
 }>({
   scrollY: { value: 0 } as SharedValue<number>
 })
+export const useTiFScroll = () => useContext(ScrollContext)
 
-const AnimatedKeyboardAwareScrollView = Animated.createAnimatedComponent(KeyboardAwareScrollView)
+const AnimatedKeyboardAwareScrollView = Animated.createAnimatedComponent(
+  KeyboardAwareScrollView
+)
 
 export type TiFScrollViewProps = {
   children: ReactNode
   style?: StyleProp<ViewStyle>
   contentContainerStyle?: StyleProp<ViewStyle>
 } & Omit<KeyboardAwareScrollViewProps, "contentContainerStyle">
-
-export const useScrollContext = () => useContext(ScrollContext)
 
 export const TiFScrollView = ({
   children,
@@ -45,7 +49,10 @@ export const TiFScrollView = ({
       <ScrollContext.Provider value={{ scrollY }}>
         <AnimatedKeyboardAwareScrollView
           style={[styles.scroll, style]}
-          contentContainerStyle={[styles.contentContainer, contentContainerStyle]}
+          contentContainerStyle={[
+            styles.contentContainer,
+            contentContainerStyle
+          ]}
           enableResetScrollToCoords={false}
           onScroll={scrollHandler}
           scrollEventThrottle={16}
@@ -60,6 +67,20 @@ export const TiFScrollView = ({
       </ScrollContext.Provider>
     </View>
   )
+}
+
+export const useAnimatedParallaxStyle = (
+  animatedParallaxStyle: (scrollOffset: SharedValue<number>) => DefaultStyle
+) => {
+  const { scrollY } = useTiFScroll()
+
+  const scrollOffset = useDerivedValue(() => {
+    return scrollY.value
+  })
+
+  return useAnimatedStyle(() => {
+    return animatedParallaxStyle(scrollOffset)
+  })
 }
 
 const styles = StyleSheet.create({

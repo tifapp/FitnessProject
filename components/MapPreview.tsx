@@ -1,14 +1,8 @@
 import { useSharedState } from ".storybook/components/HoverContext/useSharedState"
 import { Portal } from "@gorhom/portal"
 import { AppStyles } from "@lib/AppColorStyle"
-import { useAnimatedParallaxStyle } from "@lib/Parallax"
 import { withTiFDefaultSpring } from "@lib/Reanimated"
-import React, {
-  ReactNode,
-  useCallback,
-  useRef,
-  useState
-} from "react"
+import React, { ReactNode, useCallback, useState } from "react"
 import {
   LayoutRectangle,
   Platform,
@@ -26,44 +20,45 @@ import MapView, {
   Region
 } from "react-native-maps"
 import Animated, {
-  interpolate,
   runOnJS,
   SharedValue,
+  useAnimatedRef,
   useAnimatedStyle,
   useSharedValue
 } from "react-native-reanimated"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { FullWindowOverlay } from "react-native-screens"
 import { TouchableIonicon } from "./common/Icons"
+import { useAnimatedParallaxStyle } from "./common/ScrollView"
 import { useScreenBottomPadding } from "./Padding"
 
-const PARALLAX_FACTOR = 3
-
 export type ExpandableMapPreviewProps = {
-isExpanded: boolean
-onExpansionChanged: (isExpanded: boolean) => void
-onMarkerPressed?: () => void
-region: Region
-overlay?: ReactNode | ((isExpanding: boolean) => ReactNode)
-marker?: ReactNode
-style?: StyleProp<ViewStyle>
-collapsedMapProps?: MapViewProps
-expandedMapProps?: MapViewProps
-onMapLongPress?: (event: LongPressEvent) => void
+  isExpanded: boolean
+  overScrollHeight: number
+  onExpansionChanged: (isExpanded: boolean) => void
+  onMarkerPressed?: () => void
+  region: Region
+  overlay?: ReactNode | ((isExpanding: boolean) => ReactNode)
+  marker?: ReactNode
+  style?: StyleProp<ViewStyle>
+  collapsedMapProps?: MapViewProps
+  expandedMapProps?: MapViewProps
+  onMapLongPress?: (event: LongPressEvent) => void
 }
 
-const getExtendedContainerStyles = (pFactor: number) => {
+const getExtendedContainerStyles = (height: number, mapOffset: number) => {
   return {
-    height: `${100 * pFactor}%`,
-    top: "50%"
+    height,
+    bottom: mapOffset
   } as StyleProp<ViewStyle>
 }
 
 /**
-* A snippet of a map with an expand button that transitions to a full-screen map using Reanimated with parallax scrolling effect that creates a window-like appearance.
-*/
+ * A snippet of a map with an expand button that transitions to a full-screen map using Reanimated with parallax scrolling effect that creates a window-like appearance.
+ */
 export const MapPreview = ({
   isExpanded,
+  overScrollHeight = 128,
   onExpansionChanged,
   region,
   overlay,
@@ -73,7 +68,7 @@ export const MapPreview = ({
   collapsedMapProps,
   expandedMapProps
 }: ExpandableMapPreviewProps) => {
-  const snippetRef = useRef<View>(null)
+  const snippetRef = useAnimatedRef<View>()
   const [snippetLayout, setSnippetLayout] = useState<
     LayoutRectangle | undefined
   >()
@@ -84,22 +79,21 @@ export const MapPreview = ({
 
   const [isExpanding, setIsExpanding, isExpandingShared] = useSharedState(false)
 
-  const parallaxStyle = useAnimatedParallaxStyle((scrollProgress) => {
+  const parallaxStyle = useAnimatedParallaxStyle((scrollOffset) => {
     "worklet"
 
     if (isExpandingShared.value) return { transform: [] }
 
-    const maxMovement = 120 * PARALLAX_FACTOR
-
-    const translateY = interpolate(
-      scrollProgress.value,
-      [0, 0.3, 0.7],
-      [0, maxMovement * 0.4, maxMovement]
-    )
+    const translateY = scrollOffset.value * 0.2
 
     return {
       transform: [
-        { translateY: translateY - (350 * PARALLAX_FACTOR) }
+        {
+          translateY: Math.min(
+            Math.max(-overScrollHeight, translateY),
+            overScrollHeight
+          )
+        }
       ]
     }
   })
@@ -113,7 +107,7 @@ export const MapPreview = ({
       onExpansionChanged(true)
       progress.value = withTiFDefaultSpring(1)
     })
-  }, [progress, onExpansionChanged])
+  }, [snippetRef, setIsExpanding, progress, onExpansionChanged])
 
   const collapse = useCallback(() => {
     setIsExpanding(false)
@@ -123,7 +117,7 @@ export const MapPreview = ({
         runOnJS(onExpansionChanged)(false)
       }
     })
-  }, [progress, onExpansionChanged])
+  }, [setIsExpanding, progress, onExpansionChanged])
 
   return (
     <View style={style}>
@@ -137,14 +131,28 @@ export const MapPreview = ({
         <View ref={snippetRef} style={styles.mapContainer}>
           {overlayLayout && (
             <TouchableOpacity onPress={expand}>
-              <View style={[styles.mapWrapper,
-                {
-                  height: Math.max(overlay ? 450 : 300, 200 + overlayLayout.height)
-                }]}>
+              <View
+                style={[
+                  styles.mapWrapper,
+                  {
+                    height: Math.max(
+                      overlay ? 450 : 300,
+                      200 + overlayLayout.height
+                    )
+                  }
+                ]}
+              >
                 <Animated.View
                   style={[
                     styles.mapAnimatedContainer,
-                    getExtendedContainerStyles(PARALLAX_FACTOR),
+                    getExtendedContainerStyles(
+                      Math.max(
+                        overlay ? 450 : 300,
+                        200 + overlayLayout.height
+                      ) +
+                        2 * overScrollHeight,
+                      overScrollHeight
+                    ),
                     parallaxStyle
                   ]}
                 >
@@ -158,7 +166,13 @@ export const MapPreview = ({
                         right: 0,
                         bottom: 0,
                         width: "100%",
-                        height: "100%",
+                        height:
+                          Math.max(
+                            overlay ? 450 : 300,
+                            200 + overlayLayout.height
+                          ) +
+                          2 * overScrollHeight,
+
                         opacity: isExpanded ? 0 : 1
                       }
                     ]}
@@ -169,7 +183,7 @@ export const MapPreview = ({
                       top: 0,
                       left: 0,
                       right: 0,
-                      bottom: overlayLayout.height + 24 * PARALLAX_FACTOR
+                      bottom: overlayLayout.height + 24
                     }}
                     initialRegion={{
                       ...region,

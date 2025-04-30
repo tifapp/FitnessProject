@@ -1,6 +1,6 @@
-import { AppStyles } from "@lib/AppColorStyle";
-import React, { useEffect } from "react";
-import { StyleSheet, View, ViewStyle } from "react-native";
+import { AppStyles } from "@lib/AppColorStyle"
+import React, { useEffect } from "react"
+import { StyleSheet, View, ViewStyle } from "react-native"
 import Animated, {
   Easing,
   cancelAnimation,
@@ -9,16 +9,16 @@ import Animated, {
   withRepeat,
   withSequence,
   withTiming
-} from "react-native-reanimated";
+} from "react-native-reanimated"
 
 interface FadingDotProps {
-  size?: number;
-  color?: string;
-  minOpacity?: number;
-  maxOpacity?: number;
-  fadeDuration?: number;
-  pauseDuration?: number;
-  style?: ViewStyle;
+  size?: number
+  color?: string
+  minOpacity?: number
+  maxOpacity?: number
+  fadeDuration?: number
+  pauseDuration?: number
+  style?: ViewStyle
 }
 
 const FadingDot: React.FC<FadingDotProps> = ({
@@ -69,7 +69,7 @@ const FadingDot: React.FC<FadingDotProps> = ({
       clearTimeout(timeout)
       cancelAnimation(opacity)
     }
-  }, [minOpacity, maxOpacity, fadeDuration, pauseDuration])
+  }, [minOpacity, maxOpacity, fadeDuration, pauseDuration, opacity])
 
   // Create animated style for the fading effect
   const fadingStyle = useAnimatedStyle(() => ({
@@ -78,13 +78,15 @@ const FadingDot: React.FC<FadingDotProps> = ({
 
   return (
     <View style={[styles.container, style]}>
-      <View style={{
-        backgroundColor: AppStyles.colorOpacity10.toString(),
-        position: "absolute",
-        width: size,
-        height: size,
-        borderRadius: size / 2
-      }} />
+      <View
+        style={{
+          backgroundColor: AppStyles.colorOpacity10.toString(),
+          position: "absolute",
+          width: size,
+          height: size,
+          borderRadius: size / 2
+        }}
+      />
       <Animated.View
         style={[
           fadingStyle,

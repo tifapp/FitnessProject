@@ -26,11 +26,16 @@ export const Basic = () => {
           <TiFScrollView>
             <Title>Map Snippet Demo</Title>
             <Headline>{firstContent}</Headline>
+            <Headline>{firstContent}</Headline>
             <MapPreview
               isExpanded={isExpanded}
               onExpansionChanged={setIsExpanded}
               region={XEROX_ALTO_DEFAULT_REGION}
+              overScrollHeight={128}
             />
+            <Headline>{secondContent}</Headline>
+
+            <Headline>{secondContent}</Headline>
             <Headline>{secondContent}</Headline>
           </TiFScrollView>
         </SafeAreaView>
