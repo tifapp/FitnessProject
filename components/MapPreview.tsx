@@ -35,6 +35,7 @@ import { useScreenBottomPadding } from "./Padding"
 export type ExpandableMapPreviewProps = {
   isExpanded: boolean
   overScrollHeight: number
+  scrollMultipler: number
   onExpansionChanged: (isExpanded: boolean) => void
   onMarkerPressed?: () => void
   region: Region
@@ -46,7 +47,7 @@ export type ExpandableMapPreviewProps = {
   onMapLongPress?: (event: LongPressEvent) => void
 }
 
-const getExtendedContainerStyles = (height: number, mapOffset: number) => {
+const extendedContainerStyles = (height: number, mapOffset: number) => {
   return {
     height,
     bottom: mapOffset
@@ -59,6 +60,7 @@ const getExtendedContainerStyles = (height: number, mapOffset: number) => {
 export const MapPreview = ({
   isExpanded,
   overScrollHeight = 128,
+  scrollMultipler = 0.2,
   onExpansionChanged,
   region,
   overlay,
@@ -84,7 +86,7 @@ export const MapPreview = ({
 
     if (isExpandingShared.value) return { transform: [] }
 
-    const translateY = scrollOffset.value * 0.2
+    const translateY = scrollOffset.value * scrollMultipler
 
     return {
       transform: [
@@ -119,6 +121,11 @@ export const MapPreview = ({
     })
   }, [setIsExpanding, progress, onExpansionChanged])
 
+  const snippetHeight = Math.max(
+    overlay ? 450 : 300,
+    200 + (overlayLayout?.height ?? 0)
+  )
+
   return (
     <View style={style}>
       <View style={styles.container}>
@@ -135,22 +142,15 @@ export const MapPreview = ({
                 style={[
                   styles.mapWrapper,
                   {
-                    height: Math.max(
-                      overlay ? 450 : 300,
-                      200 + overlayLayout.height
-                    )
+                    height: snippetHeight
                   }
                 ]}
               >
                 <Animated.View
                   style={[
                     styles.mapAnimatedContainer,
-                    getExtendedContainerStyles(
-                      Math.max(
-                        overlay ? 450 : 300,
-                        200 + overlayLayout.height
-                      ) +
-                        2 * overScrollHeight,
+                    extendedContainerStyles(
+                      snippetHeight + 2 * overScrollHeight,
                       overScrollHeight
                     ),
                     parallaxStyle
@@ -166,13 +166,7 @@ export const MapPreview = ({
                         right: 0,
                         bottom: 0,
                         width: "100%",
-                        height:
-                          Math.max(
-                            overlay ? 450 : 300,
-                            200 + overlayLayout.height
-                          ) +
-                          2 * overScrollHeight,
-
+                        height: snippetHeight + 2 * overScrollHeight,
                         opacity: isExpanded ? 0 : 1
                       }
                     ]}
