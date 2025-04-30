@@ -32,6 +32,7 @@ export const Basic = () => {
               onExpansionChanged={setIsExpanded}
               region={XEROX_ALTO_DEFAULT_REGION}
               overScrollHeight={128}
+              scrollMultipler={0.2}
             />
             <Headline>{secondContent}</Headline>
 

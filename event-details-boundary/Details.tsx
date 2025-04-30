@@ -18,7 +18,7 @@ import { useUserSettings } from "@settings-storage/Hooks"
 import { settingsSelector } from "@settings-storage/Settings"
 import React, { memo } from "react"
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
-import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
+
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated"
 import { isAttendingEvent } from "TiFShared/domain-models/Event"
 import {
@@ -28,12 +28,12 @@ import {
 } from "./ArrivalBanner"
 import { EventAttendeeCardView } from "./AttendeesList"
 import { EventAttendeesPreview } from "./AttendeesPreview"
-import { eventCountdown, EventCountdownView } from "./Countdown"
 import { useEventSecondsToStart } from "./SecondsToStart"
 import {
   EventTravelEstimatesView,
   useEventTravelEstimates
 } from "./TravelEstimates"
+import { EventCountdownView, eventCountdown } from "./Countdown"
 
 export type EventDetailsProps = {
   state: Extract<UseLoadEventDetailsResult, { status: "success" }>
@@ -226,8 +226,11 @@ type CountdownProps = {
 
 const CountdownView = ({ time }: CountdownProps) => {
   const secondsToStart = useEventSecondsToStart(time)
-
-  return <PassportCountdown secondsToStart={secondsToStart} />
+  return (
+    <EventCountdownView
+      countdown={eventCountdown(secondsToStart, time.dateRange)}
+    />
+  )
 }
 
 const styles = StyleSheet.create({
