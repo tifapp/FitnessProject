@@ -21,11 +21,9 @@ const AttendeesListMeta: StoryMeta = {
 }
 export default AttendeesListMeta
 
-type AttendeesListStory = ComponentStory<typeof View>
-
 const Stack = createStackNavigator()
 
-export const Basic: AttendeesListStory = () => (
+export const Basic = () => (
   <RootSiblingParent>
     <TestQueryClientProvider>
       <NavigationContainer>
