@@ -3,7 +3,7 @@ import { TiFFooterView } from "@components/Footer"
 import { BodyText, Subtitle } from "@components/Text"
 import { ShadedTextField } from "@components/TextFields"
 import { TiFFormScrollableLayoutView } from "@components/form-components/ScrollableFormLayout"
-import { AlertsObject, presentAlert } from "@lib/Alerts"SS
+import { AlertsObject, presentAlert } from "@lib/Alerts"
 import { useFontScale } from "@lib/Fonts"
 import { useFormSubmission } from "@lib/utils/Form"
 import { useState } from "react"
