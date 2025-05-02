@@ -6,18 +6,17 @@ const path = require("path")
 // @ts-ignore
 const withInjectBundledSoundEffects = (config) => {
   return withXcodeProject(config, (config) => {
-    const soundFiles = fs.readdirSync("./bundled-sound-effects")
-      .map(file => {
-        const cafFile = file.replace(".mp3", ".caf")
-        return {
-          source: path.join("bundled-sound-effects", file),
-          dest: path.join(
-            config.modRequest.platformProjectRoot,
-            "FitnessApp",
-            cafFile
-          )
-        }
-      })
+    const soundFiles = fs.readdirSync("./bundled-sound-effects").map((file) => {
+      const cafFile = file.replace(".mp3", ".caf")
+      return {
+        source: path.join("bundled-sound-effects", file),
+        dest: path.join(
+          config.modRequest.platformProjectRoot,
+          "FitnessApp",
+          cafFile
+        )
+      }
+    })
 
     const resourcesDir = path.join(
       config.modRequest.platformProjectRoot,

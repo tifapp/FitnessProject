@@ -1,8 +1,8 @@
 import {
-  Layout,
-  withSpring,
   AnimatableValue,
-  AnimationCallback
+  AnimationCallback,
+  Layout,
+  withSpring
 } from "react-native-reanimated"
 
 /**

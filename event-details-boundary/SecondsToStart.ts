@@ -1,5 +1,5 @@
-import { useAutocorrectingInterval } from "@lib/AutocorrectingInterval"
 import { ClientSideEvent, eventSecondsToStart } from "@event/ClientSideEvent"
+import { useAutocorrectingInterval } from "@lib/AutocorrectingInterval"
 import { useState } from "react"
 
 export type UseEventSecondsToStartProps = Pick<

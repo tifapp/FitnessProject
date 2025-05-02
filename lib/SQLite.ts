@@ -4,7 +4,6 @@ import {
   SQLiteBindValue,
   openDatabaseAsync
 } from "expo-sqlite/next"
-import { uuidString } from "./utils/UUID"
 
 export const SQLITE_IN_MEMORY_PATH = ":memory:"
 

@@ -8,7 +8,7 @@ import { FlatList, SafeAreaView, Text, TouchableOpacity } from "react-native"
 import { useAppFonts } from "../../lib/Fonts"
 import awsconfig from "../../src/aws-exports"
 
-// Import your
+// Import your stories here
 import { setupCognito } from "@auth-boundary/CognitoHelpers"
 import AttendeesListMeta, {
   Basic as AttendeesListBasic

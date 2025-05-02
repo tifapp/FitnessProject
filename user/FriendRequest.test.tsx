@@ -1,10 +1,10 @@
+import { faker } from "@faker-js/faker"
+import { captureAlerts } from "@test-helpers/Alerts"
+import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
 import { act, renderHook, waitFor } from "@testing-library/react-native"
 import { UserHandle, UserRelationsStatus } from "TiFShared/domain-models/User"
-import { ALERTS, FriendRequestFeature, useFriendRequest } from "./FriendRequest"
 import { uuidString } from "TiFShared/lib/UUID"
-import { faker } from "@faker-js/faker"
-import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
-import { captureAlerts } from "@test-helpers/Alerts"
+import { ALERTS, FriendRequestFeature, useFriendRequest } from "./FriendRequest"
 
 describe("FriendRequest tests", () => {
   describe("UseFriendRequest tests", () => {

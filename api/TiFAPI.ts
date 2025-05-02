@@ -1,5 +1,7 @@
 import { Auth } from "@aws-amplify/auth"
-import { API_URL, BUILD_TYPE } from "@env"
+import { API_URL } from "@env"
+import { LaunchArguments, launchArguments } from "@lib/LaunchArguments"
+import { AlphaUserStorage } from "@user/alpha"
 import { CognitoUserSession } from "amazon-cognito-identity-js"
 import {
   APIMiddleware,
@@ -12,8 +14,6 @@ import {
   validateTiFAPIClientCall
 } from "TiFShared/api"
 import { chainMiddleware } from "TiFShared/lib/Middleware"
-import { AlphaUserStorage } from "@user/alpha"
-import { LaunchArguments, launchArguments } from "@lib/LaunchArguments"
 
 const userSession = () => Auth.currentSession()
 

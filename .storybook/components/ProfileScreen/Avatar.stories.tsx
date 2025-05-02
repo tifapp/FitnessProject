@@ -1,7 +1,7 @@
+import { StoryMeta } from ".storybook/HelperTypes"
 import { TiFBottomSheetProvider } from "@components/BottomSheet"
 import { clientSideEventFromResponse } from "@event/ClientSideEvent"
 import { delayData } from "@lib/utils/DelayData"
-import { uuidString } from "TiFShared/lib/UUID"
 import { NavigationContainer } from "@react-navigation/native"
 import { createStackNavigator } from "@react-navigation/stack"
 import {
@@ -13,27 +13,23 @@ import { AlphaUserMocks } from "@user/alpha/MockData"
 import { FriendRequestFeature } from "@user/FriendRequest"
 import { EmailAddress } from "@user/privacy"
 import React from "react"
+import { uuidString } from "TiFShared/lib/UUID"
+import { UserProfileFeature } from "user-profile-boundary/Context"
 import { useUpcomingEvents } from "user-profile-boundary/UpcomingEvents"
-import { ComponentStory } from "../../../.storybook/components"
 import { BASE_HEADER_SCREEN_OPTIONS } from "../../../components/Navigation"
 import {
   EventAttendeeMocks,
   EventMocks
 } from "../../../event-details-boundary/MockData"
 import {
-  UserInfoView,
   UserProfileView,
   useUserProfile
 } from "../../../user-profile-boundary/UserProfile"
-import { StoryMeta } from "../../HelperTypes"
-import { UserProfileFeature } from "user-profile-boundary/Context"
 
 const ProfileMeta: StoryMeta = {
   title: "Profile Screen"
 }
 export default ProfileMeta
-
-type ProfileStory = ComponentStory<typeof UserInfoView>
 
 const Stack = createStackNavigator()
 
@@ -46,7 +42,7 @@ const TEST_USER_SESSION = {
   primaryContactInfo: EmailAddress.peacock69
 }
 
-export const Basic: ProfileStory = () => {
+export const Basic = () => {
   return (
     <AlphaUserSessionProvider storage={storage}>
       <TiFBottomSheetProvider>

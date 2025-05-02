@@ -1,10 +1,11 @@
+import { TiFBottomSheet, TiFBottomSheetProvider } from "@components/BottomSheet"
+import { ClientSideEvent } from "@event/ClientSideEvent"
 import { EventCard } from "@event/EventCard"
 import {
   BottomSheetFlatList,
   BottomSheetHandle,
   BottomSheetHandleProps
 } from "@gorhom/bottom-sheet"
-import { ClientSideEvent } from "@event/ClientSideEvent"
 import React, { ReactElement, useCallback } from "react"
 import {
   ListRenderItemInfo,
@@ -14,7 +15,6 @@ import {
   View,
   ViewStyle
 } from "react-native"
-import { TiFBottomSheet, TiFBottomSheetProvider } from "@components/BottomSheet"
 
 export type ExploreEventsBottomSheetProps = {
   events: ClientSideEvent[]

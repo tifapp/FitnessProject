@@ -15,6 +15,8 @@ import {
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
 import Animated from "react-native-reanimated"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
+import { TiFFooterView } from "@components/Footer"
+import { TiFFormScrollableLayoutView } from "@components/form-components/ScrollableFormLayout"
 
 export type AuthSectionProps = {
   title: string

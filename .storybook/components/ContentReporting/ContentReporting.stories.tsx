@@ -1,18 +1,16 @@
-import { ComponentMeta, ComponentStory } from "@storybook/react-native"
-import React from "react"
+import { StoryMeta } from ".storybook/HelperTypes"
 import { ReportFormView } from "@content-reporting-boundary"
+import React from "react"
 
 const TestScreen = () => (
   <ReportFormView contentType="event" onSubmitted={async () => {}} />
 )
 
-const ContentReportingMeta: ComponentMeta<typeof TestScreen> = {
+const ContentReportingMeta: StoryMeta = {
   title: "Content Reporting",
   component: TestScreen
 }
 
 export default ContentReportingMeta
 
-type ContentReportingStory = ComponentStory<typeof TestScreen>
-
-export const Default: ContentReportingStory = () => <TestScreen />
+export const Default = () => <TestScreen />
