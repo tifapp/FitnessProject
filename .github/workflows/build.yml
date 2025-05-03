@@ -391,7 +391,7 @@ jobs:
         if: needs.check_platform_changes.outputs.ios_changes == 'true'
         run: |
           {
-            echo ${{secrets.EXPO_ACCESS_TOKEN}:0:5}
+            echo "${{secrets.EXPO_ACCESS_TOKEN}:0:5}"
             echo "CHECK_RUN_NAME=${{ env.IOS_CHECK_NAME }}"
             echo "PLATFORM=IOS"
             echo "CHECK_RUN_ID=${{ needs.create_build_checkruns.outputs.ios_checkrun_id }}"
