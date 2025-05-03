@@ -354,38 +354,38 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Setup Node.js and Cache
-        uses: actions/setup-node@v3
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: "npm"
+      # - name: Setup Node.js and Cache
+      #   uses: actions/setup-node@v3
+      #   with:
+      #     node-version: ${{ env.NODE_VERSION }}
+      #     cache: "npm"
 
-      - name: Install Dependencies
-        run: |
-          if [ ! -d "node_modules" ]; then
-            echo "Cache not found, running npm ci."
-            npm ci
-          else
-            echo "Cache restored, skipping npm ci."
-          fi
+      # - name: Install Dependencies
+      #   run: |
+      #     if [ ! -d "node_modules" ]; then
+      #       echo "Cache not found, running npm ci."
+      #       npm ci
+      #     else
+      #       echo "Cache restored, skipping npm ci."
+      #     fi
 
-      - name: Setup Expo
-        uses: expo/expo-github-action@v8
-        with:
-          eas-version: latest
-          token: ${{ secrets.EXPO_ACCESS_TOKEN }}
+      # - name: Setup Expo
+      #   uses: expo/expo-github-action@v8
+      #   with:
+      #     eas-version: latest
+      #     token: ${{ secrets.EXPO_ACCESS_TOKEN }}
 
-      - name: Setup Base Environment
-        run: |
-          {
-            echo "GITHUB_SHA=${{ github.event.pull_request.head.sha }}"
-            echo "GITHUB_BRANCH=${{ github.event.pull_request.head.ref }}"
-            echo "GITHUB_REPOSITORY=${{ github.repository }}"
-            echo "RUN_EAS_BUILD_HOOKS=1"
-            echo "EXPO_PROJECT_ID=${{ secrets.EXPO_PROJECT_ID }}"
-            echo "EXPO_PROJECT_OWNER=${{ secrets.EXPO_PROJECT_OWNER }}"
-            echo "MAPS_API_KEY=${{ secrets.MAPS_API_KEY }}"
-          } >> .env.infra
+      # - name: Setup Base Environment
+      #   run: |
+      #     {
+      #       echo "GITHUB_SHA=${{ github.event.pull_request.head.sha }}"
+      #       echo "GITHUB_BRANCH=${{ github.event.pull_request.head.ref }}"
+      #       echo "GITHUB_REPOSITORY=${{ github.repository }}"
+      #       echo "RUN_EAS_BUILD_HOOKS=1"
+      #       echo "EXPO_PROJECT_ID=${{ secrets.EXPO_PROJECT_ID }}"
+      #       echo "EXPO_PROJECT_OWNER=${{ secrets.EXPO_PROJECT_OWNER }}"
+      #       echo "MAPS_API_KEY=${{ secrets.MAPS_API_KEY }}"
+      #     } >> .env.infra
 
       - name: Request iOS Build
         if: needs.check_platform_changes.outputs.ios_changes == 'true'
@@ -400,14 +400,14 @@ jobs:
         env:
           EXPO_ACCESS_TOKEN: ${{ secrets.EXPO_ACCESS_TOKEN }}
 
-      - name: Request Android Build
-        if: needs.check_platform_changes.outputs.android_changes == 'true'
-        run: |
-          {
-            echo "CHECK_RUN_NAME=${{ env.ANDROID_CHECK_NAME }}"
-            echo "PLATFORM=ANDROID"
-            echo "CHECK_RUN_ID=${{ needs.create_build_checkruns.outputs.android_checkrun_id }}"
-          } >> .env.infra
-          npm run eas_build_ci_android
-        env:
-          EXPO_ACCESS_TOKEN: ${{ secrets.EXPO_ACCESS_TOKEN }}
+      # - name: Request Android Build
+      #   if: needs.check_platform_changes.outputs.android_changes == 'true'
+      #   run: |
+      #     {
+      #       echo "CHECK_RUN_NAME=${{ env.ANDROID_CHECK_NAME }}"
+      #       echo "PLATFORM=ANDROID"
+      #       echo "CHECK_RUN_ID=${{ needs.create_build_checkruns.outputs.android_checkrun_id }}"
+      #     } >> .env.infra
+      #     npm run eas_build_ci_android
+      #   env:
+      #     EXPO_ACCESS_TOKEN: ${{ secrets.EXPO_ACCESS_TOKEN }}
