@@ -391,8 +391,6 @@ jobs:
         if: needs.check_platform_changes.outputs.ios_changes == 'true'
         run: |
           {
-            eas whoami
-            eas credentials
             echo "CHECK_RUN_NAME=${{ env.IOS_CHECK_NAME }}"
             echo "PLATFORM=IOS"
             echo "CHECK_RUN_ID=${{ needs.create_build_checkruns.outputs.ios_checkrun_id }}"
