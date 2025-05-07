@@ -397,7 +397,7 @@ jobs:
           } >> .env.infra
 
       - name: Request iOS Build
-        if: needs.check_platform_changes.outputs.ios_changes == 'true'
+        if: needs.check_platform_changes.outputs.ios_changes == 'true' || needs.check_platform_changes.outputs.package_json_changes == 'true'
         run: |
           {
             echo "CHECK_RUN_NAME=${{ env.IOS_CHECK_NAME }}"
@@ -410,7 +410,7 @@ jobs:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
       - name: Request Android Build
-        if: needs.check_platform_changes.outputs.android_changes == 'true'
+        if: needs.check_platform_changes.outputs.android_changes == 'true' || needs.check_platform_changes.outputs.package_json_changes == 'true'
         run: |
           {
             echo "CHECK_RUN_NAME=${{ env.ANDROID_CHECK_NAME }}"
