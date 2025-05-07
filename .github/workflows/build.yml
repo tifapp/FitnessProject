@@ -395,6 +395,7 @@ jobs:
             echo "PLATFORM=IOS"
             echo "CHECK_RUN_ID=${{ needs.create_build_checkruns.outputs.ios_checkrun_id }}"
           } >> .env.infra
+          eas whoami
           npm run eas_build_ci_ios
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
@@ -407,6 +408,7 @@ jobs:
             echo "PLATFORM=ANDROID"
             echo "CHECK_RUN_ID=${{ needs.create_build_checkruns.outputs.android_checkrun_id }}"
           } >> .env.infra
+          eas whoami
           npm run eas_build_ci_android
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
