@@ -283,7 +283,7 @@ jobs:
     if: |
       github.actor != 'roswaaltifbot' && 
       !startsWith(github.event.pull_request.title, 'IGNORE_BUILD') && 
-      (needs.check_platform_changes.outputs.ios_changes == 'true' || needs.check_platform_changes.outputs.android_changes == 'true')
+      (needs.check_platform_changes.outputs.ios_changes == 'true' || needs.check_platform_changes.outputs.android_changes == 'true' || needs.check_platform_changes.outputs.package_json_changes == 'true')
     runs-on: ubuntu-latest
     environment:
       name: eas-build
