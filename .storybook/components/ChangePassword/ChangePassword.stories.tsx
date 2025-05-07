@@ -13,7 +13,6 @@ import {
   useNavigation
 } from "@react-navigation/native"
 import { createStackNavigator } from "@react-navigation/stack"
-import { ComponentMeta, ComponentStory } from "@storybook/react-native"
 import React from "react"
 import { Button, View } from "react-native"
 import { RootSiblingParent } from "react-native-root-siblings"
@@ -25,11 +24,9 @@ const ChangePasswordMeta: StoryMeta = {
 
 export default ChangePasswordMeta
 
-type ChangePasswordStory = ComponentStory<typeof SettingsScreen>
-
 const Stack = createStackNavigator()
 
-export const Basic: ChangePasswordStory = () => (
+export const Basic = () => (
   <RootSiblingParent>
     <TiFQueryClientProvider>
       <SafeAreaProvider>

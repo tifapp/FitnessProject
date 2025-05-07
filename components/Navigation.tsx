@@ -14,7 +14,6 @@ import { StyleProp, StyleSheet, ViewStyle } from "react-native"
 import { EventID } from "TiFShared/domain-models/Event"
 import { UserHandle, UserID } from "TiFShared/domain-models/User"
 import { TouchableIonicon } from "./common/Icons"
-import { useBottomSheetModal } from "@gorhom/bottom-sheet"
 
 /**
  * A helper type that's useful for making reusable navigation flows.

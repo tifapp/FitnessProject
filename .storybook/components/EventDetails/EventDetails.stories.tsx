@@ -1,58 +1,48 @@
-import React, { useCallback, useEffect } from "react"
-import { SafeAreaProvider } from "react-native-safe-area-context"
+import { StoryMeta } from ".storybook/HelperTypes"
+import { TiFBottomSheetProvider } from "@components/BottomSheet"
+import { BASE_HEADER_SCREEN_OPTIONS } from "@components/Navigation"
+import {
+  AlphaRegisterFeature,
+  withAlphaRegistration
+} from "@core-root/AlphaRegister"
 import {
   EventAttendeeMocks,
   EventMocks,
   mockEventLocation
 } from "@event-details-boundary/MockData"
+import {
+  ClientSideEvent,
+  clientSideEventFromResponse
+} from "@event/ClientSideEvent"
+import { EventDetailsFeature, useLoadEventDetails } from "@event/DetailsQuery"
+import { EventCard } from "@event/EventCard"
+import { loadJoinEventPermissions } from "@event/JoinEvent"
+import { EventUserAttendanceFeature } from "@event/UserAttendance"
+import { TiFQueryClientProvider } from "@lib/ReactQuery"
+import { mockPlacemark } from "@location/MockData"
 import { UserLocationFunctionsProvider } from "@location/UserLocation"
+import { NavigationContainer } from "@react-navigation/native"
+import { createStackNavigator } from "@react-navigation/stack"
+import { createTestQueryClient } from "@test-helpers/ReactQuery"
+import { AlphaUserSessionProvider, AlphaUserStorage } from "@user/alpha"
+import { AlphaUserMocks } from "@user/alpha/MockData"
 import {
   getCurrentPositionAsync,
   requestBackgroundPermissionsAsync,
   requestForegroundPermissionsAsync
 } from "expo-location"
-import { mockPlacemark } from "@location/MockData"
-import { NavigationContainer } from "@react-navigation/native"
-import { createStackNavigator } from "@react-navigation/stack"
-import { BASE_HEADER_SCREEN_OPTIONS } from "@components/Navigation"
-import { createTestQueryClient } from "@test-helpers/ReactQuery"
-import { View } from "react-native"
-import {
-  ClientSideEvent,
-  clientSideEventFromResponse
-} from "@event/ClientSideEvent"
-import { TiFQueryClientProvider } from "@lib/ReactQuery"
+import React, { useEffect } from "react"
+import { ScrollView } from "react-native"
+import { GestureHandlerRootView } from "react-native-gesture-handler"
+import { SafeAreaProvider } from "react-native-safe-area-context"
 import { dateRange } from "TiFShared/domain-models/FixedDateRange"
 import { dayjs, now } from "TiFShared/lib/Dayjs"
-import { StoryMeta } from ".storybook/HelperTypes"
-import { GestureHandlerRootView } from "react-native-gesture-handler"
-import { TiFBottomSheetProvider } from "@components/BottomSheet"
-import {
-  EventUserAttendanceButton,
-  EventUserAttendanceFeature
-} from "@event/UserAttendance"
-import { loadJoinEventPermissions } from "@event/JoinEvent"
-import { EventActionsMenuView, useEventActionsMenu } from "@event/Menu"
-import { UserSessionProvider } from "@user/Session"
-import { uuidString } from "TiFShared/lib/UUID"
-import { EmailAddress } from "@user/privacy"
-import { EventCard } from "@event/EventCard"
-import { ScrollView } from "react-native"
-import { AlphaUserSessionProvider, AlphaUserStorage } from "@user/alpha"
-import {
-  AlphaRegisterFeature,
-  withAlphaRegistration
-} from "@core-root/AlphaRegister"
-import { AlphaUserMocks } from "@user/alpha/MockData"
-import { EventDetailsFeature, useLoadEventDetails } from "@event/DetailsQuery"
 
 const EventDetailsMeta: StoryMeta = {
   title: "Event Details"
 }
 
 export default EventDetailsMeta
-
-type EventDetailsStory = ComponentStory<typeof SettingsScreen>
 
 const event = EventMocks.PickupBasketball
 
@@ -68,7 +58,7 @@ const queryClient = createTestQueryClient()
 
 const storage = AlphaUserStorage.ephemeral()
 
-export const Basic: EventDetailsStory = () => {
+export const Basic = () => {
   useEffect(() => {
     queryClient.resetQueries()
   }, [])

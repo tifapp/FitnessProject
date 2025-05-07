@@ -187,7 +187,7 @@
     "better-sqlite3": "^9.4.1",
     "detox": "^20.19.3",
     "dotenv": "^16.4.3",
-    "eas-cli": "^14.4.0",
+    "eas-cli": "^16.4.0",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^8.6.0",
     "eslint-config-standard": "^17.0.0",
@@ -213,6 +213,7 @@
     "qrcode": "^1.5.3",
     "react-native-web": "~0.19.6",
     "react-test-renderer": "18.2",
+    "storybook": "^9.0.0-beta.4",
     "typescript": "~5.3.3"
   },
   "private": true,

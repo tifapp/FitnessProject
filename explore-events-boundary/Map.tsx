@@ -1,12 +1,12 @@
-import { ExploreEventsMarkerView } from "./MapMarker"
+import { useCoreNavigation } from "@components/Navigation"
 import { ClientSideEvent } from "@event/ClientSideEvent"
+import { defaultEditFormValues } from "@event/EditFormValues"
+import { AppStyles } from "@lib/AppColorStyle"
 import React, { memo } from "react"
 import { StyleProp, ViewStyle } from "react-native"
 import MapView, { MapType, Marker } from "react-native-maps"
+import { ExploreEventsMarkerView } from "./MapMarker"
 import { ExploreEventsRegion } from "./Region"
-import { useCoreNavigation } from "@components/Navigation"
-import { AppStyles } from "@lib/AppColorStyle"
-import { defaultEditFormValues } from "@event/EditFormValues"
 
 export type ExploreEventsMapProps = {
   initialRegion: ExploreEventsRegion

@@ -1,6 +1,6 @@
 import { SecureStore } from "@lib/SecureStore"
-import { RudeusUserSchema } from "./Models"
 import { jwtBody } from "TiFShared/lib/JWT"
+import { RudeusUserSchema } from "./Models"
 
 const TOKEN_KEY = "rudeusUserToken"
 

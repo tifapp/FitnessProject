@@ -1,8 +1,8 @@
 import { faker } from "@faker-js/faker"
-import { uuidString } from "TiFShared/lib/UUID"
 import { BlockListPage, BlockListUser } from "TiFShared/domain-models/BlockList"
 import { UserHandle } from "TiFShared/domain-models/User"
 import { repeatElements } from "TiFShared/lib/Array"
+import { uuidString } from "TiFShared/lib/UUID"
 
 const IMAGE_URLS = [
   "https://images.unsplash.com/photo-1500048993953-d23a436266cf?q=80&w=2669&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",

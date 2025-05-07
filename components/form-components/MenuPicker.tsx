@@ -2,7 +2,7 @@ import { BodyText } from "@components/Text"
 import { Ionicon } from "@components/common/Icons"
 import { MenuView } from "@react-native-menu/menu"
 import { ToStringable } from "TiFShared/lib/String"
-import { StyleProp, ViewStyle, StyleSheet, View, Platform } from "react-native"
+import { Platform, StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 
 export type TiFFormMenuPickerOption<Value extends ToStringable> = {
   title: string

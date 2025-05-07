@@ -1,29 +1,29 @@
+import { TiFBottomSheetProvider } from "@components/BottomSheet"
 import { PrimaryButton } from "@components/Buttons"
-import { TiFFooterView } from "@components/Footer"
-import { AnimatedPagerView } from "@components/Pager"
-import { Headline } from "@components/Text"
 import { PlusIconView } from "@components/common/Icons"
+import { TiFFooterView } from "@components/Footer"
+import { useCoreNavigation } from "@components/Navigation"
+import { AnimatedPagerView } from "@components/Pager"
+import { ProfileCircleView } from "@components/profileImageComponents/ProfileCircle"
+import { Headline } from "@components/Text"
+import { defaultEditFormValues } from "@event/EditFormValues"
 import {
   ExploreEventsView,
   createInitialCenter,
   isSignificantlyDifferentRegions,
   useExploreEvents
 } from "@explore-events-boundary"
+import { AppStyles } from "@lib/AppColorStyle"
+import { FontScaleFactors } from "@lib/Fonts"
+import { IfAuthenticated } from "@user/Session"
+import { atom, useAtomValue, useSetAtom } from "jotai"
+import { useContext, useRef } from "react"
+import { Pressable, StyleProp, StyleSheet, View, ViewStyle } from "react-native"
+import PagerView from "react-native-pager-view"
 import { useAnimatedStyle, useSharedValue } from "react-native-reanimated"
 import { colorWithOpacity } from "TiFShared/lib/Color"
-import { FontScaleFactors } from "@lib/Fonts"
-import { ProfileCircleView } from "@components/profileImageComponents/ProfileCircle"
-import { IfAuthenticated } from "@user/Session"
-import { AppStyles } from "@lib/AppColorStyle"
-import { useRef, useContext } from "react"
-import { StyleProp, ViewStyle, View, Pressable, StyleSheet } from "react-native"
-import PagerView from "react-native-pager-view"
 import { TiFContext } from "./Context"
-import { useCoreNavigation } from "@components/Navigation"
-import { defaultEditFormValues } from "@event/EditFormValues"
-import { atom, useAtomValue, useSetAtom } from "jotai"
 import { HomeLiveEventsView } from "./HomeLiveEvents"
-import { TiFBottomSheetProvider } from "@components/BottomSheet"
 
 export type HomeProps = {
   style?: StyleProp<ViewStyle>

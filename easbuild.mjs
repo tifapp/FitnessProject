@@ -50,7 +50,11 @@ const sendMessageToSlack = (
   })
 }
 
-const sendImageToSlack = async (imageData, message, channelId = outputChannel) => {
+const sendImageToSlack = async (
+  imageData,
+  message,
+  channelId = outputChannel
+) => {
   const imageBuffer = Buffer.from(imageData.split(",")[1], "base64")
 
   try {
@@ -90,22 +94,27 @@ const sendImageToSlack = async (imageData, message, channelId = outputChannel) =
     }
 
     // Step 3: Complete upload with explicit channel sharing
-    const completeUploadResponse = await fetch("https://slack.com/api/files.completeUploadExternal", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${process.env.SLACK_APP_TOKEN}`,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        files: [{
-          id: uploadURLData.file_id,
-          title: "QR Code"
-        }],
-        channels: channelId,
-        channel_id: channelId,
-        initial_comment: message
-      })
-    })
+    const completeUploadResponse = await fetch(
+      "https://slack.com/api/files.completeUploadExternal",
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${process.env.SLACK_APP_TOKEN}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          files: [
+            {
+              id: uploadURLData.file_id,
+              title: "QR Code"
+            }
+          ],
+          channels: channelId,
+          channel_id: channelId,
+          initial_comment: message
+        })
+      }
+    )
 
     const completeUploadData = await completeUploadResponse.json()
     if (!completeUploadData.ok) {
@@ -270,63 +279,70 @@ const manageCheckRun = async (/** @type {string} */ action) => {
   const buildLink = `https://expo.dev/accounts/tifapp/projects/FitnessApp/builds/${process.env.EAS_BUILD_ID}`
 
   switch (action) {
-  case "success":
-    checkRunData = {
-      ...checkRunParams,
-      output: {
-        title: `${checkRunName} Completed`,
-        summary: `See details at\n${buildLink}`,
-        text: buildLink
+    case "success":
+      checkRunData = {
+        ...checkRunParams,
+        output: {
+          title: "Build Completed",
+          summary: buildLink
+        }
       }
-    }
-    break
-  case "failure":
-    checkRunData = {
-      ...checkRunParams,
-      output: {
-        title: `${checkRunName} Failed`,
-        summary: `Build failed with an error. See details at\n${buildLink}`,
-        text: buildLink
+      break
+    case "failure":
+      checkRunData = {
+        ...checkRunParams,
+        output: {
+          title: `${checkRunName} Failed`,
+          summary: `Build failed with an error. See details at\n${buildLink}`,
+          text: buildLink
+        }
       }
-    }
-    break
-  case "cancelled":
-    checkRunData = {
-      ...checkRunParams,
-      output: {
-        title: `${checkRunName} Cancelled`,
-        summary: `Build was cancelled. See details at\n${buildLink}`,
-        text: buildLink
+      break
+    case "cancelled":
+      checkRunData = {
+        ...checkRunParams,
+        output: {
+          title: "Build Cancelled",
+          summary: "Build was cancelled."
+        }
       }
-    }
-    break
-  default:
-    checkRunData = {
-      name: checkRunName,
-      status: "in_progress",
-      started_at: new Date().toISOString(),
-      head_sha: process.env.GITHUB_SHA,
-      output: {
-        title: `${checkRunName} Started`,
-        summary: `Build will be finished at approximately ${getPredictedBuildTime()}. See details at\n${buildLink}`,
-        text: buildLink
+      break
+    default:
+      checkRunData = {
+        name: "EAS Build",
+        status: "in_progress",
+        started_at: new Date().toISOString(),
+        head_sha: process.env.GITHUB_SHA,
+        output: {
+          title: "Build Started",
+          summary: `Build will be finished at approximately ${getPredictedBuildTime()}`
+        }
       }
-    }
   }
 
   await checkGithubActionRuns(checkRunData, checkRunIdPath)
 
   if (action === "success") {
     const buildqr = await qrcode.toDataURL(buildLink)
-    await sendImageToSlack(buildqr, `${process.env.PLATFORM} build for \`${process.env.GITHUB_BRANCH}\` is ready:\n${buildLink}\nCommit: ${process.env.GITHUB_SHA}`)
+    await sendImageToSlack(
+      buildqr,
+      `${process.env.PLATFORM} build for \`${process.env.GITHUB_BRANCH}\` is ready:\n${buildLink}\nCommit: ${process.env.GITHUB_SHA}`
+    )
     console.log("Sent successful build status to slack")
   }
   if (action === "failure") {
+    await sendMessageToSlack(
+      `${checkRunName} failed. See details at\n${buildLink}`
+    )
+  }
+  if (action === "create") {
     await sendMessageToSlack(
       `${process.env.PLATFORM} build for \`${process.env.GITHUB_BRANCH}\` failed. See details at\n${buildLink}`
     )
     console.log("Sent failed build status to slack")
   }
+
+  console.log("Sent build status to slack")
 }
 
 if (process.env.RUN_EAS_BUILD_HOOKS === "1") {

@@ -1,8 +1,8 @@
 /* global jest */
 import { Alert } from "@lib/Alerts"
 import { act } from "@testing-library/react-native"
-import { Alert as RNAlert, AlertButton } from "react-native"
 import { diff } from "jest-diff"
+import { AlertButton, Alert as RNAlert } from "react-native"
 
 interface CustomMatchers<R = unknown> {
   toHaveBeenPresentedWith(alert: Alert): R

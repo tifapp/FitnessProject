@@ -1,8 +1,5 @@
 import { InMemorySecureStore, SecureStore } from "@lib/SecureStore"
-import {
-  CallbackCollection,
-  CallbackCollectionUnsubscribe
-} from "@lib/utils/CallbackCollection"
+import { CallbackCollection } from "@lib/utils/CallbackCollection"
 import { UserSession, UserSessionProvider } from "@user/Session"
 import { EmailAddress } from "@user/privacy"
 import { TiFAPI } from "TiFShared/api"

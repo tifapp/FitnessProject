@@ -1,9 +1,9 @@
-import { ComponentMeta, ComponentStory } from "@storybook/react-native"
-import React, { useState } from "react"
-import { ContentText, ExpandableContentText } from "@components/ContentText"
-import { ScrollView, TextInput } from "react-native-gesture-handler"
+import { StoryMeta } from ".storybook/HelperTypes"
+import { ExpandableContentText } from "@components/ContentText"
 import { Headline } from "@components/Text"
+import React, { useState } from "react"
 import { Button } from "react-native"
+import { ScrollView } from "react-native-gesture-handler"
 
 const text1 =
   "Hello world, this is an @event of some kind. Please join it if you like to do !17|123/#2BC016/Pickup Basketball. \n\nNow I write this endless storybook story in the void, where \nI can test things like @hello to make sure that links are highlighting and I am not going absolutely crazy."
@@ -46,13 +46,11 @@ const StoryText = () => {
   )
 }
 
-const ContentTextMeta: ComponentMeta<typeof StoryText> = {
+const ContentTextMeta: StoryMeta = {
   title: "Content Text",
   component: StoryText
 }
 
 export default ContentTextMeta
 
-type ContentTextStory = ComponentStory<typeof StoryText>
-
-export const Basic: ContentTextStory = () => <StoryText />
+export const Basic = () => <StoryText />

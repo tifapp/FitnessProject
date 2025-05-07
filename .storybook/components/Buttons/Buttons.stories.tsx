@@ -1,23 +1,20 @@
+import { StoryMeta } from ".storybook/HelperTypes"
 import { AuthBannerButton } from "@components/AuthBanner"
 import { TiFBottomSheetProvider } from "@components/BottomSheet"
 import { PrimaryButton, SecondaryOutlinedButton } from "@components/Buttons"
 import { CircularIonicon } from "@components/common/Icons"
-import { BottomSheetModalProvider } from "@gorhom/bottom-sheet"
 import { AppStyles } from "@lib/AppColorStyle"
-import { ComponentMeta, ComponentStory } from "@storybook/react-native"
 import { ScrollView, View } from "react-native"
 import { GestureHandlerRootView } from "react-native-gesture-handler"
 import { SafeAreaProvider } from "react-native-safe-area-context"
 
-const ButtonsMeta: ComponentMeta<typeof View> = {
+const ButtonsMeta: StoryMeta = {
   title: "Buttons"
 }
 
 export default ButtonsMeta
 
-type ButtonsStory = ComponentStory<typeof View>
-
-export const Basic: ButtonsStory = () => (
+export const Basic = () => (
   <SafeAreaProvider>
     <GestureHandlerRootView>
       <TiFBottomSheetProvider>

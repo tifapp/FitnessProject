@@ -1,6 +1,6 @@
 import { Footnote, Headline } from "@components/Text"
 import { ReactNode } from "react"
-import { StyleProp, ViewStyle, StyleSheet, View } from "react-native"
+import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 
 export type TiFFormLabelProps = {
   title: ReactNode

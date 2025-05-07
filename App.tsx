@@ -1,16 +1,11 @@
-import "@api"
-import { useAppFonts } from "@lib/Fonts"
-import "date-time/DateRangeFormatting"
-import React from "react"
-import { StyleSheet } from "react-native"
-
-import { ExpoEventArrivalsGeofencer } from "@arrival-tracking/geofencing"
+import { ExpoEventArrivalsGeofencer } from "@arrival-tracking"
 import { setupCognito } from "@auth-boundary"
 import { Geo } from "@aws-amplify/geo"
-import { TiFView } from "@core-root"
+import { TiFView } from "@core-root/TiFView"
 import { LiveEventsStore } from "@event/LiveEvents"
 import { eventsByRegion } from "@explore-events-boundary"
 import { PortalProvider } from "@gorhom/portal"
+import { useAppFonts } from "@lib/Fonts"
 import { NetInfoInternetConnectionStatus } from "@lib/InternetConnection"
 import {
   sentryBreadcrumbLogHandler,
@@ -23,13 +18,15 @@ import {
   setupInternetReconnectionRefreshes
 } from "@lib/ReactQuery"
 import { enableSentry } from "@lib/Sentry"
-import * as Sentry from "@sentry/react-native"
+import { registerForPushNotifications } from "@notifications"
 import { AlphaUserSessionProvider, AlphaUserStorage } from "@user/alpha"
+import "date-time/DateRangeFormatting"
+import dayjs from "dayjs"
 import "expo-dev-client"
 import { addPushTokenListener } from "expo-notifications"
-import { dayjs } from "TiFShared/lib/Dayjs"
+import React from "react"
+import { StyleSheet } from "react-native"
 import { addLogHandler, consoleLogHandler, logger } from "TiFShared/logging"
-import { registerForPushNotifications } from "./notifications"
 import awsconfig from "./src/aws-exports"
 
 const log = logger("app.root")

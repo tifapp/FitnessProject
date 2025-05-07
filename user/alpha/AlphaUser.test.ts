@@ -1,8 +1,8 @@
+import { waitFor } from "@testing-library/react-native"
 import { TiFAPI } from "TiFShared/api"
 import { mockTiFEndpoint } from "TiFShared/test-helpers/mockAPIServer"
 import { AlphaUserStorage, registerAlphaUser } from "./AlphaUser"
 import { AlphaUserMocks } from "./MockData"
-import { waitFor } from "@testing-library/react-native"
 
 describe("AlphaUser tests", () => {
   describe("RegisterAlphaUser tests", () => {

@@ -4,21 +4,19 @@ import { FontScaleFactors, useFontScale } from "@lib/Fonts"
 import { withTiFDefaultSpring } from "@lib/Reanimated"
 import { useEffectEvent } from "@lib/utils/UseEffectEvent"
 import {
-  events,
-  hapticPattern,
   singleEventPattern,
   transientEvent,
   useHaptics
 } from "@modules/tif-haptics"
-import { PrimitiveAtom, useAtom, useAtomValue, useSetAtom } from "jotai"
+import { PrimitiveAtom, useAtom, useSetAtom } from "jotai"
 import { useEffect, useRef, useState } from "react"
 import {
+  LayoutRectangle,
+  Pressable,
   StyleProp,
   StyleSheet,
-  ViewStyle,
   View,
-  LayoutRectangle,
-  Pressable
+  ViewStyle
 } from "react-native"
 import { Gesture, GestureDetector } from "react-native-gesture-handler"
 import Animated, {

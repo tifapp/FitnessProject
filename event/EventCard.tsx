@@ -1,24 +1,24 @@
+import { CalendarDayView } from "@components/CalendarDay"
+import { Ionicon } from "@components/common/Icons"
 import { TiFFormCardView } from "@components/form-components/Card"
+import { useCoreNavigation } from "@components/Navigation"
+import { ProfileCircleView } from "@components/profileImageComponents/ProfileCircle"
 import ProfileImageAndName from "@components/profileImageComponents/ProfileImageAndName"
-import { ClientSideEvent, isEventOngoing } from "@event/ClientSideEvent"
-import React, { memo } from "react"
-import { Pressable, StyleProp, StyleSheet, View, ViewStyle } from "react-native"
-import { EventActionsMenuView, useEventActionsMenu } from "./Menu"
 import {
   BoldFootnote,
   CaptionTitle,
   Footnote,
   Subtitle
 } from "@components/Text"
-import { CalendarDayView } from "@components/CalendarDay"
-import { EventUserAttendanceButton } from "./UserAttendance"
-import { Ionicon } from "@components/common/Icons"
-import dayjs from "dayjs"
-import { FixedDateRange } from "TiFShared/domain-models/FixedDateRange"
-import { ProfileCircleView } from "@components/profileImageComponents/ProfileCircle"
-import { FontScaleFactors } from "@lib/Fonts"
-import { useCoreNavigation } from "@components/Navigation"
+import { ClientSideEvent, isEventOngoing } from "@event/ClientSideEvent"
 import { AppStyles } from "@lib/AppColorStyle"
+import { FontScaleFactors } from "@lib/Fonts"
+import dayjs from "dayjs"
+import React, { memo } from "react"
+import { Pressable, StyleProp, StyleSheet, View, ViewStyle } from "react-native"
+import { FixedDateRange } from "TiFShared/domain-models/FixedDateRange"
+import { EventActionsMenuView, useEventActionsMenu } from "./Menu"
+import { EventUserAttendanceButton } from "./UserAttendance"
 
 export type EventCardProps = {
   event: ClientSideEvent

@@ -1,27 +1,27 @@
-import { act, renderHook, waitFor } from "@testing-library/react-native"
-import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
-import { TestHaptics } from "@test-helpers/Haptics"
-import { captureAlerts } from "@test-helpers/Alerts"
 import { InMemorySecureStore } from "@lib/SecureStore"
 import {
   HapticsProvider,
-  transientEvent,
+  events,
   hapticPattern,
-  events
+  transientEvent
 } from "@modules/tif-haptics"
-import { ALERTS, sharePattern, useRudeusPatternEditor } from "./PatternEditor"
+import { captureAlerts } from "@test-helpers/Alerts"
+import { TestHaptics } from "@test-helpers/Haptics"
+import { setPlatform } from "@test-helpers/Platform"
+import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
+import { act, renderHook, waitFor } from "@testing-library/react-native"
+import { Provider, createStore } from "jotai"
+import React from "react"
+import { uuidString } from "TiFShared/lib/UUID"
 import {
   EMPTY_PATTERN_EDITOR_PATTERN,
   MOCK_USER,
   RudeusEditorPattern
 } from "./Models"
-import { RudeusUserStorage } from "./UserStorage"
+import { ALERTS, sharePattern, useRudeusPatternEditor } from "./PatternEditor"
 import { RudeusAPI, TEST_RUDEUS_URL } from "./RudeusAPI"
-import { Provider, createStore } from "jotai"
-import React from "react"
 import { mockRudeusServer } from "./TestHelpers"
-import { setPlatform } from "@test-helpers/Platform"
-import { uuidString } from "TiFShared/lib/UUID"
+import { RudeusUserStorage } from "./UserStorage"
 
 describe("PatternEditor tests", () => {
   describe("UseRudeusPatternEditor tests", () => {
