@@ -21,6 +21,7 @@ jobs:
     outputs:
       ios_changes: ${{ steps.check-files.outputs.ios_changes }}
       android_changes: ${{ steps.check-files.outputs.android_changes }}
+      package_json_changes: ${{ steps.check-files.outputs.package_json_changes }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -59,6 +60,12 @@ jobs:
           android_changed=false
 
           git diff --name-only FETCH_HEAD HEAD > changed_files.txt
+
+          package_json_changed=false
+          if grep -q "package.json" changed_files.txt; then
+            package_json_changed=true
+          fi
+          echo "package_json_changes=$package_json_changed" >> "$GITHUB_OUTPUT"
 
           if grep -q -E "\.(swift|m|h|c|mm|plist|xcodeproj|xcworkspace|pbxproj)$|ios/Podfile|ios/Podfile.lock" changed_files.txt; then
             ios_changed=true
@@ -276,7 +283,7 @@ jobs:
     if: |
       github.actor != 'roswaaltifbot' && 
       !startsWith(github.event.pull_request.title, 'IGNORE_BUILD') && 
-      (needs.check_platform_changes.outputs.ios_changes == 'true' || needs.check_platform_changes.outputs.android_changes == 'true')
+      (needs.check_platform_changes.outputs.ios_changes == 'true' || needs.check_platform_changes.outputs.android_changes == 'true' || needs.check_platform_changes.outputs.package_json_changes == 'true')
     runs-on: ubuntu-latest
     environment:
       name: eas-build
@@ -345,7 +352,9 @@ jobs:
     if: |
       github.actor != 'roswaaltifbot' && 
       !startsWith(github.event.pull_request.title, 'IGNORE_BUILD') &&
-      (needs.check_platform_changes.outputs.ios_changes == 'true' || needs.check_platform_changes.outputs.android_changes == 'true')
+      (needs.check_platform_changes.outputs.ios_changes == 'true' || 
+      needs.check_platform_changes.outputs.android_changes == 'true' || 
+      needs.check_platform_changes.outputs.package_json_changes == 'true')
     name: Request EAS Builds
     runs-on: ubuntu-latest
     env:
@@ -388,25 +397,27 @@ jobs:
           } >> .env.infra
 
       - name: Request iOS Build
-        if: needs.check_platform_changes.outputs.ios_changes == 'true'
+        if: needs.check_platform_changes.outputs.ios_changes == 'true' || needs.check_platform_changes.outputs.package_json_changes == 'true'
         run: |
           {
             echo "CHECK_RUN_NAME=${{ env.IOS_CHECK_NAME }}"
             echo "PLATFORM=IOS"
             echo "CHECK_RUN_ID=${{ needs.create_build_checkruns.outputs.ios_checkrun_id }}"
           } >> .env.infra
+          eas whoami
           npm run eas_build_ci_ios
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
       - name: Request Android Build
-        if: needs.check_platform_changes.outputs.android_changes == 'true'
+        if: needs.check_platform_changes.outputs.android_changes == 'true' || needs.check_platform_changes.outputs.package_json_changes == 'true'
         run: |
           {
             echo "CHECK_RUN_NAME=${{ env.ANDROID_CHECK_NAME }}"
             echo "PLATFORM=ANDROID"
             echo "CHECK_RUN_ID=${{ needs.create_build_checkruns.outputs.android_checkrun_id }}"
           } >> .env.infra
+          eas whoami
           npm run eas_build_ci_android
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
