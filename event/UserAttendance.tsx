@@ -1,17 +1,16 @@
+import { TrueRegionMonitor } from "@arrival-tracking/region-monitoring/MockRegionMonitors"
+import { BoldFootnote, Headline } from "@components/Text"
+import { featureContext } from "@lib/FeatureContext"
+import { isAttendingEvent } from "TiFShared/domain-models/Event"
 import { StyleProp, ViewStyle } from "react-native"
+import { ClientSideEvent } from "./ClientSideEvent"
 import {
   JoinEventButton,
-  JoinEventPermissionsSheetView,
   joinEvent,
   loadJoinEventPermissions,
   useJoinEvent
 } from "./JoinEvent"
 import { LeaveEventButton, leaveEvent, useLeaveEvent } from "./LeaveEvent"
-import { isAttendingEvent } from "TiFShared/domain-models/Event"
-import { TrueRegionMonitor } from "@arrival-tracking/region-monitoring/MockRegionMonitors"
-import { ClientSideEvent } from "./ClientSideEvent"
-import { BoldFootnote, Headline } from "@components/Text"
-import { featureContext } from "@lib/FeatureContext"
 
 export const EventUserAttendanceFeature = featureContext({
   // TODO: - Default region monitor.
@@ -74,7 +73,6 @@ export const EventUserAttendanceButton = ({
           style={style}
         />
       )}
-      <JoinEventPermissionsSheetView state={joinState} />
     </>
   )
 }

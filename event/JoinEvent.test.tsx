@@ -16,10 +16,13 @@ import { resetTestSQLiteBeforeEach, testSQLite } from "@test-helpers/SQLite"
 import { act, renderHook, waitFor } from "@testing-library/react-native"
 import { TiFAPI, TiFEndpointResponse } from "TiFShared/api"
 import { mockTiFServer } from "TiFShared/test-helpers/mockAPIServer"
+import { Provider } from "jotai"
 import {
   JOIN_EVENT_ERROR_ALERTS,
+  JOIN_EVENT_PERMISSION_BANNERS,
   JoinEventRequest,
   JoinEventResult,
+  UseJoinEvent,
   joinEvent,
   saveRecentLocationJoinEventHandler,
   useJoinEvent
@@ -52,16 +55,12 @@ describe("JoinEvent tests", () => {
 
     const NON_REQUESTABLE_PERMISSIONS = [
       {
-        kind: "notifications",
         canRequestPermission: false,
-        requestPermission: jest.fn().mockResolvedValueOnce(true),
-        bannerContents: TEST_BANNER_CONTENTS
+        bannerContents: JOIN_EVENT_PERMISSION_BANNERS.notifications
       },
       {
-        kind: "backgroundLocation",
         canRequestPermission: false,
-        requestPermission: jest.fn().mockResolvedValueOnce(true),
-        bannerContents: TEST_BANNER_CONTENTS
+        bannerContents: JOIN_EVENT_PERMISSION_BANNERS.backgroundLocation
       }
     ] as const
 
@@ -92,26 +91,24 @@ describe("JoinEvent tests", () => {
       await waitFor(() => expect(result.current.stage).toEqual("pending"))
       await act(async () => resolveJoin?.("success"))
       await waitFor(() => {
-        expect(result.current).toMatchObject({
-          stage: "permission",
-          permissionKind: "notifications"
-        })
+        expectPermissionBanner("notifications", result)
       })
       expect(env.joinEvent).toHaveBeenCalledWith({
         ...TEST_EVENT,
         hasArrived: true
       })
 
-      await act(async () => (result.current as any).requestButtonTapped())
+      await act(async () =>
+        (result.current as any).bannerContents.content.ctaAction()
+      )
       await waitFor(() => {
-        expect(result.current).toMatchObject({
-          stage: "permission",
-          permissionKind: "backgroundLocation"
-        })
+        expectPermissionBanner("backgroundLocation", result)
       })
 
       expect(env.onSuccess).not.toHaveBeenCalled()
-      await act(async () => (result.current as any).requestButtonTapped())
+      await act(async () =>
+        (result.current as any).bannerContents.content.ctaAction()
+      )
       await waitFor(() =>
         expect(result.current).toMatchObject({ stage: "idle" })
       )
@@ -130,10 +127,7 @@ describe("JoinEvent tests", () => {
 
       await act(async () => (result.current as any).joinButtonTapped())
       await waitFor(() => {
-        expect(result.current).toMatchObject({
-          stage: "permission",
-          permissionKind: "backgroundLocation"
-        })
+        expectPermissionBanner("backgroundLocation", result)
       })
     })
 
@@ -153,7 +147,7 @@ describe("JoinEvent tests", () => {
     })
 
     test("join event flow, can join multiple times", async () => {
-      env.loadPermissions.mockResolvedValueOnce(NON_REQUESTABLE_PERMISSIONS)
+      env.loadPermissions.mockResolvedValue(NON_REQUESTABLE_PERMISSIONS)
       env.joinEvent.mockResolvedValue("success")
       const { result } = renderUseJoinEvent()
 
@@ -178,24 +172,19 @@ describe("JoinEvent tests", () => {
 
       await act(async () => (result.current as any).joinButtonTapped())
       await waitFor(() => {
-        expect(result.current).toMatchObject({
-          stage: "permission",
-          permissionKind: "notifications"
-        })
+        expectPermissionBanner("notifications", result)
       })
 
-      await act(async () => (result.current as any).dismissButtonTapped())
-      expect(result.current).toMatchObject({
-        stage: "permission",
-        permissionKind: "backgroundLocation"
-      })
+      await act(async () => (result.current as any).bannerContents.dismissed())
 
-      await act(async () => (result.current as any).dismissButtonTapped())
+      expectPermissionBanner("backgroundLocation", result)
+
+      await act(async () => (result.current as any).bannerContents.dismissed())
       expect(result.current).toMatchObject({ stage: "idle" })
     })
 
     test("join event flow, error alerts", async () => {
-      env.loadPermissions.mockResolvedValueOnce([])
+      env.loadPermissions.mockResolvedValue([])
       const { result } = renderUseJoinEvent()
 
       env.joinEvent.mockResolvedValueOnce("event-has-ended")
@@ -269,12 +258,28 @@ describe("JoinEvent tests", () => {
       return renderSuccessfulUseLoadEventDetails(TEST_EVENT, queryClient)
     }
 
+    const expectPermissionBanner = (
+      banner: keyof typeof JOIN_EVENT_PERMISSION_BANNERS,
+      result: { current: UseJoinEvent }
+    ) => {
+      expect(result.current).toMatchObject({
+        stage: "permission",
+        bannerContents: {
+          content: {
+            title: JOIN_EVENT_PERMISSION_BANNERS[banner].title
+          }
+        }
+      })
+    }
+
     const renderUseJoinEvent = () => {
       return renderHook(() => useJoinEvent(TEST_EVENT, env), {
         wrapper: ({ children }: any) => (
-          <TestQueryClientProvider client={queryClient}>
-            {children}
-          </TestQueryClientProvider>
+          <Provider>
+            <TestQueryClientProvider client={queryClient}>
+              {children}
+            </TestQueryClientProvider>
+          </Provider>
         )
       })
     }

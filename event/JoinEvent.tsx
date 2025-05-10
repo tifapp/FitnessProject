@@ -3,17 +3,14 @@ import {
   EventRegionMonitor,
   useHasArrivedAtRegion
 } from "@arrival-tracking/region-monitoring"
-import { TiFBottomSheet } from "@components/BottomSheet"
 import { PrimaryButton } from "@components/Buttons"
-import { IoniconCloseButton } from "@components/common/Icons"
-import { BodyText, Title } from "@components/Text"
 import { ClientSideEvent } from "@event/ClientSideEvent"
 import { updateEventDetailsQueryEvent } from "@event/DetailsQuery"
 import {
   RecentLocationsStorage,
   recentLocationsStorage
 } from "@location/Recents"
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 import {
   getBackgroundPermissionsAsync as getBackgroundLocationPermissions,
   requestBackgroundPermissionsAsync as requestBackgroundLocationPermissions
@@ -22,15 +19,18 @@ import {
   getPermissionsAsync as getNotificationPermissions,
   requestPermissionsAsync as requestNotificationPermissions
 } from "expo-notifications"
-import React, { useEffect, useState } from "react"
-import { StyleProp, StyleSheet, TextProps, View, ViewStyle } from "react-native"
+import React from "react"
+import { StyleProp, StyleSheet, TextProps, ViewStyle } from "react-native"
 
-import { useSafeAreaInsets } from "react-native-safe-area-context"
+import {
+  TiFBottomSheetMenuContent,
+  TiFBottomSheetMenuState,
+  useBottomSheetMenu
+} from "@components/BottomSheetMenu"
+import { AlertsObject, presentAlert } from "@lib/Alerts"
 import { TiFAPI } from "TiFShared/api"
 import { EventLocation } from "TiFShared/domain-models/Event"
 import { EventLocationIdentifier } from "./LocationIdentifier"
-import { AlertsObject, presentAlert } from "@lib/Alerts"
-import { BottomSheetView } from "@gorhom/bottom-sheet"
 
 export const JOIN_EVENT_ERROR_ALERTS = {
   "event-has-ended": {
@@ -55,49 +55,42 @@ export const JOIN_EVENT_ERROR_ALERTS = {
   }
 } satisfies AlertsObject
 
+export const JOIN_EVENT_PERMISSION_BANNERS = {
+  notifications: {
+    title: "Don’t miss out on the fun!",
+    description:
+      "Enable notifications to stay informed on all the exciting events happening around you.",
+    ctaText: "Turn on Notifications",
+    ctaAction: async () => {
+      await requestNotificationPermissions()
+    }
+  },
+  backgroundLocation: {
+    title: "Don’t get left behind!",
+    description:
+      "Enable Location Sharing to inform others of your location in the event.",
+    ctaText: "Turn on Location Sharing",
+    ctaAction: async () => {
+      await requestBackgroundLocationPermissions()
+    }
+  }
+} satisfies Record<string, TiFBottomSheetMenuContent>
+
 export const loadJoinEventPermissions = async () => [
   {
-    kind: "notifications",
     canRequestPermission: (await getNotificationPermissions()).canAskAgain,
-    requestPermission: async () => {
-      await requestNotificationPermissions()
-    },
-    bannerContents: {
-      title: "Don’t miss out on the fun!",
-      description:
-        "Enable notifications to stay informed on all the exciting events happening around you.",
-      ctaText: "Turn on Notifications"
-    }
+    bannerContents: JOIN_EVENT_PERMISSION_BANNERS.notifications
   } as const,
   {
-    kind: "backgroundLocation",
     canRequestPermission: (await getBackgroundLocationPermissions())
       .canAskAgain,
-    requestPermission: async () => {
-      await requestBackgroundLocationPermissions()
-    },
-    bannerContents: {
-      title: "Don’t get left behind!",
-      description:
-        "Enable Location Sharing to inform others of your location in the event.",
-      ctaText: "Turn on Location Sharing"
-    }
+    bannerContents: JOIN_EVENT_PERMISSION_BANNERS.backgroundLocation
   } as const
 ]
 
-export type JoinEventPermissionKind = "notifications" | "backgroundLocation"
-
-export type JoinEventPermissionBannerContents = {
-  title: string
-  description: string
-  ctaText: string
-}
-
 export type JoinEventPermission = {
-  kind: JoinEventPermissionKind
-  bannerContents: JoinEventPermissionBannerContents
+  bannerContents: TiFBottomSheetMenuContent
   canRequestPermission: boolean
-  requestPermission: () => Promise<void>
 }
 
 /**
@@ -193,10 +186,7 @@ export type UseJoinEventEnvironment = {
 }
 
 export type UseJoinEventPermission = {
-  permissionKind: JoinEventPermissionKind
-  bannerContents: JoinEventPermissionBannerContents
-  requestButtonTapped: () => void
-  dismissButtonTapped: () => void
+  bannerContents: TiFBottomSheetMenuState
 }
 
 export type UseJoinEvent =
@@ -226,14 +216,27 @@ export const useJoinEvent = (
   { loadPermissions, joinEvent, monitor, onSuccess }: UseJoinEventEnvironment
 ): UseJoinEvent => {
   const hasArrived = useHasArrivedAtRegion(event.location, monitor)
-  const currentPermission = useCurrentJoinEventPermission(loadPermissions)
   const queryClient = useQueryClient()
+  const menuState = useBottomSheetMenu()
   const joinEventMutation = useMutation({
-    mutationFn: async () => await joinEvent({ ...event, hasArrived }),
-    onSuccess: (status) => {
+    mutationFn: async () => {
+      const status = await joinEvent({ ...event, hasArrived })
+      const permissions = (await loadPermissions())
+        .filter((p) => p.canRequestPermission)
+        .map((p) => p.bannerContents)
+      return { status, permissions }
+    },
+    onSuccess: ({ status, permissions }) => {
       if (status !== "success") {
         presentAlert(JOIN_EVENT_ERROR_ALERTS[status])
       } else {
+        menuState.present({
+          contents: permissions,
+          onFinished: () => {
+            onSuccess()
+            joinEventMutation.reset()
+          }
+        })
         updateEventDetailsQueryEvent(queryClient, event.id, (e) => ({
           ...e,
           userAttendeeStatus: "attending"
@@ -243,53 +246,16 @@ export const useJoinEvent = (
     onError: () => presentAlert(JOIN_EVENT_ERROR_ALERTS.generic)
   })
   const hasJoined =
-    joinEventMutation.isSuccess && joinEventMutation.data === "success"
-  const isSuccess = hasJoined && currentPermission === "done"
-  const reset = joinEventMutation.reset
+    joinEventMutation.isSuccess && joinEventMutation.data.status === "success"
 
-  useEffect(() => {
-    if (!isSuccess) return
-    onSuccess()
-    reset()
-  }, [isSuccess, onSuccess, reset])
+  const isDone = hasJoined && !menuState.content
 
-  if (hasJoined && typeof currentPermission === "object") {
-    return { stage: "permission", ...currentPermission }
-  } else if (
-    joinEventMutation.isPending ||
-    (hasJoined && currentPermission === "pending")
-  ) {
+  if (hasJoined && menuState.content) {
+    return { stage: "permission", bannerContents: menuState }
+  } else if (joinEventMutation.isPending || (hasJoined && !isDone)) {
     return { stage: "pending" }
   } else {
     return { stage: "idle", joinButtonTapped: joinEventMutation.mutate }
-  }
-}
-
-const useCurrentJoinEventPermission = (
-  loadPermissions: () => Promise<JoinEventPermission[]>
-) => {
-  const [permissionIndex, setPermissionIndex] = useState(0)
-  const { data: availablePermissions } = useQuery({
-    queryKey: ["join-event-permissions"],
-    queryFn: loadPermissions,
-    select: (permissions) => permissions.filter((p) => p.canRequestPermission)
-  })
-  const permissionRequestMutation = useMutation({
-    mutationFn: async (availablePermissions: JoinEventPermission[]) => {
-      if (permissionIndex >= availablePermissions.length) return
-      await availablePermissions[permissionIndex].requestPermission()
-    },
-    onSuccess: () => setPermissionIndex((index) => index + 1)
-  })
-  if (!availablePermissions) return "pending"
-  if (permissionIndex >= availablePermissions.length) return "done"
-  return {
-    permissionKind: availablePermissions[permissionIndex].kind,
-    bannerContents: availablePermissions[permissionIndex].bannerContents,
-    requestButtonTapped: () => {
-      permissionRequestMutation.mutate(availablePermissions)
-    },
-    dismissButtonTapped: () => setPermissionIndex((index) => index + 1)
   }
 }
 
@@ -322,68 +288,6 @@ export const JoinEventButton = ({
     </Text>
   </PrimaryButton>
 )
-
-export type JoinEventPermissionsSheetProps = {
-  state: UseJoinEvent
-  style?: StyleProp<ViewStyle>
-}
-
-export const JoinEventPermissionsSheetView = ({
-  state,
-  style
-}: JoinEventPermissionsSheetProps) => (
-  <TiFBottomSheet
-    item={state.stage === "permission" ? state : undefined}
-    sizing="content-size"
-    handleStyle={styles.sheetHandle}
-    canSwipeToDismiss={false}
-    onDismiss={() => {
-      if (state.stage !== "permission") return
-      state.dismissButtonTapped()
-    }}
-    style={style}
-  >
-    {(state) => (
-      <BottomSheetView>
-        <JoinEventPermissionBanner {...state} />
-      </BottomSheetView>
-    )}
-  </TiFBottomSheet>
-)
-
-type JoinEventPermissionBannerProps = UseJoinEventPermission & {
-  style?: StyleProp<ViewStyle>
-}
-
-const JoinEventPermissionBanner = ({
-  bannerContents: { title, ctaText, description },
-  requestButtonTapped,
-  dismissButtonTapped,
-  style
-}: JoinEventPermissionBannerProps) => {
-  const { bottom } = useSafeAreaInsets()
-  const paddingForNonSafeAreaScreens = bottom === 0 ? 24 : 0
-  return (
-    <View
-      style={[
-        style,
-        styles.container,
-        { marginBottom: bottom + 24 + paddingForNonSafeAreaScreens }
-      ]}
-    >
-      <View style={styles.topRow}>
-        <View style={styles.topRowSpacer} />
-        <IoniconCloseButton onPress={dismissButtonTapped} />
-      </View>
-      <Title style={styles.titleText}>{title}</Title>
-      <BodyText style={styles.bodyText}>{description}</BodyText>
-      <View style={styles.placeholderIllustration} />
-      <PrimaryButton onPress={requestButtonTapped} style={styles.ctaButton}>
-        {ctaText}
-      </PrimaryButton>
-    </View>
-  )
-}
 
 const styles = StyleSheet.create({
   container: {
