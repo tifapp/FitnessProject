@@ -405,7 +405,13 @@ jobs:
             echo "CHECK_RUN_ID=${{ needs.create_build_checkruns.outputs.ios_checkrun_id }}"
           } >> .env.infra
           eas whoami
-          npm run eas_build_ci_ios
+          if [[ "${{ github.event.pull_request.base.ref }}" == "master" ]]; then
+            echo "Building for master branch..."
+            npm run eas_build_ci_ios_master
+          else
+            echo "Building for non-master branch..."
+            npm run eas_build_ci_ios
+          fi
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
@@ -418,6 +424,12 @@ jobs:
             echo "CHECK_RUN_ID=${{ needs.create_build_checkruns.outputs.android_checkrun_id }}"
           } >> .env.infra
           eas whoami
-          npm run eas_build_ci_android
+          if [[ "${{ github.event.pull_request.base.ref }}" == "master" ]]; then
+            echo "Building for master branch..."
+            npm run eas_build_ci_android_master
+          else
+            echo "Building for non-master branch..."
+            npm run eas_build_ci_android
+          fi
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
