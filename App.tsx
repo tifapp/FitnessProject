@@ -19,6 +19,7 @@ import {
 } from "@lib/ReactQuery"
 import { enableSentry } from "@lib/Sentry"
 import { registerForPushNotifications } from "@notifications"
+import * as Sentry from "@sentry/react-native"
 import { AlphaUserSessionProvider, AlphaUserStorage } from "@user/alpha"
 import "date-time/DateRangeFormatting"
 import dayjs from "dayjs"

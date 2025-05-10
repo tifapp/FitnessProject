@@ -48,7 +48,8 @@ const config = {
   extra: {
     eas: {
       projectId: EXPO_PROJECT_ID
-    }
+    },
+    buildType: process.env.EAS_BUILD_TYPE
   },
   plugins: [
     [
@@ -81,9 +82,9 @@ const config = {
     bundleIdentifier,
     infoPlist: {
       NSLocationAlwaysAndWhenInUseUsageDescription:
-        'To inform others of your arrival, tap "Change to Always Allow."',
+        "To inform others of your arrival, tap \"Change to Always Allow.\"",
       NSLocationWhenInUseUsageDescription:
-        'Discover events and receive travel estimates for events by tapping "Allow Once" or "Allow While Using App."',
+        "Discover events and receive travel estimates for events by tapping \"Allow Once\" or \"Allow While Using App.\"",
       UIBackgroundModes: ["location", "fetch"],
       LSApplicationQueriesSchemes: [
         "comgooglemaps",
