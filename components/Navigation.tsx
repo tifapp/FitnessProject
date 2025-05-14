@@ -1,19 +1,19 @@
 import {
-  NavigationProp,
-  ParamListBase,
-  useNavigation
-} from "@react-navigation/native"
-import { createStackNavigator } from "@react-navigation/stack"
-import React from "react"
-import { StyleProp, StyleSheet, ViewStyle } from "react-native"
-import { TouchableIonicon } from "./common/Icons"
-import { EventID } from "TiFShared/domain-models/Event"
-import { UserHandle, UserID } from "TiFShared/domain-models/User"
-import {
   EditEventFormValues,
   toRouteableEditFormValues
 } from "@event/EditFormValues"
+import { useNavigation } from "@react-navigation/native"
 import { NativeStackHeaderLeftProps } from "@react-navigation/native-stack"
+import { type NavigationState } from "@react-navigation/routers"
+import {
+  StackNavigationProp,
+  createStackNavigator
+} from "@react-navigation/stack"
+import React, { useEffect, useRef } from "react"
+import { StyleProp, StyleSheet, ViewStyle } from "react-native"
+import { EventID } from "TiFShared/domain-models/Event"
+import { UserHandle, UserID } from "TiFShared/domain-models/User"
+import { TouchableIonicon } from "./common/Icons"
 
 /**
  * A helper type that's useful for making reusable navigation flows.
@@ -22,43 +22,57 @@ export type StackNavigatorType<
   ParamsList extends Record<string, object | undefined>
 > = ReturnType<typeof createStackNavigator<ParamsList>>
 
+// NB: ReturnType<typeof useNavigation> resolves to unknown, so we'll copy the type from react
+// navigation instead.
+
+export type UseNavigationReturn = Omit<
+  StackNavigationProp<ReactNavigation.RootParamList>,
+  "getState"
+> & {
+  getState(): NavigationState | undefined
+}
+
+/**
+ * Returns the main navigator in the current navigation context in the app.
+ *
+ * Use this instead hook of `useNavigation` for better type safety.
+ */
+export const useTiFNavigation = (): UseNavigationReturn => {
+  return useNavigation<UseNavigationReturn>()
+}
+
 /**
  * Returns an object of functions to navigate to essential app screens.
  */
 export const useCoreNavigation = () => {
-  // TODO: - Actually Navigate
-  const navigation = useNavigation()
+  const navigation = useTiFNavigation()
   return {
     presentEditEvent: (edit: EditEventFormValues, id?: EventID) => {
       const formValues = toRouteableEditFormValues(edit)
       if (id) {
-        navigation.navigate("editEvent", {
+        navigation.navigate("modal", {
           screen: "editEventForm",
           params: { ...formValues, id }
         })
       } else {
-        navigation.navigate("editEvent", {
+        navigation.navigate("modal", {
           screen: "createEventForm",
           params: formValues
         })
       }
     },
-    presentProfile: (
-      id: UserID | UserHandle,
-      method: "navigate" | "replace" = "navigate"
-    ) => {
-      ;(navigation as any)[method]("editEvent", {
-        screen: "userProfile",
-        params: { id, method }
-      })
+    presentProfile: (id: UserID | UserHandle) => {
+      navigation.navigate("modal", { screen: "userProfile", params: { id } })
     },
     pushEventDetails: (
       id: EventID,
-      method: "navigate" | "replace" = "navigate"
+      method: "replace" | "navigate" = "navigate"
     ) => {
-      // NB: Typescript doesn't like the subscript for some reason, but navigation should always
-      // have a navigate and replace method.
-      ;(navigation as any)[method]("eventDetails", { id, method })
+      if (method === "replace") {
+        navigation.replace("eventDetails", { id })
+      } else {
+        navigation.navigate("eventDetails", { id })
+      }
     },
     pushAttendeesList: (id: EventID) => {
       navigation.navigate("eventAttendeesList", { id })
@@ -82,35 +96,72 @@ export const BASE_HEADER_SCREEN_OPTIONS = {
 }
 
 export type BackButtonProps = NativeStackHeaderLeftProps & {
+  navigation?: UseNavigationReturn
   style?: StyleProp<ViewStyle>
+}
+
+/**
+ * Sets the back button for the current screen.
+ *
+ * Use this hook instead of setting the back button in the screen options because `useNavigation`
+ * will return the parent navigator inside a nested navigator screen. This causes the `goBack`
+ * method to dismiss the entire nested navigator instead of navigating to the previous screen
+ * within the nested navigator.
+ *
+ * @param Button The button component to render. By default, the component is determined by the position of the screen on the stack.
+ */
+export const useBackButton = (
+  Button?: (props: BackButtonProps) => JSX.Element
+) => {
+  const navigation = useTiFNavigation()
+  const DefaultButton = useDefaultBackButtonView()
+  const HeaderButton = Button ?? DefaultButton
+  useEffect(() => {
+    navigation.setOptions({
+      headerLeft: () => <HeaderButton navigation={navigation} />
+    })
+  }, [navigation, HeaderButton])
+}
+
+const useDefaultBackButtonView = () => {
+  const indexRef = useRef(-1)
+  const state = useTiFNavigation().getState()
+  indexRef.current =
+    indexRef.current === -1 && state?.index !== undefined
+      ? state.index
+      : indexRef.current
+  const isFirstStackScreen = indexRef.current === 0
+  return isFirstStackScreen ? XMarkBackButton : ChevronBackButton
 }
 
 /**
  * A back button that is a simple chevron icon.
  */
 export const ChevronBackButton = ({
+  navigation,
   style = styles.backButtonPadding
 }: BackButtonProps) => {
-  const navigation: NavigationProp<ParamListBase> = useNavigation()
+  const currentNavigation = useTiFNavigation()
   return (
     <TouchableIonicon
       icon={{ name: "chevron-back" }}
       accessibilityLabel="Go Back"
-      onPress={() => navigation.goBack()}
+      onPress={() => (navigation ?? currentNavigation).goBack()}
       style={style}
     />
   )
 }
 
 export const XMarkBackButton = ({
+  navigation,
   style = styles.backButtonPadding
 }: BackButtonProps) => {
-  const navigation: NavigationProp<ParamListBase> = useNavigation()
+  const currentNavigation = useTiFNavigation()
   return (
     <TouchableIonicon
       icon={{ name: "close" }}
       accessibilityLabel="Go Back"
-      onPress={() => navigation.goBack()}
+      onPress={() => (navigation ?? currentNavigation).goBack()}
       style={style}
     />
   )

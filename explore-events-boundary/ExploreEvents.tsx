@@ -1,11 +1,13 @@
 import { PrimaryButton } from "@components/Buttons"
 import { BodyText, Title } from "@components/Text"
 import { Ionicon } from "@components/common/Icons"
+import { MapTypePickerView } from "@components/form-components/MapTypePicker"
 import {
   ClientSideEvent,
   clientSideEventFromResponse
 } from "@event/ClientSideEvent"
 import { setEventDetailsQueryEvent } from "@event/DetailsQuery"
+import { useLiveEvents } from "@event/LiveEvents"
 import { QueryHookOptions } from "@lib/ReactQuery"
 import { useLastDefinedValue } from "@lib/utils/UseLastDefinedValue"
 import {
@@ -15,8 +17,9 @@ import {
 import { UseQueryResult, useQuery, useQueryClient } from "@tanstack/react-query"
 import { TiFAPI } from "TiFShared/api"
 import { LocationAccuracy, PermissionResponse } from "expo-location"
-import React, { useState } from "react"
+import React, { memo, useState } from "react"
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
+import { MapType } from "react-native-maps"
 import { ExploreEventsBottomSheet } from "./BottomSheet"
 import {
   ExploreEventsInitialCenter,
@@ -27,7 +30,7 @@ import {
   ExploreEventsRegion,
   XEROX_ALTO_DEFAULT_REGION,
   createDefaultMapRegion,
-  minRegionMeterRadius
+  maxRegionMeterRadius
 } from "./Region"
 import { SkeletonEventCard } from "./SkeletonEventCard"
 
@@ -43,7 +46,7 @@ export const eventsByRegion = async (
           latitude: region.latitude,
           longitude: region.longitude
         },
-        radius: minRegionMeterRadius(region)
+        radius: maxRegionMeterRadius(region) * 3
       },
       signal
     })
@@ -78,12 +81,14 @@ export const useExploreEvents = (
   { fetchEvents, isSignificantlyDifferentRegions }: UseExploreEventsEnvironment
 ) => {
   const { region, panToRegion } = useExploreEventsRegion(initialCenter)
+  const ongoingEvents = useLiveEvents((e) => e.ongoing)
   const { events, cancel } = useExploreEventsQuery(region!, fetchEvents, {
     enabled: !!region
   })
   return {
     region,
-    data: eventsQueryToExploreEventsData(events),
+    ongoingEvents,
+    data: eventsQueryToExploreEventsData(ongoingEvents, events),
     updateRegion: (newRegion: ExploreEventsRegion) => {
       if (!region) {
         panToRegion(newRegion)
@@ -96,6 +101,7 @@ export const useExploreEvents = (
 }
 
 const eventsQueryToExploreEventsData = (
+  ongoingEvents: ClientSideEvent[],
   query: UseQueryResult<ClientSideEvent[], unknown>
 ): ExploreEventsData => {
   if (query.isPending) {
@@ -105,7 +111,8 @@ const eventsQueryToExploreEventsData = (
   } else if (query.isError) {
     return { status: "error", retry: query.refetch }
   }
-  return { status: "success", events: query.data }
+  const ids = new Set(ongoingEvents.map((e) => e.id))
+  return { status: "success", events: query.data.filter((e) => !ids.has(e.id)) }
 }
 
 const useExploreEventsRegion = (initialCenter: ExploreEventsInitialCenter) => {
@@ -128,9 +135,7 @@ const useUserRegion = (
   const permissionQuery = useRequestForegroundLocationPermissions(options)
   const locationQuery = useUserCoordinatesQuery(
     { accuracy: LocationAccuracy.Balanced },
-    {
-      enabled: permissionQuery.data !== undefined
-    }
+    { enabled: permissionQuery.data !== undefined }
   )
   if (permissionQuery.isFetching || locationQuery.isFetching) {
     return "pending"
@@ -172,6 +177,7 @@ const useExploreEventsQuery = (
 
 export type ExploreEventsProps = {
   region?: ExploreEventsRegion
+  ongoingEvents: ClientSideEvent[]
   data: ExploreEventsData
   onRegionUpdated: (region: ExploreEventsRegion) => void
   style?: StyleProp<ViewStyle>
@@ -182,6 +188,7 @@ export type ExploreEventsProps = {
  */
 export const ExploreEventsView = ({
   region,
+  ongoingEvents,
   data,
   onRegionUpdated,
   style
@@ -189,12 +196,14 @@ export const ExploreEventsView = ({
   // NB: - Ensure the current events are still on the map when the
   // user pans to a new region
   const mapEventsData = useLastDefinedValue(data.events)
+  const [mapType, setMapType] = useState<MapType>("standard")
   return (
     <View style={[style, styles.container]}>
       {region ? (
         <ExploreEventsMap
           initialRegion={region}
           onRegionChanged={onRegionUpdated}
+          mapType={mapType}
           events={mapEventsData ?? []}
           style={styles.map}
         />
@@ -202,10 +211,14 @@ export const ExploreEventsView = ({
         <Water />
       )}
       <ExploreEventsBottomSheet
-        events={data.events ?? []}
-        HeaderComponent={
-          data.status !== "pending" ? NearbyHeader : FindingHeader
-        }
+        events={ongoingEvents.concat(data.events ?? [])}
+        HeaderComponent={() => (
+          <SheetHeaderView
+            mapType={mapType}
+            onMapTypeChanged={setMapType}
+            isLoading={data.status === "pending"}
+          />
+        )}
         EmptyEventsComponent={
           <View style={styles.emptyEventsContainer}>
             {data.status === "pending" && <LoadingView />}
@@ -218,12 +231,29 @@ export const ExploreEventsView = ({
   )
 }
 
-const NearbyHeader = () => (
-  <Title style={styles.sheetHeaderText}>Nearby Events</Title>
-)
-const FindingHeader = () => (
-  <Title style={styles.sheetHeaderText}>Finding Nearby Events...</Title>
-)
+type SheetHeaderProps = {
+  mapType: MapType
+  onMapTypeChanged: (type: MapType) => void
+  isLoading: boolean
+}
+
+const SheetHeaderView = memo(function Header({
+  mapType,
+  onMapTypeChanged,
+  isLoading
+}: SheetHeaderProps) {
+  return (
+    <View style={styles.sheetHeaderRow}>
+      <Title style={styles.sheetHeaderText}>
+        {isLoading ? "Finding Nearby Events..." : "Nearby Events"}
+      </Title>
+      <MapTypePickerView
+        selectedOption={mapType}
+        onOptionSelected={onMapTypeChanged}
+      />
+    </View>
+  )
+})
 
 type ErrorProps = {
   onRetried: () => void
@@ -271,9 +301,7 @@ const styles = StyleSheet.create({
   },
   sheetHeaderText: {
     flex: 1,
-    backgroundColor: "white",
-    paddingHorizontal: 24,
-    paddingBottom: 16
+    backgroundColor: "white"
   },
   water: {
     width: "100%",
@@ -313,5 +341,13 @@ const styles = StyleSheet.create({
   tryAgainButton: {
     marginTop: 24,
     width: "100%"
+  },
+  sheetHeaderRow: {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 24,
+    paddingBottom: 16
   }
 })

@@ -19,12 +19,7 @@ const log = logger("tif.sqlite")
  * to perform a transaction.
  */
 export class TiFSQLite {
-  private sqlExecutablePromise: Promise<ExpoSQLExecutable>
-  private queuedTransactions = [] as (() => Promise<void>)[]
-
-  private get isQueueEmpty() {
-    return this.queuedTransactions.length === 0
-  }
+  private connectionPromise: Promise<TiFSQLiteConnection>
 
   /**
    * Opens a sqlite database at the given path with all application
@@ -37,7 +32,7 @@ export class TiFSQLite {
       path: string
     ) => Promise<ExpoSQLExecutable> = openExpoSQLExecutable
   ) {
-    this.sqlExecutablePromise = TiFSQLite.setup(
+    this.connectionPromise = TiFSQLiteConnection.open(
       path,
       migrate,
       openSQLExecuatble
@@ -55,10 +50,28 @@ export class TiFSQLite {
    *
    * @param fn A function to run with exclusive database access.
    */
+  async withTransaction<T>(fn: (db: SQLExecutable) => Promise<T>) {
+    const connection = await this.connectionPromise
+    return await connection.withTransaction(fn)
+  }
+}
+
+class TiFSQLiteConnection {
+  private db: ExpoSQLExecutable
+  private queuedTransactions = [] as (() => Promise<void>)[]
+  private isRunningQueue = false
+
+  private get isQueueEmpty() {
+    return this.queuedTransactions.length === 0
+  }
+
+  private constructor(db: ExpoSQLExecutable) {
+    this.db = db
+  }
+
   withTransaction<T>(fn: (db: SQLExecutable) => Promise<T>) {
-    const shouldRunTransactions = this.isQueueEmpty
     const promise = this.enqueueTransaction(fn)
-    if (shouldRunTransactions) {
+    if (!this.isRunningQueue) {
       this.runQueueUntilEmpty()
     }
     return promise
@@ -68,9 +81,8 @@ export class TiFSQLite {
     return new Promise<T>((resolve, reject) => {
       this.queuedTransactions.push(async () => {
         try {
-          const db = await this.sqlExecutablePromise
-          await db.expoDb.withTransactionAsync(async () => {
-            resolve(await fn(db))
+          await this.db.expoDb.withTransactionAsync(async () => {
+            resolve(await fn(this.db))
           })
         } catch (e) {
           reject(e)
@@ -80,39 +92,46 @@ export class TiFSQLite {
   }
 
   private async runQueueUntilEmpty() {
-    while (!this.isQueueEmpty) {
-      await this.queuedTransactions[0]()
-      this.queuedTransactions.shift()
+    this.isRunningQueue = true
+    while (this.isRunningQueue) {
+      const task = this.queuedTransactions.shift()
+      await task?.()
+      this.isRunningQueue = !this.isQueueEmpty
     }
   }
 
-  private static async setup(
+  private static cachedConnections = new Map<string, TiFSQLiteConnection>()
+
+  static async open(
     path: string,
     migrate: (db: SQLExecutable) => Promise<void>,
-    openSQLExecuatble: (path: string) => Promise<ExpoSQLExecutable>
-  ) {
-    const db = await TiFSQLite.openWithInMemoryFallback(path, openSQLExecuatble)
-    await migrate(db)
-    return db
-  }
-
-  private static async openWithInMemoryFallback(
-    path: string,
-    openSQLExecuatble: (path: string) => Promise<ExpoSQLExecutable>
-  ) {
+    openSQLExecuatble: (
+      path: string
+    ) => Promise<ExpoSQLExecutable> = openExpoSQLExecutable
+  ): Promise<TiFSQLiteConnection> {
+    const cached = this.cachedConnections.get(path)
+    if (cached) {
+      await migrate(cached.db)
+      return cached
+    }
+    let db: ExpoSQLExecutable
     try {
-      return await openSQLExecuatble(path)
+      db = await openSQLExecuatble(path)
     } catch (e) {
       log.warn(
         "Failed to open SQLite at the specified path, falling back to an in memory instance.",
-        {
-          message: e.message,
-          code: e.code,
-          path
-        }
+        { message: e.message, code: e.code, path }
       )
-      return await openSQLExecuatble(SQLITE_IN_MEMORY_PATH)
+      return await TiFSQLiteConnection.open(
+        SQLITE_IN_MEMORY_PATH,
+        migrate,
+        openSQLExecuatble
+      )
     }
+    const conn = new TiFSQLiteConnection(db)
+    await migrate(db)
+    this.cachedConnections.set(path, conn)
+    return conn
   }
 }
 

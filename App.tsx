@@ -1,11 +1,12 @@
-import "@api"
-import "date-time/DateRangeFormatting"
-import { useAppFonts } from "@lib/Fonts"
-import React from "react"
-import { StyleSheet } from "react-native"
-
+import { ExpoEventArrivalsGeofencer } from "@arrival-tracking"
+import { setupCognito } from "@auth-boundary"
 import { Geo } from "@aws-amplify/geo"
-import { ExpoEventArrivalsGeofencer } from "@arrival-tracking/geofencing"
+import { TiFView } from "@core-root/TiFView"
+import { LiveEventsStore } from "@event/LiveEvents"
+import { eventsByRegion } from "@explore-events-boundary"
+import { PortalProvider } from "@gorhom/portal"
+import { useAppFonts } from "@lib/Fonts"
+import { NetInfoInternetConnectionStatus } from "@lib/InternetConnection"
 import {
   sentryBreadcrumbLogHandler,
   sentryErrorCapturingLogHandler,
@@ -17,18 +18,17 @@ import {
   setupInternetReconnectionRefreshes
 } from "@lib/ReactQuery"
 import { enableSentry } from "@lib/Sentry"
-import { TiFView } from "@core-root"
+import { registerForPushNotifications } from "@notifications"
 import * as Sentry from "@sentry/react-native"
+import { AlphaUserSessionProvider, AlphaUserStorage } from "@user/alpha"
+import "date-time/DateRangeFormatting"
+import dayjs from "dayjs"
 import "expo-dev-client"
 import { addPushTokenListener } from "expo-notifications"
-import { setupCognito } from "@auth-boundary"
-import { registerForPushNotifications } from "./notifications"
+import React from "react"
+import { StyleSheet } from "react-native"
+import { addLogHandler, consoleLogHandler, logger } from "TiFShared/logging"
 import awsconfig from "./src/aws-exports"
-import { NetInfoInternetConnectionStatus } from "@lib/InternetConnection"
-import { consoleLogHandler, logger, addLogHandler } from "TiFShared/logging"
-import { dayjs } from "TiFShared/lib/Dayjs"
-import { eventsByRegion } from "@explore-events-boundary"
-import { AlphaUserSessionProvider } from "@user/alpha"
 
 const log = logger("app.root")
 
@@ -51,6 +51,7 @@ export const setupApp = () => {
   addPushTokenListener(registerForPushNotifications)
   setupInternetReconnectionRefreshes(NetInfoInternetConnectionStatus.shared)
   setupFocusRefreshes()
+  LiveEventsStore.default.observeUserChanges(AlphaUserStorage.default)
 }
 
 export type AppProps = {
@@ -60,13 +61,15 @@ export type AppProps = {
 const TiFApp = () => {
   const [isFontsLoaded] = useAppFonts()
   return (
-    <AlphaUserSessionProvider>
-      <TiFView
-        fetchEvents={eventsByRegion}
-        isFontsLoaded={isFontsLoaded}
-        style={styles.tif}
-      />
-    </AlphaUserSessionProvider>
+    <PortalProvider>
+      <AlphaUserSessionProvider>
+        <TiFView
+          fetchEvents={eventsByRegion}
+          isFontsLoaded={isFontsLoaded}
+          style={styles.tif}
+        />
+      </AlphaUserSessionProvider>
+    </PortalProvider>
   )
 }
 

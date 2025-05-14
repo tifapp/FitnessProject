@@ -1,16 +1,16 @@
 import { EventMocks } from "@event-details-boundary/MockData"
 import { renderUseLoadEventDetails } from "@event-details-boundary/TestHelpers"
-import { uuidString } from "@lib/utils/UUID"
 import { TestInternetConnectionStatus } from "@test-helpers/InternetConnectionStatus"
 import { fakeTimers } from "@test-helpers/Timers"
+import { waitFor } from "@testing-library/react-native"
 import { TiFAPI } from "TiFShared/api"
 import { ColorString } from "TiFShared/domain-models/ColorString"
 import { EventID, EventWhenBlockedByHost } from "TiFShared/domain-models/Event"
 import { UserHandle } from "TiFShared/domain-models/User"
+import { uuidString } from "TiFShared/lib/UUID"
 import { mockTiFEndpoint } from "TiFShared/test-helpers/mockAPIServer"
 import { act } from "react-test-renderer"
 import { eventDetails } from "./DetailsQuery"
-import { waitFor } from "@testing-library/react-native"
 
 describe("EventDetailsLoading tests", () => {
   beforeEach(() => {

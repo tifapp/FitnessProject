@@ -1,42 +1,42 @@
-import { TiFFormScrollableLayoutView } from "@components/form-components/ScrollableFormLayout"
-import { ClientSideEvent, ClientSideEventTime } from "@event/ClientSideEvent"
-import {
-  StyleProp,
-  ViewStyle,
-  StyleSheet,
-  View,
-  RefreshControl
-} from "react-native"
-import { useEventSecondsToStart } from "./SecondsToStart"
-import { EventCountdownView, eventCountdown } from "./Countdown"
-import { EventUserAttendanceButton } from "@event/UserAttendance"
-import { BodyText, Title } from "@components/Text"
-import { memo } from "react"
+import { RegionMonitorContext } from "@arrival-tracking"
 import { TiFFooterView } from "@components/Footer"
+import { TiFFormCardView } from "@components/form-components/Card"
+import { TiFFormNamedIconRowView } from "@components/form-components/NamedIconRow"
+import { TiFFormScrollableLayoutView } from "@components/form-components/ScrollableFormLayout"
 import {
   TiFFormCardSectionView,
   TiFFormSectionView
 } from "@components/form-components/Section"
-import { EventAttendeeCardView } from "./AttendeesList"
-import {
-  EventTravelEstimatesView,
-  useEventTravelEstimates
-} from "./TravelEstimates"
-import { TiFFormCardView } from "@components/form-components/Card"
-import { TiFFormNamedIconRowView } from "@components/form-components/NamedIconRow"
-import { AppStyles } from "@lib/AppColorStyle"
-import { placemarkToFormattedAddress } from "@lib/AddressFormatting"
+import { BodyText, Title } from "@components/Text"
+import { ClientSideEvent, ClientSideEventTime } from "@event/ClientSideEvent"
 import { UseLoadEventDetailsResult } from "@event/DetailsQuery"
+import { EventUserAttendanceButton } from "@event/UserAttendance"
+import { placemarkToFormattedAddress } from "@lib/AddressFormatting"
+import { AppStyles } from "@lib/AppColorStyle"
+import { useUserSettings } from "@settings-storage/Hooks"
+import { settingsSelector } from "@settings-storage/Settings"
+import { memo } from "react"
+import {
+  RefreshControl,
+  StyleProp,
+  StyleSheet,
+  View,
+  ViewStyle
+} from "react-native"
+import Animated, { FadeIn, FadeOut } from "react-native-reanimated"
+import { isAttendingEvent } from "TiFShared/domain-models/Event"
 import {
   EventArrivalBannerView,
   eventArrivalBannerCountdown,
   useIsShowingEventArrivalBanner
 } from "./ArrivalBanner"
-import { isAttendingEvent } from "TiFShared/domain-models/Event"
-import { useUserSettings } from "@settings-storage/Hooks"
-import { settingsSelector } from "@settings-storage/Settings"
-import { RegionMonitorContext } from "@arrival-tracking"
-import Animated, { FadeIn, FadeOut } from "react-native-reanimated"
+import { EventAttendeeCardView } from "./AttendeesList"
+import { EventCountdownView, eventCountdown } from "./Countdown"
+import { useEventSecondsToStart } from "./SecondsToStart"
+import {
+  EventTravelEstimatesView,
+  useEventTravelEstimates
+} from "./TravelEstimates"
 
 export type EventDetailsProps = {
   state: Extract<UseLoadEventDetailsResult, { status: "success" }>
@@ -147,6 +147,7 @@ const LocationSectionView = ({ event }: SectionProps) => (
       />
     </TiFFormCardView>
     <EventTravelEstimatesView
+      eventTitle={event.title}
       host={event.host}
       location={event.location}
       result={useEventTravelEstimates(event.location.coordinate)}
@@ -199,3 +200,4 @@ const styles = StyleSheet.create({
     justifyContent: "space-between"
   }
 })
+export { UseLoadEventDetailsResult }

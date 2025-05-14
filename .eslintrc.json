@@ -69,6 +69,7 @@
   "globals": {
     "RequestInfo": "readonly",
     "RequestInit": "readonly",
+    "ReactNavigation": "readonly",
     "JSX": "readonly",
     "NodeJS": "readonly",
     "__DEV__": "readonly"

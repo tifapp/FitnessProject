@@ -6,8 +6,8 @@ import {
   randomIntegerInRange,
   randomlyUndefined
 } from "@lib/utils/Random"
-import { uuidString } from "@lib/utils/UUID"
 import { mockLocationCoordinate2D, mockPlacemark } from "@location/MockData"
+import { uuidString } from "TiFShared/lib/UUID"
 
 import { ChatTokenRequest } from "TiFShared/api/models/Chat"
 import { EventResponse } from "TiFShared/api/models/Event"

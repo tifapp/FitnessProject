@@ -1,12 +1,11 @@
 import { StoryMeta } from ".storybook/HelperTypes"
 import { BASE_HEADER_SCREEN_OPTIONS } from "@components/Navigation"
 import { TiFQueryClientProvider } from "@lib/ReactQuery"
-
 import { delayData } from "@lib/utils/DelayData"
 import {
+  LocationSearchBar,
   LocationSearchPicker,
-  useLocationsSearch,
-  LocationSearchBar
+  useLocationsSearch
 } from "@location-search-boundary"
 import { mockLocationSearchResult } from "@location-search-boundary/MockData"
 import {
@@ -16,11 +15,10 @@ import {
   useNavigation
 } from "@react-navigation/native"
 import { createStackNavigator } from "@react-navigation/stack"
-import { ComponentMeta, ComponentStory } from "@storybook/react-native"
-import { repeatElements } from "TiFShared/lib/Array"
 import React from "react"
 import { Button } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
+import { repeatElements } from "TiFShared/lib/Array"
 
 const LocationSearchMeta: StoryMeta = {
   title: "Location Search Screen"
@@ -28,11 +26,9 @@ const LocationSearchMeta: StoryMeta = {
 
 export default LocationSearchMeta
 
-type LocationSearchStory = ComponentStory<typeof SettingsScreen>
-
 const Stack = createStackNavigator()
 
-export const Basic: LocationSearchStory = () => (
+export const Basic = () => (
   <TiFQueryClientProvider>
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ ...BASE_HEADER_SCREEN_OPTIONS }}>

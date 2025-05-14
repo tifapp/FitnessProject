@@ -95,6 +95,7 @@ export type WithAlphaRegistrationProps<Props> = Props & { session: UserSession }
  *
  * If the user is not authenticated, the {@link AlphaRegisterView} is presented instead.
  */
+// eslint-disable-next-line comma-spacing
 export const withAlphaRegistration = <Props,>(
   Component: (props: WithAlphaRegistrationProps<Props>) => ReactNode
 ) => {

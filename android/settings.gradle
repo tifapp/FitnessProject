@@ -47,6 +47,7 @@ if (getRNMinorVersion() >= 75) {
 rootProject.name = 'FitnessApp'
 
 dependencyResolutionManagement {
+  repositoriesMode.set(RepositoriesMode.PREFER_PROJECT)
   versionCatalogs {
     reactAndroidLibs {
       from(files(new File(["node", "--print", "require.resolve('react-native/package.json')"].execute(null, rootDir).text.trim(), "../gradle/libs.versions.toml")))

@@ -1,10 +1,10 @@
 import {
   ChevronBackButton,
   StackNavigatorType,
-  XMarkBackButton
+  XMarkBackButton,
+  useTiFNavigation
 } from "@components/Navigation"
 import { TouchableIonicon } from "@components/common/Icons"
-import { useNavigation } from "@react-navigation/native"
 import { StackScreenProps } from "@react-navigation/stack"
 import React, { memo } from "react"
 import { Alert, StyleSheet } from "react-native"
@@ -192,7 +192,7 @@ const EndingScreen = ({
 )
 
 const SignUpExitButton = () => {
-  const navigation = useNavigation()
+  const navigation = useTiFNavigation()
   return (
     <TouchableIonicon
       icon={{ name: "close" }}

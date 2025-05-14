@@ -4,7 +4,7 @@ import { AlphaUserMocks } from "@user/alpha/MockData"
 import { TiFAPI } from "TiFShared/api"
 import { UserProfile } from "TiFShared/domain-models/User"
 import { mockTiFEndpoint } from "TiFShared/test-helpers/mockAPIServer"
-import { userProfile } from "./UserProfile"
+import { userProfile } from "./Context"
 
 describe("UserProfile tests", () => {
   const testUser = {

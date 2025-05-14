@@ -1,5 +1,6 @@
 import { EventMocks } from "@event-details-boundary/MockData"
 import { renderUseLoadEventDetails } from "@event-details-boundary/TestHelpers"
+import { LiveEventsFeature, LiveEventsStore } from "@event/LiveEvents"
 import {
   mockExpoLocationObject,
   mockLocationCoordinate2D,
@@ -15,6 +16,7 @@ import {
 } from "@test-helpers/ReactQuery"
 import { fakeTimers, timeTravel } from "@test-helpers/Timers"
 import { act, renderHook, waitFor } from "@testing-library/react-native"
+import { AlphaUserMocks } from "@user/alpha/MockData"
 import { TiFAPI } from "TiFShared/api"
 import { EventsInAreaResponse } from "TiFShared/api/models/Event"
 import { EventID } from "TiFShared/domain-models/Event"
@@ -26,8 +28,7 @@ import { ExploreEventsInitialCenter } from "./InitialCenter"
 import {
   ExploreEventsRegion,
   XEROX_ALTO_DEFAULT_REGION,
-  createDefaultMapRegion,
-  minRegionMeterRadius
+  createDefaultMapRegion
 } from "./Region"
 
 const TEST_EVENTS = [EventMocks.Multiday, EventMocks.PickupBasketball]
@@ -179,11 +180,16 @@ describe("ExploreEvents tests", () => {
     test("basics", async () => {
       const now = new Date()
       jest.setSystemTime(now)
-      const region = mockRegion()
+      const region = {
+        latitude: 88.1,
+        longitude: 44.1,
+        latitudeDelta: 0.4,
+        longitudeDelta: 0.3
+      }
       setupExploreEndpointHandlerExpectingRegion(
         region.latitude,
         region.longitude,
-        minRegionMeterRadius(region)
+        66716.955
       )
       const events = await eventsByRegion(
         region,
@@ -210,7 +216,10 @@ describe("ExploreEvents tests", () => {
       mockTiFServer({
         exploreEvents: {
           expectedRequest: {
-            body: { userLocation: { latitude, longitude }, radius }
+            body: {
+              userLocation: { latitude, longitude },
+              radius: expect.closeTo(radius)
+            }
           },
           mockResponse: {
             status: 200,
@@ -246,6 +255,31 @@ describe("ExploreEvents tests", () => {
       await waitFor(() => expect(result.current.data.status).toEqual("success"))
       expect(result.current.data.events).toEqual(TEST_EVENTS)
       expectFetchedExploreRegion(expectedRegion)
+    })
+
+    it("should place ongoing events in a separate field", async () => {
+      const userLocation = mockExpoLocationObject()
+      requestForegroundPermissions.mockResolvedValueOnce({ granted: true })
+      queryUserCoordinates.mockReturnValueOnce(userLocation)
+      fetchEvents.mockResolvedValueOnce(TEST_EVENTS)
+
+      const store = new LiveEventsStore(
+        queryClient,
+        jest.fn().mockResolvedValueOnce({
+          ongoing: [TEST_EVENTS[1]],
+          startingSoon: []
+        })
+      )
+      store.beginObserving(AlphaUserMocks.TheDarkLord.id)
+
+      const { result } = renderUseExploreEvents(
+        { center: "user-location" },
+        store
+      )
+
+      await waitFor(() => expect(result.current.data.status).toEqual("success"))
+      expect(result.current.data.events).toEqual([TEST_EVENTS[0]])
+      expect(result.current.ongoingEvents).toEqual([TEST_EVENTS[1]])
     })
 
     test("retrying after unsuccessfully exploring events", async () => {
@@ -466,7 +500,10 @@ describe("ExploreEvents tests", () => {
     const isSignificantlyDifferentRegions = jest.fn()
     const fetchEvents = jest.fn()
 
-    const renderUseExploreEvents = (center: ExploreEventsInitialCenter) => {
+    const renderUseExploreEvents = (
+      center: ExploreEventsInitialCenter,
+      store: LiveEventsStore = new LiveEventsStore(queryClient, jest.fn())
+    ) => {
       return renderHook(
         () =>
           useExploreEvents(center, {
@@ -476,12 +513,14 @@ describe("ExploreEvents tests", () => {
         {
           wrapper: ({ children }) => (
             <TestQueryClientProvider client={queryClient}>
-              <UserLocationFunctionsProvider
-                getCurrentLocation={queryUserCoordinates}
-                requestForegroundPermissions={requestForegroundPermissions}
-              >
-                {children}
-              </UserLocationFunctionsProvider>
+              <LiveEventsFeature.Provider store={store}>
+                <UserLocationFunctionsProvider
+                  getCurrentLocation={queryUserCoordinates}
+                  requestForegroundPermissions={requestForegroundPermissions}
+                >
+                  {children}
+                </UserLocationFunctionsProvider>
+              </LiveEventsFeature.Provider>
             </TestQueryClientProvider>
           )
         }

@@ -1,29 +1,29 @@
-import { useAtom } from "jotai"
-import {
-  ViewStyle,
-  StyleProp,
-  View,
-  StyleSheet,
-  LayoutRectangle,
-  ActivityIndicator
-} from "react-native"
-import { editEventFormValueAtoms } from "./FormAtoms"
+import { AvatarMapMarkerView } from "@components/AvatarMapMarker"
+import { ExpandableMapSnippetView } from "@components/MapSnippetView"
+import { Caption, Footnote } from "@components/Text"
+import { Ionicon } from "@components/common/Icons"
+import { TiFFormNavigationLinkView } from "@components/form-components/NavigationLink"
+import { EditEventFormLocation } from "@event/EditFormValues"
+import { placemarkToFormattedAddress } from "@lib/AddressFormatting"
+import { AppStyles } from "@lib/AppColorStyle"
+import { FontScaleFactors } from "@lib/Fonts"
 import {
   DEFAULT_GEOCODE_QUERY_OPTIONS,
   useGeocodeQuery,
   useReverseGeocodeQuery
 } from "@location/Geocoding"
-import React, { useEffect, useRef, useState } from "react"
-import { TiFFormNavigationLinkView } from "@components/form-components/NavigationLink"
-import { AppStyles } from "@lib/AppColorStyle"
-import MapView, { Marker } from "react-native-maps"
-import Animated, { FadeIn } from "react-native-reanimated"
-import { TiFFormCardView } from "@components/form-components/Card"
-import { placemarkToFormattedAddress } from "@lib/AddressFormatting"
-import { FontScaleFactors } from "@lib/Fonts"
-import { AvatarMapMarkerView } from "@components/AvatarMapMarker"
-import { EditEventFormLocation } from "@event/EditFormValues"
 import { LocationCoordinate2D } from "TiFShared/domain-models/LocationCoordinate2D"
+import { useAtom } from "jotai"
+import React, { useEffect, useRef, useState } from "react"
+import {
+  ActivityIndicator,
+  StyleProp,
+  StyleSheet,
+  View,
+  ViewStyle
+} from "react-native"
+import MapView, { LongPressEvent } from "react-native-maps"
+import { editEventFormValueAtoms } from "./FormAtoms"
 
 export const useEditEventFormLocation = () => {
   const [location, setLocation] = useAtom(editEventFormValueAtoms.location)
@@ -56,6 +56,7 @@ export type EditEventFormLocationProps = {
   hostProfileImageURL?: string
   location?: EditEventFormLocation
   onSelectLocationTapped: () => void
+  onMapLongPress: (event: LongPressEvent) => void
   style?: StyleProp<ViewStyle>
 }
 
@@ -64,6 +65,7 @@ export const EditEventFormLocationView = ({
   hostProfileImageURL,
   location,
   onSelectLocationTapped,
+  onMapLongPress,
   style
 }: EditEventFormLocationProps) => (
   <View style={style}>
@@ -83,6 +85,7 @@ export const EditEventFormLocationView = ({
         hostProfileImageURL={hostProfileImageURL}
         location={location}
         onSelectLocationTapped={onSelectLocationTapped}
+        onMapLongPress={onMapLongPress}
       />
     )}
   </View>
@@ -93,110 +96,119 @@ type LocationProps = {
   hostProfileImageURL?: string
   location: EditEventFormLocation
   onSelectLocationTapped: () => void
+  onMapLongPress: (event: LongPressEvent) => void
 }
 
 const LocationView = ({
   hostName,
   hostProfileImageURL,
   location,
-  onSelectLocationTapped
+  onSelectLocationTapped,
+  onMapLongPress
 }: LocationProps) => {
   const mapRef = useRef<MapView>(null)
-  const [overlayLayout, setOverlayLayout] = useState<
-    LayoutRectangle | undefined
-  >(undefined)
   useEffect(() => {
     if (location.coordinate) {
       mapRef.current?.animateToRegion(mapRegion(location.coordinate))
     }
   }, [location.coordinate])
-  const mapHeight = overlayLayout && Math.max(300, 200 + overlayLayout.height)
+  const [isExpanded, setIsExpanded] = useState(false)
   return (
-    <View style={[styles.locationContainer, { height: mapHeight }]}>
-      {mapHeight && (
-        <Animated.View
-          entering={FadeIn.duration(300)}
-          style={styles.mapDimensions}
-        >
-          {location.coordinate ? (
-            <MapView
-              style={[styles.mapDimensions, { height: mapHeight }]}
-              loadingEnabled
-              ref={mapRef}
-              zoomEnabled={false}
-              scrollEnabled={false}
-              initialRegion={mapRegion(location.coordinate)}
-              mapPadding={{
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: overlayLayout.height + 24
-              }}
-              customMapStyle={[
-                {
-                  featureType: "poi",
-                  stylers: [{ visibility: "off" }]
-                },
-                {
-                  featureType: "transit",
-                  stylers: [{ visibility: "off" }]
-                }
-              ]}
-            >
-              <Marker coordinate={location.coordinate}>
-                <AvatarMapMarkerView
-                  name={hostName}
-                  imageURL={hostProfileImageURL}
-                />
-              </Marker>
-            </MapView>
-          ) : (
-            <View
-              style={[
-                styles.mapDimensions,
-                styles.loadingMap,
-                { height: mapHeight }
-              ]}
-            >
-              <ActivityIndicator
-                style={{ marginTop: (mapHeight - overlayLayout.height) / 2 }}
-              />
-            </View>
-          )}
-        </Animated.View>
+    <View>
+      {location.coordinate ? (
+        <ExpandableMapSnippetView
+          ref={mapRef}
+          isExpanded={isExpanded}
+          onExpansionChanged={setIsExpanded}
+          region={mapRegion(location.coordinate)}
+          collapsedMapProps={{
+            customMapStyle: [
+              {
+                featureType: "poi",
+                stylers: [{ visibility: "off" }]
+              },
+              {
+                featureType: "transit",
+                stylers: [{ visibility: "off" }]
+              }
+            ]
+          }}
+          expandedMapProps={{
+            onLongPress: onMapLongPress,
+            showsUserLocation: true
+          }}
+          marker={
+            <AvatarMapMarkerView
+              name={hostName}
+              imageURL={hostProfileImageURL}
+            />
+          }
+          overlay={(isExpanding) => {
+            return (
+              <View style={styles.container}>
+                {isExpanding && (
+                  <View style={styles.instructionContainer}>
+                    <Ionicon
+                      name="pin-sharp"
+                      size={24}
+                      style={styles.instructionIcon}
+                      color="black"
+                    />
+                    <Footnote style={styles.instructionText}>
+                      {
+                        "Tap and hold anywhere on the map to select a new location."
+                      }
+                    </Footnote>
+                  </View>
+                )}
+                {!location.placemark ? (
+                  <View style={styles.overlayContainer}>
+                    <Caption style={styles.currentLocation}>
+                      {"Current Location"}
+                    </Caption>
+                    <TiFFormNavigationLinkView
+                      iconName="location"
+                      iconBackgroundColor={AppStyles.primary}
+                      maximumFontScaleFactor={FontScaleFactors.xxxLarge}
+                      style={styles.locationMapNavigationLink}
+                      title={`${location.coordinate.latitude}, ${location.coordinate.longitude}`}
+                      onTapped={() => {
+                        setIsExpanded(false)
+                        onSelectLocationTapped()
+                      }}
+                    />
+                  </View>
+                ) : (
+                  <View style={styles.overlayContainer}>
+                    <Caption style={styles.currentLocation}>
+                      {"Current Location"}
+                    </Caption>
+                    <TiFFormNavigationLinkView
+                      iconName="location"
+                      iconBackgroundColor={AppStyles.primary}
+                      style={styles.locationMapNavigationLink}
+                      title={location.placemark.name ?? "Unknown Location"}
+                      maximumFontScaleFactor={FontScaleFactors.xxxLarge}
+                      description={
+                        placemarkToFormattedAddress(location.placemark) ??
+                        "Unknown Address"
+                      }
+                      onTapped={() => {
+                        setIsExpanded(false)
+                        onSelectLocationTapped()
+                      }}
+                    />
+                  </View>
+                )}
+              </View>
+            )
+          }}
+        />
+      ) : (
+        <View style={[styles.mapDimensions, styles.loadingMap]}>
+          <ActivityIndicator />
+        </View>
       )}
-      <View style={styles.overlayContainer}>
-        <TiFFormCardView borderRadius={8} style={styles.overlay}>
-          <View
-            style={styles.overlayRow}
-            onLayout={(event) => setOverlayLayout(event.nativeEvent.layout)}
-          >
-            {!location.placemark ? (
-              <TiFFormNavigationLinkView
-                iconName="location"
-                iconBackgroundColor={AppStyles.primary}
-                maximumFontScaleFactor={FontScaleFactors.xxxLarge}
-                style={styles.locationMapNavigationLink}
-                title={`${location.coordinate.latitude}, ${location.coordinate.longitude}`}
-                onTapped={onSelectLocationTapped}
-              />
-            ) : (
-              <TiFFormNavigationLinkView
-                iconName="location"
-                iconBackgroundColor={AppStyles.primary}
-                style={styles.locationMapNavigationLink}
-                title={location.placemark.name ?? "Unknown Location"}
-                maximumFontScaleFactor={FontScaleFactors.xxxLarge}
-                description={
-                  placemarkToFormattedAddress(location.placemark) ??
-                  "Unknown Address"
-                }
-                onTapped={onSelectLocationTapped}
-              />
-            )}
-          </View>
-        </TiFFormCardView>
-      </View>
     </View>
   )
 }
@@ -208,6 +220,29 @@ const mapRegion = (coordinate: LocationCoordinate2D) => ({
 })
 
 const styles = StyleSheet.create({
+  container: {
+    rowGap: 16
+  },
+  currentLocation: {
+    paddingHorizontal: 16,
+    paddingTop: 16
+  },
+  instructionContainer: {
+    borderRadius: 12,
+    backgroundColor: "white",
+    overflow: "hidden",
+    padding: 16,
+    flex: 1,
+    alignItems: "center",
+    columnGap: 16,
+    flexDirection: "row"
+  },
+  instructionIcon: {
+    marginLeft: 8
+  },
+  instructionText: {
+    flex: 1
+  },
   locationNavigationLink: {
     width: "100%",
     borderStyle: "dashed",
@@ -230,16 +265,18 @@ const styles = StyleSheet.create({
     height: 300
   },
   loadingMap: {
+    height: 300,
     backgroundColor: AppStyles.colorOpacity15
   },
   overlayContainer: {
-    paddingHorizontal: 16
+    borderRadius: 12,
+    backgroundColor: "white",
+    overflow: "hidden"
   },
   overlay: {
     position: "absolute",
     bottom: 16,
     marginHorizontal: 16,
-    borderRadius: 12,
     backgroundColor: "white",
     width: "100%",
     padding: 4

@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import { createSignUpEnvironment } from "@auth-boundary/sign-up"
-import { uuidString } from "@lib/utils/UUID"
 import {
   NavigationContainer,
   NavigatorScreenParams,
@@ -19,6 +18,7 @@ import {
 } from "@testing-library/react-native"
 import { TiFAPI } from "TiFShared/api"
 import { UserHandle } from "TiFShared/domain-models/User"
+import { uuidString } from "TiFShared/lib/UUID"
 import {
   mockTiFEndpoint,
   mockTiFServer

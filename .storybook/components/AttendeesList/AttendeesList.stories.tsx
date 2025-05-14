@@ -1,32 +1,29 @@
-import { BASE_HEADER_SCREEN_OPTIONS } from "@components/Navigation"
-import { EventMocks } from "@event-details-boundary/MockData"
-import { NavigationContainer } from "@react-navigation/native"
-import { createStackNavigator } from "@react-navigation/stack"
-import React from "react"
-import { View } from "react-native"
 import { StoryMeta } from ".storybook/HelperTypes"
+import { BASE_HEADER_SCREEN_OPTIONS } from "@components/Navigation"
 import {
   EventAttendeesListView,
   useEventAttendeesList
 } from "@event-details-boundary/AttendeesList"
+import { EventMocks } from "@event-details-boundary/MockData"
 import { clientSideEventFromResponse } from "@event/ClientSideEvent"
+import { delayData } from "@lib/utils/DelayData"
+import { NavigationContainer } from "@react-navigation/native"
+import { createStackNavigator } from "@react-navigation/stack"
 import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
 import { FriendRequestFeature } from "@user/FriendRequest"
+import { View } from "react-native"
 import { RootSiblingParent } from "react-native-root-siblings"
-import { uuidString } from "@lib/utils/UUID"
-import { delayData } from "@lib/utils/DelayData"
 import { UserHandle } from "TiFShared/domain-models/User"
+import { uuidString } from "TiFShared/lib/UUID"
 
 const AttendeesListMeta: StoryMeta = {
   title: "Attendees List Screen"
 }
 export default AttendeesListMeta
 
-type AttendeesListStory = ComponentStory<typeof View>
-
 const Stack = createStackNavigator()
 
-export const Basic: AttendeesListStory = () => (
+export const Basic = () => (
   <RootSiblingParent>
     <TestQueryClientProvider>
       <NavigationContainer>

@@ -1,18 +1,36 @@
-import { PrimaryButton, SecondaryOutlinedButton } from "@components/Buttons"
+import {
+  FormSubmissionSecondaryButton,
+  PrimaryButton
+} from "@components/Buttons"
 import { TiFFooterView } from "@components/Footer"
+import { Caption } from "@components/Text"
 import { ShadedTextField } from "@components/TextFields"
+import { TouchableIonicon } from "@components/common/Icons"
 import { TiFFormScrollableLayoutView } from "@components/form-components/ScrollableFormLayout"
 import { TiFFormSectionView } from "@components/form-components/Section"
+import { AlertsObject, presentAlert } from "@lib/Alerts"
 import { AppStyles } from "@lib/AppColorStyle"
 import { useFontScale } from "@lib/Fonts"
+import { Store } from "@lib/Jotai"
+import { TiFDefaultLayoutTransition } from "@lib/Reanimated"
+import { useFormSubmission } from "@lib/utils/Form"
 import {
   HapticPatternElement,
   transientEvent,
   useHaptics
 } from "@modules/tif-haptics"
-import { StyleProp, ViewStyle, StyleSheet, View, TextStyle } from "react-native"
-import { RudeusAPI } from "./RudeusAPI"
-import { Platform } from "react-native"
+import { uuidString } from "TiFShared/lib/UUID"
+import { PrimitiveAtom, atom, useAtom, useAtomValue, useStore } from "jotai"
+import { useState } from "react"
+import {
+  Platform,
+  StyleProp,
+  StyleSheet,
+  TextStyle,
+  View,
+  ViewStyle
+} from "react-native"
+import Animated, { FadeIn, FadeOut } from "react-native-reanimated"
 import {
   RudeusEditablePatternElement,
   RudeusEditablePatternEventID,
@@ -20,20 +38,11 @@ import {
   RudeusPattern,
   RudeusPlatform
 } from "./Models"
-import { useState } from "react"
-import { Caption, Headline } from "@components/Text"
-import { PrimitiveAtom, atom, useAtom, useAtomValue, useStore } from "jotai"
-import { AlertsObject, presentAlert } from "@lib/Alerts"
-import { useFormSubmission } from "@lib/utils/Form"
-import { Store } from "@lib/Jotai"
-import { uuidString } from "@lib/utils/UUID"
-import { TouchableIonicon } from "@components/common/Icons"
-import Animated, { FadeIn, FadeOut } from "react-native-reanimated"
-import { TiFDefaultLayoutTransition } from "@lib/Reanimated"
 import {
   RudeusPatternElementEditorView,
   useRudeusPatternElementEditor
 } from "./PatternElementEditor"
+import { RudeusAPI } from "./RudeusAPI"
 
 export const sharePattern = async (
   pattern: RudeusEditorPattern,
@@ -176,17 +185,12 @@ export const RudeusPatternEditorView = ({
             <PrimaryButton onPress={state.played} style={styles.playButton}>
               Play
             </PrimaryButton>
-            <SecondaryOutlinedButton
-              disabled={state.submission.status !== "submittable"}
-              onPress={() => {
-                if (state.submission.status === "submittable") {
-                  state.submission.submit()
-                }
-              }}
+            <FormSubmissionSecondaryButton
+              submission={state.submission}
               style={styles.playButton}
             >
               Share
-            </SecondaryOutlinedButton>
+            </FormSubmissionSecondaryButton>
           </View>
         </TiFFooterView>
       }

@@ -1,18 +1,24 @@
+import { UserInfoEmailFileFeature } from "@lib/UserInfoEmailFile"
 import { captureAlerts } from "@test-helpers/Alerts"
 import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
 import { act, renderHook, waitFor } from "@testing-library/react-native"
+import { AlphaUserMocks } from "@user/alpha/MockData"
 import {
   HELP_AND_SUPPORT_ALERTS,
   HELP_AND_SUPPORT_EMAILS,
   HELP_AND_SUPPORT_EMAIL_ERROR_ALERTS,
   HELP_AND_SUPPORT_EMAIL_SUCCESS_ALERTS,
+  HelpAndSupportFeature,
   useHelpAndSupportSettings
 } from "./HelpAndSupport"
 
 describe("HelpAndSupportSettings tests", () => {
   describe("UseHelpAndSupportSettings tests", () => {
     const TEST_COMPILE_LOGS_URI = "test/logs.zip"
+    const TEST_USER_ID_FILE_URI = "userURI"
     const { alertPresentationSpy, tapAlertButton } = captureAlerts()
+    const createTempIDFile = jest.fn()
+    const deleteTempIDFile = jest.fn()
     const isShowingContactSection = jest.fn()
     const compileLogs = jest.fn()
     const composeEmail = jest.fn()
@@ -31,20 +37,20 @@ describe("HelpAndSupportSettings tests", () => {
 
     test("Successful submit feedback flow", async () => {
       const result = await renderSuccessfulEmailCompositionFlow()
-      act(() => result.current.feedbackSubmitted())
+      await act(async () => result.current.feedbackSubmitted())
       await waitFor(async () => {
         expect(alertPresentationSpy).toHaveBeenPresentedWith(
           HELP_AND_SUPPORT_EMAIL_SUCCESS_ALERTS.submitFeedback
         )
       })
       expect(composeEmail).toHaveBeenCalledWith(
-        HELP_AND_SUPPORT_EMAILS.feedbackSubmitted
+        HELP_AND_SUPPORT_EMAILS.feedbackSubmitted(TEST_USER_ID_FILE_URI)
       )
     })
 
     test("Unsuccessful submit feedback flow", async () => {
       const result = await renderUnsuccessfulEmailCompositionFlow()
-      act(() => result.current.feedbackSubmitted())
+      await act(async () => result.current.feedbackSubmitted())
       await waitFor(() =>
         expect(alertPresentationSpy).toHaveBeenPresentedWith(
           HELP_AND_SUPPORT_EMAIL_ERROR_ALERTS.submitFeedback
@@ -55,7 +61,7 @@ describe("HelpAndSupportSettings tests", () => {
     test("Successful report bug flow: no logs selected", async () => {
       compileLogs.mockRejectedValueOnce(new Error("Logs not compiled"))
       const result = await renderSuccessfulEmailCompositionFlow()
-      act(() => result.current.bugReported())
+      await act(async () => result.current.bugReported())
       await reportWithoutLogs()
       await waitFor(() =>
         expect(alertPresentationSpy).toHaveBeenPresentedWith(
@@ -63,14 +69,14 @@ describe("HelpAndSupportSettings tests", () => {
         )
       )
       expect(composeEmail).toHaveBeenCalledWith(
-        HELP_AND_SUPPORT_EMAILS.bugReported(undefined)
+        HELP_AND_SUPPORT_EMAILS.bugReported([TEST_USER_ID_FILE_URI])
       )
     })
 
     test("Successful report bug flow: logs success", async () => {
       compileLogs.mockResolvedValueOnce(TEST_COMPILE_LOGS_URI)
       const result = await renderSuccessfulEmailCompositionFlow()
-      act(() => result.current.bugReported())
+      await act(async () => result.current.bugReported())
       await reportWithLogs()
       await waitFor(() =>
         expect(alertPresentationSpy).toHaveBeenPresentedWith(
@@ -78,14 +84,17 @@ describe("HelpAndSupportSettings tests", () => {
         )
       )
       expect(composeEmail).toHaveBeenCalledWith(
-        HELP_AND_SUPPORT_EMAILS.bugReported(TEST_COMPILE_LOGS_URI)
+        HELP_AND_SUPPORT_EMAILS.bugReported([
+          TEST_USER_ID_FILE_URI,
+          TEST_COMPILE_LOGS_URI
+        ])
       )
     })
 
     test("Successful report bug flow: logs failure, switch to no logs", async () => {
       compileLogs.mockRejectedValueOnce(new Error("Something went wrong"))
       const result = await renderSuccessfulEmailCompositionFlow()
-      act(() => result.current.bugReported())
+      await act(async () => result.current.bugReported())
       await reportWithLogs()
       await waitFor(() =>
         expect(alertPresentationSpy).toHaveBeenPresentedWith(
@@ -99,13 +108,15 @@ describe("HelpAndSupportSettings tests", () => {
         )
       )
       expect(composeEmail).toHaveBeenCalledWith(
-        HELP_AND_SUPPORT_EMAILS.bugReported(undefined)
+        HELP_AND_SUPPORT_EMAILS.bugReported([TEST_USER_ID_FILE_URI])
       )
     })
 
     test("Successful submit question flow", async () => {
       const result = await renderSuccessfulEmailCompositionFlow()
-      act(() => result.current.questionSubmitted())
+      await waitFor(
+        async () => await act(async () => result.current.questionSubmitted())
+      )
       await waitFor(() =>
         expect(alertPresentationSpy).toHaveBeenPresentedWith(
           HELP_AND_SUPPORT_EMAIL_SUCCESS_ALERTS.submitQuestion
@@ -113,7 +124,7 @@ describe("HelpAndSupportSettings tests", () => {
       )
 
       expect(composeEmail).toHaveBeenCalledWith(
-        HELP_AND_SUPPORT_EMAILS.questionSubmitted
+        HELP_AND_SUPPORT_EMAILS.questionSubmitted(TEST_USER_ID_FILE_URI)
       )
     })
 
@@ -124,7 +135,7 @@ describe("HelpAndSupportSettings tests", () => {
       await waitFor(() =>
         expect(result.current.isShowingContactSection).toEqual(true)
       )
-      act(() => result.current.questionSubmitted())
+      await act(async () => result.current.questionSubmitted())
       await waitFor(() =>
         expect(alertPresentationSpy).toHaveBeenPresentedWith(
           HELP_AND_SUPPORT_EMAIL_ERROR_ALERTS.submitQuestion
@@ -132,8 +143,31 @@ describe("HelpAndSupportSettings tests", () => {
       )
     })
 
+    test("Unsuccessful tempUserID, still pulls up mailComposer", async () => {
+      composeEmail.mockResolvedValue("success")
+      createTempIDFile.mockRejectedValueOnce(new Error())
+      isShowingContactSection.mockResolvedValueOnce(true)
+      const { result } = renderUseHelpAndSupportSettings()
+      await waitFor(() =>
+        expect(result.current.isShowingContactSection).toEqual(true)
+      )
+      await waitFor(
+        async () => await act(async () => result.current.questionSubmitted())
+      )
+      await waitFor(() =>
+        expect(alertPresentationSpy).toHaveBeenPresentedWith(
+          HELP_AND_SUPPORT_EMAIL_SUCCESS_ALERTS.submitQuestion
+        )
+      )
+
+      expect(composeEmail).toHaveBeenCalledWith(
+        HELP_AND_SUPPORT_EMAILS.questionSubmitted()
+      )
+    })
+
     const renderSuccessfulEmailCompositionFlow = async () => {
       composeEmail.mockResolvedValue("success")
+      createTempIDFile.mockResolvedValue(TEST_USER_ID_FILE_URI)
       isShowingContactSection.mockResolvedValueOnce(true)
       const { result } = renderUseHelpAndSupportSettings()
       await waitFor(() =>
@@ -156,13 +190,22 @@ describe("HelpAndSupportSettings tests", () => {
       return renderHook(
         () =>
           useHelpAndSupportSettings({
-            isMailComposerAvailable: isShowingContactSection,
-            compileLogs,
-            composeEmail
+            userID: AlphaUserMocks.TheDarkLord.id
           }),
         {
           wrapper: ({ children }: any) => (
-            <TestQueryClientProvider>{children}</TestQueryClientProvider>
+            <UserInfoEmailFileFeature.Provider
+              createTempIDFile={createTempIDFile}
+              deleteTempIDFile={deleteTempIDFile}
+            >
+              <HelpAndSupportFeature.Provider
+                isMailComposerAvailable={isShowingContactSection}
+                compileLogs={compileLogs}
+                composeEmail={composeEmail}
+              >
+                <TestQueryClientProvider>{children}</TestQueryClientProvider>
+              </HelpAndSupportFeature.Provider>
+            </UserInfoEmailFileFeature.Provider>
           )
         }
       )

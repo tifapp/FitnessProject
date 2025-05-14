@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import { TestCognitoError } from "@auth-boundary/CognitoHelpers"
-import { uuidString } from "@lib/utils/UUID"
 import { EmailAddress, USPhoneNumber } from "@user/privacy"
 import { TiFAPI } from "TiFShared/api"
 import { UserHandle } from "TiFShared/domain-models/User"
+import { uuidString } from "TiFShared/lib/UUID"
 import {
   mockTiFEndpoint,
   mockTiFServer

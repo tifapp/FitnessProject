@@ -1,4 +1,4 @@
-import { uuidString } from "@lib/utils/UUID"
+import { uuidString } from "TiFShared/lib/UUID"
 import { EMPTY_PATTERN_EDITOR_PATTERN, editorPattern } from "./Models"
 
 describe("Models tests", () => {

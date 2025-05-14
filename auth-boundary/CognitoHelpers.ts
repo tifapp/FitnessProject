@@ -1,16 +1,17 @@
 import { Auth } from "@aws-amplify/auth"
-import * as ExpoSecureStore from "expo-secure-store"
-import awsExports from "../src/aws-exports"
-import { CognitoSecureStorage } from "./CognitoSecureStorage"
 import { SecureStore } from "@lib/SecureStore"
+import * as ExpoSecureStore from "expo-secure-store"
+import awsmobile from "../src/aws-exports"
+import { CognitoSecureStorage } from "./CognitoSecureStorage"
 
 /**
  * Sets up cognito with a secure store.
  */
 export const setupCognito = (secureStore: SecureStore = ExpoSecureStore) => {
   Auth.configure({
-    ...awsExports,
-    storage: new CognitoSecureStorage(secureStore)
+    ...awsmobile,
+    storage: new CognitoSecureStorage(secureStore),
+    mandatorySignIn: false // Add this line to enable unauthenticated access
   })
 }
 

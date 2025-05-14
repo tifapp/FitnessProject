@@ -1,7 +1,4 @@
-import {
-  BASE_HEADER_SCREEN_OPTIONS,
-  useCoreNavigation
-} from "@components/Navigation"
+import { useCoreNavigation, useTiFNavigation } from "@components/Navigation"
 import {
   withAlphaRegistration,
   WithAlphaRegistrationProps
@@ -10,20 +7,17 @@ import { EditEventFormDismissButton } from "@edit-event-boundary/Dismiss"
 import { EditEventView } from "@edit-event-boundary/EditEvent"
 import { editEventFormValueAtoms } from "@edit-event-boundary/FormAtoms"
 import {
-  RouteableEditEventFormValues,
-  fromRouteableEditFormValues
+  fromRouteableEditFormValues,
+  RouteableEditEventFormValues
 } from "@event/EditFormValues"
 import {
   LocationsSearchView,
   useLocationsSearch
 } from "@location-search-boundary"
-import { StaticScreenProps, useNavigation } from "@react-navigation/native"
-import { createNativeStackNavigator } from "@react-navigation/native-stack"
+import { StaticScreenProps } from "@react-navigation/native"
 import { EventID } from "TiFShared/domain-models/Event"
-import { useSetAtom } from "jotai"
+import { useAtom, useSetAtom } from "jotai"
 import { StyleSheet } from "react-native"
-import { eventDetailsScreens } from "./EventDetails"
-import { profileScreens } from "./Profile"
 
 type EditEventScreenProps = WithAlphaRegistrationProps<
   StaticScreenProps<RouteableEditEventFormValues & { id?: EventID }>
@@ -31,7 +25,8 @@ type EditEventScreenProps = WithAlphaRegistrationProps<
 
 const EditEventScreen = withAlphaRegistration(
   ({ session, route }: EditEventScreenProps) => {
-    const navigation = useNavigation()
+    const navigation = useTiFNavigation()
+    const [location, setLocation] = useAtom(editEventFormValueAtoms.location)
     const { pushEventDetails } = useCoreNavigation()
     return (
       <EditEventView
@@ -40,10 +35,14 @@ const EditEventScreen = withAlphaRegistration(
         hostName={session.name}
         hostProfileImageURL={session.profileImageURL}
         onSelectLocationTapped={() => {
-          navigation.navigate("editEvent", {
-            screen: "editEventLocationSearch"
-          })
+          navigation.navigate("modal", { screen: "editEventLocationSearch" })
         }}
+        onMapLongPress={(e) =>
+          setLocation({
+            placemark: undefined,
+            coordinate: e.nativeEvent.coordinate
+          })
+        }
         onSuccess={(e) => pushEventDetails(e.id, "replace")}
         style={styles.screen}
       />
@@ -53,7 +52,7 @@ const EditEventScreen = withAlphaRegistration(
 
 const LocationSearchScreen = () => {
   const setLocation = useSetAtom(editEventFormValueAtoms.location)
-  const navigation = useNavigation()
+  const navigation = useTiFNavigation()
   return (
     <LocationsSearchView
       state={useLocationsSearch()}
@@ -70,32 +69,27 @@ const LocationSearchScreen = () => {
 }
 
 const EditEventFormBackButton = () => (
-  <EditEventFormDismissButton onDismiss={useNavigation().goBack} />
+  <EditEventFormDismissButton onDismiss={useTiFNavigation().goBack} />
 )
 
-export const EditEventNavigator = createNativeStackNavigator({
-  screenOptions: () => BASE_HEADER_SCREEN_OPTIONS,
-  screens: {
-    editEventForm: {
-      options: {
-        headerTitle: "Edit Event",
-        headerLeft: EditEventFormBackButton
-      },
-      screen: EditEventScreen
+export const editEventScreens = () => ({
+  editEventForm: {
+    options: {
+      headerTitle: "Edit Event",
+      headerLeft: EditEventFormBackButton
     },
-    createEventForm: {
-      options: {
-        headerTitle: "Create Event",
-        headerLeft: EditEventFormBackButton
-      },
-      screen: EditEventScreen
+    screen: EditEventScreen
+  },
+  createEventForm: {
+    options: {
+      headerTitle: "Create Event",
+      headerLeft: EditEventFormBackButton
     },
-    editEventLocationSearch: {
-      options: { headerShown: false },
-      screen: LocationSearchScreen
-    },
-    ...eventDetailsScreens(),
-    ...profileScreens()
+    screen: EditEventScreen
+  },
+  editEventLocationSearch: {
+    options: { headerShown: false },
+    screen: LocationSearchScreen
   }
 })
 

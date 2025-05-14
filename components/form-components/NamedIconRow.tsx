@@ -1,14 +1,15 @@
 import { CircularIonicon, IoniconName } from "@components/common/Icons"
 import { ColorString } from "TiFShared/domain-models/ColorString"
+import { ReactNode } from "react"
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 import { TiFFormLabelView } from "./Label"
 
 export type TiFFormNamedIconRowProps = {
   iconName: IoniconName
   iconBackgroundColor: ColorString
-  name: string
+  name: ReactNode
   maximumFontScaleFactor?: number
-  description?: string
+  description?: ReactNode
   children?: JSX.Element
   style?: StyleProp<ViewStyle>
 }

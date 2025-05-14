@@ -1,10 +1,8 @@
 import { AlphaRegisterView, useAlphaRegister } from "@core-root/AlphaRegister"
-import { uuidString } from "@lib/utils/UUID"
 import { TestQueryClientProvider } from "@test-helpers/ReactQuery"
 import React from "react"
 import { GestureHandlerRootView } from "react-native-gesture-handler"
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context"
-import { UserHandle } from "TiFShared/domain-models/User"
 
 export const NameEntryMeta = {
   title: "NameEntry"

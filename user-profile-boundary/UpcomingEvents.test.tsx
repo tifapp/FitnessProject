@@ -2,10 +2,10 @@ import {
   EventAttendeeMocks,
   EventMocks
 } from "@event-details-boundary/MockData"
+import { mockPlacemark } from "@location/MockData"
 import { TiFAPI } from "TiFShared/api"
 import { mockTiFEndpoint } from "TiFShared/test-helpers/mockAPIServer"
-import { userUpcomingEvents } from "./UpcomingEvents"
-import { mockPlacemark } from "@location/MockData"
+import { userUpcomingEvents } from "./Context"
 
 describe("fetchUpcomingEvents tests", () => {
   it("loads upcoming events for current user", async () => {
